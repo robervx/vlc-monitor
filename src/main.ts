@@ -9,6 +9,7 @@ import type { PickingInfo, Color } from '@deck.gl/core';
 import { preloadDistrictGeometry, getDistrictCentroid } from './services/district-geometry';
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
+import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
 import type { EstacionValenbisi } from './services/valenbisi';
@@ -137,6 +138,40 @@ async function fetchEstadoMeteoActual(): Promise<{ estado: EstadoMeteo; fresh: b
   const res = await fetch('/api/meteo/v1/actual');
   if (!res.ok) throw new Error(`GET /api/meteo/v1/actual -> HTTP ${res.status}`);
   return (await res.json()) as { estado: EstadoMeteo; fresh: boolean };
+}
+
+function formatoHora(iso: string): string {
+  return new Date(iso).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Madrid',
+  });
+}
+
+// Spec 016 — panel de "próximas horas" junto al de meteo actual.
+function renderPrediccionPanel(root: HTMLDivElement, prediccion: PrediccionCortoPlazo, fresh: boolean): void {
+  const tramos = prediccion.predicciones
+    .map(
+      (tramo) => `
+        <div class="prediccion-panel__tramo">
+          <div class="prediccion-panel__hora">${formatoHora(tramo.horaObjetivo)}</div>
+          <div class="prediccion-panel__icon">${iconoWeatherCode(tramo.weatherCode)}</div>
+          <div class="prediccion-panel__temp">${Math.round(tramo.temperatura)}°</div>
+          <div class="prediccion-panel__lluvia">💧${Math.round(tramo.probabilidadPrecipitacion)}%</div>
+        </div>`,
+    )
+    .join('');
+  root.innerHTML = `
+    <div class="info-panel__desc">Próximas ${prediccion.ventanaHoras}h</div>
+    <div class="prediccion-panel__tramos">${tramos}</div>
+    <div class="info-panel__meta">${metaFrescura('Open-Meteo', prediccion.fetchedAt, fresh)}</div>
+  `;
+}
+
+async function fetchPrediccionCortoPlazoActual(): Promise<{ prediccion: PrediccionCortoPlazo; fresh: boolean }> {
+  const res = await fetch('/api/meteo/v1/prediccion-corto-plazo');
+  if (!res.ok) throw new Error(`GET /api/meteo/v1/prediccion-corto-plazo -> HTTP ${res.status}`);
+  return (await res.json()) as { prediccion: PrediccionCortoPlazo; fresh: boolean };
 }
 
 // Colores por banda del European AQI — ver src/services/calidad-aire.ts.
@@ -867,6 +902,18 @@ async function main(): Promise<void> {
     }
   }
   startPolling(refreshMeteoPanel, 5 * 60 * 1000);
+
+  const prediccionPanelRoot = buildInfoPanel('meteo-prediccion-panel');
+  async function refreshPrediccionPanel(): Promise<void> {
+    try {
+      const { prediccion, fresh } = await fetchPrediccionCortoPlazoActual();
+      renderPrediccionPanel(prediccionPanelRoot, prediccion, fresh);
+    } catch (err) {
+      prediccionPanelRoot.textContent = 'Predicción no disponible';
+      console.error('Fallo al cargar predicción a corto plazo:', err);
+    }
+  }
+  startPolling(refreshPrediccionPanel, 5 * 60 * 1000);
 
   const airePanelRoot = buildInfoPanel('aire-panel');
   async function refreshAirePanel(): Promise<void> {

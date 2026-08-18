@@ -20,7 +20,7 @@ Antes de escribir código, mira aquí. No se implementa nada sin fila `Draft`/`A
 | `013` | Motor de insights y alertas operativas | F3.6 | Planned — no redactada aún. Debe diseñarse cumpliendo "avisa, no actúa" (`CLAUDE.md` §4) — ver tensión documentada en `docs/investigacion/BACKLOG_FUNCIONALIDADES_2026-08-18.md` | `001`, `002`, `004`, `008`, `009` |
 | `014` | Sistema de notificaciones (push/email) sobre alertas | F3.6 | Planned — no redactada aún. Evaluar si se fusiona en el DoD de `008` en vez de ir como spec separada | `008` |
 | `015` | Integración de rutas externas (Waze/Google Maps) por cortes | F7 | Planned — necesita investigación de viabilidad (programa Waze for Cities / convenio con el Ayuntamiento) antes de poder pasar a Draft, igual que `011` | `004`, `008` |
-| `016` | Predicción meteorológica a corto plazo (nowcasting) | F4.5 | Planned — no redactada aún. Verificar con llamada real la ventana de confianza que ofrece Open-Meteo | `001` |
+| `016` | Predicción meteorológica a corto plazo (nowcasting) | F4.5 | **Implemented** — Open-Meteo `hourly` en producción, panel "Próximas 4h" junto al de meteo actual | `001` |
 | `017` | Histórico y analítica de tráfico | F4.5 | Planned — no redactada aún. Decidir almacén y política de retención | `004` |
 
 ## Leyenda de estados
