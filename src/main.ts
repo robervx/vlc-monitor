@@ -13,6 +13,8 @@ import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
 import type { PanelInsights } from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
+import type { HistoricoTrafico } from './services/trafico-historico';
+import { sparklinePath } from './services/trafico-historico';
 import type { EstacionValenbisi } from './services/valenbisi';
 import type { Aparcamiento } from './services/aparcamiento';
 import type { PulsoDistrito, CategoriaPulso } from './services/pulso-distrito';
@@ -299,6 +301,44 @@ async function fetchEstadoTraficoActual(): Promise<{ tramos: TramoTrafico[]; fre
   const res = await fetch('/api/trafico/v1/estado');
   if (!res.ok) throw new Error(`GET /api/trafico/v1/estado -> HTTP ${res.status}`);
   return (await res.json()) as { tramos: TramoTrafico[]; fresh: boolean };
+}
+
+// Spec 017 — sparkline de congestión media de ciudad, últimas 24h. El
+// histórico se acumula solo con el cron de GitHub Actions (ver
+// .github/workflows/trafico-historico-cron.yml) — recién mergeado apenas
+// tiene puntos, así que el "todavía no hay suficiente histórico" es un
+// estado normal a corto plazo, no un error.
+const SPARK_WIDTH = 140;
+const SPARK_HEIGHT = 28;
+
+function renderTraficoHistoricoPanel(root: HTMLDivElement, historico: HistoricoTrafico, fresh: boolean): void {
+  if (historico.puntos.length < 2) {
+    root.innerHTML = `
+      <div class="info-panel__desc">Histórico de tráfico</div>
+      <div class="info-panel__meta">Todavía no hay suficiente histórico (empieza a acumularse cada hora)</div>
+    `;
+    return;
+  }
+
+  const valores = historico.puntos.map((p) => p.congestion);
+  const puntosSvg = sparklinePath(valores, SPARK_WIDTH, SPARK_HEIGHT);
+  const ultimo = Math.round((valores[valores.length - 1] ?? 0) * 100);
+
+  root.innerHTML = `
+    <div class="info-panel__desc">Congestión de ciudad — últimas 24h</div>
+    <svg class="trafico-historico__spark" viewBox="0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}" preserveAspectRatio="none">
+      <polyline points="${puntosSvg}" fill="none" stroke="#b45309" stroke-width="2" />
+    </svg>
+    <div class="info-panel__value info-panel__value--small">${ultimo}% ahora</div>
+    <div class="info-panel__meta">${metaFrescura('VLC Monitor (histórico)', historico.fetchedAt, fresh)}</div>
+  `;
+}
+
+async function fetchTraficoHistoricoCiudad(): Promise<{ historico: HistoricoTrafico; fresh: boolean }> {
+  const res = await fetch('/api/trafico/v1/historico?dias=1');
+  if (!res.ok) throw new Error(`GET /api/trafico/v1/historico -> HTTP ${res.status}`);
+  const body = (await res.json()) as { historico: HistoricoTrafico };
+  return { historico: body.historico, fresh: true };
 }
 
 // Rojo (casi sin bicis) -> verde (bicis de sobra); gris si la estación está cerrada.
@@ -998,6 +1038,20 @@ async function main(): Promise<void> {
     }
   }
   startPolling(refreshInsightsPanel, 5 * 60 * 1000);
+
+  const traficoHistoricoPanelRoot = buildInfoPanel('trafico-historico-panel');
+  async function refreshTraficoHistoricoPanel(): Promise<void> {
+    try {
+      const { historico, fresh } = await fetchTraficoHistoricoCiudad();
+      renderTraficoHistoricoPanel(traficoHistoricoPanelRoot, historico, fresh);
+    } catch (err) {
+      traficoHistoricoPanelRoot.textContent = 'Histórico de tráfico no disponible';
+      console.error('Fallo al cargar histórico de tráfico:', err);
+    }
+  }
+  // Cadencia holgada: el histórico se actualiza una vez por hora en origen
+  // (cron), no hace falta sondear más a menudo que eso.
+  startPolling(refreshTraficoHistoricoPanel, 15 * 60 * 1000);
 }
 
 main().catch((err: unknown) => {

@@ -95,6 +95,20 @@ Por eso esta spec, igual que la `011`, probablemente deba quedar marcada `Planne
 
 ---
 
+## 8. Publicación con contraseña en dominio propio — spec `018`
+
+**Idea del usuario (2026-08-18, turno posterior):** dar un paso más allá del `localhost` — publicar VLC Monitor en una web con contraseña, comprando un dominio propio si hace falta.
+
+**Ya contemplado como opción, no como decisión tomada:** `docs/01_VIABILIDAD_VISION_Y_PROCESO.md` §1.1 ya menciona un dominio propio como coste opcional (~10-15€/año) sobre Vercel Hobby. Lo nuevo aquí es la intención explícita de comprarlo y añadir protección por contraseña.
+
+**Dos cosas pendientes de verificar/decidir antes de `Draft`:**
+- **Compra del dominio:** es un pago real — no lo puede ejecutar una sesión de Claude Code (ver reglas de la sesión: acciones con pago requieren que el usuario las haga él mismo). Una sesión puede guiar la configuración de DNS/Vercel una vez comprado, no comprarlo.
+- **Protección por contraseña:** no verificado todavía si Vercel Hobby (plan gratuito) la incluye de serie o si hace falta construirla a mano (middleware con contraseña compartida, cookie de sesión). Antes de prometer nada hay que comprobarlo con la documentación real de Vercel, no asumirlo.
+
+**Depende de:** ninguna spec de datos — es una pieza de despliegue/acceso, no de capa. Relacionado con `F5` (Pulido y compartición) del roadmap.
+
+**Fase propuesta:** `F5`.
+
 ## Resumen de ids nuevos
 
 | id | Título | Fase propuesta | Depende de | Notas |
@@ -105,3 +119,4 @@ Por eso esta spec, igual que la `011`, probablemente deba quedar marcada `Planne
 | `015` | Integración de rutas externas (Waze/Google Maps) por cortes | F7 (nueva) | `004`, `008` | Necesita investigación de viabilidad antes de `Draft`, similar a `011` |
 | `016` | Predicción meteorológica a corto plazo (nowcasting) | F4.5 (nueva) | `001` | Verificar ventana de confianza real de Open-Meteo |
 | `017` | Histórico y analítica de tráfico | F4.5 (nueva) | `004` | Decidir almacén y política de retención |
+| `018` | Publicación con contraseña en dominio propio | F5 | — | Compra de dominio la hace el usuario; verificar opciones reales de password-protection en Vercel antes de prometer nada |

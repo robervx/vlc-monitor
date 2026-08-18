@@ -13,7 +13,7 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 | **F3.6** | Motor de insights y alertas operativas | Panel de insights bajo el mapa + sistema de notificaciones sobre alertas de interés (eventos, cortes). Debe cumplir "avisa, no actúa" (`CLAUDE.md` §4) — ver `docs/investigacion/BACKLOG_FUNCIONALIDADES_2026-08-18.md` | `013`, `014` |
 | **F4** | Contexto mediático | RSS de medios locales + GDELT filtrado por Valencia + Reddit como señal secundaria | `009` |
 | **F4.5** | Analítica temporal | Predicción meteorológica a corto plazo (nowcasting) e histórico de tráfico para detectar patrones | `016`, `017` |
-| **F5** | Pulido y compartición | Estado en URL, PWA instalable, rendimiento, accesibilidad, geolocalización de usuario + "qué tengo más cerca" (pendiente de decisión de framing, ver backlog) | `012` |
+| **F5** | Pulido y compartición | Estado en URL, PWA instalable, rendimiento, accesibilidad, geolocalización de usuario + "qué tengo más cerca" (pendiente de decisión de framing, ver backlog), publicación con contraseña en dominio propio | `012`, `018` |
 | **F6** | Densidad de movilidad agregada real | Sustituye el prototipo mock (`003`) por una fuente real agregada y anonimizada en origen (ej. producto comercial tipo Telefónica LUCA/Smart Steps), **sujeta a contrato y revisión de cumplimiento** | `011` (bloqueada hasta que exista contrato) |
 | **F7** | Integraciones externas de navegación | Publicación de cortes/incidencias en formato consumible por Waze/Google Maps — sujeta a investigación de viabilidad y posible convenio con el Ayuntamiento | `015` |
 
