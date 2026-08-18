@@ -3,11 +3,11 @@
 ```yaml
 id: 003
 titulo: "Capa de movimiento/densidad de personas por distrito (mockup)"
-estado: Draft
+estado: Implemented
 tipo: capa
 depende_de: [000]
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
@@ -20,7 +20,9 @@ Queremos poder diseñar y probar en el mapa una capa de "densidad/movimiento de 
 
 | Fuente | Estado |
 |---|---|
-| Generador sintético local (script propio) | Único origen en v1. Distribuye puntos aleatorios ponderados por distrito (se puede ponderar por densidad de población oficial del INE como base de realismo, ya que esa sí es pública y agregada) para simular variación por hora del día. |
+| Generador sintético local (script propio) | Único origen en v1. Pondera por distrito con población oficial (ver referencia abajo) y una curva horaria determinista para simular variación por hora del día — no es aleatorio puro. |
+
+**Referencia de ponderación (no es una fuente en vivo, solo un peso estático de plausibilidad):** Padrón Municipal de Habitantes 2024, Ayuntamiento de Valencia — `https://www.valencia.es/estadistica/Padron/2024/Padron2024Cast.pdf`. Verificado 2026-08-18: extraídos los 19 valores por distrito, suma = 830.606, coincide exactamente con el total oficial publicado. Versionado en `data/poblacion-distritos-valencia-2024.json`. Al no ser una fuente que se consulte en caliente (es una constante horneada en el generador), no sigue el pipeline seed→caché→endpoint de otras specs.
 
 ### Guardarraíl obligatorio para cualquier fuente real futura
 
@@ -70,10 +72,10 @@ La UI **debe** mostrar de forma visible (no en letra pequeña) que la capa usa d
 
 ## 6. Criterios de aceptación
 
-- [ ] Generador sintético produce valores plausibles (ponderados por población oficial del distrito, no puramente aleatorios).
-- [ ] La capa muestra visiblemente el badge "MOCK" en todo momento.
-- [ ] El endpoint nunca se conecta a ninguna fuente externa real.
-- [ ] El guardarraíl de la sección 2 queda documentado y enlazado desde cualquier spec futura que intente sustituir el mock por datos reales.
+- [x] Generador sintético produce valores plausibles (ponderados por población oficial del distrito — Padrón 2024, ver §2 — más una curva horaria y ruido determinista, no puramente aleatorio). Verificado con tests (`src/services/densidad-personas-mock.test.ts`): distrito 10 (más poblado) > distrito 17 (menos poblado) a igual hora; suma de intensidades mayor en hora punta (19:00) que de madrugada (03:00).
+- [x] La capa muestra visiblemente el badge "MOCK" en todo momento — badge junto al control del toggle, más un banner superior "Capa de datos SINTÉTICOS (MOCK) — no representa actividad real" mientras la capa está activa (`src/main.ts`, verificado visualmente en navegador).
+- [x] El endpoint nunca se conecta a ninguna fuente externa real — `api/mock/v1/densidad-personas.ts` solo llama a `generarDensidadMock()`, cálculo puro sin `fetch`.
+- [x] El guardarraíl de la sección 2 queda documentado (líneas 27-36) — enlazar desde ahí cualquier spec futura (`011`, ver `specs/INDEX.md`) que intente sustituir el mock por datos reales.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -85,3 +87,4 @@ La UI **debe** mostrar de forma visible (no en letra pequeña) que la capa usa d
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-08-17 | Creación — versión mock, sin fuente real |
+| 2 | 2026-08-18 | DoD completo: ponderación por población real del Padrón 2024 (verificada, ver §2), generador determinista (`src/services/densidad-personas-mock.ts` + tests), endpoint (`api/mock/v1/densidad-personas.ts`), capa registrada con badge (`src/config/map-layer-definitions.ts`), UI con toggle + selector de hora + badge/banner MOCK persistentes (`src/main.ts`). Verificado con `npm run typecheck`, `npm run test`, `npm run build` y en navegador. Spec pasa a `Implemented`. |
