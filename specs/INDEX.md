@@ -21,7 +21,8 @@ Antes de escribir código, mira aquí. No se implementa nada sin fila `Draft`/`A
 | `014` | Sistema de notificaciones (push/email) sobre alertas | F3.6 | Planned — no redactada aún. Evaluar si se fusiona en el DoD de `008` en vez de ir como spec separada | `008` |
 | `015` | Integración de rutas externas (Waze/Google Maps) por cortes | F7 | Planned — necesita investigación de viabilidad (programa Waze for Cities / convenio con el Ayuntamiento) antes de poder pasar a Draft, igual que `011` | `004`, `008` |
 | `016` | Predicción meteorológica a corto plazo (nowcasting) | F4.5 | **Implemented** — Open-Meteo `hourly` en producción, panel "Próximas 4h" junto al de meteo actual | `001` |
-| `017` | Histórico y analítica de tráfico | F4.5 | Planned — no redactada aún. Decidir almacén y política de retención | `004` |
+| `017` | Histórico y analítica de tráfico | F4.5 | **Implemented** — GitHub Actions cron cada 60 min, snapshots agregados versionados en el repo con compactación a diario pasados 30 días, panel con sparkline de las últimas 24h | `004` |
+| `018` | Publicación con contraseña en dominio propio | F5 | Planned — no redactada aún. Compra de dominio la hace el usuario; verificar password-protection real de Vercel antes de prometer nada | — |
 
 ## Leyenda de estados
 

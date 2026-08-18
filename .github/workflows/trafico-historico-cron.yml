@@ -1,0 +1,43 @@
+name: Histórico de tráfico (snapshot horario)
+
+# Spec 017 (specs/017-historico-trafico.md §0, §4). Cadencia horaria elegida
+# a propósito: el repo es privado, así que GitHub Actions consume minutos del
+# plan gratuito (2.000/mes) — a 60 min de cadencia son ~720 min/mes, muy
+# holgado. No subir la frecuencia sin revisar antes esa cuenta.
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trafico-historico-cron
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      # Si la fuente falla, el script termina con código de error y este paso
+      # rompe el job — no se comitea nada (spec 017 §4: nunca un snapshot
+      # vacío/falso). El siguiente run programado lo reintenta solo.
+      - run: npm run snapshot:trafico-historico
+
+      - name: Comitear el snapshot si hay cambios
+        run: |
+          git config user.name "vlc-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/trafico-historico.json data/trafico-historico-diario.json
+          git diff --cached --quiet || git commit -m "chore: snapshot de tráfico histórico $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
