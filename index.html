@@ -4,6 +4,217 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VLC Monitor</title>
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+      }
+
+      #controls {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 6px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+      }
+
+      .controls__row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .controls__row--hora,
+      .controls__row--trafico {
+        margin-top: 8px;
+      }
+
+      .controls__row[hidden] {
+        display: none;
+      }
+
+      .mock-badge {
+        background: #d64545;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      #mock-banner {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+        background: #d64545;
+        color: #fff;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      #info-panels {
+        position: absolute;
+        bottom: 30px;
+        left: 12px;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+      }
+
+      .info-panel {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 6px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        min-width: 140px;
+      }
+
+      .info-panel__main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .info-panel__icon {
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .info-panel__value {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .info-panel__value--small {
+        font-size: 15px;
+      }
+
+      .info-panel__badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 0 4px;
+      }
+
+      .info-panel__desc {
+        font-size: 13px;
+        color: #333;
+        margin-top: 2px;
+      }
+
+      .info-panel__meta {
+        font-size: 11px;
+        color: #777;
+        margin-top: 6px;
+      }
+
+      .info-panel__stale {
+        color: #b45309;
+        font-weight: 600;
+        margin-left: 4px;
+      }
+
+      .trafico-leyenda__row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #333;
+        margin-top: 3px;
+      }
+
+      .trafico-leyenda__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      #media-panel {
+        position: absolute;
+        top: 12px;
+        right: 60px;
+        z-index: 1;
+        width: 300px;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        overflow: hidden;
+      }
+
+      #media-panel[hidden] {
+        display: none;
+      }
+
+      .media-panel__header {
+        padding: 10px 12px;
+        font-weight: 700;
+        border-bottom: 1px solid #eee;
+      }
+
+      .media-panel__list {
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .media-panel__item {
+        display: block;
+        padding: 8px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .media-panel__item:hover {
+        background: #f7f7f7;
+      }
+
+      .media-panel__item-titulo {
+        font-size: 13px;
+        color: #222;
+        line-height: 1.35;
+      }
+
+      .media-panel__item-meta {
+        font-size: 11px;
+        color: #888;
+        margin-top: 3px;
+      }
+
+      #media-panel .info-panel__meta {
+        padding: 8px 12px;
+        margin-top: 0;
+        border-top: 1px solid #eee;
+      }
+    </style>
   </head>
   <body>
     <div id="map"></div>

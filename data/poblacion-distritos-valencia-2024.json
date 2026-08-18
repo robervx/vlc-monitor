@@ -1,0 +1,28 @@
+{
+  "fuente": "Padrón Municipal de Habitantes, Ayuntamiento de Valencia",
+  "url": "https://www.valencia.es/estadistica/Padron/2024/Padron2024Cast.pdf",
+  "fechaReferencia": "2024-01-01",
+  "verificadoEl": "2026-08-18",
+  "notas": "Suma de los 19 valores = 830606, coincide con el total oficial publicado. Usado únicamente como peso de plausibilidad en el generador sintético de la spec 003 — no es una fuente en vivo.",
+  "poblacionPorDistrito": {
+    "01": 30002,
+    "02": 44631,
+    "03": 50643,
+    "04": 40917,
+    "05": 48383,
+    "06": 31020,
+    "07": 51474,
+    "08": 59417,
+    "09": 53582,
+    "10": 80266,
+    "11": 56843,
+    "12": 67453,
+    "13": 36266,
+    "14": 28541,
+    "15": 56703,
+    "16": 50152,
+    "17": 7009,
+    "18": 15261,
+    "19": 22043
+  }
+}

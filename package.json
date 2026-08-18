@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "seed:distritos": "node scripts/seed-distritos.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^4.7.1",
@@ -18,6 +20,9 @@
   },
   "devDependencies": {
     "typescript": "^5.6.0",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.7.0",
+    "@types/geojson": "^7946.0.14"
   }
 }

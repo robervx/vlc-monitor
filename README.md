@@ -25,7 +25,7 @@ npm run dev
 
 ## Estado actual
 
-Fase **F0 (Cimientos)** en curso — ver `specs/000-mapa-base-distritos.md`. Hay un prototipo paralelo de capa con datos sintéticos (`specs/003-capa-movimiento-personas-mock.md`) para validar la UI de choropleth antes de tener ninguna fuente real de movilidad agregada.
+Fases **F0 (Cimientos)**, **F1 (MVP — 3 capas)**, la mayor parte de **F2 (Movilidad completa)**, **F3 (Índice de Pulso de Distrito)**, **F3.5 (Agenda y aglomeraciones previsibles)** y **F4 (Contexto mediático)** completas: mapa base + distritos (`000`), meteorología (`001`), calidad del aire (`002`), tráfico en tiempo real (`004`), Valenbisi (`005`), aparcamiento (`006`), el índice compuesto Pulso de Distrito (`010`, combina tráfico+aire+meteo sin fuente propia), Fallas (`008`, v1 acotada — monumentos, carpas y zonas de movilidad reducida) y contexto mediático (`009`, RSS de Las Provincias + Valencia Plaza + GDELT, con resiliencia por fuente individual), todas `Implemented` — ver `specs/INDEX.md`. Dos piezas quedan `Planned` por falta de fuente limpia: la capa EMT (`007`, paradas confirmadas pero sin API de llegadas en tiempo real) y Reddit como señal secundaria dentro de `009` (bloqueado 403 sin autenticación — necesita que el usuario registre su propia app gratuita en `reddit.com/prefs/apps`). La agenda cultural general (más allá de Fallas) también queda como fast-follow de `008` por el mismo motivo. También hay un prototipo paralelo de capa con datos sintéticos (`003-capa-movimiento-personas-mock.md`) para validar la UI de choropleth antes de tener ninguna fuente real de movilidad agregada.
 
 ## Licencia y datos
 
