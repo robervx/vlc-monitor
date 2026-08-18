@@ -10,6 +10,7 @@ import { preloadDistrictGeometry, getDistrictCentroid } from './services/distric
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
 import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
+import type { PanelInsights } from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
 import type { EstacionValenbisi } from './services/valenbisi';
@@ -172,6 +173,47 @@ async function fetchPrediccionCortoPlazoActual(): Promise<{ prediccion: Predicci
   const res = await fetch('/api/meteo/v1/prediccion-corto-plazo');
   if (!res.ok) throw new Error(`GET /api/meteo/v1/prediccion-corto-plazo -> HTTP ${res.status}`);
   return (await res.json()) as { prediccion: PrediccionCortoPlazo; fresh: boolean };
+}
+
+// Spec 013 — "avisa, no actúa" (CLAUDE.md §4): cada tarjeta ofrece un
+// borrador para copiar, nunca un envío automático ni una lista de
+// destinatarios. Guardamos el último panel para que el listener de clic
+// (delegado, ver más abajo) pueda leer el texto exacto a copiar.
+let ultimoPanelInsights: PanelInsights | null = null;
+
+function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: boolean): void {
+  ultimoPanelInsights = panel;
+
+  if (panel.insights.length === 0) {
+    root.innerHTML = `
+      <div class="info-panel__desc">✓ Sin alertas activas</div>
+      <div class="info-panel__meta">${metaFrescura('VLC Monitor (insights)', panel.fetchedAt, fresh)}</div>
+    `;
+    return;
+  }
+
+  const tarjetas = panel.insights
+    .map(
+      (insight, i) => `
+        <div class="insight-card insight-card--${insight.severidad}">
+          <div class="insight-card__titulo">${insight.titulo}</div>
+          <div class="insight-card__desc">${insight.descripcion}</div>
+          <button class="insight-card__copiar" type="button" data-insight-index="${i}">Copiar borrador</button>
+        </div>`,
+    )
+    .join('');
+
+  root.innerHTML = `
+    <div class="info-panel__desc">⚠ ${panel.insights.length} alerta${panel.insights.length === 1 ? '' : 's'}</div>
+    <div class="insight-panel__tarjetas">${tarjetas}</div>
+    <div class="info-panel__meta">${metaFrescura('VLC Monitor (insights)', panel.fetchedAt, fresh)}</div>
+  `;
+}
+
+async function fetchInsightsActual(): Promise<{ panel: PanelInsights; fresh: boolean }> {
+  const res = await fetch('/api/insights/v1/actual');
+  if (!res.ok) throw new Error(`GET /api/insights/v1/actual -> HTTP ${res.status}`);
+  return (await res.json()) as { panel: PanelInsights; fresh: boolean };
 }
 
 // Colores por banda del European AQI — ver src/services/calidad-aire.ts.
@@ -926,6 +968,36 @@ async function main(): Promise<void> {
     }
   }
   startPolling(refreshAirePanel, 5 * 60 * 1000);
+
+  const insightsPanelRoot = buildInfoPanel('insights-panel');
+  // Delegado (no un listener por tarjeta): el HTML se reconstruye en cada
+  // refresco, así que un listener directo por botón se perdería.
+  insightsPanelRoot.addEventListener('click', (ev) => {
+    const boton = (ev.target as HTMLElement).closest<HTMLButtonElement>('button[data-insight-index]');
+    if (!boton || !ultimoPanelInsights) return;
+    const insight = ultimoPanelInsights.insights[Number(boton.dataset.insightIndex)];
+    if (!insight) return;
+    const texto = `Asunto: ${insight.protocoloSugerido.asunto}\n\n${insight.protocoloSugerido.cuerpo}`;
+    navigator.clipboard
+      .writeText(texto)
+      .then(() => {
+        boton.textContent = 'Copiado ✓';
+        setTimeout(() => {
+          boton.textContent = 'Copiar borrador';
+        }, 2000);
+      })
+      .catch((err: unknown) => console.error('No se pudo copiar el borrador:', err));
+  });
+  async function refreshInsightsPanel(): Promise<void> {
+    try {
+      const { panel, fresh } = await fetchInsightsActual();
+      renderInsightsPanel(insightsPanelRoot, panel, fresh);
+    } catch (err) {
+      insightsPanelRoot.textContent = 'Insights no disponibles';
+      console.error('Fallo al cargar insights:', err);
+    }
+  }
+  startPolling(refreshInsightsPanel, 5 * 60 * 1000);
 }
 
 main().catch((err: unknown) => {
