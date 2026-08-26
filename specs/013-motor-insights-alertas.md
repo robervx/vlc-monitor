@@ -7,7 +7,7 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [001, 002, 010, 016]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 0. Decisión de diseño (resuelve la tensión documentada en el backlog)
@@ -100,6 +100,7 @@ No es una capa de mapa — panel fijo (igual que meteo/aire), con una tarjeta po
 | `aire-mala-calidad` | `categoria === 'Muy mala'` → `urgente`; `categoria === 'Mala'` → `aviso` | según categoría |
 | `lluvia-intensa-prevista` | algún tramo de `prediccion-corto-plazo` con `precipitacion >= 5` mm en esa hora | `aviso` |
 | `distrito-critico` | algún distrito de Pulso con `categoria === 'Crítico'` | `urgente` |
+| `viento-fuerte` | rachas (`vientoRachas`) `>= 50 km/h` → `aviso`; `>= 70 km/h` → `urgente` (v3, 2026-08-19) | según racha |
 
 ## 7. Criterios de aceptación (Definition of Done)
 
@@ -121,3 +122,4 @@ No es una capa de mapa — panel fijo (igual que meteo/aire), con una tarjeta po
 |---|---|---|
 | 1 | 2026-08-18 | Creación. Diseño "alerta + borrador, envío manual" decidido explícitamente por el usuario tras la tensión documentada en el backlog (§0). Dependencias (001, 002, 010, 016) ya `Implemented`. |
 | 2 | 2026-08-18 | DoD completo: función pura + tests (`src/services/insights.ts`), endpoint que combina las cachés existentes con degradación si tráfico/predicción fallan (`api/insights/v1/actual.ts`), panel con tarjetas por severidad y botón "Copiar borrador" sin destinatarios (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (92/92) y en navegador. Spec pasa a `Implemented`. |
+| 3 | 2026-08-19 | Nueva regla `viento-fuerte` (umbral por rachas, heurística documentada igual criterio que el resto de reglas de esta spec — ver §8) — `insightVientoFuerte()` en `insights.ts`, 3 tests nuevos. Los umbrales (`UMBRAL_VIENTO_AVISO_KMH`/`UMBRAL_VIENTO_URGENTE_KMH`) se exportan para que el panel de meteo (spec 001, `main.ts`) pinte el mismo semáforo de color sin duplicar el número en dos sitios. |

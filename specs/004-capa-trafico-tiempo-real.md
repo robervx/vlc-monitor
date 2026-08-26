@@ -7,7 +7,7 @@ estado: Implemented
 tipo: capa
 depende_de: [000]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 1. Problema / motivación
@@ -66,6 +66,8 @@ interface TramoTrafico {
 
 Color por `estado`: fluido verde, denso amarillo, congestionado naranja, cortado rojo oscuro, sin-datos gris. Capa activable/desactivable (no siempre visible, a diferencia de distritos) — igual patrón de toggle que la capa mock de la spec 003, pero sin badge "MOCK" porque el dato es real.
 
+**Efecto de flujo animado (v3)**: mientras la capa está activa, cada tramo con `estado` distinto de `cortado`/`sin-datos` muestra puntos que recorren su geometría (reutiliza `src/services/flujo-animado.ts`, construido originalmente para spec 022 y trasladado aquí — a petición del usuario, tiene más sentido en la capa de tráfico real que en el simulador de cortes, que ahora solo muestra el resultado estático). **Limitación honesta**: esta fuente (Geoportal, spec 004 §2) no incluye sentido de circulación — a diferencia del grafo de spec 020 (que sí lo tiene, vía OSM), aquí el punto se anima en el orden en que llega la geometría, sin verificar que sea el sentido real de circulación. Si en el futuro hace falta precisión de sentido aquí, requeriría la misma reconciliación nombre↔grafo que ya quedó pendiente en spec 020 §7, no algo trivial. Ritmo deliberadamente lento (ciclo de 4,5s, throttle de renderizado a ~220ms) y excluyendo `cortado` — a petición explícita del usuario, para que no sature con ~400 tramos a la vez y para que una calle cortada no aparente tener circulación.
+
 ## 6. Criterios de aceptación (Definition of Done)
 
 - [x] Fuente probada con al menos una llamada real (`curl` — ver §2 — y en producción vía `GET /api/trafico/v1/estado` contra el dev server: 412 tramos, 404 fluido / 7 cortado / 1 sin-datos en el snapshot de verificación).
@@ -73,6 +75,7 @@ Color por `estado`: fluido verde, denso amarillo, congestionado naranja, cortado
 - [x] Caché con TTL de 3 min y comportamiento stale-on-error verificados — reutiliza `getOrFetch()` (ya probado en `api/_shared/cache.test.ts`); normalización probada en `src/services/trafico.test.ts` (incluye el caso de filas con `geometry: null`) y el endpoint en `api/trafico/v1/estado.test.ts`.
 - [x] Capa visible y legible en el mapa (tramos coloreados por estado: verde fluido, rojo cortado), activable con un toggle "Tráfico en tiempo real" — verificado visualmente en navegador.
 - [x] Atribución de fuente ("Ajuntament de València") y frescura visibles en la UI mientras la capa está activa — leyenda con conteos por estado + "actualizado hace N min".
+- [x] (v3) Efecto de flujo animado: verificado el pipeline de datos de forma directa (script contra datos reales de la capa: 406/412 tramos animables, coordenadas generadas dentro de la geometría real de cada tramo) y las funciones puras con 7 tests (`flujo-animado.test.ts`). **No se pudo reconfirmar visualmente el movimiento en esta sesión de verificación concreta** — la pestaña del navegador quedó en estado `document.hidden=true` en el entorno de pruebas, lo que limita a los navegadores a casi no ejecutar `requestAnimationFrame` (throttling estándar de pestañas en segundo plano, no un fallo de la implementación). Si en un navegador real con la pestaña visible no se aprecia movimiento, revisar aquí primero.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -86,3 +89,4 @@ Color por `estado`: fluido verde, denso amarillo, congestionado naranja, cortado
 |---|---|---|
 | 1 | 2026-08-18 | Creación con fuente verificada (Geoportal ArcGIS, capa Trafico/MapServer/192). |
 | 2 | 2026-08-18 | DoD completo: servicio de normalización con filtrado de filas vacías (`src/services/trafico.ts`), endpoint con resolución de distrito server-side (`api/trafico/v1/estado.ts`), nuevo valor `'linea'` en `LayerDefinition.agregacion`, capa registrada, toggle + leyenda + capa deck.gl en el mapa (`src/main.ts`). Extraído `distritosFromGeoJSON()` a `district-geometry.ts` para reutilizar la carga de distritos sin `fetch` relativo en endpoints edge. Verificado con `npm run typecheck`, `npm run test` y en navegador. Spec pasa a `Implemented`. |
+| 3 | 2026-08-26 | Efecto de flujo animado trasladado aquí desde spec 022 (a petición del usuario: más sentido en tráfico real que en el simulador de cortes) — `src/services/flujo-animado.ts` reutilizado, bucle de animación con throttling ligado al toggle de esta capa, excluye tramos `cortado`/`sin-datos`, ritmo lento (ciclo 4,5s) para no saturar con ~400 tramos. Verificado el pipeline de datos de forma directa contra la fuente real y con tests; verificación visual de movimiento no concluyente en esta sesión por `document.hidden=true` del navegador de pruebas (ver §6). `npm run typecheck` y `npm run test` (159/159) sin regresiones. |

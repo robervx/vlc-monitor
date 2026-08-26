@@ -3,11 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VLC Monitor</title>
+    <title>Intelligent City Monitor</title>
     <style>
+      :root {
+        --header-h: 56px;
+        --sidebar-w-collapsed: 52px;
+        --sidebar-w-expanded: 280px;
+        --imc-navy: #0b1f33;
+        --imc-navy-light: #14304f;
+      }
+
       html,
-      body,
-      #map {
+      body {
         height: 100%;
         margin: 0;
       }
@@ -16,10 +23,470 @@
         font-family: system-ui, sans-serif;
       }
 
+      /* El mapa empieza debajo de la cabecera (no solapado), para que el
+         control de zoom nativo de MapLibre ('top-right') no quede tapado. */
+      #map {
+        position: absolute;
+        top: var(--header-h);
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      /* Cabecera institucional — spec 019 */
+      #app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-h);
+        z-index: 200;
+        background: var(--imc-navy);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        box-sizing: border-box;
+      }
+
+      #app-header__logo {
+        height: 36px;
+        width: 36px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      #app-header__brand {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+        min-width: 0;
+      }
+
+      #app-header__name {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      #app-header__tagline {
+        font-size: 11px;
+        color: #b9c6d6;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      #app-header__status {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+
+      #app-header__live {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #86efac;
+        text-transform: uppercase;
+      }
+
+      #app-header__status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        animation: imc-pulse 2s infinite;
+      }
+
+      #app-header__divider {
+        width: 1px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      #app-header__datetime {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        line-height: 1.3;
+      }
+
+      #app-header__clock {
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+        font-size: 17px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+        color: #fff;
+      }
+
+      #app-header__date {
+        font-size: 11px;
+        color: #9db3c9;
+      }
+
+      @keyframes imc-pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+        }
+        70% {
+          box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+        }
+      }
+
+      /* Sidebar plegable — spec 019 */
+      #app-sidebar {
+        position: fixed;
+        top: var(--header-h);
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-w-collapsed);
+        z-index: 150;
+        background: var(--imc-navy-light);
+        overflow: hidden;
+        transition: width 0.18s ease;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.25);
+      }
+
+      #app-sidebar.is-expanded {
+        width: var(--sidebar-w-expanded);
+      }
+
+      #app-sidebar__toggle {
+        height: 44px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      #app-sidebar__toggle:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      #app-sidebar__sections {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .sidebar-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 15px;
+        color: #e2e8f0;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .sidebar-section--interactive {
+        cursor: pointer;
+      }
+
+      .sidebar-section--interactive:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .sidebar-section--interactive.is-open {
+        background: rgba(255, 255, 255, 0.08);
+        border-left-color: #f2c744;
+      }
+
+      .sidebar-panel-content {
+        padding: 4px 15px 12px 47px;
+      }
+
+      .sidebar-panel-content__title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7d90a6;
+        margin-bottom: 6px;
+      }
+
+      .proximidad-boton {
+        width: 100%;
+        padding: 7px 10px;
+        border-radius: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .proximidad-boton:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .proximidad-boton:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .proximidad-estado {
+        font-size: 11px;
+        color: #9db3c9;
+        margin-top: 6px;
+        min-height: 14px;
+      }
+
+      .proximidad-seccion {
+        margin-top: 10px;
+      }
+
+      .proximidad-seccion__titulo {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7d90a6;
+        margin-bottom: 4px;
+      }
+
+      .proximidad-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: #dbe6f0;
+        padding: 3px 0;
+      }
+
+      .proximidad-item__nombre {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .proximidad-item__dist {
+        flex-shrink: 0;
+        color: #9db3c9;
+      }
+
+      .proximidad-vacio {
+        font-size: 11px;
+        color: #6b7f94;
+        font-style: italic;
+      }
+
+      .cordon-intro {
+        font-size: 12px;
+        color: #b9c6d6;
+        line-height: 1.4;
+        margin: 0 0 8px;
+      }
+
+      .cordon-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .cordon-form label {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 11px;
+        color: #9db3c9;
+      }
+
+      .cordon-form select,
+      .cordon-form input[type='number'],
+      .cordon-form textarea {
+        font-size: 12px;
+        padding: 4px 6px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-family: inherit;
+        resize: vertical;
+      }
+
+      .cordon-checkbox-label {
+        flex-direction: row !important;
+        align-items: center;
+        gap: 6px !important;
+      }
+
+      .cordon-pii-error {
+        font-size: 11px;
+        color: #fca5a5;
+        background: rgba(220, 38, 38, 0.15);
+        border-radius: 4px;
+        padding: 4px 6px;
+      }
+
+      .cordon-badge {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 6px 8px;
+        margin-top: 8px;
+      }
+
+      .cordon-badge__punto {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 3px;
+        flex-shrink: 0;
+      }
+
+      .cordon-badge__texto {
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .cordon-badge__fuente {
+        font-size: 10px;
+        color: #9db3c9;
+        margin-top: 2px;
+      }
+
+      .cordon-disclaimer {
+        font-size: 10px;
+        color: #fbbf24;
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
+      .cordon-resumen {
+        font-size: 11px;
+        color: #dbe6f0;
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .sim-corte-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #dbe6f0;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .sim-corte-sentido {
+        color: #7d90a6;
+        font-size: 10px;
+      }
+
+      .sim-corte-quitar {
+        background: transparent;
+        border: none;
+        color: #f87171;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 2px 4px;
+        flex-shrink: 0;
+      }
+
+      .sim-corte-quitar:hover {
+        color: #fca5a5;
+      }
+
+      .sim-aviso-aislados {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #fca5a5;
+        background: rgba(220, 38, 38, 0.15);
+        border: 1px solid rgba(220, 38, 38, 0.4);
+        border-radius: 5px;
+        padding: 6px 8px;
+      }
+
+      .sim-aviso-aislados ul {
+        margin: 4px 0 0;
+        padding-left: 16px;
+      }
+
+      .sim-aviso-ok {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #86efac;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 5px;
+        padding: 6px 8px;
+      }
+
+      .sidebar-panel-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #dbe6f0;
+        padding: 4px 0;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .sidebar-section--placeholder {
+        color: #8fa3ba;
+      }
+
+      .sidebar-section__icon {
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .sidebar-section__label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .sidebar-section__tag {
+        margin-left: auto;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 2px 5px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+
+      #app-footer-attrib {
+        font-size: 10px;
+        color: #7d90a6;
+        padding: 8px 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
       #controls {
         position: absolute;
-        top: 12px;
-        left: 12px;
+        top: calc(var(--header-h) + 12px);
+        left: calc(var(--sidebar-w-collapsed) + 12px);
         z-index: 1;
         background: rgba(255, 255, 255, 0.95);
         border-radius: 6px;
@@ -55,7 +522,7 @@
 
       #mock-banner {
         position: absolute;
-        top: 12px;
+        top: calc(var(--header-h) + 12px);
         left: 50%;
         transform: translateX(-50%);
         z-index: 1;
@@ -71,11 +538,16 @@
       #info-panels {
         position: absolute;
         bottom: 30px;
-        left: 12px;
+        left: calc(var(--sidebar-w-collapsed) + 12px);
+        right: 12px;
         z-index: 1;
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: 8px;
+        justify-content: flex-start;
+        max-height: calc(100vh - var(--header-h) - 260px);
+        overflow-y: auto;
       }
 
       .info-panel {
@@ -124,6 +596,22 @@
         font-size: 13px;
         color: #333;
         margin-top: 2px;
+      }
+
+      .info-panel__viento {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #444;
+        margin-top: 4px;
+      }
+
+      .info-panel__viento-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
       }
 
       .info-panel__meta {
@@ -247,7 +735,7 @@
 
       #media-panel {
         position: absolute;
-        top: 12px;
+        top: calc(var(--header-h) + 12px);
         right: 60px;
         z-index: 1;
         width: 300px;

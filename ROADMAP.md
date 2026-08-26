@@ -4,7 +4,7 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 
 | Fase | Nombre | Contenido | Specs |
 |---|---|---|---|
-| **F0** | Cimientos | Mapa base (MapLibre + deck.gl), geometría de distritos, arquitectura de registro de capas, pipeline seed→caché→endpoint | `000` |
+| **F0** | Cimientos | Mapa base (MapLibre + deck.gl), geometría de distritos, arquitectura de registro de capas, pipeline seed→caché→endpoint, identidad de marca (Intelligent City Monitor) + chasis de navegación | `000`, `019` |
 | — | *Prototipo paralelo* | Capa de movimiento de personas con datos sintéticos (mock), para validar UI de choropleth antes de tener fuente real | `003` |
 | **F1** | MVP — 3 capas | Meteorología, calidad del aire, tráfico en tiempo real | `001`, `002`, `004` |
 | **F2** | Movilidad completa | Valenbisi, aparcamiento, EMT (si hay fuente viable) | `005`, `006`, `007` |
@@ -13,9 +13,10 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 | **F3.6** | Motor de insights y alertas operativas | Panel de insights bajo el mapa + sistema de notificaciones sobre alertas de interés (eventos, cortes). Debe cumplir "avisa, no actúa" (`CLAUDE.md` §4) — ver `docs/investigacion/BACKLOG_FUNCIONALIDADES_2026-08-18.md` | `013`, `014` |
 | **F4** | Contexto mediático | RSS de medios locales + GDELT filtrado por Valencia + Reddit como señal secundaria | `009` |
 | **F4.5** | Analítica temporal | Predicción meteorológica a corto plazo (nowcasting) e histórico de tráfico para detectar patrones | `016`, `017` |
-| **F5** | Pulido y compartición | Estado en URL, PWA instalable, rendimiento, accesibilidad, geolocalización de usuario + "qué tengo más cerca" (pendiente de decisión de framing, ver backlog), publicación con contraseña en dominio propio | `012`, `018` |
+| **F5** | Pulido y compartición | Estado en URL, PWA instalable, rendimiento, accesibilidad, geolocalización de usuario + "qué tengo más cerca" (implementado, desbloqueado por `ADR-001`), publicación con contraseña en dominio propio (pendiente) | `012`, `018` |
 | **F6** | Densidad de movilidad agregada real | Sustituye el prototipo mock (`003`) por una fuente real agregada y anonimizada en origen (ej. producto comercial tipo Telefónica LUCA/Smart Steps), **sujeta a contrato y revisión de cumplimiento** | `011` (bloqueada hasta que exista contrato) |
 | **F7** | Integraciones externas de navegación | Publicación de cortes/incidencias en formato consumible por Waze/Google Maps — sujeta a investigación de viabilidad y posible convenio con el Ayuntamiento | `015` |
+| **F8** | Apoyo a decisión operativa — cordón de seguridad por incidente | Grafo viario base (recorte de bajo riesgo de la Opción B de `ADR-001`, sin simulador de tráfico) + motor de propuesta de perímetro/calles a cortar según tipo e intensidad de incidente, editable por el mando, nunca automático (`CLAUDE.md` §4) | `020`, `021` |
 
 ## Fuera de alcance (recordatorio — detalle completo en `CLAUDE.md` §3-4)
 

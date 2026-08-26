@@ -19,7 +19,8 @@ export type TipoInsight =
   | 'frio-extremo'
   | 'aire-mala-calidad'
   | 'lluvia-intensa-prevista'
-  | 'distrito-critico';
+  | 'distrito-critico'
+  | 'viento-fuerte';
 
 export interface ProtocoloSugerido {
   asunto: string;
@@ -35,6 +36,7 @@ export interface Insight {
   protocoloSugerido: ProtocoloSugerido;
   distritoCodigo?: string;
   fuenteSpec: '001' | '002' | '010' | '016';
+  // 'viento-fuerte' también usa fuenteSpec '001' (mismo EstadoMeteo, campo vientoRachas).
   detectedAt: string;
   fetchedAt: string;
 }
@@ -49,6 +51,13 @@ const UMBRAL_CALOR_TEMPERATURA = 38;
 const UMBRAL_CALOR_SENSACION = 42;
 const UMBRAL_FRIO_TEMPERATURA = 0;
 const UMBRAL_LLUVIA_MM = 5;
+// Basado en rachas (vientoRachas), no en velocidad sostenida — más indicativo
+// del riesgo real, mismo criterio que usan los avisos AEMET por viento.
+// Heurística documentada, no un umbral oficial — igual disclaimer que spec 010 §7.
+// Exportados para que el panel de meteo (main.ts) pinte el mismo semáforo
+// sin duplicar el umbral en dos sitios.
+export const UMBRAL_VIENTO_AVISO_KMH = 50;
+export const UMBRAL_VIENTO_URGENTE_KMH = 70;
 
 function insightCalorExtremo(meteo: EstadoMeteo, fetchedAt: string): Insight | null {
   if (meteo.temperatura < UMBRAL_CALOR_TEMPERATURA && meteo.sensacionTermica < UMBRAL_CALOR_SENSACION) {
@@ -87,6 +96,29 @@ function insightFrioExtremo(meteo: EstadoMeteo, fetchedAt: string): Insight | nu
       cuerpo:
         `Se ha detectado una temperatura de ${meteo.temperatura}°C en Valencia a las ${meteo.observedAt}. ` +
         'Se sugiere valorar aviso a las unidades sobre riesgo de helada en calzada y protocolo de frío para personas sin techo. ' +
+        'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
+    },
+    fuenteSpec: '001',
+    detectedAt: meteo.observedAt,
+    fetchedAt,
+  };
+}
+
+function insightVientoFuerte(meteo: EstadoMeteo, fetchedAt: string): Insight | null {
+  if (meteo.vientoRachas < UMBRAL_VIENTO_AVISO_KMH) return null;
+  const severidad: SeveridadInsight = meteo.vientoRachas >= UMBRAL_VIENTO_URGENTE_KMH ? 'urgente' : 'aviso';
+  return {
+    id: 'viento-fuerte:ciudad',
+    tipo: 'viento-fuerte',
+    severidad,
+    titulo: `Viento fuerte — rachas de ${Math.round(meteo.vientoRachas)} km/h`,
+    descripcion: `Rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) — por encima del umbral de viento fuerte (${UMBRAL_VIENTO_AVISO_KMH} km/h).`,
+    protocoloSugerido: {
+      asunto: 'Aviso de viento fuerte — Valencia',
+      cuerpo:
+        `Se han detectado rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) ` +
+        `en Valencia a las ${meteo.observedAt}. Se sugiere valorar aviso a unidades sobre riesgo de caída de objetos/ramas, ` +
+        'precaución con estructuras temporales (casetas, carpas) y vía pública. ' +
         'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
     },
     fuenteSpec: '001',
@@ -176,6 +208,7 @@ export function calcularInsights(
   const insights: Insight[] = [
     insightCalorExtremo(meteo, fetchedAt),
     insightFrioExtremo(meteo, fetchedAt),
+    insightVientoFuerte(meteo, fetchedAt),
     insightAireMalaCalidad(aire, fetchedAt),
     ...(prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : []),
     ...(distritos ? insightsDistritoCritico(distritos, fetchedAt) : []),
