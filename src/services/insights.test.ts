@@ -145,6 +145,23 @@ describe('calcularInsights', () => {
     expect(resultado.insights[0]?.severidad).toBe('urgente');
   });
 
+  it('genera viento-fuerte con severidad aviso a partir de 50 km/h de racha', () => {
+    const resultado = calcularInsights({ ...METEO_NEUTRA, vientoRachas: 50 }, AIRE_BUENA, null, null);
+    const insight = resultado.insights.find((i) => i.tipo === 'viento-fuerte');
+    expect(insight?.severidad).toBe('aviso');
+  });
+
+  it('no genera viento-fuerte un km/h por debajo del umbral', () => {
+    const resultado = calcularInsights({ ...METEO_NEUTRA, vientoRachas: 49 }, AIRE_BUENA, null, null);
+    expect(resultado.insights.filter((i) => i.tipo === 'viento-fuerte')).toHaveLength(0);
+  });
+
+  it('genera viento-fuerte con severidad urgente a partir de 70 km/h de racha', () => {
+    const resultado = calcularInsights({ ...METEO_NEUTRA, vientoRachas: 75 }, AIRE_BUENA, null, null);
+    const insight = resultado.insights.find((i) => i.tipo === 'viento-fuerte');
+    expect(insight?.severidad).toBe('urgente');
+  });
+
   it('no revienta si distritos o predicción no están disponibles (null)', () => {
     const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null);
     expect(resultado.insights).toHaveLength(0);

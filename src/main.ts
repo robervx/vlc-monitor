@@ -11,6 +11,7 @@ import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
 import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
 import type { PanelInsights } from './services/insights';
+import { UMBRAL_VIENTO_AVISO_KMH, UMBRAL_VIENTO_URGENTE_KMH } from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
 import type { HistoricoTrafico } from './services/trafico-historico';
@@ -20,10 +21,33 @@ import type { Aparcamiento } from './services/aparcamiento';
 import type { PulsoDistrito, CategoriaPulso } from './services/pulso-distrito';
 import type { DatosFallas, MonumentoFalla } from './services/fallas';
 import type { ItemMediatico } from './services/mediatico';
+import { mountChasis } from './ui/chasis';
+import { applyPanelVisibility } from './ui/panel-preferences';
+import {
+  actualizarTramosTrafico,
+  actualizarEstacionesValenbisi,
+  actualizarAparcamientos,
+} from './services/capas-activas-store';
+import { onCambioModoCordon, reportarUbicacionElegida, getTramoPorId, getEstadoModoCordon } from './ui/modo-cordon';
+import {
+  onCambioModoSimulacion,
+  toggleTramoCortado,
+  getTramoPorIdSimulacion,
+  getEstadoModoSimulacion,
+} from './ui/modo-simulacion-cortes';
+import { cargarGrafoViario } from './services/grafo-viario-cliente';
+import { puntosFlujoParaTramo } from './services/flujo-animado';
+import type { Coordenada } from './services/proximidad';
 
 const OPENFREEMAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 const VALENCIA_CENTER: [number, number] = [-0.3763, 39.4699];
 const DEFAULT_ZOOM = 12;
+// Duración del ciclo del efecto de flujo animado de la capa de tráfico real
+// (spec 004) — cuánto tarda un punto en recorrer un tramo completo. Más
+// lento que un efecto "urgente" a propósito (petición del usuario: "a un
+// ritmo algo más lento para que no sature") — con ~400 tramos visibles a la
+// vez, un ritmo rápido satura visualmente y consume más CPU sin necesidad.
+const DURACION_CICLO_FLUJO_TRAFICO_MS = 4500;
 
 interface DistritoProperties {
   codigo: string;
@@ -126,6 +150,14 @@ function buildInfoPanel(id: string): HTMLDivElement {
   return root;
 }
 
+// Semáforo de viento — mismos umbrales que la regla 'viento-fuerte' de
+// insights.ts (spec 013), para que el color de aquí y el aviso coincidan.
+function colorSemaforoViento(rachas: number): string {
+  if (rachas >= UMBRAL_VIENTO_URGENTE_KMH) return '#dc2626'; // rojo
+  if (rachas >= UMBRAL_VIENTO_AVISO_KMH) return '#f59e0b'; // ámbar
+  return '#16a34a'; // verde
+}
+
 function renderMeteoPanel(root: HTMLDivElement, estado: EstadoMeteo, fresh: boolean): void {
   root.innerHTML = `
     <div class="info-panel__main">
@@ -133,6 +165,10 @@ function renderMeteoPanel(root: HTMLDivElement, estado: EstadoMeteo, fresh: bool
       <span class="info-panel__value">${Math.round(estado.temperatura)}°C</span>
     </div>
     <div class="info-panel__desc">${estado.descripcion}</div>
+    <div class="info-panel__viento">
+      <span class="info-panel__viento-dot" style="background:${colorSemaforoViento(estado.vientoRachas)}"></span>
+      Viento ${Math.round(estado.vientoVelocidad)} km/h · rachas ${Math.round(estado.vientoRachas)} km/h
+    </div>
     <div class="info-panel__meta">${metaFrescura('Open-Meteo', estado.fetchedAt, fresh)}</div>
   `;
 }
@@ -591,6 +627,8 @@ async function fetchDensidadMock(hora: string): Promise<DensidadDistritoMock[]> 
 }
 
 async function main(): Promise<void> {
+  mountChasis();
+
   const initialState = readStateFromUrl();
 
   const map = new maplibregl.Map({
@@ -637,6 +675,42 @@ async function main(): Promise<void> {
   }
 
   function renderLayers(): void {
+    const estadoCordon = getEstadoModoCordon();
+    const cordonPropuesta = estadoCordon.resultado?.ok ? estadoCordon.resultado.propuesta : null;
+    const cordonUbicacion = estadoCordon.ubicacion;
+
+    const estadoSimulacion = getEstadoModoSimulacion();
+    const tramosCortadosIds = estadoSimulacion.tramosCortados;
+    const tramosAisladosIds = estadoSimulacion.resultado?.tramosAislados.map((t) => t.idTramo) ?? [];
+    const algunModoActivo = estadoCordon.fase !== 'inactivo' || estadoSimulacion.fase !== 'inactivo';
+
+    // Efecto de flujo animado — spec 004 (tráfico real), no spec 022. Se
+    // quitó del simulador de cortes a petición del usuario: el simulador ya
+    // muestra el resultado final (estático) del corte; el flujo en vivo
+    // tiene más sentido en la capa de tráfico real, que es donde de verdad
+    // hay circulación que visualizar. Solo tramos con circulación real
+    // (nunca 'cortado' ni 'sin-datos' — no hay nada que fluya ahí).
+    const faseFlujoTrafico = (performance.now() % DURACION_CICLO_FLUJO_TRAFICO_MS) / DURACION_CICLO_FLUJO_TRAFICO_MS;
+    const puntosFlujoTrafico: Coordenada[] = [];
+    if (traficoVisible) {
+      for (const t of tramosTrafico) {
+        if (t.estado === 'cortado' || t.estado === 'sin-datos') continue;
+        // LineString o MultiLineString (spec 004 §3) — se anima cada parte
+        // por separado. Sentido real desconocido en esta fuente (Geoportal,
+        // distinta del grafo de spec 020) — se anima en el orden en que
+        // llega la geometría, sin afirmar que sea el sentido real de circulación.
+        const partes = t.geometry.type === 'LineString' ? [t.geometry.coordinates] : t.geometry.coordinates;
+        for (const parte of partes) {
+          puntosFlujoTrafico.push(
+            ...puntosFlujoParaTramo(parte as Coordenada[], 'unidireccional', {
+              fase: faseFlujoTrafico,
+              puntosPorSentido: 2,
+            }),
+          );
+        }
+      }
+    }
+
     const intensidadPorDistrito = new Map(densidadMock.map((d) => [d.distritoCodigo, d.intensidad]));
     const pulsoPorDistrito = new Map(pulsoDistritos.map((p) => [p.distritoCodigo, p]));
     const traficoFeatureCollection: GeoJSON.FeatureCollection<GeoJSON.Geometry, { estado: EstadoTramo }> = {
@@ -670,6 +744,23 @@ async function main(): Promise<void> {
             getLineWidth: 4,
             lineWidthMinPixels: 2,
             updateTriggers: { getLineColor: [tramosTrafico] },
+          }),
+        puntosFlujoTrafico.length > 0 &&
+          new ScatterplotLayer<Coordenada>({
+            id: 'trafico-flujo',
+            data: puntosFlujoTrafico,
+            pickable: false,
+            getPosition: (p) => p,
+            getFillColor: [255, 255, 255, 230],
+            // Borde oscuro — sin esto, un punto blanco casi no se distingue
+            // sobre el estilo de mapa claro (OpenFreeMap Liberty), sea cual
+            // sea el color de fondo del tramo (verde/ámbar/naranja).
+            stroked: true,
+            getLineColor: [15, 31, 51, 220],
+            lineWidthMinPixels: 1,
+            getRadius: 7,
+            radiusMinPixels: 3,
+            radiusMaxPixels: 5,
           }),
         valenbisiVisible &&
           new ScatterplotLayer<EstacionValenbisi>({
@@ -748,12 +839,143 @@ async function main(): Promise<void> {
             getRadius: 18,
             radiusMinPixels: 2,
           }),
+        // Spec 021 — modo cordón de incidente. Solo se pinta mientras el
+        // modo está activo y hay una propuesta calculada; nunca compite por
+        // espacio con el resto de capas porque main.ts oculta los paneles
+        // habituales mientras este modo está activo (ver actualizarUiModoCordon).
+        cordonPropuesta &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-area-socorro',
+            data: { type: 'Feature', geometry: cordonPropuesta.geometriaAreaSocorro, properties: {} },
+            stroked: true,
+            filled: true,
+            getFillColor: [245, 158, 11, 35],
+            getLineColor: [245, 158, 11, 180],
+            getLineWidth: 2,
+            lineWidthMinPixels: 1,
+          }),
+        cordonPropuesta &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-area-intervencion',
+            data: { type: 'Feature', geometry: cordonPropuesta.geometriaAreaIntervencion, properties: {} },
+            stroked: true,
+            filled: true,
+            getFillColor: [220, 38, 38, 55],
+            getLineColor: [220, 38, 38, 200],
+            getLineWidth: 2,
+            lineWidthMinPixels: 1,
+          }),
+        cordonPropuesta &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-tramos-cerrados',
+            data: {
+              type: 'FeatureCollection',
+              features: cordonPropuesta.tramosCerrados
+                .map((id) => getTramoPorId(id))
+                .filter((t): t is NonNullable<typeof t> => !!t)
+                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+            },
+            stroked: true,
+            filled: false,
+            getLineColor: [220, 38, 38, 230],
+            getLineWidth: 5,
+            lineWidthMinPixels: 3,
+          }),
+        cordonPropuesta &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-tramos-corte',
+            data: {
+              type: 'FeatureCollection',
+              features: cordonPropuesta.tramosCorte
+                .map((id) => getTramoPorId(id))
+                .filter((t): t is NonNullable<typeof t> => !!t)
+                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+            },
+            stroked: true,
+            filled: false,
+            getLineColor: [245, 158, 11, 230],
+            getLineWidth: 4,
+            lineWidthMinPixels: 2,
+          }),
+        cordonPropuesta &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-tramos-desvio',
+            data: {
+              type: 'FeatureCollection',
+              features: cordonPropuesta.tramosDesvioSugerido
+                .map((id) => getTramoPorId(id))
+                .filter((t): t is NonNullable<typeof t> => !!t)
+                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+            },
+            stroked: true,
+            filled: false,
+            getLineColor: [59, 130, 246, 210],
+            getLineWidth: 3,
+            lineWidthMinPixels: 2,
+          }),
+        cordonUbicacion &&
+          new ScatterplotLayer<{ position: [number, number] }>({
+            id: 'cordon-marcador',
+            data: [{ position: cordonUbicacion }],
+            pickable: false,
+            getPosition: (d) => d.position,
+            getFillColor: [255, 60, 0, 255],
+            getRadius: 8,
+            radiusMinPixels: 6,
+            stroked: true,
+            getLineColor: [255, 255, 255, 255],
+            getLineWidth: 2,
+            lineWidthMinPixels: 2,
+          }),
+        // Spec 022 — simulador de cortes: tramos cortados a mano por el
+        // usuario en rojo, tramos que quedan sin salida como consecuencia en
+        // violeta (color distinto del cordón de spec 021, aunque nunca
+        // coinciden activos a la vez — son modos mutuamente excluyentes).
+        tramosCortadosIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'simulacion-tramos-cortados',
+            data: {
+              type: 'FeatureCollection',
+              features: tramosCortadosIds
+                .map((id) => getTramoPorIdSimulacion(id))
+                .filter((t): t is NonNullable<typeof t> => !!t)
+                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+            },
+            stroked: true,
+            filled: false,
+            // Naranja, no rojo — el rojo queda reservado para el cordón de
+            // incidente real (spec 021, una emergencia de verdad). Este es
+            // un corte hipotético de una simulación, no una urgencia.
+            getLineColor: [249, 115, 22, 230],
+            getLineWidth: 5,
+            lineWidthMinPixels: 3,
+          }),
+        tramosAisladosIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'simulacion-tramos-aislados',
+            data: {
+              type: 'FeatureCollection',
+              features: tramosAisladosIds
+                .map((id) => getTramoPorIdSimulacion(id))
+                .filter((t): t is NonNullable<typeof t> => !!t)
+                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+            },
+            stroked: true,
+            filled: false,
+            getLineColor: [168, 85, 247, 220],
+            getLineWidth: 4,
+            lineWidthMinPixels: 2,
+          }),
         new GeoJsonLayer<DistritoProperties>({
           id: 'distritos',
           data: featureCollection,
           stroked: true,
           filled: !mockVisible && !pulsoVisible,
-          pickable: true,
+          // Desactivada mientras el modo cordón (spec 021) o el simulador de
+          // cortes (spec 022) están activos: si no, el clic de esos modos
+          // también dispara el picking de esta capa y selecciona/pinta el
+          // distrito entero encima.
+          pickable: !algunModoActivo,
           autoHighlight: false,
           getFillColor: (f) => {
             const codigo = f.properties.codigo;
@@ -768,6 +990,10 @@ async function main(): Promise<void> {
             getFillColor: [selectedDistrito, hoveredDistrito, mockVisible],
           },
           onHover: (info: PickingInfo<GeoJSON.Feature<GeoJSON.Geometry, DistritoProperties>>) => {
+            // Guard explícito, no solo `pickable` — comprobar el estado en
+            // vivo aquí evita depender de que el re-render con pickable:false
+            // ya se haya aplicado antes de que llegue este evento (spec 021/022).
+            if (getEstadoModoCordon().fase !== 'inactivo' || getEstadoModoSimulacion().fase !== 'inactivo') return;
             const nuevoHover = info.object?.properties.codigo ?? null;
             if (nuevoHover !== hoveredDistrito) {
               hoveredDistrito = nuevoHover;
@@ -775,6 +1001,7 @@ async function main(): Promise<void> {
             }
           },
           onClick: (info: PickingInfo<GeoJSON.Feature<GeoJSON.Geometry, DistritoProperties>>) => {
+            if (getEstadoModoCordon().fase !== 'inactivo' || getEstadoModoSimulacion().fase !== 'inactivo') return;
             selectedDistrito = info.object?.properties.codigo ?? null;
             renderLayers();
             persistViewState();
@@ -784,6 +1011,91 @@ async function main(): Promise<void> {
 
     overlay.setProps({ layers });
   }
+
+  // Spec 021 — modo cordón de incidente: oculta los paneles habituales
+  // mientras está activo (evita el amontonamiento y la confusión de tener
+  // dos flujos de trabajo a la vez) y gestiona el clic único en el mapa
+  // para marcar la ubicación del incidente.
+  let clicCordonHandler: ((e: maplibregl.MapMouseEvent) => void) | null = null;
+  onCambioModoCordon((estadoCordon) => {
+    const controlesEl = document.getElementById('controls');
+    const infoPanelsEl = document.getElementById('info-panels');
+    const activo = estadoCordon.fase !== 'inactivo';
+    if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
+    if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+
+    if (estadoCordon.fase === 'esperandoClicMapa' && !clicCordonHandler) {
+      map.getCanvas().style.cursor = 'crosshair';
+      clicCordonHandler = (e) => reportarUbicacionElegida([e.lngLat.lng, e.lngLat.lat]);
+      map.on('click', clicCordonHandler);
+    } else if (estadoCordon.fase !== 'esperandoClicMapa' && clicCordonHandler) {
+      map.off('click', clicCordonHandler);
+      clicCordonHandler = null;
+      map.getCanvas().style.cursor = '';
+    }
+
+    renderLayers();
+  });
+
+  // Spec 022 — modo simulador de cortes: cada clic hace snap al tramo más
+  // cercano (reutiliza el mismo índice espacial de spec 020) y lo
+  // añade/quita del conjunto de cortes. El grafo ya está en caché tras
+  // activarSimulacionCortes(), así que cargarGrafoViario() aquí no repite
+  // la llamada de red.
+  let clicSimulacionHandler: ((e: maplibregl.MapMouseEvent) => void) | null = null;
+
+  // Bucle de animación del efecto de flujo de la capa de tráfico (spec 004)
+  // — con throttling: sin limitar, un requestAnimationFrame llamaría a
+  // renderLayers() a ~60fps, reconstruyendo TODAS las capas (no solo los
+  // puntos de flujo) muchas más veces de las necesarias — con ~400 tramos
+  // visibles a la vez esto sí se nota, a diferencia del puñado de tramos
+  // que maneja el simulador de spec 022. Throttle más generoso aquí a
+  // propósito ("que no sature", petición del usuario) y solo activo
+  // mientras la capa de tráfico está visible.
+  const INTERVALO_RENDER_FLUJO_TRAFICO_MS = 220;
+  let animacionFlujoTraficoActiva = false;
+  let ultimoRenderFlujoTrafico = 0;
+  function tickAnimacionFlujoTrafico(timestamp: number): void {
+    if (!animacionFlujoTraficoActiva) return;
+    if (timestamp - ultimoRenderFlujoTrafico >= INTERVALO_RENDER_FLUJO_TRAFICO_MS) {
+      ultimoRenderFlujoTrafico = timestamp;
+      renderLayers();
+    }
+    requestAnimationFrame(tickAnimacionFlujoTrafico);
+  }
+  function actualizarAnimacionFlujoTrafico(activar: boolean): void {
+    if (activar && !animacionFlujoTraficoActiva) {
+      animacionFlujoTraficoActiva = true;
+      requestAnimationFrame(tickAnimacionFlujoTrafico);
+    } else if (!activar) {
+      animacionFlujoTraficoActiva = false;
+    }
+  }
+
+  onCambioModoSimulacion((estadoSimulacion) => {
+    const controlesEl = document.getElementById('controls');
+    const infoPanelsEl = document.getElementById('info-panels');
+    const activo = estadoSimulacion.fase !== 'inactivo';
+    if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
+    if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+
+    if (estadoSimulacion.fase === 'seleccionando' && !clicSimulacionHandler) {
+      map.getCanvas().style.cursor = 'crosshair';
+      clicSimulacionHandler = (e) => {
+        void cargarGrafoViario().then((grafo) => {
+          const snap = grafo.indice.tramoMasCercano([e.lngLat.lng, e.lngLat.lat], 60);
+          if (snap) toggleTramoCortado(snap.tramo.idTramo);
+        });
+      };
+      map.on('click', clicSimulacionHandler);
+    } else if (estadoSimulacion.fase !== 'seleccionando' && clicSimulacionHandler) {
+      map.off('click', clicSimulacionHandler);
+      clicSimulacionHandler = null;
+      map.getCanvas().style.cursor = '';
+    }
+
+    renderLayers();
+  });
 
   const panel = buildControlPanel();
   panel.horaSlider.value = horaSimulada.slice(0, 2);
@@ -820,6 +1132,7 @@ async function main(): Promise<void> {
     try {
       const { tramos, fresh } = await fetchEstadoTraficoActual();
       tramosTrafico = tramos;
+      actualizarTramosTrafico(tramos);
       renderLayers();
       renderTraficoLeyenda(traficoLeyendaRoot, tramos, fresh);
     } catch (err) {
@@ -831,6 +1144,7 @@ async function main(): Promise<void> {
   panel.traficoToggle.addEventListener('change', () => {
     traficoVisible = panel.traficoToggle.checked;
     traficoLeyendaRoot.hidden = !traficoVisible;
+    actualizarAnimacionFlujoTrafico(traficoVisible);
     if (traficoVisible && !traficoPollingIniciado) {
       traficoPollingIniciado = true;
       startPolling(refreshTrafico, 3 * 60 * 1000); // igual TTL que la caché del endpoint, spec 004 §4
@@ -846,6 +1160,7 @@ async function main(): Promise<void> {
     try {
       const { estaciones, fresh } = await fetchEstacionesValenbisiActual();
       estacionesValenbisi = estaciones;
+      actualizarEstacionesValenbisi(estaciones);
       renderLayers();
       renderValenbisiLeyenda(valenbisiLeyendaRoot, estaciones, fresh);
     } catch (err) {
@@ -872,6 +1187,7 @@ async function main(): Promise<void> {
     try {
       const { aparcamientos: datos, fresh } = await fetchAparcamientosActual();
       aparcamientos = datos;
+      actualizarAparcamientos(datos);
       renderLayers();
       renderAparcamientoLeyenda(aparcamientoLeyendaRoot, datos, fresh);
     } catch (err) {
@@ -1052,6 +1368,10 @@ async function main(): Promise<void> {
   // Cadencia holgada: el histórico se actualiza una vez por hora en origen
   // (cron), no hace falta sondear más a menudo que eso.
   startPolling(refreshTraficoHistoricoPanel, 15 * 60 * 1000);
+
+  // Los 5 paneles fijos de arriba ya existen en el DOM — aplicar ahora la
+  // preferencia de visibilidad guardada en Configuración (spec 019 v3).
+  applyPanelVisibility();
 }
 
 main().catch((err: unknown) => {
