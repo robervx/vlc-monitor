@@ -231,14 +231,18 @@ function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: 
   }
 
   const tarjetas = panel.insights
-    .map(
-      (insight, i) => `
+    .map((insight, i) => {
+      const chips = insight.fuenteSpec
+        .map((spec) => `<span class="insight-card__fuente-chip">${spec}</span>`)
+        .join('');
+      return `
         <div class="insight-card insight-card--${insight.severidad}">
           <div class="insight-card__titulo">${insight.titulo}</div>
           <div class="insight-card__desc">${insight.descripcion}</div>
+          <div class="insight-card__fuentes">${chips}</div>
           <button class="insight-card__copiar" type="button" data-insight-index="${i}">Copiar borrador</button>
-        </div>`,
-    )
+        </div>`;
+    })
     .join('');
 
   root.innerHTML = `

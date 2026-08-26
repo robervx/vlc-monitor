@@ -3,15 +3,25 @@
 // (stale-on-error) — dato casi estático fuera de la ventana de Fallas.
 import { getOrFetch } from '../../_shared/cache';
 import { fetchDatosFallas } from '../../../src/services/fallas';
+import {
+  distritosFromGeoJSON,
+  setLoadedDistricts,
+  getDistrictAtCoordinates,
+} from '../../../src/services/district-geometry';
+import distritosGeoJSON from '../../../data/distritos-valencia.json';
 
 export const config = { runtime: 'edge' };
 
 const CACHE_KEY = 'fallas:valencia-actual:v1';
 const TTL_MS = 6 * 60 * 60 * 1000;
 
+setLoadedDistricts(distritosFromGeoJSON(distritosGeoJSON));
+
 export default async function handler(): Promise<Response> {
   try {
-    const { value: datos, fresh } = await getOrFetch(CACHE_KEY, TTL_MS, fetchDatosFallas);
+    const { value: datos, fresh } = await getOrFetch(CACHE_KEY, TTL_MS, () =>
+      fetchDatosFallas((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null),
+    );
     return new Response(JSON.stringify({ ...datos, fresh }), {
       status: 200,
       headers: {

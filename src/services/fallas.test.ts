@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fetchDatosFallas } from './fallas';
 
+// Stub simple — spec 024 §2 delega la resolución real en getDistrictAtCoordinates
+// (district-geometry.ts, ya testeado por su cuenta); aquí solo se comprueba que
+// fetchDatosFallas invoca el resolver recibido con las coordenadas correctas.
+const RESOLVER_FIJO = (): string | null => '01';
+
 const MONUMENTO_EJEMPLO = {
   type: 'FeatureCollection',
   features: [
@@ -84,7 +89,7 @@ describe('fetchDatosFallas', () => {
   it('normaliza los 4 recursos y descarta filas vacías', async () => {
     mockFetchPorUrl();
 
-    const datos = await fetchDatosFallas();
+    const datos = await fetchDatosFallas(RESOLVER_FIJO);
 
     expect(datos.monumentos).toHaveLength(1);
     expect(datos.monumentos[0]).toMatchObject({
@@ -100,7 +105,7 @@ describe('fetchDatosFallas', () => {
 
   it('enriquece nombreFalla de la carpa cruzando por idFalla', async () => {
     mockFetchPorUrl();
-    const datos = await fetchDatosFallas();
+    const datos = await fetchDatosFallas(RESOLVER_FIJO);
     expect(datos.carpas[0]?.nombreFalla).toBe('Plaça Mercat Central');
   });
 
@@ -130,7 +135,7 @@ describe('fetchDatosFallas', () => {
       }),
     );
 
-    const datos = await fetchDatosFallas();
+    const datos = await fetchDatosFallas(RESOLVER_FIJO);
     expect(datos.carpas[0]?.nombreFalla).toBeNull();
   });
 
@@ -142,6 +147,17 @@ describe('fetchDatosFallas', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(INFANTILES_VACIO) });
       }),
     );
-    await expect(fetchDatosFallas()).rejects.toThrow('503');
+    await expect(fetchDatosFallas(RESOLVER_FIJO)).rejects.toThrow('503');
+  });
+
+  it('resuelve distrito en monumentos, carpas y zonas con el resolver recibido', async () => {
+    mockFetchPorUrl();
+    const resolverEspia = vi.fn(() => '05');
+    const datos = await fetchDatosFallas(resolverEspia);
+
+    expect(datos.monumentos[0]?.distrito).toBe('05');
+    expect(datos.carpas[0]?.distrito).toBe('05');
+    expect(datos.zonasMovilidadReducida[0]?.distrito).toBe('05');
+    expect(resolverEspia).toHaveBeenCalled();
   });
 });

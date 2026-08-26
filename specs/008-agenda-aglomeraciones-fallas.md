@@ -7,7 +7,7 @@ estado: Implemented
 tipo: capa
 depende_de: [000]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 1. Problema / motivación
@@ -122,3 +122,4 @@ Un único toggle "Fallas" activa las tres sub-capas a la vez (monumentos + infan
 |---|---|---|
 | 1 | 2026-08-18 | Creación. Investigación exhaustiva de agenda general sin fuente limpia (ver §2) — decisión explícita del usuario de acotar v1 a Fallas (4 fuentes reales verificadas) y dejar el scraping de agenda general como fast-follow. |
 | 2 | 2026-08-18 | DoD completo: servicio de normalización con enriquecimiento cruzado (`src/services/fallas.ts`), endpoint (`api/fallas/v1/actual.ts`), capa registrada, toggle único + 3 sub-capas (monumentos/carpas/zonas) + leyenda en el mapa (`src/main.ts`). Verificado con `npm run typecheck`, `npm run test` y en navegador. Spec pasa a `Implemented`. |
+| 3 | 2026-08-26 | Campo `distrito: string | null` añadido a `MonumentoFalla`/`CarpaFalla`/`ZonaMovilidadReducida` (resuelto con `getDistrictAtCoordinates`, mismo patrón que `trafico.ts`) — extensión de contrato para la regla `trafico-en-zona-fallas` de la spec [024](024-motor-insights-v2-correlacion.md) §2/§3, no cambia la fuente ni el resto del contrato. |

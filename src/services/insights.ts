@@ -1,16 +1,22 @@
 /**
- * Motor de insights de la spec 013 (specs/013-motor-insights-alertas.md §3, §6).
+ * Motor de insights de la spec 013 (specs/013-motor-insights-alertas.md §3, §6)
+ * y su v2 de correlación operativa (specs/024-motor-insights-v2-correlacion.md).
  * Función pura, sin red — combina datos ya obtenidos de las specs 001 (meteo),
- * 002 (aire), 010 (Pulso de Distrito) y 016 (predicción a corto plazo).
+ * 002 (aire), 004 (tráfico), 008 (Fallas), 010 (Pulso de Distrito) y 016
+ * (predicción a corto plazo).
  *
  * "Avisa, no actúa" (CLAUDE.md §4): cada insight lleva un borrador de texto
  * listo para copiar, nunca una acción ni una lista de destinatarios — ver
- * specs/013-motor-insights-alertas.md §0.
+ * specs/013-motor-insights-alertas.md §0. Las reglas de correlación de spec
+ * 024 siguen el mismo principio de spec 013 §0/§8: reglas declarativas
+ * independientes, nunca un score compuesto ponderado entre señales.
  */
 import type { EstadoMeteo } from './estado-meteo';
 import type { CalidadAire } from './calidad-aire';
 import type { PulsoDistrito } from './pulso-distrito';
 import type { PrediccionCortoPlazo } from './prediccion-corto-plazo';
+import type { TramoTrafico } from './trafico';
+import type { DatosFallas } from './fallas';
 
 export type SeveridadInsight = 'aviso' | 'urgente';
 
@@ -20,12 +26,17 @@ export type TipoInsight =
   | 'aire-mala-calidad'
   | 'lluvia-intensa-prevista'
   | 'distrito-critico'
-  | 'viento-fuerte';
+  | 'viento-fuerte'
+  | 'trafico-concentrado-distrito'
+  | 'trafico-en-zona-fallas'
+  | 'lluvia-mas-trafico-denso';
 
 export interface ProtocoloSugerido {
   asunto: string;
   cuerpo: string;
 }
+
+export type FuenteInsight = '001' | '002' | '004' | '008' | '010' | '016' | '023';
 
 export interface Insight {
   id: string;
@@ -35,8 +46,8 @@ export interface Insight {
   descripcion: string;
   protocoloSugerido: ProtocoloSugerido;
   distritoCodigo?: string;
-  fuenteSpec: '001' | '002' | '010' | '016';
-  // 'viento-fuerte' también usa fuenteSpec '001' (mismo EstadoMeteo, campo vientoRachas).
+  fuenteSpec: FuenteInsight[];
+  // 'viento-fuerte' también usa fuenteSpec ['001'] (mismo EstadoMeteo, campo vientoRachas).
   detectedAt: string;
   fetchedAt: string;
 }
@@ -77,7 +88,7 @@ function insightCalorExtremo(meteo: EstadoMeteo, fetchedAt: string): Insight | n
         'hidratación y rotación de las unidades en calle, prioridad a zonas sin sombra. ' +
         'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
     },
-    fuenteSpec: '001',
+    fuenteSpec: ['001'],
     detectedAt: meteo.observedAt,
     fetchedAt,
   };
@@ -98,7 +109,7 @@ function insightFrioExtremo(meteo: EstadoMeteo, fetchedAt: string): Insight | nu
         'Se sugiere valorar aviso a las unidades sobre riesgo de helada en calzada y protocolo de frío para personas sin techo. ' +
         'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
     },
-    fuenteSpec: '001',
+    fuenteSpec: ['001'],
     detectedAt: meteo.observedAt,
     fetchedAt,
   };
@@ -121,7 +132,7 @@ function insightVientoFuerte(meteo: EstadoMeteo, fetchedAt: string): Insight | n
         'precaución con estructuras temporales (casetas, carpas) y vía pública. ' +
         'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
     },
-    fuenteSpec: '001',
+    fuenteSpec: ['001'],
     detectedAt: meteo.observedAt,
     fetchedAt,
   };
@@ -144,7 +155,7 @@ function insightAireMalaCalidad(aire: CalidadAire, fetchedAt: string): Insight |
         'y revisar si aplica alguna restricción según el protocolo municipal de calidad del aire. ' +
         'Dato de origen: Open-Meteo Air Quality (VLC Monitor, spec 002). Revisar y decidir antes de actuar.',
     },
-    fuenteSpec: '002',
+    fuenteSpec: ['002'],
     detectedAt: aire.observedAt,
     fetchedAt,
   };
@@ -167,7 +178,7 @@ function insightsLluviaIntensa(prediccion: PrediccionCortoPlazo, fetchedAt: stri
           'inundación habituales y refuerzo en pasos de peatones/zonas bajas. ' +
           'Dato de origen: Open-Meteo (VLC Monitor, spec 016). Revisar y decidir antes de actuar.',
       },
-      fuenteSpec: '016' as const,
+      fuenteSpec: ['016'] as FuenteInsight[],
       detectedAt: tramo.horaObjetivo,
       fetchedAt,
     }));
@@ -191,10 +202,147 @@ function insightsDistritoCritico(distritos: PulsoDistrito[], fetchedAt: string):
           'Dato de origen: VLC Monitor, índice compuesto (spec 010). Revisar y decidir antes de actuar.',
       },
       distritoCodigo: d.distritoCodigo,
-      fuenteSpec: '010' as const,
+      fuenteSpec: ['010'] as FuenteInsight[],
       detectedAt: d.observedAt,
       fetchedAt,
     }));
+}
+
+const UMBRAL_TRAFICO_CONCENTRADO_AVISO = 3;
+const UMBRAL_TRAFICO_CONCENTRADO_URGENTE = 6;
+
+function nombreDistritoOCodigo(distritos: PulsoDistrito[] | null, codigo: string): string {
+  return distritos?.find((d) => d.distritoCodigo === codigo)?.distritoNombre ?? codigo;
+}
+
+/** spec 024 §6 — multiplicidad de tramos en vez de persistencia temporal: el motor sigue sin estado (spec 013 §8). */
+function insightsTraficoConcentrado(
+  tramos: TramoTrafico[],
+  distritos: PulsoDistrito[] | null,
+  fetchedAt: string,
+): Insight[] {
+  const afectadosPorDistrito = new Map<string, number>();
+  const monitorizadosPorDistrito = new Map<string, number>();
+  for (const tramo of tramos) {
+    if (!tramo.distrito) continue;
+    monitorizadosPorDistrito.set(tramo.distrito, (monitorizadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
+    if (tramo.estado === 'congestionado' || tramo.estado === 'cortado') {
+      afectadosPorDistrito.set(tramo.distrito, (afectadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
+    }
+  }
+
+  const insights: Insight[] = [];
+  for (const [codigo, afectados] of afectadosPorDistrito) {
+    if (afectados < UMBRAL_TRAFICO_CONCENTRADO_AVISO) continue;
+    const nombre = nombreDistritoOCodigo(distritos, codigo);
+    const monitorizados = monitorizadosPorDistrito.get(codigo) ?? afectados;
+    const severidad: SeveridadInsight = afectados >= UMBRAL_TRAFICO_CONCENTRADO_URGENTE ? 'urgente' : 'aviso';
+    insights.push({
+      id: `trafico-concentrado-distrito:${codigo}`,
+      tipo: 'trafico-concentrado-distrito',
+      severidad,
+      titulo: `Tráfico denso concentrado — ${nombre}`,
+      descripcion: `${afectados} de ${monitorizados} tramos monitorizados en ${nombre} están congestionados o cortados ahora mismo.`,
+      protocoloSugerido: {
+        asunto: `Concentración de tráfico denso — ${nombre}`,
+        cuerpo:
+          `Se han detectado ${afectados} tramos en estado congestionado o cortado (de ${monitorizados} monitorizados) en ${nombre}. ` +
+          'Se sugiere valorar revisar la situación sobre el terreno. ' +
+          'Dato de origen: Geoportal Ajuntament de València (VLC Monitor, spec 004). Revisar y decidir antes de actuar.',
+      },
+      distritoCodigo: codigo,
+      fuenteSpec: ['004'],
+      detectedAt: fetchedAt,
+      fetchedAt,
+    });
+  }
+  return insights;
+}
+
+/**
+ * spec 024 §6 — deliberadamente solo `zonasMovilidadReducida`, no
+ * monumentos/carpas (esos están poblados todo el año, ver spec 024 §6):
+ * es la única señal de Fallas genuinamente estacional.
+ */
+function insightsTraficoEnZonaFallas(
+  tramos: TramoTrafico[],
+  fallas: DatosFallas,
+  distritos: PulsoDistrito[] | null,
+  fetchedAt: string,
+): Insight[] {
+  const distritosConZonaFallas = new Set(
+    fallas.zonasMovilidadReducida.map((z) => z.distrito).filter((d): d is string => d !== null),
+  );
+  if (distritosConZonaFallas.size === 0) return [];
+
+  const distritosConTraficoDenso = new Set(
+    tramos
+      .filter((t) => t.distrito && (t.estado === 'congestionado' || t.estado === 'cortado'))
+      .map((t) => t.distrito!),
+  );
+
+  const insights: Insight[] = [];
+  for (const codigo of distritosConZonaFallas) {
+    if (!distritosConTraficoDenso.has(codigo)) continue;
+    const nombre = nombreDistritoOCodigo(distritos, codigo);
+    insights.push({
+      id: `trafico-en-zona-fallas:${codigo}`,
+      tipo: 'trafico-en-zona-fallas',
+      severidad: 'urgente',
+      titulo: `Tráfico denso en zona de Fallas activa — ${nombre}`,
+      descripcion: `${nombre} tiene tráfico congestionado o cortado y una zona de movilidad reducida de Fallas activa a la vez.`,
+      protocoloSugerido: {
+        asunto: `Concurrencia de tráfico denso y zona de Fallas — ${nombre}`,
+        cuerpo:
+          `Se ha detectado tráfico congestionado o cortado coincidiendo con una zona de movilidad reducida de Fallas activa en ${nombre}. ` +
+          'Se sugiere valorar reforzar la zona sobre el terreno. ' +
+          'Datos de origen: Geoportal Ajuntament de València (VLC Monitor, specs 004 y 008). Revisar y decidir antes de actuar.',
+      },
+      distritoCodigo: codigo,
+      fuenteSpec: ['004', '008'],
+      detectedAt: fetchedAt,
+      fetchedAt,
+    });
+  }
+  return insights;
+}
+
+/** spec 024 §6 — refuerza el insight de lluvia ya existente en vez de duplicarlo; no reemplaza insightsLluviaIntensa. */
+function insightLluviaMasTrafico(
+  insightsLluvia: Insight[],
+  tramos: TramoTrafico[],
+  distritos: PulsoDistrito[] | null,
+  fetchedAt: string,
+): Insight | null {
+  if (insightsLluvia.length === 0) return null;
+
+  const distritosConTraficoDenso = Array.from(
+    new Set(
+      tramos
+        .filter((t) => t.distrito && (t.estado === 'congestionado' || t.estado === 'cortado'))
+        .map((t) => t.distrito!),
+    ),
+  );
+  if (distritosConTraficoDenso.length === 0) return null;
+
+  const nombres = distritosConTraficoDenso.map((codigo) => nombreDistritoOCodigo(distritos, codigo)).join(', ');
+  return {
+    id: 'lluvia-mas-trafico-denso:ciudad',
+    tipo: 'lluvia-mas-trafico-denso',
+    severidad: 'urgente',
+    titulo: 'Lluvia intensa prevista con tráfico ya denso',
+    descripcion: `Hay lluvia intensa prevista y tráfico ya congestionado o cortado en: ${nombres}.`,
+    protocoloSugerido: {
+      asunto: 'Lluvia intensa prevista con tráfico ya denso — Valencia',
+      cuerpo:
+        `Además de la lluvia intensa prevista, ya hay tráfico congestionado o cortado en: ${nombres}. ` +
+        'Se sugiere valorar priorizar el refuerzo preventivo en esas zonas antes de que llegue la lluvia. ' +
+        'Datos de origen: Open-Meteo y Geoportal Ajuntament de València (VLC Monitor, specs 016 y 004). Revisar y decidir antes de actuar.',
+    },
+    fuenteSpec: ['016', '004'],
+    detectedAt: fetchedAt,
+    fetchedAt,
+  };
 }
 
 export function calcularInsights(
@@ -202,16 +350,23 @@ export function calcularInsights(
   aire: CalidadAire,
   distritos: PulsoDistrito[] | null,
   prediccion: PrediccionCortoPlazo | null,
+  tramosTrafico: TramoTrafico[] | null = null,
+  datosFallas: DatosFallas | null = null,
 ): PanelInsights {
   const fetchedAt = new Date().toISOString();
+
+  const insightsLluvia = prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : [];
 
   const insights: Insight[] = [
     insightCalorExtremo(meteo, fetchedAt),
     insightFrioExtremo(meteo, fetchedAt),
     insightVientoFuerte(meteo, fetchedAt),
     insightAireMalaCalidad(aire, fetchedAt),
-    ...(prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : []),
+    ...insightsLluvia,
     ...(distritos ? insightsDistritoCritico(distritos, fetchedAt) : []),
+    ...(tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos, fetchedAt) : []),
+    ...(tramosTrafico && datosFallas ? insightsTraficoEnZonaFallas(tramosTrafico, datosFallas, distritos, fetchedAt) : []),
+    ...(tramosTrafico ? [insightLluviaMasTrafico(insightsLluvia, tramosTrafico, distritos, fetchedAt)] : []),
   ].filter((insight): insight is Insight => insight !== null);
 
   return { insights, fetchedAt, source: 'vlc-monitor-insights' };
