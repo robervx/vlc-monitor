@@ -4,6 +4,8 @@ import type { EstadoMeteo } from './estado-meteo';
 import type { CalidadAire } from './calidad-aire';
 import type { PulsoDistrito } from './pulso-distrito';
 import type { PrediccionCortoPlazo } from './prediccion-corto-plazo';
+import type { TramoTrafico } from './trafico';
+import type { DatosFallas } from './fallas';
 
 const METEO_NEUTRA: EstadoMeteo = {
   id: 'valencia',
@@ -71,6 +73,41 @@ const DISTRITO_TRANQUILO: PulsoDistrito = {
   fetchedAt: '2026-08-18T10:01:00.000Z',
   source: 'vlc-monitor-compuesto',
 };
+
+function tramo(id: string, distrito: string | null, estado: TramoTrafico['estado']): TramoTrafico {
+  return {
+    id,
+    nombre: `Calle ${id}`,
+    geometry: { type: 'LineString', coordinates: [[-0.38, 39.47]] },
+    estadoCodigo: 0,
+    estado,
+    esPasoInferior: false,
+    distrito,
+    observedAt: '2026-08-18T10:00:00.000Z',
+    fetchedAt: '2026-08-18T10:01:00.000Z',
+    source: 'ajuntament-valencia-geoportal',
+  };
+}
+
+const FALLAS_SIN_ZONAS: DatosFallas = { monumentos: [], carpas: [], zonasMovilidadReducida: [] };
+
+function fallasConZona(distrito: string): DatosFallas {
+  return {
+    monumentos: [],
+    carpas: [],
+    zonasMovilidadReducida: [
+      {
+        id: 'z1',
+        descripcion: 'Mascletà',
+        geometry: { type: 'Polygon', coordinates: [[[-0.38, 39.47], [-0.381, 39.471], [-0.38, 39.47]]] },
+        distrito,
+        observedAt: '2026-08-18T10:00:00.000Z',
+        fetchedAt: '2026-08-18T10:01:00.000Z',
+        source: 'ajuntament-valencia-geoportal',
+      },
+    ],
+  };
+}
 
 describe('calcularInsights', () => {
   it('no genera ningún insight cuando todo está dentro de los umbrales normales', () => {
@@ -165,5 +202,100 @@ describe('calcularInsights', () => {
   it('no revienta si distritos o predicción no están disponibles (null)', () => {
     const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null);
     expect(resultado.insights).toHaveLength(0);
+  });
+
+  it('todos los insights de spec 013 emiten fuenteSpec como array', () => {
+    const resultado = calcularInsights(
+      { ...METEO_NEUTRA, temperatura: 38, sensacionTermica: 39 },
+      { ...AIRE_BUENA, categoria: 'Muy mala', indiceEuropeo: 95 },
+      [{ ...DISTRITO_TRANQUILO, distritoCodigo: '05', categoria: 'Crítico', indice: 80 }],
+      { ...PREDICCION_SIN_LLUVIA, predicciones: [{ ...PREDICCION_SIN_LLUVIA.predicciones[0]!, precipitacion: 6 }] },
+    );
+    expect(resultado.insights.length).toBeGreaterThan(0);
+    for (const insight of resultado.insights) {
+      expect(Array.isArray(insight.fuenteSpec)).toBe(true);
+    }
+  });
+
+  describe('spec 024 — correlación tráfico/Fallas/lluvia', () => {
+    it('no genera trafico-concentrado-distrito con menos de 3 tramos densos en el mismo distrito', () => {
+      const tramos = [tramo('1', '05', 'congestionado'), tramo('2', '05', 'congestionado'), tramo('3', '05', 'fluido')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, FALLAS_SIN_ZONAS);
+      expect(resultado.insights.filter((i) => i.tipo === 'trafico-concentrado-distrito')).toHaveLength(0);
+    });
+
+    it('genera trafico-concentrado-distrito con severidad aviso a partir de 3 tramos densos', () => {
+      const tramos = [
+        tramo('1', '05', 'congestionado'),
+        tramo('2', '05', 'congestionado'),
+        tramo('3', '05', 'cortado'),
+        tramo('4', '05', 'fluido'),
+      ];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, FALLAS_SIN_ZONAS);
+      const insight = resultado.insights.find((i) => i.tipo === 'trafico-concentrado-distrito');
+      expect(insight?.severidad).toBe('aviso');
+      expect(insight?.distritoCodigo).toBe('05');
+      expect(insight?.fuenteSpec).toEqual(['004']);
+    });
+
+    it('sube trafico-concentrado-distrito a urgente a partir de 6 tramos densos', () => {
+      const tramos = Array.from({ length: 6 }, (_, i) => tramo(String(i), '05', 'cortado'));
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, FALLAS_SIN_ZONAS);
+      const insight = resultado.insights.find((i) => i.tipo === 'trafico-concentrado-distrito');
+      expect(insight?.severidad).toBe('urgente');
+    });
+
+    it('no genera trafico-en-zona-fallas si no hay zonas de movilidad reducida activas', () => {
+      const tramos = [tramo('1', '05', 'cortado')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, FALLAS_SIN_ZONAS);
+      expect(resultado.insights.filter((i) => i.tipo === 'trafico-en-zona-fallas')).toHaveLength(0);
+    });
+
+    it('no genera trafico-en-zona-fallas si el tráfico denso está en un distrito distinto al de la zona', () => {
+      const tramos = [tramo('1', '05', 'cortado')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, fallasConZona('01'));
+      expect(resultado.insights.filter((i) => i.tipo === 'trafico-en-zona-fallas')).toHaveLength(0);
+    });
+
+    it('genera trafico-en-zona-fallas cuando coincide distrito de tráfico denso y zona de Fallas activa', () => {
+      const tramos = [tramo('1', '05', 'cortado')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, tramos, fallasConZona('05'));
+      const insight = resultado.insights.find((i) => i.tipo === 'trafico-en-zona-fallas');
+      expect(insight?.severidad).toBe('urgente');
+      expect(insight?.fuenteSpec).toEqual(['004', '008']);
+    });
+
+    it('no genera lluvia-mas-trafico-denso si no hay lluvia intensa prevista', () => {
+      const tramos = [tramo('1', '05', 'cortado')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, PREDICCION_SIN_LLUVIA, tramos, FALLAS_SIN_ZONAS);
+      expect(resultado.insights.filter((i) => i.tipo === 'lluvia-mas-trafico-denso')).toHaveLength(0);
+    });
+
+    it('no genera lluvia-mas-trafico-denso si hay lluvia pero no tráfico denso', () => {
+      const prediccion: PrediccionCortoPlazo = {
+        ...PREDICCION_SIN_LLUVIA,
+        predicciones: [{ ...PREDICCION_SIN_LLUVIA.predicciones[0]!, precipitacion: 6 }],
+      };
+      const tramos = [tramo('1', '05', 'fluido')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, prediccion, tramos, FALLAS_SIN_ZONAS);
+      expect(resultado.insights.filter((i) => i.tipo === 'lluvia-mas-trafico-denso')).toHaveLength(0);
+    });
+
+    it('genera lluvia-mas-trafico-denso cuando coinciden lluvia intensa prevista y tráfico denso', () => {
+      const prediccion: PrediccionCortoPlazo = {
+        ...PREDICCION_SIN_LLUVIA,
+        predicciones: [{ ...PREDICCION_SIN_LLUVIA.predicciones[0]!, precipitacion: 6 }],
+      };
+      const tramos = [tramo('1', '05', 'congestionado')];
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, prediccion, tramos, FALLAS_SIN_ZONAS);
+      const insight = resultado.insights.find((i) => i.tipo === 'lluvia-mas-trafico-denso');
+      expect(insight?.severidad).toBe('urgente');
+      expect(insight?.fuenteSpec).toEqual(['016', '004']);
+    });
+
+    it('no revienta si tramosTrafico/datosFallas no están disponibles (null, valor por defecto)', () => {
+      const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null);
+      expect(resultado.insights.filter((i) => i.tipo.startsWith('trafico-') || i.tipo === 'lluvia-mas-trafico-denso')).toHaveLength(0);
+    });
   });
 });

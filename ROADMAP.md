@@ -16,7 +16,7 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 | **F5** | Pulido y compartición | Estado en URL, PWA instalable, rendimiento, accesibilidad, geolocalización de usuario + "qué tengo más cerca" (implementado, desbloqueado por `ADR-001`), publicación con contraseña en dominio propio (pendiente) | `012`, `018` |
 | **F6** | Densidad de movilidad agregada real | Sustituye el prototipo mock (`003`) por una fuente real agregada y anonimizada en origen (ej. producto comercial tipo Telefónica LUCA/Smart Steps), **sujeta a contrato y revisión de cumplimiento** | `011` (bloqueada hasta que exista contrato) |
 | **F7** | Integraciones externas de navegación | Publicación de cortes/incidencias en formato consumible por Waze/Google Maps — sujeta a investigación de viabilidad y posible convenio con el Ayuntamiento | `015` |
-| **F8** | Apoyo a decisión operativa — cordón de seguridad por incidente | Grafo viario base (recorte de bajo riesgo de la Opción B de `ADR-001`, sin simulador de tráfico) + motor de propuesta de perímetro/calles a cortar según tipo e intensidad de incidente, editable por el mando, nunca automático (`CLAUDE.md` §4) | `020`, `021` |
+| **F8** | Apoyo a decisión operativa — gemelo digital | Grafo viario base (recorte de bajo riesgo de la Opción B de `ADR-001`, sin simulador de tráfico) + motor de propuesta de perímetro/calles a cortar según tipo e intensidad de incidente, editable por el mando, nunca automático (`CLAUDE.md` §4) + simulador de cortes de calle + motor de insights v2 con correlación declarativa entre señales ya existentes (tráfico, Fallas, contexto mediático), sin modelo estadístico nuevo | `020`, `021`, `022`, `024` |
 
 ## Fuera de alcance (recordatorio — detalle completo en `CLAUDE.md` §3-4)
 

@@ -18,6 +18,7 @@ export interface MonumentoFalla {
   anyoFundacion: number | null;
   distintivo: string | null;
   bocetoUrl: string | null;
+  distrito: string | null; // spec 024 §2 — resuelto con el mismo getDistrictAtCoordinates que usa trafico.ts
   observedAt: string;
   fetchedAt: string;
   source: 'ajuntament-valencia-geoportal';
@@ -28,6 +29,7 @@ export interface CarpaFalla {
   idFalla: string | null;
   nombreFalla: string | null;
   geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon;
+  distrito: string | null; // spec 024 §2 — resuelto sobre el centroide del polígono
   observedAt: string;
   fetchedAt: string;
   source: 'ajuntament-valencia-geoportal';
@@ -37,9 +39,24 @@ export interface ZonaMovilidadReducida {
   id: string;
   descripcion: string;
   geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon;
+  distrito: string | null; // spec 024 §2 — resuelto sobre el centroide del polígono
   observedAt: string;
   fetchedAt: string;
   source: 'ajuntament-valencia-geoportal';
+}
+
+export type ResolverDistrito = (lat: number, lon: number) => string | null;
+
+/** Centroide simple (media de vértices del anillo exterior) — mismo nivel de precisión que puntoMedio() en trafico.ts, suficiente para resolver distrito, no para cálculo geométrico exacto. */
+function centroidePoligono(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): [number, number] {
+  const anillo = geometry.type === 'Polygon' ? geometry.coordinates[0]! : geometry.coordinates[0]![0]!;
+  let sumaLon = 0;
+  let sumaLat = 0;
+  for (const punto of anillo) {
+    sumaLon += punto[0]!;
+    sumaLat += punto[1]!;
+  }
+  return [sumaLon / anillo.length, sumaLat / anillo.length];
 }
 
 export interface DatosFallas {
@@ -89,6 +106,7 @@ function normalizarMonumentos(
   respuesta: ArcGisResponse<MonumentoProperties>,
   esInfantil: boolean,
   fetchedAt: string,
+  resolverDistrito: ResolverDistrito,
 ): MonumentoFalla[] {
   return respuesta.features
     .filter(
@@ -111,6 +129,7 @@ function normalizarMonumentos(
         anyoFundacion: f.properties.anyo_fundacion,
         distintivo: f.properties.distintivo,
         bocetoUrl: f.properties.boceto,
+        distrito: resolverDistrito(lat!, lon!),
         observedAt: fetchedAt,
         fetchedAt,
         source: 'ajuntament-valencia-geoportal',
@@ -127,6 +146,7 @@ function normalizarCarpas(
   respuesta: ArcGisResponse<CarpaProperties>,
   nombrePorIdFalla: Map<string, string>,
   fetchedAt: string,
+  resolverDistrito: ResolverDistrito,
 ): CarpaFalla[] {
   return respuesta.features
     .filter(
@@ -137,11 +157,13 @@ function normalizarCarpas(
     )
     .map((f) => {
       const idFalla = f.properties.id_falla !== null ? String(f.properties.id_falla) : null;
+      const [lon, lat] = centroidePoligono(f.geometry);
       return {
         id: String(f.properties.objectid),
         idFalla,
         nombreFalla: idFalla ? (nombrePorIdFalla.get(idFalla) ?? null) : null,
         geometry: f.geometry,
+        distrito: resolverDistrito(lat, lon),
         observedAt: fetchedAt,
         fetchedAt,
         source: 'ajuntament-valencia-geoportal',
@@ -157,6 +179,7 @@ interface ZonaProperties {
 function normalizarZonas(
   respuesta: ArcGisResponse<ZonaProperties>,
   fetchedAt: string,
+  resolverDistrito: ResolverDistrito,
 ): ZonaMovilidadReducida[] {
   return respuesta.features
     .filter(
@@ -166,17 +189,21 @@ function normalizarZonas(
         f.properties.gid !== null &&
         f.properties.descripcion !== null,
     )
-    .map((f) => ({
-      id: String(f.properties.gid),
-      descripcion: f.properties.descripcion!,
-      geometry: f.geometry,
-      observedAt: fetchedAt,
-      fetchedAt,
-      source: 'ajuntament-valencia-geoportal' as const,
-    }));
+    .map((f) => {
+      const [lon, lat] = centroidePoligono(f.geometry);
+      return {
+        id: String(f.properties.gid),
+        descripcion: f.properties.descripcion!,
+        geometry: f.geometry,
+        distrito: resolverDistrito(lat, lon),
+        observedAt: fetchedAt,
+        fetchedAt,
+        source: 'ajuntament-valencia-geoportal' as const,
+      };
+    });
 }
 
-export async function fetchDatosFallas(): Promise<DatosFallas> {
+export async function fetchDatosFallas(resolverDistrito: ResolverDistrito): Promise<DatosFallas> {
   const fetchedAt = new Date().toISOString();
 
   const [monumentosRaw, infantilesRaw, carpasRaw, zonasRaw] = await Promise.all([
@@ -187,12 +214,12 @@ export async function fetchDatosFallas(): Promise<DatosFallas> {
   ]);
 
   const monumentos = [
-    ...normalizarMonumentos(monumentosRaw, false, fetchedAt),
-    ...normalizarMonumentos(infantilesRaw, true, fetchedAt),
+    ...normalizarMonumentos(monumentosRaw, false, fetchedAt, resolverDistrito),
+    ...normalizarMonumentos(infantilesRaw, true, fetchedAt, resolverDistrito),
   ];
   const nombrePorIdFalla = new Map(monumentos.filter((m) => !m.esInfantil).map((m) => [m.id, m.nombre]));
-  const carpas = normalizarCarpas(carpasRaw, nombrePorIdFalla, fetchedAt);
-  const zonasMovilidadReducida = normalizarZonas(zonasRaw, fetchedAt);
+  const carpas = normalizarCarpas(carpasRaw, nombrePorIdFalla, fetchedAt, resolverDistrito);
+  const zonasMovilidadReducida = normalizarZonas(zonasRaw, fetchedAt, resolverDistrito);
 
   return { monumentos, carpas, zonasMovilidadReducida };
 }
