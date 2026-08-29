@@ -6,7 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer, ScatterplotLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
-import { preloadDistrictGeometry, getDistrictCentroid } from './services/district-geometry';
+import { preloadDistrictGeometry, getDistrictCentroid, getLoadedDistricts } from './services/district-geometry';
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
 import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
@@ -21,8 +21,13 @@ import type { Aparcamiento } from './services/aparcamiento';
 import type { PulsoDistrito, CategoriaPulso } from './services/pulso-distrito';
 import type { DatosFallas, MonumentoFalla } from './services/fallas';
 import type { ItemMediatico } from './services/mediatico';
+import type { VentanaTendencia } from './services/tendencia-terminos';
+import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility } from './ui/panel-preferences';
+import { initPwa } from './pwa';
+import { initDeteccionDispositivo } from './ui/deteccion-dispositivo';
+import { initLayoutMovil } from './ui/layout-movil';
 import {
   actualizarTramosTrafico,
   actualizarEstacionesValenbisi,
@@ -493,6 +498,74 @@ async function fetchDatosFallasActual(): Promise<DatosFallas & { fresh: boolean 
   return (await res.json()) as DatosFallas & { fresh: boolean };
 }
 
+// Spec 026 — mostaza/morado/verde azulado: distintos de rojo (reservado para
+// spec 021), naranja (spec 022) y dorado (Fallas, spec 008).
+const COLOR_TIPO_VIA_PUBLICA: Record<TipoIncidenciaViaPublica, Color> = {
+  obras: [212, 160, 23, 210],
+  incidencias: [142, 68, 173, 210],
+  festejos: [26, 188, 156, 210],
+};
+const ZOOM_MINIMO_VIA_PUBLICA = 12; // spec 026 §5/§7 — evita saturar el mapa con 499 puntos a zoom de ciudad
+
+const NOMBRE_TIPO_VIA_PUBLICA: Record<TipoIncidenciaViaPublica, string> = {
+  obras: 'Obras',
+  incidencias: 'Incidencias',
+  festejos: 'Festejos',
+};
+
+function renderViaPublicaLeyenda(root: HTMLDivElement, incidencias: IncidenciaViaPublica[], fresh: boolean): void {
+  const filas = (Object.keys(COLOR_TIPO_VIA_PUBLICA) as TipoIncidenciaViaPublica[])
+    .map((tipo) => {
+      const [r, g, b] = COLOR_TIPO_VIA_PUBLICA[tipo];
+      const n = incidencias.filter((i) => i.tipo === tipo).length;
+      return `<div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(${r},${g},${b})"></span>${NOMBRE_TIPO_VIA_PUBLICA[tipo]} (${n})</div>`;
+    })
+    .join('');
+
+  root.innerHTML = `
+    <div class="info-panel__desc">Incidencias de vía pública — ${incidencias.length} activas</div>
+    ${filas}
+    <div class="info-panel__meta info-panel__meta--aviso">Las fechas son la vigencia del permiso administrativo, no la duración real confirmada del corte.</div>
+    <div class="info-panel__meta">Solo visible acercando el mapa (zoom de calle) · toque un punto para ver el detalle</div>
+    <div class="info-panel__meta">${metaFrescura('Ajuntament de València — Geoportal', incidencias[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+  `;
+}
+
+async function fetchIncidenciasViaPublicaActual(): Promise<{ incidencias: IncidenciaViaPublica[]; fresh: boolean }> {
+  const res = await fetch('/api/via-publica/v1/incidencias');
+  if (!res.ok) throw new Error(`GET /api/via-publica/v1/incidencias -> HTTP ${res.status}`);
+  return (await res.json()) as { incidencias: IncidenciaViaPublica[]; fresh: boolean };
+}
+
+function formatoFechaCorta(iso: string): string {
+  return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+/** Tooltip mínimo específico de esta capa — ningún otro layer de puntos del proyecto usa popup todavía, no se construye un sistema genérico sin que otra spec lo pida. */
+function buildViaPublicaTooltip(): HTMLDivElement {
+  const el = document.createElement('div');
+  el.id = 'via-publica-tooltip';
+  el.hidden = true;
+  document.body.appendChild(el);
+  return el;
+}
+
+function renderViaPublicaTooltip(el: HTMLDivElement, incidencia: IncidenciaViaPublica | null, x: number, y: number): void {
+  if (!incidencia) {
+    el.hidden = true;
+    return;
+  }
+  el.hidden = false;
+  el.style.left = `${x + 12}px`;
+  el.style.top = `${y + 12}px`;
+  el.innerHTML = `
+    <div class="via-publica-tooltip__tipo">${NOMBRE_TIPO_VIA_PUBLICA[incidencia.tipo]}</div>
+    <div class="via-publica-tooltip__calle">${escapeHtml(incidencia.calle)}</div>
+    <div class="via-publica-tooltip__afectacion">${escapeHtml(incidencia.afectacion)}</div>
+    <div class="via-publica-tooltip__vigencia">Vigente hasta ${formatoFechaCorta(incidencia.vigenciaHasta)}</div>
+  `;
+}
+
 function formatoTiempoRelativo(fechaIso: string): string {
   const minutos = Math.round((Date.now() - new Date(fechaIso).getTime()) / 60000);
   if (minutos < 1) return 'hace instantes';
@@ -515,23 +588,65 @@ function buildMediaPanel(): { root: HTMLDivElement; list: HTMLDivElement } {
   return { root, list: root.querySelector('#media-panel-list')! };
 }
 
+// Spec 023 §5: cada ítem enlaza a la noticia; si menciona distrito(s), se muestra
+// como chip(s) — atenuado si el match solo pasó por la guarda de contexto de un
+// nombre ambiguo (bajaConfianza).
+function renderItemMediatico(item: ItemMediatico): string {
+  const chips = item.distritosMencionados
+    .map((m) => {
+      const clase = m.bajaConfianza ? 'media-panel__chip media-panel__chip--baja-confianza' : 'media-panel__chip';
+      return `<span class="${clase}">${escapeHtml(m.distritoNombre)}</span>`;
+    })
+    .join('');
+
+  return `
+    <a class="media-panel__item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+      <div class="media-panel__item-titulo">${escapeHtml(item.titulo)}</div>
+      <div class="media-panel__item-meta">${item.fuente} · ${formatoTiempoRelativo(item.publicadoEn)}</div>
+      ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
+    </a>
+  `;
+}
+
+function renderGrupoMediatico(titulo: string, items: ItemMediatico[]): string {
+  if (items.length === 0) return '';
+  return `
+    <div class="media-panel__grupo-titulo">${escapeHtml(titulo)}</div>
+    ${items.map(renderItemMediatico).join('')}
+  `;
+}
+
 function renderMediaticoPanel(
   panel: { root: HTMLDivElement; list: HTMLDivElement },
   items: ItemMediatico[],
   fresh: boolean,
   fuentesFallidas: string[],
 ): void {
-  panel.list.innerHTML = items
-    .filter((item) => /^https?:\/\//i.test(item.url)) // nunca renderizar javascript:/data: aunque venga en el feed
-    .map(
-      (item) => `
-        <a class="media-panel__item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
-          <div class="media-panel__item-titulo">${escapeHtml(item.titulo)}</div>
-          <div class="media-panel__item-meta">${item.fuente} · ${formatoTiempoRelativo(item.publicadoEn)}</div>
-        </a>
-      `,
-    )
+  const validos = items.filter((item) => /^https?:\/\//i.test(item.url)); // nunca renderizar javascript:/data: aunque venga en el feed
+
+  // Spec 023 §5: agrupar por distrito mencionado; un ítem con dos distritos
+  // aparece en los dos grupos. Sin ninguna mención -> bloque "Valencia (general)".
+  const porDistrito = new Map<string, { nombre: string; items: ItemMediatico[] }>();
+  const generales: ItemMediatico[] = [];
+
+  for (const item of validos) {
+    if (item.distritosMencionados.length === 0) {
+      generales.push(item);
+      continue;
+    }
+    for (const mencion of item.distritosMencionados) {
+      const grupo = porDistrito.get(mencion.distritoCodigo) ?? { nombre: mencion.distritoNombre, items: [] };
+      grupo.items.push(item);
+      porDistrito.set(mencion.distritoCodigo, grupo);
+    }
+  }
+
+  const gruposDistrito = [...porDistrito.entries()]
+    .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre))
+    .map(([, grupo]) => renderGrupoMediatico(grupo.nombre, grupo.items))
     .join('');
+
+  panel.list.innerHTML = gruposDistrito + renderGrupoMediatico('Valencia (general)', generales);
 
   const meta = panel.root.querySelector('#media-panel-meta')!;
   const avisoFallidas = fuentesFallidas.length > 0 ? ` · sin ${fuentesFallidas.join(', ')}` : '';
@@ -548,6 +663,70 @@ async function fetchItemsMediaticosActual(): Promise<{
   return (await res.json()) as { items: ItemMediatico[]; fresh: boolean; fuentesFallidas: string[] };
 }
 
+// Spec 025 — mínimo de ítems en la ventana para mostrar el ranking como
+// representativo; por debajo se avisa en vez de fingir precisión (§6 DoD).
+const MINIMO_ITEMS_TENDENCIA = 5;
+
+function buildTendenciaPanel(): { root: HTMLDivElement; list: HTMLDivElement; ventanaSelect: HTMLSelectElement } {
+  const root = document.createElement('div');
+  root.id = 'tendencia-panel';
+  root.hidden = true;
+  root.innerHTML = `
+    <div class="media-panel__header">
+      Términos en tendencia
+      <select id="tendencia-ventana-select" class="tendencia-panel__select">
+        <option value="hora">Última hora</option>
+        <option value="dia">Último día</option>
+      </select>
+    </div>
+    <div class="media-panel__list" id="tendencia-panel-list"></div>
+    <div class="info-panel__meta" id="tendencia-panel-meta"></div>
+  `;
+  document.body.appendChild(root);
+  return {
+    root,
+    list: root.querySelector('#tendencia-panel-list')!,
+    ventanaSelect: root.querySelector('#tendencia-ventana-select')!,
+  };
+}
+
+function renderTendenciaPanel(
+  panel: { root: HTMLDivElement; list: HTMLDivElement },
+  ventana: VentanaTendencia,
+  fresh: boolean,
+): void {
+  if (ventana.totalItems < MINIMO_ITEMS_TENDENCIA) {
+    panel.list.innerHTML = `<div class="tendencia-panel__insuficiente">Muestra insuficiente (${ventana.totalItems} ítem${ventana.totalItems === 1 ? '' : 's'} en esta ventana) — no se muestra un ranking poco representativo.</div>`;
+  } else {
+    panel.list.innerHTML = ventana.terminos
+      .map((t) => {
+        const chips = t.distritosAsociados
+          .map((codigo) => {
+            const nombre = getLoadedDistricts().find((d) => d.codigo === codigo)?.nombre ?? codigo;
+            return `<span class="media-panel__chip">${escapeHtml(nombre)}</span>`;
+          })
+          .join('');
+        return `
+          <div class="tendencia-panel__termino">
+            <span class="tendencia-panel__palabra">${escapeHtml(t.formaOriginal)}</span>
+            <span class="tendencia-panel__frecuencia">${t.frecuencia} ítem${t.frecuencia === 1 ? '' : 's'}</span>
+            ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  const meta = panel.root.querySelector('#tendencia-panel-meta')!;
+  meta.innerHTML = `${metaFrescura('VLC Monitor (tendencia)', ventana.fetchedAt, fresh)} · ${ventana.totalItems} ítems considerados`;
+}
+
+async function fetchTendenciaActual(ventana: 'hora' | 'dia'): Promise<{ panel: VentanaTendencia; fresh: boolean }> {
+  const res = await fetch(`/api/mediatico/v1/tendencia?ventana=${ventana}`);
+  if (!res.ok) throw new Error(`GET /api/mediatico/v1/tendencia -> HTTP ${res.status}`);
+  return (await res.json()) as { panel: VentanaTendencia; fresh: boolean };
+}
+
 interface ControlPanel {
   mockToggle: HTMLInputElement;
   horaSlider: HTMLInputElement;
@@ -560,6 +739,8 @@ interface ControlPanel {
   pulsoToggle: HTMLInputElement;
   fallasToggle: HTMLInputElement;
   mediaToggle: HTMLInputElement;
+  tendenciaToggle: HTMLInputElement;
+  viaPublicaToggle: HTMLInputElement;
 }
 
 function buildControlPanel(): ControlPanel {
@@ -599,6 +780,14 @@ function buildControlPanel(): ControlPanel {
       <input type="checkbox" id="toggle-media" />
       Contexto mediático
     </label>
+    <label class="controls__row controls__row--trafico">
+      <input type="checkbox" id="toggle-tendencia" />
+      Términos en tendencia
+    </label>
+    <label class="controls__row controls__row--trafico">
+      <input type="checkbox" id="toggle-via-publica" />
+      Incidencias de vía pública
+    </label>
   `;
   document.body.appendChild(panel);
 
@@ -620,6 +809,8 @@ function buildControlPanel(): ControlPanel {
     pulsoToggle: panel.querySelector('#toggle-pulso')!,
     fallasToggle: panel.querySelector('#toggle-fallas')!,
     mediaToggle: panel.querySelector('#toggle-media')!,
+    tendenciaToggle: panel.querySelector('#toggle-tendencia')!,
+    viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
   };
 }
 
@@ -631,6 +822,8 @@ async function fetchDensidadMock(hora: string): Promise<DensidadDistritoMock[]> 
 }
 
 async function main(): Promise<void> {
+  initPwa();
+  initDeteccionDispositivo();
   mountChasis();
 
   const initialState = readStateFromUrl();
@@ -659,6 +852,9 @@ async function main(): Promise<void> {
   let pulsoDistritos: PulsoDistrito[] = [];
   let fallasVisible = false;
   let datosFallas: DatosFallas = { monumentos: [], carpas: [], zonasMovilidadReducida: [] };
+  let viaPublicaVisible = false;
+  let incidenciasViaPublica: IncidenciaViaPublica[] = [];
+  const viaPublicaTooltip = buildViaPublicaTooltip();
 
   const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
   map.addControl(overlay);
@@ -842,6 +1038,23 @@ async function main(): Promise<void> {
             getFillColor: (m) => (m.esInfantil ? COLOR_MONUMENTO_FALLA_INFANTIL : COLOR_MONUMENTO_FALLA),
             getRadius: 18,
             radiusMinPixels: 2,
+          }),
+        // Spec 026 — solo a partir de zoom de calle (499 puntos activos,
+        // satura el mapa antes de eso). pickable solo fuera de los modos
+        // cordón/simulación, mismo guard que la capa de distritos.
+        viaPublicaVisible &&
+          map.getZoom() >= ZOOM_MINIMO_VIA_PUBLICA &&
+          new ScatterplotLayer<IncidenciaViaPublica>({
+            id: 'via-publica',
+            data: incidenciasViaPublica,
+            pickable: !algunModoActivo,
+            getPosition: (i) => [i.lon, i.lat],
+            getFillColor: (i) => COLOR_TIPO_VIA_PUBLICA[i.tipo],
+            getRadius: 22,
+            radiusMinPixels: 3,
+            onHover: (info: PickingInfo<IncidenciaViaPublica>) => {
+              renderViaPublicaTooltip(viaPublicaTooltip, info.object ?? null, info.x, info.y);
+            },
           }),
         // Spec 021 — modo cordón de incidente. Solo se pinta mientras el
         // modo está activo y hay una propuesta calculada; nunca compite por
@@ -1263,6 +1476,41 @@ async function main(): Promise<void> {
     }
   });
 
+  const viaPublicaLeyendaRoot = buildInfoPanel('via-publica-leyenda');
+  viaPublicaLeyendaRoot.hidden = true;
+  let viaPublicaPollingIniciado = false;
+  async function refreshViaPublica(): Promise<void> {
+    try {
+      const { incidencias, fresh } = await fetchIncidenciasViaPublicaActual();
+      incidenciasViaPublica = incidencias;
+      renderLayers();
+      renderViaPublicaLeyenda(viaPublicaLeyendaRoot, incidencias, fresh);
+    } catch (err) {
+      viaPublicaLeyendaRoot.textContent = 'Incidencias de vía pública no disponibles';
+      console.error('Fallo al cargar incidencias de vía pública:', err);
+    }
+  }
+
+  panel.viaPublicaToggle.addEventListener('change', () => {
+    viaPublicaVisible = panel.viaPublicaToggle.checked;
+    viaPublicaLeyendaRoot.hidden = !viaPublicaVisible;
+    if (!viaPublicaVisible) viaPublicaTooltip.hidden = true;
+    if (viaPublicaVisible && !viaPublicaPollingIniciado) {
+      viaPublicaPollingIniciado = true;
+      startPolling(refreshViaPublica, 60 * 60 * 1000); // igual TTL que la caché del endpoint, spec 026 §4
+    } else {
+      renderLayers();
+    }
+  });
+
+  // La capa solo aparece a partir de ZOOM_MINIMO_VIA_PUBLICA (spec 026 §5) —
+  // sin este listener, acercar/alejar el mapa sin tocar ningún toggle no
+  // recalcularía qué capas mostrar. 'zoomend' (no 'zoom' continuo) para no
+  // reconstruir todas las capas en cada frame de un gesto de zoom.
+  map.on('zoomend', () => {
+    if (viaPublicaVisible) renderLayers();
+  });
+
   const mediaPanel = buildMediaPanel();
   let mediaPollingIniciado = false;
   async function refreshMediatico(): Promise<void> {
@@ -1280,6 +1528,32 @@ async function main(): Promise<void> {
     if (panel.mediaToggle.checked && !mediaPollingIniciado) {
       mediaPollingIniciado = true;
       startPolling(refreshMediatico, 15 * 60 * 1000); // igual TTL que la caché del endpoint, spec 009 §4
+    }
+  });
+
+  const tendenciaPanel = buildTendenciaPanel();
+  let tendenciaPollingIniciado = false;
+  let ventanaTendenciaActual: 'hora' | 'dia' = 'hora';
+  async function refreshTendencia(): Promise<void> {
+    try {
+      const { panel: ventana, fresh } = await fetchTendenciaActual(ventanaTendenciaActual);
+      renderTendenciaPanel(tendenciaPanel, ventana, fresh);
+    } catch (err) {
+      tendenciaPanel.list.textContent = 'Términos en tendencia no disponibles';
+      console.error('Fallo al cargar términos en tendencia:', err);
+    }
+  }
+
+  tendenciaPanel.ventanaSelect.addEventListener('change', () => {
+    ventanaTendenciaActual = tendenciaPanel.ventanaSelect.value === 'dia' ? 'dia' : 'hora';
+    void refreshTendencia();
+  });
+
+  panel.tendenciaToggle.addEventListener('change', () => {
+    tendenciaPanel.root.hidden = !panel.tendenciaToggle.checked;
+    if (panel.tendenciaToggle.checked && !tendenciaPollingIniciado) {
+      tendenciaPollingIniciado = true;
+      startPolling(refreshTendencia, 15 * 60 * 1000); // igual TTL que la caché del endpoint, spec 025 §4
     }
   });
 
@@ -1376,6 +1650,10 @@ async function main(): Promise<void> {
   // Los 5 paneles fijos de arriba ya existen en el DOM — aplicar ahora la
   // preferencia de visibilidad guardada en Configuración (spec 019 v3).
   applyPanelVisibility();
+
+  // Spec 029 — con los paneles ya montados, activa el layout móvil (bottom
+  // sheet + reparentado) si el dispositivo lo pide.
+  initLayoutMovil();
 }
 
 main().catch((err: unknown) => {

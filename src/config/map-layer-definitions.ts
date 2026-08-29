@@ -94,6 +94,20 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
     zoomMinimo: 0,
     agregacion: 'lista',
   },
+  tendenciaTerminos: {
+    key: 'tendenciaTerminos',
+    specId: '025',
+    renderers: ['panel'],
+    zoomMinimo: 0,
+    agregacion: 'lista',
+  },
+  incidenciasViaPublica: {
+    key: 'incidenciasViaPublica',
+    specId: '026',
+    renderers: ['deck'],
+    zoomMinimo: 12, // solo a nivel calle — 499 puntos activos, satura el mapa a zoom de ciudad (spec 026 §5/§7)
+    agregacion: 'punto',
+  },
   //
   // No añadas entradas aquí sin que exista antes la spec correspondiente
   // en specs/, con su contrato de capa ya congelado (sección 5 de la spec).

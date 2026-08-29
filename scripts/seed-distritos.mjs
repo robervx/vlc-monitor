@@ -16,6 +16,12 @@ import path from 'node:path';
 const SOURCE_URL =
   'https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/225/query?where=1=1&outFields=*&f=geojson';
 
+// Barrios (spec 023 §2) — misma fuente que localizó y verificó (solo existencia/
+// formato) la spec 000 §2, cuya ingesta se pospuso explícitamente. Se re-verificó
+// en vivo el 2026-08-26 (88 features, campos codbarrio/nombre/coddistbar/coddistrit).
+const BARRIOS_SOURCE_URL =
+  'https://geoportal.valencia.es/server/rest/services/OPENDATA/UrbanismoEInfraestructuras/MapServer/224/query?where=1=1&outFields=*&f=geojson';
+
 // Extensión .json (no .geojson) a propósito: así tsc (resolveJsonModule) y el
 // bundler de Vite lo importan como módulo JSON tipado sin plugins adicionales,
 // tanto en dev como en el build de las funciones edge de api/. El contenido
@@ -28,6 +34,59 @@ const OUTPUT_PATH = path.join(
 );
 
 const LOWERCASE_PARTICLES = new Set(['de', 'del', 'la', 'les', 'al', "l'", 'els']);
+
+// Correcciones puntuales de display (spec 023 §2) para nombres que el heurístico
+// genérico de toTitleCase no resuelve bien (guiones, puntos usados como "·", acentos
+// perdidos en el origen ASCII) — dato curado a mano, no automatismo.
+const DISPLAY_NAME_OVERRIDES = {
+  'SANT MARCEL.LI': "Sant Marcel·lí",
+  'LA FONTETA S.LLUIS': 'La Fonteta Sant Lluís',
+  'CIUTAT DE LES ARTS I DE LES CIENCIES': 'Ciutat de les Arts i de les Ciències',
+  'CIUTAT JARDI': 'Ciutat Jardí',
+  'CABANYAL-CANYAMELAR': 'Cabanyal-Canyamelar',
+  'LA MALVA-ROSA': 'La Malva-Rosa',
+  'PENYA-ROJA': 'Penya-Roja',
+  'RAFALELL-VISTABELLA': 'Rafalell-Vistabella',
+  'MAHUELLA-TAULADELLA': 'Mahuella-Tauladella',
+  "CASTELLAR-L'OLIVERAL": "Castellar-l'Oliveral",
+  'CAMI DE VERA': 'Camí de Vera',
+  'CAMI FONDO': 'Camí Fondo',
+  'CAMI REAL': 'Camí Real',
+  'SANT LLORENS': 'Sant Llorenç',
+  BORBOTO: 'Borbotó',
+  EXPOSICIO: 'Exposició',
+};
+
+// Alias conocidos (castellano/valenciano) por nombre de barrio ya corregido — spec
+// 023 §2, lista corta a completar según se observen más variantes en producción.
+const ALIAS_OVERRIDES = {
+  Russafa: ['Ruzafa'],
+  Natzaret: ['Nazaret'],
+  'Cabanyal-Canyamelar': ['Cabañal', 'El Cabanyal'],
+  'La Malva-Rosa': ['La Malvarrosa', 'Malvarrosa'],
+  'El Grau': ['El Grao'],
+};
+
+// Revisión de ambigüedad de la spec 023 §2 (15 nombres de 107 reales) — nombres que
+// colisionan con palabras/topónimos comunes y necesitan guarda de contexto en el
+// matching (ver src/services/geolocalizacion-texto.ts).
+const AMBIGUOUS_DISTRICT_CODES = new Set(['09']); // "Jesus"
+const AMBIGUOUS_BARRIO_NAMES = new Set([
+  'Sant Isidre',
+  'Sant Antoni',
+  'Sant Francesc',
+  'Sant Pau',
+  'Sant Llorenç',
+  'La Seu',
+  'El Pilar',
+  'La Torre',
+  'La Llum',
+  'Camí Real',
+  'Morvedre',
+  'La Punta',
+  'Exposició',
+  'La Gran Via',
+]);
 
 function toTitleCase(nombreMayusculas) {
   return nombreMayusculas
@@ -113,6 +172,40 @@ function extendBbox(bbox, coordinates) {
   }
 }
 
+// Descarga y normaliza los 88 barrios (spec 023 §2) agrupados por código de
+// distrito de dos cifras, con nombre corregido + alias + ambiguo ya resueltos.
+async function fetchBarriosPorDistrito() {
+  console.log(`Descargando ${BARRIOS_SOURCE_URL} ...`);
+  const res = await fetch(BARRIOS_SOURCE_URL, {
+    headers: { 'User-Agent': 'vlc-monitor-seed/1.0 (+https://github.com/)' },
+  });
+  if (!res.ok) {
+    throw new Error(`Geoportal (barrios) respondió HTTP ${res.status}`);
+  }
+  const raw = await res.json();
+  if (raw.type !== 'FeatureCollection' || !Array.isArray(raw.features)) {
+    throw new Error('Respuesta inesperada de barrios: no es un FeatureCollection de GeoJSON');
+  }
+  if (raw.features.length !== 88) {
+    throw new Error(`Se esperaban 88 barrios, se obtuvieron ${raw.features.length}`);
+  }
+
+  const porDistrito = new Map();
+  for (const feature of raw.features) {
+    const codigoDistrito = String(feature.properties.coddistrit).padStart(2, '0');
+    const nombreOrigen = feature.properties.nombre.trim();
+    const nombre = DISPLAY_NAME_OVERRIDES[nombreOrigen] ?? toTitleCase(nombreOrigen);
+    const barrio = {
+      nombre,
+      alias: ALIAS_OVERRIDES[nombre] ?? [],
+      ambiguo: AMBIGUOUS_BARRIO_NAMES.has(nombre),
+    };
+    if (!porDistrito.has(codigoDistrito)) porDistrito.set(codigoDistrito, []);
+    porDistrito.get(codigoDistrito).push(barrio);
+  }
+  return porDistrito;
+}
+
 async function main() {
   console.log(`Descargando ${SOURCE_URL} ...`);
   const res = await fetch(SOURCE_URL, {
@@ -153,6 +246,8 @@ async function main() {
     throw new Error(`Se esperaban 19 distritos, se obtuvieron ${porCodigo.size}`);
   }
 
+  const barriosPorDistrito = await fetchBarriosPorDistrito();
+
   const fetchedAt = new Date().toISOString();
   const features = [...porCodigo.values()]
     .sort((a, b) => Number(a.codigoOrigen) - Number(b.codigoOrigen))
@@ -167,6 +262,10 @@ async function main() {
       for (const coordinates of polygons) extendBbox(bbox, coordinates);
 
       const centroide = multiPolygonCentroid(polygons);
+      const barrios = barriosPorDistrito.get(codigo) ?? [];
+      if (barrios.length === 0) {
+        throw new Error(`Distrito ${codigo} (${nombre}) sin barrios asociados — revisar coddistrit de origen`);
+      }
 
       return {
         type: 'Feature',
@@ -176,7 +275,8 @@ async function main() {
           nombre: toTitleCase(nombre),
           centroide,
           bbox,
-          barrios: [], // pospuesto — ver specs/000-mapa-base-distritos.md §7
+          barrios, // spec 023 §2/§3 — BarrioInfo[] real (nombre + alias + ambiguo)
+          ambiguo: AMBIGUOUS_DISTRICT_CODES.has(codigo), // spec 023 §2 — solo distrito 09 "Jesus" por ahora
           fetchedAt,
           source: 'ajuntament-valencia-geoportal',
         },

@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
+    "auth:hash": "tsx scripts/auth-hash.ts",
+    "iconos:pwa": "tsx scripts/generar-iconos-pwa.ts",
     "seed:distritos": "node scripts/seed-distritos.mjs",
     "seed:red-viaria": "tsx scripts/seed-red-viaria.ts",
     "snapshot:trafico-historico": "tsx scripts/snapshot-trafico-historico.ts"
@@ -29,6 +31,7 @@
     "tsx": "^4.23.12",
     "typescript": "^5.6.0",
     "vite": "^5.4.0",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^2.1.0"
   }
 }

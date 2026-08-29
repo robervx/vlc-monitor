@@ -3,6 +3,8 @@
 // sobre el que se apoyan el mapa y los paneles ya existentes (que siguen
 // apareciendo vía document.body.appendChild sin cambios).
 import { PANEL_PREFERENCES_REGISTRY, isPanelVisible, setPanelVisible } from './panel-preferences';
+import { limpiarCacheDatos } from '../pwa';
+import { esMovil, getLayoutForzado, setLayoutForzado, onCambioLayout } from './deteccion-dispositivo';
 import { calcularCercania, formatoDistancia, type ResultadoCercania } from '../services/proximidad';
 import { getCapasActivas } from '../services/capas-activas-store';
 import {
@@ -522,10 +524,12 @@ function buildHeader(): HTMLElement {
 
   const updateClock = () => {
     const now = new Date();
+    // En móvil el reloj se compacta a HH:MM (spec 029 §3); la fecha completa
+    // se oculta por CSS.
     clock.textContent = now.toLocaleTimeString('es-ES', {
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit',
+      ...(esMovil() ? {} : { second: '2-digit' }),
       timeZone: 'Europe/Madrid',
     });
     date.textContent = capitalizar(
@@ -585,11 +589,13 @@ function buildSidebarSection(def: SidebarSectionDefinition): HTMLElement {
   return wrap;
 }
 
-function buildSidebar(): HTMLElement {
+function buildSidebar(): void {
   const sidebar = document.createElement('aside');
   sidebar.id = 'app-sidebar';
 
-  const expandedInicial = localStorage.getItem(SIDEBAR_EXPANDED_KEY) === '1';
+  // En móvil la hoja siempre arranca cerrada (si no, taparía el mapa al abrir
+  // la app); en escritorio se respeta lo que el usuario dejó (spec 019).
+  const expandedInicial = !esMovil() && localStorage.getItem(SIDEBAR_EXPANDED_KEY) === '1';
   if (expandedInicial) sidebar.classList.add('is-expanded');
 
   const toggle = document.createElement('button');
@@ -597,10 +603,105 @@ function buildSidebar(): HTMLElement {
   toggle.type = 'button';
   toggle.setAttribute('aria-label', 'Mostrar/ocultar barra lateral');
   toggle.textContent = expandedInicial ? '⟨' : '☰';
-  toggle.addEventListener('click', () => {
-    const expanded = sidebar.classList.toggle('is-expanded');
+
+  // Backdrop — solo se ve en móvil (CSS), cierra la hoja al tocar fuera.
+  const backdrop = document.createElement('div');
+  backdrop.id = 'app-sidebar__backdrop';
+  backdrop.hidden = true;
+
+  // Botón de cierre grande — solo visible en móvil (CSS).
+  const cerrar = document.createElement('button');
+  cerrar.id = 'app-sidebar__cerrar';
+  cerrar.type = 'button';
+  cerrar.setAttribute('aria-label', 'Cerrar');
+  cerrar.textContent = '✕';
+
+  // Botón flotante para abrir la hoja en móvil (vive fuera del sidebar para
+  // que el `transform` del panel no lo arrastre). Solo visible en móvil (CSS).
+  const fab = document.createElement('button');
+  fab.id = 'app-sidebar__fab';
+  fab.type = 'button';
+  fab.setAttribute('aria-label', 'Abrir menú');
+  fab.textContent = '☰';
+
+  let focoPrevio: HTMLElement | null = null;
+
+  function setExpandido(expanded: boolean): void {
+    sidebar.classList.toggle('is-expanded', expanded);
     toggle.textContent = expanded ? '⟨' : '☰';
+    toggle.setAttribute('aria-expanded', String(expanded));
+    backdrop.hidden = !(expanded && esMovil());
     localStorage.setItem(SIDEBAR_EXPANDED_KEY, expanded ? '1' : '0');
+
+    if (expanded && esMovil()) {
+      focoPrevio = document.activeElement as HTMLElement | null;
+      cerrar.focus();
+      document.addEventListener('keydown', onKeydown);
+    } else {
+      document.removeEventListener('keydown', onKeydown);
+      if (focoPrevio && !esMovil()) focoPrevio = null;
+      else if (focoPrevio) {
+        focoPrevio.focus?.();
+        focoPrevio = null;
+      }
+    }
+  }
+
+  function onKeydown(ev: KeyboardEvent): void {
+    if (ev.key === 'Escape') {
+      setExpandido(false);
+      return;
+    }
+    // Trampa de foco básica mientras la hoja está abierta en móvil.
+    if (ev.key === 'Tab') {
+      const focusables = sidebar.querySelectorAll<HTMLElement>(
+        'button, a[href], input, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) return;
+      const primero = focusables[0]!;
+      const ultimo = focusables[focusables.length - 1]!;
+      if (ev.shiftKey && document.activeElement === primero) {
+        ev.preventDefault();
+        ultimo.focus();
+      } else if (!ev.shiftKey && document.activeElement === ultimo) {
+        ev.preventDefault();
+        primero.focus();
+      }
+    }
+  }
+
+  toggle.addEventListener('click', () => setExpandido(!sidebar.classList.contains('is-expanded')));
+  fab.addEventListener('click', () => setExpandido(true));
+  cerrar.addEventListener('click', () => setExpandido(false));
+  backdrop.addEventListener('click', () => setExpandido(false));
+
+  // Swipe a la izquierda para cerrar la hoja (solo móvil).
+  let xTouch = 0;
+  sidebar.addEventListener(
+    'touchstart',
+    (ev) => {
+      xTouch = ev.touches[0]?.clientX ?? 0;
+    },
+    { passive: true },
+  );
+  sidebar.addEventListener(
+    'touchend',
+    (ev) => {
+      if (!esMovil() || !sidebar.classList.contains('is-expanded')) return;
+      const dx = (ev.changedTouches[0]?.clientX ?? 0) - xTouch;
+      if (dx < -60) setExpandido(false);
+    },
+    { passive: true },
+  );
+
+  // Al pasar de móvil a escritorio con la hoja abierta, normaliza el estado.
+  onCambioLayout((layout) => {
+    if (layout === 'escritorio') {
+      backdrop.hidden = true;
+      document.removeEventListener('keydown', onKeydown);
+    } else if (sidebar.classList.contains('is-expanded')) {
+      backdrop.hidden = false;
+    }
   });
 
   const sections = document.createElement('div');
@@ -609,14 +710,71 @@ function buildSidebar(): HTMLElement {
 
   const footer = document.createElement('div');
   footer.id = 'app-footer-attrib';
-  footer.textContent = 'Uso interno — no es un servicio público';
 
-  sidebar.append(toggle, sections, footer);
-  return sidebar;
+  // Sesión (spec 018) — solo se muestra si el gate de acceso está activo.
+  // Si /api/auth/v1/estado no responde o no hay sesión (p.ej. `npm run dev`
+  // sin AUTH_SECRET), este bloque queda oculto y no estorba.
+  const sesionBox = document.createElement('div');
+  sesionBox.id = 'app-sidebar__sesion';
+  sesionBox.hidden = true;
+  const sesionUsuario = document.createElement('span');
+  sesionUsuario.id = 'app-sidebar__sesion-usuario';
+  const cerrarSesion = document.createElement('button');
+  cerrarSesion.type = 'button';
+  cerrarSesion.id = 'app-sidebar__logout';
+  cerrarSesion.textContent = 'Cerrar sesión';
+  cerrarSesion.addEventListener('click', () => {
+    cerrarSesion.disabled = true;
+    void fetch('/api/auth/v1/logout', { method: 'POST' })
+      .catch(() => undefined)
+      .then(() => limpiarCacheDatos())
+      .catch(() => undefined)
+      .finally(() => window.location.reload());
+  });
+  sesionBox.append(sesionUsuario, cerrarSesion);
+
+  void fetch('/api/auth/v1/estado')
+    .then((r) => (r.ok ? (r.json() as Promise<{ autenticado: boolean; usuario?: string }>) : null))
+    .then((estado) => {
+      if (estado?.autenticado) {
+        sesionUsuario.textContent = `Sesión: ${estado.usuario ?? ''}`;
+        sesionBox.hidden = false;
+      }
+    })
+    .catch(() => undefined);
+
+  // Cambiar entre versión de escritorio y móvil (spec 029 §3).
+  const layoutBox = document.createElement('div');
+  layoutBox.id = 'app-sidebar__layout';
+  const layoutLink = document.createElement('button');
+  layoutLink.type = 'button';
+  layoutLink.id = 'app-sidebar__layout-link';
+  const pintarLayoutLink = (): void => {
+    const forzado = getLayoutForzado();
+    if (forzado === 'movil') layoutLink.textContent = 'Ver versión de escritorio';
+    else if (forzado === 'escritorio') layoutLink.textContent = 'Ver versión móvil';
+    else layoutLink.textContent = esMovil() ? 'Ver versión de escritorio' : 'Ver versión móvil';
+  };
+  layoutLink.addEventListener('click', () => {
+    setLayoutForzado(esMovil() ? 'escritorio' : 'movil');
+    pintarLayoutLink();
+  });
+  onCambioLayout(pintarLayoutLink);
+  layoutBox.appendChild(layoutLink);
+
+  const attrib = document.createElement('div');
+  attrib.id = 'app-footer-attrib__text';
+  attrib.textContent = 'Uso interno — no es un servicio público';
+  footer.append(sesionBox, layoutBox, attrib);
+
+  sidebar.append(cerrar, toggle, sections, footer);
+  // Orden en el DOM: backdrop, sidebar, fab (el selector `~` del CSS que oculta
+  // el fab con la hoja abierta necesita que el fab vaya después del sidebar).
+  document.body.append(backdrop, sidebar, fab);
 }
 
 /** Monta cabecera + sidebar. Llamar una vez, al inicio de main(). */
 export function mountChasis(): void {
   document.body.appendChild(buildHeader());
-  document.body.appendChild(buildSidebar());
+  buildSidebar();
 }

@@ -8,8 +8,16 @@ import {
   fetchGdeltValencia,
   type ItemMediatico,
 } from '../../../src/services/mediatico';
+import { distritosFromGeoJSON, setLoadedDistricts } from '../../../src/services/district-geometry';
+import distritosGeoJSON from '../../../data/distritos-valencia.json';
 
 export const config = { runtime: 'edge' };
+
+// Spec 023 — el matching de distrito/barrio (geolocalizacion-texto.ts) necesita los
+// distritos ya cargados antes de normalizar cada fuente; los endpoints edge no
+// tienen "origen de página" implícito, así que se cargan del asset estático
+// directamente, no vía fetch (mismo patrón que api/trafico/v1/estado.ts).
+setLoadedDistricts(distritosFromGeoJSON(distritosGeoJSON));
 
 const TTL_MS = 15 * 60 * 1000;
 

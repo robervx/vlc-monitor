@@ -7,13 +7,22 @@
  * directamente al Geoportal (ver CLAUDE.md §2).
  */
 
+/** Barrio real dentro de un distrito — spec 023 §3 (antes `string[]` en la spec 000, sin datos). */
+export interface BarrioInfo {
+  nombre: string;
+  alias: string[];
+  ambiguo: boolean;
+}
+
 export interface Distrito {
   codigo: string;
   nombre: string;
   geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon;
   centroide: [number, number];
   bbox: [number, number, number, number];
-  barrios: string[];
+  barrios: BarrioInfo[];
+  /** true si `nombre` colisiona con una palabra/nombre propio común (spec 023 §2/§3) — solo el distrito 09 "Jesus" de momento. */
+  ambiguo?: boolean;
   fetchedAt: string;
   source: 'ajuntament-valencia-geoportal';
 }
@@ -126,7 +135,8 @@ export function getDistrictBbox(codigo: string): [number, number, number, number
   return distritos.find((d) => d.codigo === codigo)?.bbox ?? null;
 }
 
-function normalizeForSearch(text: string): string {
+/** Exportada para reutilizar en spec 023 (geolocalizacion-texto.ts) — no duplicar. */
+export function normalizeForSearch(text: string): string {
   return text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')

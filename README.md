@@ -11,6 +11,49 @@ npm install
 npm run dev
 ```
 
+## Acceso protegido (spec 018)
+
+La app se sirve detrás de un gate de usuario + PIN (`middleware.ts`, edge). En
+producción es **fail-closed**: sin `AUTH_SECRET` no se sirve nada.
+
+1. Genera un secreto de firma: `openssl rand -hex 32` → variable `AUTH_SECRET`.
+2. Genera una entrada por cada acceso (persona o turno):
+
+   ```bash
+   npm run auth:hash -- rcerdan
+   ```
+
+   Pide el PIN por consola (sin eco, mínimo 6 dígitos) e imprime un objeto
+   `{u,h,s}`. Junta todas las entradas en un array JSON → variable `APP_USERS`.
+3. En Vercel: **Settings → Environment Variables** → añade `AUTH_SECRET` y
+   `APP_USERS`. Alta/baja de un acceso = editar `APP_USERS` y redeployar.
+4. En local, para probar el gate: crea un `.env` (git-ignored) con esas dos
+   variables. Sin `.env`, `npm run dev` funciona sin barrera.
+
+## Instalar en el móvil (PWA, spec 028)
+
+La app es una PWA instalable. Tras entrar una vez con sesión válida:
+
+- **Android / Chrome**: menú → "Añadir a pantalla de inicio" (o el aviso de instalación).
+- **iOS / Safari**: Compartir → "Añadir a pantalla de inicio".
+
+Abre a pantalla completa, con icono propio, y sigue abriendo con red mala
+(sirve los últimos datos cacheados, marcados como no en vivo). Cuando hay una
+versión nueva desplegada aparece un aviso "Nueva versión · Actualizar" — nunca
+se recarga sola.
+
+Los iconos se regeneran del escudo oficial con `npm run iconos:pwa` (requiere
+macOS por `sips`); su salida está versionada en `public/icons/`.
+
+Para depurar la caché del service worker: DevTools → Application → Clear storage.
+
+## Layout escritorio / móvil (spec 029)
+
+La misma app se adapta sola: en móvil (pantalla ≤ 640 px + táctil) la cabecera
+se compacta, el sidebar pasa a hoja a pantalla completa y los paneles a un
+bottom sheet arrastrable de 3 alturas. En escritorio no cambia nada. El pie del
+sidebar tiene un enlace "Ver versión de escritorio / móvil" para forzar uno.
+
 ## Dónde está cada cosa
 
 | Quiero... | Voy a... |
