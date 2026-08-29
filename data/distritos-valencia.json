@@ -187,8 +187,40 @@
           -0.36601570037277603,
           39.48223174307488
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "El Carme",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Xerea",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Mercat",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Pilar",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Sant Francesc",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "La Seu",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -350,8 +382,27 @@
           -0.3599693869042381,
           39.47310826975881
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "El Pla del Remei",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Russafa",
+            "alias": [
+              "Ruzafa"
+            ],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Gran Via",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -589,8 +640,30 @@
           -0.37652726010842674,
           39.48115839149668
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "El Botanic",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Arrancapins",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Roqueta",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Petxina",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -1476,8 +1549,30 @@
           -0.3810545927151668,
           39.49708472794478
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "El Calvari",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Sant Pau",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Campanar",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Les Tendetes",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -1699,8 +1794,35 @@
           -0.3635416532825679,
           39.4920605536405
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Tormos",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Marxalenes",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Morvedre",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Trinitat",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Sant Antoni",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -1882,8 +2004,30 @@
           -0.3524766344052729,
           39.48522363952425
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Exposició",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Jaume Roig",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Ciutat Universitaria",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Mestalla",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -2593,8 +2737,35 @@
           -0.39003075556862127,
           39.4756503909817
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "La Fontsanta",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Tres Forques",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Nou Moles",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Soternes",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Llum",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -2936,8 +3107,35 @@
           -0.38693717983977277,
           39.4679405519231
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Safranar",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Vara de Quart",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Patraix",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Favara",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Sant Isidre",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -3127,8 +3325,35 @@
           -0.3812388903732512,
           39.46267105333486
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "La Creu Coberta",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Raiosa",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Camí Real",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "l'Hort de Senabre",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Sant Marcel·lí",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": true,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -3462,8 +3687,45 @@
           -0.33459128413740125,
           39.46342844256052
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "La Fonteta Sant Lluís",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "En Corts",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Malilla",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Punta",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Montolivet",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Na Rovella",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Ciutat de les Arts i de les Ciències",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -6657,8 +6919,45 @@
           -0.3019617379199896,
           39.48560731894289
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Betero",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Cabanyal-Canyamelar",
+            "alias": [
+              "Cabañal",
+              "El Cabanyal"
+            ],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Malva-Rosa",
+            "alias": [
+              "La Malvarrosa",
+              "Malvarrosa"
+            ],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Natzaret",
+            "alias": [
+              "Nazaret"
+            ],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Grau",
+            "alias": [
+              "El Grao"
+            ],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -6892,8 +7191,35 @@
           -0.33542506438542136,
           39.47147531108982
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Albors",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Aiora",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Camí Fondo",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Penya-Roja",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Creu del Grau",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -7447,8 +7773,35 @@
           -0.3315104329274244,
           39.48774327906645
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "l'Illa Perduda",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "l'Amistat",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Carrasca",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Vega Baixa",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Ciutat Jardí",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -8050,8 +8403,20 @@
           -0.342757228635524,
           39.49409507200066
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Camí de Vera",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Benimaclet",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -8985,8 +9350,25 @@
           -0.3547926309190047,
           39.50468189682869
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Torrefiel",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Sant Llorenç",
+            "alias": [],
+            "ambiguo": true
+          },
+          {
+            "nombre": "Els Orriols",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -9416,8 +9798,20 @@
           -0.38009683191243965,
           39.504331443867436
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Ciutat Fallera",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Benicalap",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -17441,8 +17835,50 @@
           -0.2876696850267751,
           39.56659381812163
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Rafalell-Vistabella",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Carpesa",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Borbotó",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Benifaraig",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Poble Nou",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Les Cases de Barcena",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Mahuella-Tauladella",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Massarrojos",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -18912,8 +19348,20 @@
           -0.3982444035133673,
           39.5074140659289
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "Benimamet",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Beniferri",
+            "alias": [],
+            "ambiguo": false
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     },
@@ -24435,8 +24883,50 @@
           -0.27536845690029316,
           39.459593381039404
         ],
-        "barrios": [],
-        "fetchedAt": "2026-08-18T09:21:29.366Z",
+        "barrios": [
+          {
+            "nombre": "El Palmar",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Saler",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Perellonet",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Pinedo",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Faitanar",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "Castellar-l'Oliveral",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "El Forn d'Alcedo",
+            "alias": [],
+            "ambiguo": false
+          },
+          {
+            "nombre": "La Torre",
+            "alias": [],
+            "ambiguo": true
+          }
+        ],
+        "ambiguo": false,
+        "fetchedAt": "2026-08-26T09:36:34.134Z",
         "source": "ajuntament-valencia-geoportal"
       }
     }

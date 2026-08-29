@@ -5,6 +5,8 @@
  * de credenciales del usuario — ver spec 009 §2, no se implementa aquí.
  */
 
+import { findDistrictMentions, type DistritoMencion } from './geolocalizacion-texto';
+
 export type FuenteMediatica = 'Las Provincias' | 'Valencia Plaza' | 'GDELT';
 
 export interface ItemMediatico {
@@ -17,6 +19,16 @@ export interface ItemMediatico {
   publicadoEn: string;
   fetchedAt: string;
   source: 'rss' | 'gdelt';
+  /** Spec 023 — [] si no menciona ningún distrito/barrio explícito ("Valencia general"). */
+  distritosMencionados: DistritoMencion[];
+}
+
+/** Spec 023 §4: se aplica antes de cachear, dentro de la normalización de cada fuente. */
+function enrichWithDistricts(items: Omit<ItemMediatico, 'distritosMencionados'>[]): ItemMediatico[] {
+  return items.map((item) => ({
+    ...item,
+    distritosMencionados: findDistrictMentions(`${item.titulo} ${item.resumen ?? ''}`),
+  }));
 }
 
 const HEADERS = { 'User-Agent': 'vlc-monitor/1.0 (+https://github.com/)' };
@@ -72,12 +84,14 @@ function extraerImagenMedia(bloque: string): string | null {
   return m?.[1] ?? null;
 }
 
+type ItemMediaticoSinDistrito = Omit<ItemMediatico, 'distritosMencionados'>;
+
 /** Parser RSS 2.0 minimalista por regex — suficiente para feeds bien formados, sin dependencia de un parser XML completo. */
 export function parsearRss(xml: string, fuente: FuenteMediatica, fetchedAt: string): ItemMediatico[] {
   const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
 
-  return bloques
-    .map((bloque): ItemMediatico | null => {
+  const items = bloques
+    .map((bloque): ItemMediaticoSinDistrito | null => {
       const titulo = extraerTag(bloque, 'title');
       const url = extraerTag(bloque, 'link');
       const pubDate = extraerTag(bloque, 'pubDate');
@@ -98,7 +112,9 @@ export function parsearRss(xml: string, fuente: FuenteMediatica, fetchedAt: stri
         source: 'rss',
       };
     })
-    .filter((item): item is ItemMediatico => item !== null);
+    .filter((item): item is ItemMediaticoSinDistrito => item !== null);
+
+  return enrichWithDistricts(items);
 }
 
 async function fetchRss(url: string, fuente: FuenteMediatica): Promise<ItemMediatico[]> {
@@ -156,9 +172,9 @@ export async function fetchGdeltValencia(): Promise<ItemMediatico[]> {
   const body = (await res.json()) as GdeltResponse;
   const fetchedAt = new Date().toISOString();
 
-  return (body.articles ?? [])
+  const items = (body.articles ?? [])
     .filter((a) => mencionaValencia(a.title))
-    .map((a): ItemMediatico | null => {
+    .map((a): ItemMediaticoSinDistrito | null => {
       const publicadoEn = normalizarFechaGdelt(a.seendate);
       if (!publicadoEn) return null;
       return {
@@ -173,5 +189,7 @@ export async function fetchGdeltValencia(): Promise<ItemMediatico[]> {
         source: 'gdelt',
       };
     })
-    .filter((item): item is ItemMediatico => item !== null);
+    .filter((item): item is ItemMediaticoSinDistrito => item !== null);
+
+  return enrichWithDistricts(items);
 }

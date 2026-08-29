@@ -2,8 +2,34 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Intelligent City Monitor</title>
+
+    <!-- PWA — spec 028. El <link rel="manifest"> lo inyecta vite-plugin-pwa. -->
+    <meta name="theme-color" content="#0b1f33" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="IC Monitor" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- Layout escritorio/móvil — spec 029. Se fija antes del primer pintado
+         para que no haya parpadeo; deteccion-dispositivo.ts lo mantiene en
+         sincronía de forma reactiva. -->
+    <script>
+      (function () {
+        try {
+          var f = localStorage.getItem('imc:layout-forzado');
+          if (f === 'movil' || f === 'escritorio') {
+            document.documentElement.dataset.layout = f;
+          } else {
+            var m = window.matchMedia('(max-width: 640px) and (pointer: coarse)').matches;
+            document.documentElement.dataset.layout = m ? 'movil' : 'escritorio';
+          }
+        } catch (e) {
+          document.documentElement.dataset.layout = 'escritorio';
+        }
+      })();
+    </script>
     <style>
       :root {
         --header-h: 56px;
@@ -475,12 +501,91 @@
       }
 
       #app-footer-attrib {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+
+      #app-footer-attrib__text {
         font-size: 10px;
         color: #7d90a6;
         padding: 8px 15px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
         white-space: nowrap;
         overflow: hidden;
+      }
+
+      #app-sidebar__sesion {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 15px;
+        font-size: 11px;
+        color: #c7d4e1;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      #app-sidebar__sesion-usuario {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #app-sidebar__logout {
+        flex-shrink: 0;
+        font-size: 11px;
+        padding: 4px 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        background: transparent;
+        color: #eef3f8;
+        cursor: pointer;
+      }
+
+      #app-sidebar__logout:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      #app-sidebar__logout:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      /* Aviso de nueva versión (PWA) — spec 028 */
+      #pwa-toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px 10px 16px;
+        border-radius: 10px;
+        background: var(--imc-navy, #0b1f33);
+        color: #eef3f8;
+        font-size: 13px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      #pwa-toast button {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border: 0;
+        border-radius: 7px;
+        background: #2563eb;
+        color: #fff;
+        cursor: pointer;
+        min-height: 32px;
+      }
+
+      #pwa-toast .pwa-toast__cerrar {
+        background: transparent;
+        color: #9fb3c8;
+        font-weight: 400;
+        padding: 6px 8px;
       }
 
       #controls {
@@ -626,6 +731,14 @@
         margin-left: 4px;
       }
 
+      /* Spec 026 §6 — aviso de que las fechas son la vigencia del permiso,
+         no la duración real del corte; debe verse, no ir en letra pequeña
+         (CLAUDE.md §4), de ahí el color y el peso frente a .info-panel__meta normal. */
+      .info-panel__meta--aviso {
+        color: #92400e;
+        font-weight: 600;
+      }
+
       .prediccion-panel__tramos {
         display: flex;
         flex-direction: row;
@@ -769,6 +882,59 @@
         display: none;
       }
 
+      /* Spec 025 — panel "pequeño junto al de contexto mediático" (§5), a su
+         izquierda, mismo estilo visual que #media-panel. */
+      #tendencia-panel {
+        position: absolute;
+        top: calc(var(--header-h) + 12px);
+        right: 372px;
+        z-index: 1;
+        width: 240px;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        overflow: hidden;
+      }
+
+      #tendencia-panel[hidden] {
+        display: none;
+      }
+
+      .tendencia-panel__select {
+        float: right;
+        font-size: 11px;
+      }
+
+      .tendencia-panel__termino {
+        padding: 7px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .tendencia-panel__palabra {
+        font-size: 13px;
+        font-weight: 600;
+        color: #222;
+      }
+
+      .tendencia-panel__frecuencia {
+        font-size: 11px;
+        color: #888;
+      }
+
+      .tendencia-panel__insuficiente {
+        padding: 12px;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+      }
+
       .media-panel__header {
         padding: 10px 12px;
         font-weight: 700;
@@ -804,10 +970,319 @@
         margin-top: 3px;
       }
 
+      .media-panel__grupo-titulo {
+        position: sticky;
+        top: 0;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        color: #555;
+        background: #f0f0f0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .media-panel__chips {
+        margin-top: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .media-panel__chip {
+        display: inline-block;
+        padding: 2px 7px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #1a5276;
+        background: #eaf2f8;
+        border-radius: 10px;
+        line-height: 1.4;
+      }
+
+      .media-panel__chip--baja-confianza {
+        color: #7d6608;
+        background: #fef9e7;
+      }
+
+      /* Spec 026 — tooltip mínimo específico de esta capa (ver comentario en
+         buildViaPublicaTooltip, src/main.ts). Posicionado en coordenadas de
+         pantalla junto al cursor, nunca intercepta clics (pointer-events: none). */
+      #via-publica-tooltip {
+        position: fixed;
+        z-index: 20;
+        pointer-events: none;
+        background: rgba(20, 20, 20, 0.92);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        line-height: 1.4;
+        max-width: 220px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .via-publica-tooltip__tipo {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.02em;
+        opacity: 0.85;
+      }
+
+      .via-publica-tooltip__calle {
+        font-weight: 600;
+        margin-top: 2px;
+      }
+
+      .via-publica-tooltip__vigencia {
+        margin-top: 3px;
+        opacity: 0.75;
+      }
+
       #media-panel .info-panel__meta {
         padding: 8px 12px;
         margin-top: 0;
         border-top: 1px solid #eee;
+      }
+
+      /* ================================================================
+         Layout MÓVIL — spec 029. Activo cuando <html data-layout="movil">
+         (deteccion-dispositivo.ts / script inline). Escritorio: sin cambios.
+         ================================================================ */
+
+      :root[data-layout='movil'] {
+        --header-h: 52px;
+      }
+
+      /* Cabecera: safe-area arriba, reloj compacto, sin fecha. */
+      :root[data-layout='movil'] #app-header {
+        height: calc(var(--header-h) + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        padding-left: max(12px, env(safe-area-inset-left));
+        gap: 8px;
+      }
+      :root[data-layout='movil'] #app-header__tagline,
+      :root[data-layout='movil'] #app-header__date,
+      :root[data-layout='movil'] #app-header__divider {
+        display: none;
+      }
+      :root[data-layout='movil'] #app-header__name {
+        font-size: 14px;
+      }
+      :root[data-layout='movil'] #app-header__status {
+        gap: 8px;
+      }
+      :root[data-layout='movil'] #app-header__clock {
+        font-size: 14px;
+      }
+
+      /* El mapa arranca bajo la cabecera (con safe-area). */
+      :root[data-layout='movil'] #map {
+        top: calc(var(--header-h) + env(safe-area-inset-top));
+      }
+
+      /* Sidebar: hoja a pantalla completa que entra deslizando desde la
+         izquierda (transform — el botón flotante de abrir vive fuera de este
+         subárbol, así que el bloque contenedor que crea el transform no le
+         afecta). */
+      :root[data-layout='movil'] #app-sidebar {
+        top: calc(var(--header-h) + env(safe-area-inset-top));
+        width: 100%;
+        max-width: 30rem;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        z-index: 150;
+        padding-left: env(safe-area-inset-left);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      :root[data-layout='movil'] #app-sidebar.is-expanded {
+        transform: translateX(0);
+      }
+      /* El toggle del raíl (⟨/☰) no se usa en móvil; abre el FAB de abajo. */
+      :root[data-layout='movil'] #app-sidebar__toggle {
+        display: none;
+      }
+      /* Botón flotante para abrir la hoja. */
+      #app-sidebar__fab {
+        display: none;
+      }
+      :root[data-layout='movil'] #app-sidebar__fab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: calc(var(--header-h) + env(safe-area-inset-top) + 10px);
+        left: 10px;
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 10px;
+        background: var(--imc-navy);
+        color: #fff;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        z-index: 151;
+        cursor: pointer;
+      }
+      :root[data-layout='movil'] #app-sidebar.is-expanded ~ #app-sidebar__fab {
+        display: none;
+      }
+      :root[data-layout='movil'] #app-sidebar__cerrar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin: 4px 4px 0 auto;
+        border: none;
+        background: transparent;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      :root[data-layout='movil'] #app-sidebar:not(.is-expanded) #app-sidebar__cerrar {
+        display: none;
+      }
+      :root[data-layout='movil'] #app-sidebar__backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 149;
+        background: rgba(0, 0, 0, 0.4);
+      }
+      :root[data-layout='movil'] #app-sidebar__backdrop[hidden] {
+        display: none;
+      }
+      /* Objetivos táctiles ≥ 44 px dentro de la hoja. */
+      :root[data-layout='movil'] .sidebar-section {
+        min-height: 44px;
+        font-size: 14px;
+      }
+      :root[data-layout='movil'] .sidebar-panel-checkbox {
+        min-height: 40px;
+        font-size: 13px;
+      }
+      :root[data-layout='movil'] .sidebar-panel-checkbox input {
+        width: 20px;
+        height: 20px;
+      }
+      :root[data-layout='movil'] .proximidad-boton {
+        min-height: 40px;
+        font-size: 13px;
+      }
+
+      /* Escritorio: ocultar los controles solo-móvil. */
+      :root:not([data-layout='movil']) #app-sidebar__cerrar,
+      :root:not([data-layout='movil']) #app-sidebar__backdrop,
+      :root:not([data-layout='movil']) #sheet-tirador {
+        display: none;
+      }
+
+      /* --- Bottom sheet de paneles --- */
+      :root[data-layout='movil'] #info-panels {
+        position: fixed;
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        height: 42vh;
+        height: 42svh;
+        max-height: 95vh;
+        max-height: 95svh;
+        margin: 0;
+        padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        z-index: 140;
+        display: block;
+        background: #f1f4f8;
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.28);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        transition: height 0.16s ease;
+      }
+      :root[data-layout='movil'] #info-panels[data-sheet='oculto'] {
+        overflow: hidden;
+      }
+      :root[data-layout='movil'] #sheet-tirador {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 44px;
+        border: none;
+        background: #f1f4f8;
+        border-radius: 14px 14px 0 0;
+        cursor: grab;
+        touch-action: none;
+        z-index: 2;
+      }
+      :root[data-layout='movil'] #sheet-tirador__barra {
+        width: 40px;
+        height: 5px;
+        border-radius: 3px;
+        background: #b3bfce;
+      }
+      /* Los paneles reparentados y las tarjetas fijas: en columna, ancho completo. */
+      :root[data-layout='movil'] #info-panels > #controls,
+      :root[data-layout='movil'] #info-panels > #media-panel,
+      :root[data-layout='movil'] #info-panels > #tendencia-panel,
+      :root[data-layout='movil'] #info-panels > .info-panel {
+        position: static !important;
+        inset: auto !important;
+        width: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0 10px 10px !important;
+        box-sizing: border-box;
+      }
+      :root[data-layout='movil'] #info-panels > #media-panel,
+      :root[data-layout='movil'] #info-panels > #tendencia-panel {
+        display: flex !important;
+      }
+      :root[data-layout='movil'] #info-panels > #media-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden] {
+        display: none !important;
+      }
+
+      /* mock-banner no debe tapar el raíl del sidebar en móvil. */
+      :root[data-layout='movil'] #mock-banner {
+        left: 50%;
+        font-size: 12px;
+        padding: 5px 12px;
+      }
+
+      /* Controles nativos de MapLibre por encima del sheet colapsado. */
+      :root[data-layout='movil'] .maplibregl-ctrl-bottom-left,
+      :root[data-layout='movil'] .maplibregl-ctrl-bottom-right {
+        margin-bottom: calc(46px + env(safe-area-inset-bottom));
+      }
+
+      /* Enlace "Ver versión de escritorio/móvil". */
+      #app-sidebar__layout {
+        padding: 8px 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      #app-sidebar__layout-link {
+        background: none;
+        border: none;
+        color: #9db3c9;
+        font-size: 11px;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 4px 0;
+        white-space: nowrap;
+      }
+      #app-sidebar__layout-link:hover {
+        color: #dbe6f0;
+      }
+      :root[data-layout='movil'] #app-sidebar__layout-link {
+        font-size: 13px;
+        min-height: 40px;
       }
     </style>
   </head>
