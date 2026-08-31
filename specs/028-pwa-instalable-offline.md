@@ -50,7 +50,7 @@ No aplica — no consume ninguna fuente externa. Genera dos artefactos estático
 
 ### Iconos (`public/icons/`, assets versionados)
 
-Derivados del escudo oficial ya presente (`public/assets/policia-local-valencia-logo.png`) sobre fondo navy `#0b1f33`, con zona segura para la variante `maskable` (el escudo ocupa ≤ 80 % del lienzo). Generados una vez y versionados — no hay pipeline en runtime.
+Generados con `npm run marca` (spec `030`) del logo `public/assets/logo.png`, sobre fondo navy `#0b1f33`, con zona segura para la variante `maskable`. Versionados — no hay pipeline en runtime.
 
 ### `<head>` de `index.html`
 
@@ -62,7 +62,7 @@ Derivados del escudo oficial ya presente (`public/assets/policia-local-valencia-
 - `<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">` (180×180, fondo navy — iOS no aplica máscara)
 - `viewport` ampliado con `viewport-fit=cover` (el resto del layout móvil lo cubre la spec 029).
 
-Los iconos (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`) se generan del escudo oficial con `npm run iconos:pwa` (`scripts/generar-iconos-pwa.ts`: `sips` para el reescalado + aplanado del alfa contra el navy en Node puro) y se **versionan** en `public/icons/`. No es una dependencia de build.
+Los iconos (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`, `favicon-32.png`) se generan con `npm run marca` (`scripts/generar-marca.ts`, Node puro — sin `sips` ni dependencias) y se **versionan** en `public/icons/`. No es una dependencia de build.
 
 ### Service worker (Workbox vía `vite-plugin-pwa`, `strategies: generateSW`, `registerType: 'prompt'`)
 
@@ -100,7 +100,7 @@ No aplica — no cambia ninguna capa ni panel.
 
 - [x] `npm run build` genera `dist/manifest.webmanifest` (válido: `name`, `short_name`, `display: standalone`, `scope`, `lang`, `theme/background_color`, 3 iconos incl. `maskable`), `dist/sw.js` + `dist/workbox-*.js`, y precache de 9 entradas (~1,6 MiB, dominado por el bundle JS ya existente — el SW no añade peso al primer render).
 - [x] `index.html` inyecta `<link rel="manifest">` (vite-plugin-pwa) y lleva `theme-color`, `apple-mobile-web-app-capable/-status-bar-style/-title`, `apple-touch-icon` y `viewport-fit=cover` — verificado en el HTML emitido.
-- [x] Iconos generados del escudo oficial (`npm run iconos:pwa`), fondo navy y zona segura para el `maskable` — verificados visualmente. Versionados en `public/icons/`.
+- [x] Iconos generados (`npm run marca`), fondo navy y zona segura para el `maskable` — verificados visualmente. Versionados en `public/icons/`. (v2 usaba el escudo oficial; spec `030` lo sustituyó por el logo neutro.)
 - [x] Rutas del SW correctas en `dist/sw.js`: `NetworkFirst` para navegación (`icm-shell`), `StaleWhileRevalidate` para `/api/**/v1/**` (`icm-datos`, solo `200`), `CacheFirst` para `openfreemap.org` (`icm-tiles`), `NetworkOnly` para `/api/auth/*`.
 - [x] `src/pwa.ts`: interceptor de `window.fetch` que ante un `401` en `/api/*` (excepto `/api/auth/*`) fuerza `location.reload()`; `limpiarCacheDatos()` conectado al botón "Cerrar sesión". Cookie `HttpOnly` confirmada (JS no puede leerla/borrarla).
 - [x] `vite-plugin-pwa` es la única dependencia nueva. `npm run typecheck`, `npm run test` (224/224) y `npm run build` sin regresiones. App verificada tras login en `npm run dev` sin errores de consola.

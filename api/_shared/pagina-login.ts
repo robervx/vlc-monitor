@@ -5,7 +5,8 @@
 // navegador y, tras entrar, un `location.reload()` deja ver la página pedida.
 //
 // HTML autocontenido: sin bundle de la app, sin dependencias de frontend.
-// Identidad IMC (spec 019): escudo + nombre + fondo navy. Mobile-first.
+// Marca (spec 030): logo neutro + nombre + fondo navy. Mobile-first.
+import { MARCA } from '../../src/config/marca';
 
 export function paginaLogin(): string {
   return `<!doctype html>
@@ -15,7 +16,7 @@ export function paginaLogin(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="robots" content="noindex" />
 <meta name="theme-color" content="#0b1f33" />
-<title>Acceso — Intelligent City Monitor</title>
+<title>Acceso — ${MARCA.nombre}</title>
 <style>
   :root { --navy: #0b1f33; --navy-light: #14304f; }
   * { box-sizing: border-box; }
@@ -76,10 +77,10 @@ export function paginaLogin(): string {
 <body>
   <form class="card" id="f" autocomplete="on">
     <div class="brand">
-      <img src="/assets/policia-local-valencia-logo.png" alt="" onerror="this.style.display='none'" />
+      <img src="/assets/logo.png" alt="" onerror="this.style.display='none'" />
       <div>
-        <div class="brand__name">Intelligent City Monitor</div>
-        <div class="brand__tag">Policía Local de València</div>
+        <div class="brand__name">${MARCA.nombre}</div>
+        <div class="brand__tag">${MARCA.tagline}</div>
       </div>
     </div>
     <label for="usuario">Usuario</label>
@@ -89,7 +90,7 @@ export function paginaLogin(): string {
     <label class="remember"><input id="recordar" type="checkbox" checked /> Recordar este dispositivo</label>
     <button type="submit" id="btn">Entrar</button>
     <div class="error" id="err" role="alert"></div>
-    <div class="foot">Uso interno — no es un servicio público</div>
+    <div class="foot">Acceso restringido a este despliegue</div>
   </form>
 <script>
   var f = document.getElementById('f');

@@ -134,7 +134,7 @@ function authDevPlugin(): Plugin {
 function pwaPlugin(): Plugin[] {
   return VitePWA({
     registerType: 'prompt',
-    includeAssets: ['icons/apple-touch-icon.png', 'assets/policia-local-valencia-logo.png'],
+    includeAssets: ['icons/apple-touch-icon.png', 'icons/favicon-32.png', 'assets/logo.png'],
     manifest: {
       name: 'Intelligent City Monitor',
       short_name: 'IC Monitor',

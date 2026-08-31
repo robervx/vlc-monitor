@@ -7,7 +7,7 @@ estado: Implemented
 tipo: infraestructura
 depende_de: [019]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 0. Contexto de la decisión
@@ -95,7 +95,7 @@ export const config = {
 
 Lógica:
 
-1. Sin `AUTH_SECRET` configurado → **fail-closed**: `503` (nada se sirve). En `npm run dev` el gate es opt-in: sin `AUTH_SECRET` en `.env` no se activa, para no estorbar a quien trabaja en otras specs.
+1. Sin `AUTH_SECRET` configurado → **el gate NO se activa** (spec `030` / ADR-002: la app se sirve abierta, modo repo público / demo). El gate solo entra en juego si existe `AUTH_SECRET` (+ `APP_USERS`). Igual en `npm run dev` (opt-in vía `.env`).
 2. Lee `imc_session`. Si firma HMAC + `exp` válidos → continúa (`return undefined`).
 3. Si no:
    - Petición a `/api/*` → `401 { error: 'no autenticado' }` en JSON.
@@ -106,7 +106,7 @@ Lógica:
 No es una capa. La pantalla de login es una página propia (`api/_shared/pagina-login.ts`, string HTML que sirve el middleware):
 
 - HTML autocontenido, **sin dependencias de frontend** ni bundle de la app.
-- Identidad IMC: escudo (`/assets/policia-local-valencia-logo.png`, `onerror` lo oculta), nombre, fondo navy `#0b1f33`.
+- Marca: logo `/assets/logo.png` (`onerror` lo oculta), `MARCA.nombre` + `MARCA.tagline` (`src/config/marca.ts`), fondo navy `#0b1f33`.
 - Formulario: `usuario` (text) + `pin` (`inputmode="numeric"`, `autocomplete="current-password"`), checkbox "Recordar este dispositivo" marcado por defecto, botón "Entrar".
 - Al enviar: `fetch('/api/auth/v1/login', …)`; si `ok` → `location.reload()` (la cookie ya está puesta, el middleware deja pasar); si 401 → "Usuario o PIN incorrectos"; si 429 → "Demasiados intentos. Espera N s".
 - Mobile-first, `viewport-fit=cover`, `env(safe-area-inset-*)`, `<meta name="robots" content="noindex">`.
@@ -120,7 +120,7 @@ No es una capa. La pantalla de login es una página propia (`api/_shared/pagina-
 - [x] PIN nunca en claro: `APP_USERS` solo lleva `h` (PBKDF2-SHA256, 100 000 iteraciones) + `s`; `middleware.ts` y `login.ts` no registran PIN ni credenciales en ningún log; comparación en tiempo constante (`timingSafeEqual`) y PBKDF2 ejecutado siempre (aunque el usuario no exista) para no filtrar por tiempo.
 - [x] Cookie de 30 días con "recordar" marcado (por defecto); cookie de sesión (12 h, sin `Max-Age`) sin marcarlo — verificado en test y en navegador. *Pendiente de cerrar contra un despliegue real:* persistencia en iOS Safari tras "Añadir a pantalla de inicio" — se verifica junto con la spec 028 (PWA), que es la que habilita ese modo.
 - [x] `POST /api/auth/v1/logout` borra la cookie (`Max-Age=0`) y la siguiente navegación vuelve a la pantalla de login — verificado en navegador (botón "Cerrar sesión" del pie del sidebar).
-- [x] Pantalla de login (`api/_shared/pagina-login.ts`, servida por el middleware) con identidad IMC (escudo + nombre + navy), responsive (verificada a 1280px y 375×812), `inputmode="numeric"` en el PIN, sin dependencias de frontend ni bundle de la app. Indicador "Sesión: <usuario>" + "Cerrar sesión" añadido al pie del sidebar (`src/ui/chasis.ts`), oculto si el gate no está activo.
+- [x] Pantalla de login (`api/_shared/pagina-login.ts`, servida por el middleware) con la marca (`src/config/marca.ts`), responsive (verificada a 1280px y 375×812), `inputmode="numeric"` en el PIN, sin dependencias de frontend ni bundle de la app. Indicador "Sesión: <usuario>" + "Cerrar sesión" añadido al pie del sidebar (`src/ui/chasis.ts`), oculto si el gate no está activo.
 - [x] `npm run auth:hash -- <usuario>` (`scripts/auth-hash.ts`): pide el PIN por stdin sin eco, reutiliza el `pbkdf2` del runtime, imprime `{u,h,s}` — documentado en README.
 - [x] `npm run typecheck`, `npm run test` (224/224) y `npm run build` sin regresiones.
 
@@ -139,3 +139,4 @@ No es una capa. La pantalla de login es una página propia (`api/_shared/pagina-
 |---|---|---|
 | 1 | 2026-08-28 | Creación, `Draft`. Sustituye la fila `Planned` "Publicación con contraseña en dominio propio". Verificado que Vercel no ofrece password-protection en Hobby → se opta por gate propio en middleware. Contrato de cookie, endpoints y rate-limit congelados. |
 | 2 | 2026-08-28 | Implementado. `api/_shared/auth.ts` (PBKDF2, HMAC de cookie, rate-limit en memoria), `api/_shared/pagina-login.ts`, `middleware.ts` + `authDevPlugin` en `vite.config.ts` para dev, `api/auth/v1/{login,logout,estado}.ts`, `scripts/auth-hash.ts` (`npm run auth:hash`), indicador de sesión + logout en `src/ui/chasis.ts`. 26 tests nuevos (224/224), `typecheck` y `build` verdes, flujo completo verificado con `curl` y en navegador (login, gate de `/api/*`, logout, responsive 375×812). Cambio de diseño respecto a v1: la pantalla de login se sirve en la misma URL desde el middleware (no `rewrite` a `/login`), evitando la dependencia `@vercel/edge` y una ruta estática extra. Pasa a `Implemented`; único punto abierto: persistencia de sesión en PWA iOS, que se cierra con la spec 028. |
+| 3 | 2026-08-29 | Spec `030` / ADR-002: el gate pasa de **fail-closed a fail-open**. Sin `AUTH_SECRET`, `middleware.ts` hace `return undefined` (app abierta, repo público / demo); con `AUTH_SECRET` + `APP_USERS`, el gate funciona igual que en v2. Marca de la pantalla de login desde `src/config/marca.ts` (sin escudo institucional). Verificado con `curl` (sin `.env`: `/` y `/api/*` a 200; con `.env`: gate). |

@@ -2,12 +2,12 @@
 
 ```yaml
 id: 019
-titulo: "Cabecera institucional (Intelligent City Monitor) + barra lateral plegable de funcionalidades"
+titulo: "Cabecera (Intelligent City Monitor) + barra lateral plegable de funcionalidades"
 estado: Implemented
 tipo: fundacional
 depende_de: [000]
 propietario: ""
-version: 3
+version: 4
 ```
 
 ## 0. Contexto de la decisión
@@ -24,7 +24,7 @@ Hasta ahora la pantalla no tenía identidad institucional ni un sitio organizado
 
 No aplica — esta spec no consume ninguna fuente externa ni añade ningún dato nuevo. Es chasis de interfaz (cabecera + navegación) sobre datos que ya sirven las specs existentes.
 
-**Activo de marca**: escudo oficial de Policía Local de València, aportado directamente por el propietario del producto con autorización confirmada del cuerpo (registrado en ADR-001) — no obtenido de ninguna búsqueda ni fuente externa. Fichero esperado en `public/assets/policia-local-valencia-logo.png`.
+**Activo de marca (v4, spec `030` / ADR-002):** placeholder neutro generado (`public/assets/logo.png`, marca tipo radar sobre transparente; `scripts/generar-marca.ts`, Node puro). El escudo oficial de Policía Local de València que introdujo ADR-001 se retiró al publicar el repo. El nombre/tagline/pie viven en `src/config/marca.ts`.
 
 ## 3. Contrato de datos (normalizado)
 
@@ -56,14 +56,14 @@ No es una capa de mapa — es chasis de aplicación (cabecera fija + navegación
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [x] Cabecera visible con el nombre "Intelligent City Monitor" y el escudo oficial de Policía Local de València — fichero recibido y colocado en `public/assets/policia-local-valencia-logo.png`; `<img>` con `onerror` que oculta el logo sin romper la cabecera si el fichero llegara a faltar.
+- [x] Cabecera visible con el nombre y tagline de `src/config/marca.ts` y el logo `public/assets/logo.png` (v4: placeholder neutro, ver spec `030`); `<img>` con `onerror` que oculta el logo sin romper la cabecera si el fichero faltara.
 - [x] Sidebar plegado por defecto, desplegable con el control `☰`/`⟨`, dos secciones registradas en `SIDEBAR_REGISTRY` (`gemelo-digital` como `placeholder`; `configuracion` como `disponible` con contenido real desplegable — ver v3 abajo) — verificado visualmente expandido y colapsado.
 - [x] Sección "Configuración" (v3): panel desplegable con un checkbox por cada uno de los 5 paneles fijos del panel principal (`PANEL_PREFERENCES_REGISTRY` en `src/ui/panel-preferences.ts`), que oculta/muestra ese panel al instante y persiste la preferencia en `localStorage` (`imc:panel-visibility-hidden`) — verificado desmarcando "Calidad del aire" y confirmando que se oculta y sigue oculto tras recargar.
 - [x] `#info-panels` (v3): `flex-wrap` + `max-height` con scroll interno — con varias leyendas de capa activas a la vez, las tarjetas ya no se amontonan en una sola fila ni invaden el panel de capas; se reparten en filas y, si no caben, el bloque hace scroll interno — verificado con 5 leyendas de capa activas simultáneamente (10 tarjetas en total).
 - [x] Estado plegado/desplegado persiste entre recargas (`localStorage`, clave `imc:sidebar-expanded`) — verificado recargando con el sidebar expandido.
 - [x] Ninguna capa ni panel existente (F0-F4, insights) pierde funcionalidad ni queda tapado por la cabecera/sidebar en su estado de reposo (colapsado) — verificado visualmente en navegador con el panel de capas, los paneles inferiores y el control de zoom de MapLibre, los tres reposicionados con `calc(var(--header-h) + 12px)` / `calc(var(--sidebar-w-collapsed) + 12px)`. El mapa se reancla con `top: var(--header-h)` para que el control nativo `top-right` de MapLibre no quede bajo la cabecera.
 - [x] Responsive básico: sidebar expandido se abre como overlay temporal sobre el panel de capas (no reflow permanente) — comportamiento de cajón estándar, aceptado explícitamente en §7.
-- [x] Atribución "Uso interno — no es un servicio público" visible en el pie del sidebar; tagline "Policía Local de València" en la cabecera (v3: se retira "— herramienta interna" de la tagline por decisión del usuario, queda solo en el pie del sidebar).
+- [x] Pie del sidebar con `MARCA.pie` (v4: "Proyecto de datos abiertos · sin relación con ningún organismo oficial"); tagline de cabecera con `MARCA.tagline`. Ambos desde `src/config/marca.ts`.
 - [x] Reloj de cabecera (v3): formato "pro" (monoespaciado, con segundos) + fecha completa en español debajo, indicador "EN VIVO" separado con divisor visual.
 - [x] `npm run typecheck` y `npm run test` (108/108) verificados tras el cambio, sin regresiones.
 
@@ -80,3 +80,4 @@ No es una capa de mapa — es chasis de aplicación (cabecera fija + navegación
 | 1 | 2026-08-18 | Creación, `Draft`. Pendiente: fichero de logo oficial y verificación visual en navegador antes de pasar a `Implemented`. |
 | 2 | 2026-08-19 | DoD completo: `src/ui/chasis.ts` (cabecera + sidebar con `SIDEBAR_REGISTRY`), CSS en `index.html`, mapa reanclado bajo la cabecera, paneles existentes reposicionados sin pérdida de funcionalidad. Logo oficial recibido y colocado en `public/assets/policia-local-valencia-logo.png`. Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador (colapsado, expandido, persistencia tras recarga). Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Ajustes tras feedback de uso: (1) renombrado "Intelligent MonitorCity" → "Intelligent City Monitor" (el orden original no es inglés correcto); (2) tagline sin "— herramienta interna"; (3) `#info-panels` con `flex-wrap` + scroll interno, corrige amontonamiento de leyendas de capa; (4) sección "Configuración" pasa de `placeholder` a `disponible`, con `src/ui/panel-preferences.ts` nuevo (registro + persistencia de qué paneles fijos se muestran); (5) reloj de cabecera rediseñado con fecha. Verificado con `npm run typecheck`, `npm run test` (108/108) y en navegador (checkboxes de capa simultáneos, toggle de Configuración, persistencia tras recarga). |
+| 4 | 2026-08-29 | Re-marca genérica (spec `030` / ADR-002): se retira el escudo oficial de Policía Local de València (`public/assets/policia-local-valencia-logo.png` eliminado) y el lenguaje institucional. Logo → placeholder neutro `public/assets/logo.png` (`scripts/generar-marca.ts`). Nombre/tagline/pie centralizados en `src/config/marca.ts`, consumidos por `chasis.ts` y `pagina-login.ts`. El contexto §0 y la motivación §1 de esta spec quedan como registro histórico de ADR-001. |

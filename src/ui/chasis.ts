@@ -4,6 +4,7 @@
 // apareciendo vía document.body.appendChild sin cambios).
 import { PANEL_PREFERENCES_REGISTRY, isPanelVisible, setPanelVisible } from './panel-preferences';
 import { limpiarCacheDatos } from '../pwa';
+import { MARCA } from '../config/marca';
 import { esMovil, getLayoutForzado, setLayoutForzado, onCambioLayout } from './deteccion-dispositivo';
 import { calcularCercania, formatoDistancia, type ResultadoCercania } from '../services/proximidad';
 import { getCapasActivas } from '../services/capas-activas-store';
@@ -475,8 +476,8 @@ function buildHeader(): HTMLElement {
 
   const logo = document.createElement('img');
   logo.id = 'app-header__logo';
-  logo.src = '/assets/policia-local-valencia-logo.png';
-  logo.alt = 'Escudo de la Policía Local de València';
+  logo.src = '/assets/logo.png';
+  logo.alt = '';
   logo.onerror = () => {
     logo.style.visibility = 'hidden';
   };
@@ -486,11 +487,11 @@ function buildHeader(): HTMLElement {
 
   const name = document.createElement('span');
   name.id = 'app-header__name';
-  name.textContent = 'Intelligent City Monitor';
+  name.textContent = MARCA.nombre;
 
   const tagline = document.createElement('span');
   tagline.id = 'app-header__tagline';
-  tagline.textContent = 'Policía Local de València';
+  tagline.textContent = MARCA.tagline;
 
   brand.append(name, tagline);
 
@@ -764,7 +765,7 @@ function buildSidebar(): void {
 
   const attrib = document.createElement('div');
   attrib.id = 'app-footer-attrib__text';
-  attrib.textContent = 'Uso interno — no es un servicio público';
+  attrib.textContent = MARCA.pie;
   footer.append(sesionBox, layoutBox, attrib);
 
   sidebar.append(cerrar, toggle, sections, footer);
