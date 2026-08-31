@@ -1162,7 +1162,7 @@
         font-size: 14px;
       }
       :root[data-layout='movil'] .sidebar-panel-checkbox {
-        min-height: 40px;
+        min-height: 44px;
         font-size: 13px;
       }
       :root[data-layout='movil'] .sidebar-panel-checkbox input {
@@ -1170,8 +1170,40 @@
         height: 20px;
       }
       :root[data-layout='movil'] .proximidad-boton {
-        min-height: 40px;
+        min-height: 44px;
         font-size: 13px;
+      }
+
+      /* Objetivos táctiles >= 44px en móvil — spec 029 §5. */
+      :root[data-layout='movil'] .controls__row {
+        min-height: 44px;
+      }
+      :root[data-layout='movil'] .controls__row input[type='checkbox'] {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      :root[data-layout='movil'] .controls__row--hora,
+      :root[data-layout='movil'] .controls__row--trafico {
+        margin-top: 2px;
+      }
+      :root[data-layout='movil'] #info-panels button,
+      :root[data-layout='movil'] .insight-card__copiar,
+      :root[data-layout='movil'] .cordon-badge + button,
+      :root[data-layout='movil'] #cordon-resultado button,
+      :root[data-layout='movil'] .sim-corte-quitar {
+        min-height: 40px;
+        min-width: 40px;
+      }
+      :root[data-layout='movil'] .cordon-form input[type='number'],
+      :root[data-layout='movil'] .cordon-form select,
+      :root[data-layout='movil'] .cordon-form textarea {
+        min-height: 40px;
+        font-size: 16px; /* evita el zoom de iOS al enfocar */
+      }
+      :root[data-layout='movil'] #app-sidebar__logout {
+        min-height: 40px;
+        padding: 8px 14px;
       }
 
       /* Escritorio: ocultar los controles solo-móvil. */

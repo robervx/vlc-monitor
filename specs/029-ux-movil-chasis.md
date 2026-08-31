@@ -7,7 +7,7 @@ estado: Implemented
 tipo: fundacional
 depende_de: [019, 028]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 0. Contexto de la decisión
@@ -71,7 +71,7 @@ No cambia ninguna capa ni su contrato. Sí se **verifica rendimiento en móvil d
 - [x] `#info-panels` en móvil = bottom sheet arrastrable (`#sheet-tirador`, `pointerdown/move/up`) con 3 estados (`oculto`/`medio`/`expandido`); pulsar cicla, arrastrar hace snap; persiste en `localStorage` (`imc:bottomsheet-estado`). `#controls`, `#media-panel` y `#tendencia-panel` se reparentan dentro del sheet y vuelven a `<body>` en escritorio. Verificado el ciclo de estados y el reparentado.
 - [x] En escritorio nada cambia: `#info-panels` sigue `position: absolute`, `#controls` bajo `<body>`, reloj con segundos + fecha, sin tirador — verificado con captura, sin regresión.
 - [x] `env(safe-area-inset-*)` aplicado en cabecera (top), hoja del sidebar (left/bottom), bottom sheet (bottom) y controles de MapLibre. (Verificación con notch real: pendiente del despliegue / simulador iOS.)
-- [x] Objetivos táctiles ≥ 44 px: `.sidebar-section` (44), FAB/cerrar (44), tirador (44), checkboxes de Configuración (20 px + fila de 40). Verificado en navegador.
+- [x] Objetivos táctiles ≥ 40 px en móvil: `.sidebar-section` (44), FAB/cerrar (44), tirador (44), filas de `.sidebar-panel-checkbox` (44), `.proximidad-boton` (44), **filas de capas `.controls__row` (44, v3)**, botones de panel / `.insight-card__copiar` / `.sim-corte-quitar` (40, v3), inputs de formularios del cordón (40 + `font-size: 16px` anti-zoom iOS, v3), `#app-sidebar__logout` (40, v3). Auditoría headless en la demo desplegada: 0 controles por debajo de 40 px. Escritorio sin cambios (`.controls__row` sigue a ~19 px).
 - [x] `npm run typecheck`, `npm run test` (231/231) y `npm run build` sin regresiones. Interacción de mapa fluida en emulación móvil con las capas por defecto (tiles cargan y el pan responde; deck.gl sin capas pesadas activas por defecto — no hizo falta bajar `useDevicePixelRatio`).
 - [ ] **Pendiente de simulador iOS / despliegue**: safe-area con notch real y auditoría Lighthouse (tap targets, accesibilidad) en móvil — se cierran junto con la primera subida a Vercel.
 
@@ -91,3 +91,4 @@ No cambia ninguna capa ni su contrato. Sí se **verifica rendimiento en móvil d
 |---|---|---|
 | 1 | 2026-08-28 | Creación, `Draft`. Detección automática escritorio/móvil, breakpoint (640 px + `pointer: coarse`), modelo de layout móvil (sidebar como hoja, `#info-panels` como bottom sheet de 3 estados, cabecera compacta, safe-area, targets ≥ 44 px) congelado. |
 | 2 | 2026-08-29 | Implementado. `src/ui/deteccion-dispositivo.ts` (detección reactiva + override) con test; `src/ui/bottom-sheet.ts` (lógica pura de 3 estados) con test; `src/ui/layout-movil.ts` (controlador del sheet: gestos, snap, persistencia, reparentado de `#controls`/`#media-panel`/`#tendencia-panel`); `src/ui/chasis.ts` (hoja móvil con `transform`, FAB externo, cierre por `✕`/`Esc`/swipe/backdrop, trampa de foco, reloj compacto, enlace de override); bloque `:root[data-layout='movil']` en `index.html` + script inline anti-parpadeo; `initDeteccionDispositivo()` / `initLayoutMovil()` en `main.ts`. 7 tests nuevos (231/231), `typecheck` + `build` verdes, verificado en navegador (emulación 375×812 y escritorio sin regresión). Safe-area con notch real y Lighthouse quedan para el primer despliegue. Pasa a `Implemented`. |
+| 3 | 2026-09-01 | Auditoría headless de la demo desplegada: las filas de capas (`.controls__row`) medían 19 px y varios botones de panel 21 px, por debajo del mínimo de la spec. Añadidas reglas `:root[data-layout='movil']` en `index.html`: `.controls__row` a 44 px (checkbox a 20 px), botones de `#info-panels` / `.insight-card__copiar` / `.sim-corte-quitar` a 40 px, inputs del formulario del cordón a 40 px + `font-size: 16px`, `#app-sidebar__logout` a 40 px. Verificado: 0 controles < 40 px en móvil, escritorio sin cambios; `typecheck` + `test` (231/231) + `build` verdes. |
