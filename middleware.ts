@@ -25,10 +25,10 @@ export default async function middleware(request: Request): Promise<Response | u
   const secret = process.env.AUTH_SECRET;
   const esApi = new URL(request.url).pathname.startsWith('/api/');
 
-  // Fail-closed: sin AUTH_SECRET la herramienta no se sirve.
-  if (!secret) {
-    return respuestaNoAutenticado(esApi, 'Servicio no configurado: falta AUTH_SECRET.');
-  }
+  // Spec 030 / ADR-002: el gate es OPCIONAL. Sin AUTH_SECRET, la app se sirve
+  // abierta (repo público / demo). Con AUTH_SECRET + APP_USERS, queda tras el
+  // gate (despliegues privados).
+  if (!secret) return undefined;
 
   const token = leerCookie(request.headers.get('cookie'), COOKIE_NOMBRE);
   const sesion = await verificarSesion(token, secret);
