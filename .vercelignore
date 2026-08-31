@@ -1,6 +1,5 @@
-# Ficheros que no deben subirse ni desplegarse (Vercel los trataría como
-# funciones si están bajo api/).
+# No subir al despliegue (Vercel los trataría como funciones si están bajo api/,
+# o solo pesan de más).
 **/*.test.ts
-scripts/
 docs/
 specs/

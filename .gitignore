@@ -5,3 +5,6 @@ dist/
 *.log
 .DS_Store
 .vercel
+
+# Bundle de la API generado por scripts/bundle-api.mjs
+api/router.js
