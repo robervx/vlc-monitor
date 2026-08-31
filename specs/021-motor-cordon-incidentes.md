@@ -91,7 +91,7 @@ No hay fuente externa en vivo. `ReglaPerimetro[]` es config estática (como en `
 
 | Parámetro | Valor |
 |---|---|
-| Endpoint interno | Ninguno propio — reutiliza `GET /api/grafo-viario/v1/tramos` de spec `020` |
+| Endpoint interno | Ninguno propio — reutiliza `/data/red-viaria-rodada.json` (asset estático) de spec `020` |
 | Persistencia de `Incidente` | Ninguna fuera de la sesión del navegador, v1 |
 | Comportamiento si spec `020` no está disponible | Modo deshabilitado con aviso explícito, no cálculo aproximado silencioso |
 

@@ -9,7 +9,7 @@ import type { RedViaria } from './red-viaria';
 // ~8MB en el pipeline de transform de Vite/esbuild — evita que este único
 // test file dispare el tiempo de `npm run test` completo (~16s -> ~43s
 // medido con import estático; con readFileSync vuelve al tiempo normal).
-const RED_REAL_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'data', 'red-viaria-rodada.json');
+const RED_REAL_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public', 'data', 'red-viaria-rodada.json');
 const redReal = JSON.parse(readFileSync(RED_REAL_PATH, 'utf-8')) as RedViaria;
 
 // Fixture pequeño y determinista para los casos de borde.

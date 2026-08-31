@@ -6,7 +6,8 @@
 // resolviendo cada tramo contra la geometría oficial de distritos (spec 000)
 // — así se evita depender de un polígono de recorte propio en la consulta
 // Overpass. Escribe el resultado como asset estático versionado en
-// data/red-viaria-rodada.json.
+// public/data/red-viaria-rodada.json (servido por el CDN, no por una función:
+// pesa ~9 MB, ver spec 020 §7).
 //
 // Se ejecuta manualmente (la red viaria cambia con muy poca frecuencia).
 // Uso: npm run seed:red-viaria
@@ -27,7 +28,7 @@ const BBOX = '39.40,-0.43,39.51,-0.30';
 const TIPOS_VIA_QUERY =
   'motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street';
 
-const OUTPUT_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', 'red-viaria-rodada.json');
+const OUTPUT_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'data', 'red-viaria-rodada.json');
 
 async function fetchOverpass(): Promise<OverpassElement[]> {
   const query = `[out:json][timeout:120];(way["highway"~"^(${TIPOS_VIA_QUERY})$"](${BBOX});); out body; >; out skel qt;`;
