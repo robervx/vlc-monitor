@@ -28,16 +28,11 @@ function apiDevPlugin(): Plugin {
         }
 
         const url = new URL(req.url, 'http://localhost');
-        const relativePath = url.pathname.replace(/^\/api\//, '');
-        const resolvedPath = path.normalize(path.join(apiDir, relativePath));
-        if (!resolvedPath.startsWith(apiDir)) {
-          res.statusCode = 400;
-          res.end('Ruta de API inválida');
-          return;
-        }
 
         try {
-          const mod = await server.ssrLoadModule(`${resolvedPath}.ts`);
+          // En producción, Vercel enruta todo /api/* al catch-all api/[...path].ts
+          // (una sola función, por el límite de 12 de Hobby). En dev replicamos eso.
+          const mod = await server.ssrLoadModule(path.join(apiDir, '[...path].ts'));
           const handler = mod.default;
           if (typeof handler !== 'function') {
             next();

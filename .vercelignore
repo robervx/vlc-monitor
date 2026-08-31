@@ -1,0 +1,6 @@
+# Ficheros que no deben subirse ni desplegarse (Vercel los trataría como
+# funciones si están bajo api/).
+**/*.test.ts
+scripts/
+docs/
+specs/
