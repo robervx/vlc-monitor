@@ -6,7 +6,7 @@ import { proponerCordon, type Incidente } from './cordon-incidente';
 import { construirIndiceEspacial } from './red-viaria-indice';
 import type { RedViaria, Tramo } from './red-viaria';
 
-const RED_REAL_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'data', 'red-viaria-rodada.json');
+const RED_REAL_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public', 'data', 'red-viaria-rodada.json');
 const redReal = JSON.parse(readFileSync(RED_REAL_PATH, 'utf-8')) as RedViaria;
 const indiceReal = construirIndiceEspacial(redReal.tramos);
 

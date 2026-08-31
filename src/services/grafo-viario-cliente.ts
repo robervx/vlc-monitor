@@ -22,8 +22,11 @@ export async function cargarGrafoViario(): Promise<GrafoViarioCliente> {
   if (promesaEnCurso) return promesaEnCurso;
 
   promesaEnCurso = (async () => {
-    const res = await fetch('/api/grafo-viario/v1/tramos');
-    if (!res.ok) throw new Error(`GET /api/grafo-viario/v1/tramos -> HTTP ${res.status}`);
+    // Asset estático versionado (spec 020): ~9 MB, servido por el CDN (gzip
+    // ~1.1 MB), no por una función — supera el límite de tamaño/respuesta de
+    // las funciones de Vercel. Sigue siendo mismo-origen y propio.
+    const res = await fetch('/data/red-viaria-rodada.json');
+    if (!res.ok) throw new Error(`GET /data/red-viaria-rodada.json -> HTTP ${res.status}`);
     const red = (await res.json()) as RedViaria;
     const resultado: GrafoViarioCliente = {
       nodos: red.nodos,

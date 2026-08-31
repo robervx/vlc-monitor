@@ -17,7 +17,7 @@ export const config = {
   // Se dejan pasar sin gate: los assets del build, los iconos y ficheros PWA
   // (manifest, service worker, runtime de Workbox) y los endpoints de auth.
   matcher: [
-    '/((?!assets/|icons/|favicon|robots\\.txt|manifest\\.webmanifest|sw\\.js|workbox-|registerSW\\.js|api/auth/).*)',
+    '/((?!assets/|icons/|data/|favicon|robots\\.txt|manifest\\.webmanifest|sw\\.js|workbox-|registerSW\\.js|api/auth/).*)',
   ],
 };
 

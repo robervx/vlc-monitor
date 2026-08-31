@@ -20,7 +20,7 @@ Un mando planificando el corte de calles para un evento (carrera, procesión, ob
 
 ## 2. Fuente(s) de datos
 
-Ninguna nueva. Reutiliza el grafo de spec `020` (`GET /api/grafo-viario/v1/tramos`) y su índice espacial (`rbush`, spec `020`/`012`). Los cortes los elige el usuario haciendo clic en el mapa — no hay persistencia entre sesiones (mismo criterio que spec `021`: es una herramienta de trabajo puntual, no un dato a guardar).
+Ninguna nueva. Reutiliza el grafo de spec `020` (`/data/red-viaria-rodada.json` (asset estático)) y su índice espacial (`rbush`, spec `020`/`012`). Los cortes los elige el usuario haciendo clic en el mapa — no hay persistencia entre sesiones (mismo criterio que spec `021`: es una herramienta de trabajo puntual, no un dato a guardar).
 
 ## 3. Contrato de datos (normalizado)
 
@@ -50,7 +50,7 @@ interface ResultadoSimulacionCortes {
 
 ## 4. Pipeline (seed → caché → endpoint)
 
-Ninguno propio — reutiliza `GET /api/grafo-viario/v1/tramos` de spec `020`, ya cacheado en el cliente vía `grafo-viario-cliente.ts`.
+Ninguno propio — reutiliza `/data/red-viaria-rodada.json` (asset estático) de spec `020`, ya cacheado en el cliente vía `grafo-viario-cliente.ts`.
 
 ## 5. Contrato de capa de mapa
 
