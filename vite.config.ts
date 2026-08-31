@@ -184,16 +184,12 @@ function pwaPlugin(): Plugin[] {
             cacheableResponse: { statuses: [200] },
           },
         },
-        {
-          // Tiles del mapa base.
-          urlPattern: ({ url }: { url: URL }) => url.hostname.endsWith('openfreemap.org'),
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'icm-tiles',
-            expiration: { maxEntries: 300, maxAgeSeconds: 14 * 24 * 60 * 60 },
-            cacheableResponse: { statuses: [0, 200] },
-          },
-        },
+        // Nota: NO se intercepta OpenFreeMap (tiles del mapa base). Enrutar sus
+        // respuestas por el SW —aunque sea NetworkOnly— dejaba el mapa base en
+        // blanco en producción (el worker de MapLibre GL lee las teselas
+        // vectoriales de un modo que no tolera el paso por Cache/respondWith).
+        // Sin regla, el navegador las sirve nativamente. El offline de teselas
+        // del área ya vista queda como fast-follow con verificación propia.
       ],
     },
     devOptions: { enabled: false },
