@@ -9,14 +9,14 @@ const apiDir = path.join(rootDir, 'api');
 const serverDir = path.join(rootDir, 'src/server');
 
 /**
- * Sirve las funciones de api/ (formato Vercel Edge: `export default (req: Request) =>
- * Promise<Response>`, `export const config = { runtime: 'edge' }`) durante
- * `npm run dev`, traduciendo IncomingMessage/ServerResponse de Node a la Fetch API.
+ * Réplica local, para `npm run dev`, del router de API que en producción es una
+ * única función (`api/router.js`, bundle de `api/_router-src.ts`). Traduce
+ * IncomingMessage/ServerResponse de Node a la Fetch API y delega en el mismo
+ * router (handlers en `src/server/`, estilo web `Request -> Response`).
  *
- * En producción (Vercel) estas mismas funciones se despliegan tal cual — este
- * plugin es solo la réplica local del router de api/ de Vercel, no un sustituto
- * de su runtime real. Ver vite.config.ts (comentario original) y CLAUDE.md §2:
- * el frontend siempre habla con /api/..., nunca con la fuente externa.
+ * No sustituye al runtime real de Vercel — solo evita tener que desplegar para
+ * probar la API. Ver CLAUDE.md §6 (arquitectura) y §2 (el frontend siempre
+ * habla con /api/..., nunca con la fuente externa).
  */
 function apiDevPlugin(): Plugin {
   return {
@@ -67,9 +67,9 @@ function apiDevPlugin(): Plugin {
  * Réplica local del gate de `middleware.ts` (spec 018) para `npm run dev`.
  * Vite no ejecuta el Edge Middleware de Vercel, así que sin esto el gate no
  * se puede verificar en local. Solo se activa si `AUTH_SECRET` está definido
- * — sin esa variable, `npm run dev` sigue funcionando sin barrera (para no
- * estorbar a quien trabaja en otras specs), igual que en producción es
- * fail-closed pero en local es opt-in.
+ * — sin esa variable, `npm run dev` sigue funcionando sin barrera. Igual que
+ * en producción: el gate (spec 018) es opcional y solo se activa con
+ * `AUTH_SECRET` + `APP_USERS` (ADR-002).
  */
 function authDevPlugin(): Plugin {
   return {
