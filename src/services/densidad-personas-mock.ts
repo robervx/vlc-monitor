@@ -5,7 +5,7 @@
  * spec 003 §2 (dato agregado, anonimizado en origen, con contrato comercial,
  * revisado por compliance) — sin excepción.
  */
-import poblacionDistritos from '../../data/poblacion-distritos-valencia-2024.json';
+import poblacionDistritos from '../../data/poblacion-distritos-valencia-2024.json' with { type: 'json' };
 
 export interface DensidadDistritoMock {
   distritoCodigo: string;

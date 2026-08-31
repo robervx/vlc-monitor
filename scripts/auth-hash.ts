@@ -7,7 +7,7 @@
 // (importado de api/_shared/auth.ts para que los parámetros no se desincronicen)
 // y escribe el objeto JSON listo para pegar en la variable APP_USERS de Vercel.
 import { createInterface } from 'node:readline';
-import { pbkdf2 } from '../api/_shared/auth';
+import { pbkdf2 } from '../src/server/_shared/auth';
 
 const usuario = process.argv[2];
 if (!usuario || !/^[a-zA-Z0-9_-]{2,32}$/.test(usuario)) {

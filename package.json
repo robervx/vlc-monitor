@@ -7,7 +7,7 @@
   "description": "Monitor de datos abiertos de València en tiempo real: movilidad, meteorología, calidad del aire, eventos e incidencias en un único mapa.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/bundle-api.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test": "vitest run",
@@ -29,6 +29,7 @@
     "@types/geojson": "^7946.0.14",
     "@types/node": "^22.7.0",
     "@types/rbush": "^4.0.0",
+    "esbuild": "^0.21.5",
     "tsx": "^4.23.12",
     "typescript": "^5.6.0",
     "vercel": "^59.10.0",

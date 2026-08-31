@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const apiDir = path.join(rootDir, 'api');
+const serverDir = path.join(rootDir, 'src/server');
 
 /**
  * Sirve las funciones de api/ (formato Vercel Edge: `export default (req: Request) =>
@@ -30,10 +31,10 @@ function apiDevPlugin(): Plugin {
         const url = new URL(req.url, 'http://localhost');
 
         try {
-          // En producción, Vercel enruta todo /api/* al catch-all api/[...path].ts
-          // (una sola función, por el límite de 12 de Hobby). En dev replicamos eso.
-          const mod = await server.ssrLoadModule(path.join(apiDir, '[...path].ts'));
-          const handler = mod.default;
+          // En producción, Vercel reescribe /api/* -> /api/router (una función, por el
+          // límite de 12 de Hobby). En dev delegamos en el mismo router.
+          const mod = await server.ssrLoadModule(path.join(apiDir, '_router-src.ts'));
+          const handler = mod.GET ?? mod.default;
           if (typeof handler !== 'function') {
             next();
             return;
@@ -74,8 +75,8 @@ function authDevPlugin(): Plugin {
   return {
     name: 'vlc-monitor-auth-dev',
     configureServer(server: ViteDevServer) {
-      const authModule = path.join(apiDir, '_shared/auth.ts');
-      const loginModule = path.join(apiDir, '_shared/pagina-login.ts');
+      const authModule = path.join(serverDir, '_shared/auth.ts');
+      const loginModule = path.join(serverDir, '_shared/pagina-login.ts');
 
       const middleware: Connect.NextHandleFunction = async (req, res, next) => {
         const secret = process.env.AUTH_SECRET;
@@ -133,7 +134,7 @@ function pwaPlugin(): Plugin[] {
     manifest: {
       name: 'Intelligent City Monitor',
       short_name: 'IC Monitor',
-      description: 'Monitor de ciudad para mandos de Policía Local de València — uso interno.',
+      description: 'Datos abiertos de València en tiempo real: movilidad, meteo, aire, eventos e incidencias.',
       lang: 'es',
       start_url: '/',
       scope: '/',
@@ -141,7 +142,7 @@ function pwaPlugin(): Plugin[] {
       orientation: 'any',
       background_color: '#0b1f33',
       theme_color: '#0b1f33',
-      categories: ['utilities', 'government'],
+      categories: ['utilities', 'navigation'],
       icons: [
         { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },

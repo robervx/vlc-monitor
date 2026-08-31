@@ -10,8 +10,8 @@
 // Se excluyen del matcher: los assets que necesita la propia pantalla de login
 // (/assets/*), los assets PWA (spec 028) y /api/auth/* (login/logout/estado).
 
-import { verificarSesion, leerCookie, COOKIE_NOMBRE } from './api/_shared/auth';
-import { paginaLogin } from './api/_shared/pagina-login';
+import { verificarSesion, leerCookie, COOKIE_NOMBRE } from './src/server/_shared/auth';
+import { paginaLogin } from './src/server/_shared/pagina-login';
 
 export const config = {
   // Se dejan pasar sin gate: los assets del build, los iconos y ficheros PWA

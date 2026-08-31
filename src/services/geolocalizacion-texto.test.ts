@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeAll } from 'vitest';
-import distritosGeoJSON from '../../data/distritos-valencia.json';
+import distritosGeoJSON from '../../data/distritos-valencia.json' with { type: 'json' };
 import { setLoadedDistricts, type Distrito } from './district-geometry';
 import { findDistrictMentions, resetTablaPatronesGeolocalizacion } from './geolocalizacion-texto';
 

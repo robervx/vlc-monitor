@@ -79,21 +79,29 @@ docs/
   01_VIABILIDAD_VISION_Y_PROCESO.md
   investigacion/          # research de referencia (World Monitor, fuentes OSINT)
 src/
-  config/                 # map-layer-definitions.ts y config estática
-  services/                # geometría de distritos, clientes de API internos
+  config/                 # map-layer-definitions.ts, marca.ts y config estática
+  services/                # geometría de distritos, clientes de datos (frontend)
+  server/
+    <dominio>-<recurso>.ts  # handlers de API, un fichero por RPC (contrato de cada spec).
+                             #   Estilo Web: export default (Request) => Promise<Response>.
+                             #   Añadir un endpoint = fichero nuevo + entrada en RUTAS de _router-src.ts
+    _shared/                 # caché, helpers de auth, pantalla de login
 api/
-  [...path].ts              # ÚNICA función desplegada — router que delega en los handlers
-                            #   (Vercel Hobby limita a 12 funciones/deploy; ver spec 020 §7)
-  _<dominio>/v1/<recurso>.ts # handlers, un fichero por RPC siguiendo el contrato de cada spec.
-                            #   El prefijo `_` evita que Vercel los trate como funciones.
-                            #   Añadir un endpoint = fichero nuevo + entrada en RUTAS de [...path].ts
-  _shared/                  # caché, helpers de auth, pantalla de login
-data/                       # assets pequeños versionados (geojson de distritos, histórico)
+  _router-src.ts             # fuente del router: mapea /api/<dom>/v1/<rec> -> handler de src/server/
+  router.js                  # BUNDLE de _router-src.ts (esbuild) — ÚNICA función desplegada.
+                             #   Generado por `npm run build`, git-ignored. Ver scripts/bundle-api.mjs.
+data/                       # assets pequeños versionados (geojson de distritos, histórico de tráfico)
 public/data/                # assets grandes servidos por el CDN, NO por una función
                             #   (red-viaria-rodada.json ~9 MB — supera el límite de función)
+vercel.json                 # reescribe /api/* -> /api/router (el router zero-config de Vercel no
+                            #   soporta catch-all multi-segmento)
 ```
 
-Las URLs públicas no cambian con esto: siguen siendo `GET /api/<dominio>/v1/<recurso>`.
+**Por qué un router único y bundleado** (ver spec 020 §7 e historial): Vercel Hobby
+limita a 12 funciones por despliegue y teníamos ~18. Todo va en una sola función
+Node. El bundle de esbuild resuelve extensiones ESM e `import ... with {type:'json'}`
+que el `tsc` del proyecto no emite. Las URLs públicas no cambian:
+`GET /api/<dominio>/v1/<recurso>`.
 
 ## 7. Comandos
 
