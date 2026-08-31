@@ -82,10 +82,18 @@ src/
   config/                 # map-layer-definitions.ts y config estática
   services/                # geometría de distritos, clientes de API internos
 api/
-  <dominio>/v1/            # funciones edge, un fichero por RPC, siguiendo el contrato de cada spec
-  _shared/                  # caché, cors, helpers comunes
-data/                       # assets estáticos versionados (geojson de distritos, etc.)
+  [...path].ts              # ÚNICA función desplegada — router que delega en los handlers
+                            #   (Vercel Hobby limita a 12 funciones/deploy; ver spec 020 §7)
+  _<dominio>/v1/<recurso>.ts # handlers, un fichero por RPC siguiendo el contrato de cada spec.
+                            #   El prefijo `_` evita que Vercel los trate como funciones.
+                            #   Añadir un endpoint = fichero nuevo + entrada en RUTAS de [...path].ts
+  _shared/                  # caché, helpers de auth, pantalla de login
+data/                       # assets pequeños versionados (geojson de distritos, histórico)
+public/data/                # assets grandes servidos por el CDN, NO por una función
+                            #   (red-viaria-rodada.json ~9 MB — supera el límite de función)
 ```
+
+Las URLs públicas no cambian con esto: siguen siendo `GET /api/<dominio>/v1/<recurso>`.
 
 ## 7. Comandos
 
