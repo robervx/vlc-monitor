@@ -7,7 +7,7 @@ estado: Implemented
 tipo: infraestructura
 depende_de: [019, 018]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 0. Contexto de la decisión
@@ -70,7 +70,7 @@ Los iconos (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touc
 |---|---|---|
 | Assets del build (JS/CSS/SVG/woff2) | Precache con revisión por hash (`globPatterns`) | `index.html` **NO** se precachea (ver abajo) |
 | Navegación (`request.mode === 'navigate'`) | **NetworkFirst** (`cacheName: icm-shell`) | `networkTimeoutSeconds: 3`, `maxEntries: 2`, `statuses: [200]` |
-| Tiles de OpenFreeMap (`*.openfreemap.org`) | CacheFirst (`icm-tiles`) | `maxEntries: 300`, `maxAgeSeconds: 1209600` (14 d), `statuses: [0, 200]` |
+| Tiles de OpenFreeMap (`*.openfreemap.org`) | **Sin regla — no interceptar** (v3) | El SW pasando por Cache/`respondWith` deja el mapa base en blanco (el worker de MapLibre GL lee las teselas vectoriales de un modo incompatible). Verificado en producción. Offline de teselas = fast-follow. |
 | Datos `/api/*/v1/*` | StaleWhileRevalidate (`icm-datos`) | `maxEntries: 60`, `maxAgeSeconds: 3600`, `statuses: [200]` |
 | `/api/auth/*` | **NetworkOnly** (nunca en caché) | — |
 
@@ -101,7 +101,7 @@ No aplica — no cambia ninguna capa ni panel.
 - [x] `npm run build` genera `dist/manifest.webmanifest` (válido: `name`, `short_name`, `display: standalone`, `scope`, `lang`, `theme/background_color`, 3 iconos incl. `maskable`), `dist/sw.js` + `dist/workbox-*.js`, y precache de 9 entradas (~1,6 MiB, dominado por el bundle JS ya existente — el SW no añade peso al primer render).
 - [x] `index.html` inyecta `<link rel="manifest">` (vite-plugin-pwa) y lleva `theme-color`, `apple-mobile-web-app-capable/-status-bar-style/-title`, `apple-touch-icon` y `viewport-fit=cover` — verificado en el HTML emitido.
 - [x] Iconos generados (`npm run marca`), fondo navy y zona segura para el `maskable` — verificados visualmente. Versionados en `public/icons/`. (v2 usaba el escudo oficial; spec `030` lo sustituyó por el logo neutro.)
-- [x] Rutas del SW correctas en `dist/sw.js`: `NetworkFirst` para navegación (`icm-shell`), `StaleWhileRevalidate` para `/api/**/v1/**` (`icm-datos`, solo `200`), `CacheFirst` para `openfreemap.org` (`icm-tiles`), `NetworkOnly` para `/api/auth/*`.
+- [x] Rutas del SW correctas en `dist/sw.js`: `NetworkFirst` para navegación (`icm-shell`), `StaleWhileRevalidate` para `/api/**/v1/**` (`icm-datos`, solo `200`), `NetworkOnly` para `/api/auth/*`. OpenFreeMap **sin regla** (v3 — ver §3): interceptarlo dejaba el mapa base en blanco en producción.
 - [x] `src/pwa.ts`: interceptor de `window.fetch` que ante un `401` en `/api/*` (excepto `/api/auth/*`) fuerza `location.reload()`; `limpiarCacheDatos()` conectado al botón "Cerrar sesión". Cookie `HttpOnly` confirmada (JS no puede leerla/borrarla).
 - [x] `vite-plugin-pwa` es la única dependencia nueva. `npm run typecheck`, `npm run test` (224/224) y `npm run build` sin regresiones. App verificada tras login en `npm run dev` sin errores de consola.
 - [ ] **Pendiente de un despliegue real** (el runtime de service worker no se puede ejercitar en el navegador de esta sesión — SW deshabilitado en el sandbox): Lighthouse PWA/Performance en móvil, "Añadir a pantalla de inicio" en Android Chrome + iOS Safari (`standalone`, icono, status bar), apertura offline tras primera carga, ausencia de `/api/auth/*` en `caches`, y el toast de actualización con dos despliegues consecutivos. Se cierran en la primera subida a Vercel.
@@ -123,3 +123,4 @@ No aplica — no cambia ninguna capa ni panel.
 |---|---|---|
 | 1 | 2026-08-28 | Creación, `Draft`. Contrato de manifest, iconos, meta tags y estrategias de service worker congelado. |
 | 2 | 2026-08-28 | Implementado. `vite-plugin-pwa` (única dependencia nueva) en `vite.config.ts` (`generateSW`, `registerType: 'prompt'`, `devOptions.enabled: false`); `scripts/generar-iconos-pwa.ts` + `public/icons/*` (`npm run iconos:pwa`); `src/pwa.ts` (registro del SW, toast de actualización, interceptor de 401, `limpiarCacheDatos`) llamado desde `main()`; cabeceras PWA + `viewport-fit=cover` en `index.html`; `src/vite-env.d.ts`; matcher del middleware (spec 018) ampliado para dejar pasar los ficheros PWA. Cambio respecto a v1: la navegación pasa de `navigateFallback` a **NetworkFirst** e `index.html` deja de precachearse, para que el gate de la spec 018 decida app vs. login en cada carga. `typecheck` + `test` (224/224) + `build` verdes; app verificada tras login en `npm run dev`. Pasa a `Implemented`; los criterios de runtime del SW quedan para cerrar en el primer despliegue (el navegador de la sesión no registra SW). |
+| 3 | 2026-08-31 | En el primer despliegue el mapa base salía en blanco: el SW rompía las teselas vectoriales de OpenFreeMap al pasarlas por Cache Storage / `respondWith` (el worker de MapLibre GL no lo tolera). Solución: **no interceptar `openfreemap.org`** (regla eliminada de `runtimeCaching`). Verificado en producción con SW nuevo. El offline de teselas queda como fast-follow.
