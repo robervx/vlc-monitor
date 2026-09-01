@@ -1,13 +1,19 @@
 /**
- * Orquestador del "modo simulador de cortes" — spec 022. Mismo patrón que
- * `modo-cordon.ts` (spec 021): vive fuera de chasis.ts/main.ts para evitar
- * el import circular, ambos se suscriben a este store.
+ * Orquestador del "modo simulador de cortes" — spec 022 (v5). Mismo patrón
+ * que `modo-cordon.ts` (spec 021): vive fuera de chasis.ts/main.ts para
+ * evitar el import circular, ambos se suscriben a este store.
  *
  * Mutuamente excluyente con el modo cordón (spec 021) — activar uno sale
  * del otro, nunca los dos interceptando clics del mapa a la vez.
+ *
+ * v5: sustituye el cálculo propio de alcanzabilidad a un nodo único (Plaza
+ * del Ayuntamiento) por el motor compartido de propagación dirigida (spec
+ * 031): además de "zonas sin salida" ahora reporta "zonas sin entrada" y
+ * "desvío forzado". La referencia pasa a ser la SCC principal del grafo.
  */
-import { cargarGrafoViario } from '../services/grafo-viario-cliente';
-import { calcularAlcanzablesBase, calcularAislados, type ResultadoSimulacionCortes } from '../services/simulacion-cortes';
+import { cargarGrafoViario, obtenerBasePropagacion, type BasePropagacionCliente } from '../services/grafo-viario-cliente';
+import { propagarCorte, type ResultadoPropagacionCorte } from '../services/propagacion-corte';
+import { calcularRutasAlternativas, type RutaAlternativa } from '../services/reruta-corte';
 import type { Tramo } from '../services/red-viaria';
 import { salirModoCordon } from './modo-cordon';
 
@@ -16,19 +22,18 @@ export type FaseModoSimulacion = 'inactivo' | 'seleccionando';
 export interface EstadoModoSimulacion {
   fase: FaseModoSimulacion;
   tramosCortados: string[]; // orden de selección, no un Set (para poder listar en la UI)
-  resultado: ResultadoSimulacionCortes | null;
+  resultado: ResultadoPropagacionCorte | null;
+  /** Ruta representativa del desvío por cada corte — para la animación cualitativa (spec 022 v6). */
+  rutasAlternativas: RutaAlternativa[];
   cargandoGrafo: boolean;
   errorGrafo: string | null;
 }
-
-// Plaza del Ayuntamiento — mismo punto usado como referencia en otras specs
-// de esta sesión, ver spec 022 §3.
-const REFERENCIA_COORD: [number, number] = [-0.3763, 39.4699];
 
 const ESTADO_INICIAL: EstadoModoSimulacion = {
   fase: 'inactivo',
   tramosCortados: [],
   resultado: null,
+  rutasAlternativas: [],
   cargandoGrafo: false,
   errorGrafo: null,
 };
@@ -53,8 +58,7 @@ export function getEstadoModoSimulacion(): EstadoModoSimulacion {
 
 let tramosCache: Tramo[] | null = null;
 let tramosPorIdCache: Map<string, Tramo> | null = null;
-let nodoReferenciaIdCache: string | null = null;
-let alcanzablesBaseCache: Set<string> | null = null;
+let baseCache: BasePropagacionCliente | null = null;
 
 export function getTramoPorIdSimulacion(id: string): Tramo | undefined {
   return tramosPorIdCache?.get(id);
@@ -68,10 +72,7 @@ export async function activarSimulacionCortes(): Promise<void> {
     const grafo = await cargarGrafoViario();
     tramosCache = grafo.tramos;
     tramosPorIdCache = grafo.tramosPorId;
-    const snap = grafo.indice.tramoMasCercano(REFERENCIA_COORD, 500);
-    if (!snap) throw new Error('No se encontró un tramo cerca del punto de referencia');
-    nodoReferenciaIdCache = snap.tramo.nodoOrigenId;
-    alcanzablesBaseCache = calcularAlcanzablesBase(grafo.tramos, nodoReferenciaIdCache);
+    baseCache = obtenerBasePropagacion(grafo); // memoizado, compartido con spec 021
     estado = { ...estado, cargandoGrafo: false };
     notificar();
   } catch {
@@ -85,14 +86,11 @@ export async function activarSimulacionCortes(): Promise<void> {
 }
 
 function recalcular(): void {
-  if (!tramosCache || !nodoReferenciaIdCache || !alcanzablesBaseCache) return;
-  const resultado = calcularAislados(
-    tramosCache,
-    new Set(estado.tramosCortados),
-    nodoReferenciaIdCache,
-    alcanzablesBaseCache,
-  );
-  estado = { ...estado, resultado };
+  if (!tramosCache || !baseCache) return;
+  const cortados = new Set(estado.tramosCortados);
+  const resultado = propagarCorte(tramosCache, cortados, baseCache.base);
+  const rutasAlternativas = calcularRutasAlternativas(tramosCache, cortados);
+  estado = { ...estado, resultado, rutasAlternativas };
   notificar();
 }
 

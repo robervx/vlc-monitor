@@ -52,6 +52,46 @@ describe('construirRedViaria', () => {
     expect(a?.sentido).toBe('bidireccional');
   });
 
+  it('marca junction=roundabout como unidireccional aunque no traiga oneway (spec 020 v4)', () => {
+    const elementos: OverpassElement[] = [
+      { type: 'node', id: 1, lat: 39.47, lon: -0.377 },
+      { type: 'node', id: 2, lat: 39.4702, lon: -0.3768 },
+      { type: 'node', id: 3, lat: 39.4703, lon: -0.3772 },
+      { type: 'node', id: 4, lat: 39.4701, lon: -0.3774 },
+      // Way cerrado de rotonda, sin tag oneway.
+      { type: 'way', id: 400, nodes: [1, 2, 3, 4, 1], tags: { highway: 'tertiary', junction: 'roundabout' } },
+    ];
+    const red = construirRedViaria(elementos, { ...OPCIONES_BASE, resolverDistrito: resolverSiempreDistrito01 });
+    expect(red.tramos.length).toBeGreaterThan(0);
+    expect(red.tramos.every((t) => t.sentido === 'unidireccional')).toBe(true);
+  });
+
+  it('junction=circular NO implica sentido único (a diferencia de roundabout)', () => {
+    const elementos: OverpassElement[] = [
+      { type: 'node', id: 1, lat: 39.47, lon: -0.377 },
+      { type: 'node', id: 2, lat: 39.4705, lon: -0.3765 },
+      { type: 'way', id: 401, nodes: [1, 2], tags: { highway: 'residential', junction: 'circular' } },
+    ];
+    const red = construirRedViaria(elementos, { ...OPCIONES_BASE, resolverDistrito: resolverSiempreDistrito01 });
+    expect(red.tramos[0]?.sentido).toBe('bidireccional');
+  });
+
+  it('oneway=-1 es unidireccional con la geometría invertida (origen->destino = sentido real)', () => {
+    const elementos: OverpassElement[] = [
+      { type: 'node', id: 1, lat: 39.47, lon: -0.377 },
+      { type: 'node', id: 2, lat: 39.4705, lon: -0.3765 },
+      { type: 'node', id: 3, lat: 39.471, lon: -0.376 },
+      { type: 'way', id: 402, nodes: [1, 2, 3], tags: { highway: 'residential', name: 'Contramano', oneway: '-1' } },
+    ];
+    const red = construirRedViaria(elementos, { ...OPCIONES_BASE, resolverDistrito: resolverSiempreDistrito01 });
+    const t = red.tramos.find((x) => x.nombreCalle === 'Contramano');
+    expect(t?.sentido).toBe('unidireccional');
+    // El way OSM va n1->n3; con oneway=-1 la circulación real es n3->n1.
+    const coords = t!.geometria.coordinates;
+    expect(coords[0]).toEqual([-0.376, 39.471]);
+    expect(coords[coords.length - 1]).toEqual([-0.377, 39.47]);
+  });
+
   it('descarta tramos cuyo punto medio cae fuera de cualquier distrito', () => {
     const red = construirRedViaria(fixtureElementos(), { ...OPCIONES_BASE, resolverDistrito: () => null });
     expect(red.tramos).toHaveLength(0);

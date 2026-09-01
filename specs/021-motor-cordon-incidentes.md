@@ -5,12 +5,20 @@ id: 021
 titulo: "Propuesta de perímetro/cordón y calles a cortar según tipo e intensidad de incidente"
 estado: Draft
 tipo: capa
-depende_de: [020, 019]
+depende_de: [020, 019, 031]
 propietario: ""
-version: 2
+version: 3
 ```
 
 **Nota de estado (v2, 2026-08-25)**: el DoD de software (§6) está completo e implementado — motor de cálculo, UI, tests, badges de confianza, guard de datos personales. **Sigue en `Draft`, deliberadamente no `Approved`**: esta spec fija su propio bloqueante (§7) de que `Approved` requiere contraste real con el Consorcio Provincial de Bombers de València, que es una acción humana fuera de esta sesión — construir el software no sustituye esa validación, y marcar esto como algo más que `Draft` sería exactamente el riesgo que el badge de confianza está diseñado para evitar.
+
+**Nota (2026-09-01) — v3, revisión del gemelo digital**: la propuesta de perímetro por **distancia de red radial** (§3-§4) no cambia. Lo que añade v3:
+- **Cortes de calle a mano** en el modo cordón (fase `formulario`): clic en el mapa hace snap al tramo más cercano y lo añade/quita de `cortesManuales` (mismo patrón que el simulador de spec `022`). Segundo handler de clic en `main.ts`, activo solo en fase `formulario`.
+- **Efecto en cadena dirigido** (motor de spec `031`) sobre `tramosCerrados` (del perímetro) + `cortesManuales`. En la UI **solo se muestra la propagación que se escapa del área de socorro** (`modo-cordon.ts` → `calcularPropagacionFuera`, filtra por distancia recta al incidente > `radioAreaSocorroM`): el interior del cordón siempre queda sin entrada/salida por diseño, eso no es una alarma (spec `031` §5).
+- Flechas de sentido de circulación visibles mientras el modo está activo (capa `flechas-sentido`, compartida con spec `022`).
+- Precálculo de `031` (`obtenerBasePropagacion`) compartido con el simulador de spec `022`, memoizado en `grafo-viario-cliente.ts`.
+
+El bloqueante de §7 (contraste con Bombers) es independiente y **sigue vigente** — v3 no cambia el estado `Draft`.
 
 ## 0. Contexto de la decisión
 
@@ -135,3 +143,4 @@ Pintado: marcador del incidente (punto rojo), dos polígonos concéntricos (Áre
 |---|---|---|
 | 1 | 2026-08-25 | Creación, `Draft`. Investigación de fuentes reales (RD 1196/2003, doctrina PEMU, ITC.SP 147:2024, documento conjunto de bomberos con coautoría de Ayto. Valencia, ERG Guía 147, UK NOG) — hueco identificado y dejado explícito para vehículo eléctrico en vía pública y perímetro de vivienda/edificio, pendiente de validación con el Consorcio Provincial de Bombers de València antes de `Approved`. |
 | 2 | 2026-08-25 | DoD de software completo (sigue en `Draft`, ver nota de estado arriba): `src/config/reglas-perimetro-incendio.ts` (18 filas trazables), `src/services/cordon-incidente.ts` (motor de cálculo, distancia de red vía Dijkstra acotado, 10 tests), `src/ui/modo-cordon.ts` (orquestador de estado, sin persistencia), sección "Cordón de incidente" en `SIDEBAR_REGISTRY` con formulario + badges + guard PII, capas de mapa en `main.ts`. Dos bugs reales encontrados y corregidos durante la verificación en navegador (ver §6 y §7: capa `distritos` interceptando el clic de colocación; aproximación de distancia al extremo del tramo propio). Verificado con `npm run typecheck`, `npm run test` (146/146) y en navegador (flujo completo, guard PII, ausencia del bug de selección de distrito). |
+| 3 | 2026-09-01 | Paso 3 de la revisión del gemelo digital (sigue en `Draft`). Cortes de calle a mano (`toggleCorteManual` en `modo-cordon.ts`, segundo handler de clic en `main.ts` para fase `formulario`) + efecto en cadena de spec `031` sobre cerrados + cortes manuales, filtrado a lo que se escapa del área de socorro (`calcularPropagacionFuera`). Capas nuevas en `main.ts` (`cordon-cortes-manuales` naranja, `cordon-propagacion-sin-entrada/-sin-salida/-desvio`), flechas de sentido, panel en `chasis.ts` (lista de cortes + bloque "efecto en cadena fuera del cordón"). `obtenerBasePropagacion` compartido con spec `022`. `npm run typecheck` / `npm run test` (241/241) verdes. Verificado en navegador: incidente + corte manual de "Carrer de Vicente Beltrán Grimal" → "efecto en cadena fuera del cordón: desvío forzado" con la lista de calles; flechas de sentido visibles; sin errores de consola. |
