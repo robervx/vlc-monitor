@@ -45517,12 +45517,428 @@ function findDistrictMentions(texto) {
   return [...porDistrito.values()];
 }
 
+// data/lexico-ambito-ciudad.json
+var lexico_ambito_ciudad_default = {
+  descripcion: "L\xE9xico determinista del filtro Valencia-ciudad de la spec 009 \xA73.1. Sin IA: listas de expresiones que, buscadas como palabra/frase completa sobre el titular+resumen normalizado (NFD, sin acentos, min\xFAsculas, separadores colapsados a espacio), clasifican un \xEDtem medi\xE1tico. Ver src/services/filtro-ambito-ciudad.ts.",
+  actualizado: "2026-09-01",
+  hitosCiudad: [
+    "mestalla",
+    "roig arena",
+    "ciutat de les arts",
+    "ciudad de las artes",
+    "ciutat de les arts i les ciencies",
+    "ciudad de las artes y las ciencias",
+    "ciudad de las ciencias",
+    "oceanografic",
+    "hemisferic",
+    "umbracle",
+    "bioparc",
+    "jardi del turia",
+    "jardin del turia",
+    "riu turia",
+    "rio turia",
+    "cauce del turia",
+    "parc del turia",
+    "parque del turia",
+    "pont de fusta",
+    "estacio del nord",
+    "estacion del norte",
+    "estacio joaquin sorolla",
+    "estacion joaquin sorolla",
+    "mercat central",
+    "mercado central",
+    "mercat de colon",
+    "mercado de colon",
+    "mercat de russafa",
+    "llotja de la seda",
+    "lonja de la seda",
+    "la marina de valencia",
+    "marina real",
+    "malva rosa",
+    "malvarrosa",
+    "playa de las arenas",
+    "playa del cabanyal",
+    "playa de la patacona",
+    "torres de serranos",
+    "torres de serrans",
+    "torres de quart",
+    "plaza del ayuntamiento",
+    "pla\xE7a de l ajuntament",
+    "plaza de la reina",
+    "pla\xE7a de la reina",
+    "plaza de la virgen",
+    "pla\xE7a de la mare de deu",
+    "nuevo centro",
+    "nou centre",
+    "ciutat fallera",
+    "ciudad fallera",
+    "tarongers",
+    "avinguda del port",
+    "avenida del puerto",
+    "gran via marques del turia",
+    "carrer de colon",
+    "calle colon",
+    "mercat de russafa"
+  ],
+  marcadoresInstitucionCiudad: [
+    "ajuntament de valencia",
+    "ayuntamiento de valencia",
+    "consistorio de valencia",
+    "ciudad de valencia",
+    "ciutat de valencia",
+    "valencia capital",
+    "capital del turia",
+    "alcalde de valencia",
+    "alcaldesa de valencia",
+    "maria jose catala",
+    "policia local de valencia",
+    "bomberos de valencia",
+    "bombers de valencia",
+    "emt de valencia",
+    "en la ciudad de valencia",
+    "casco urbano de valencia",
+    "pleno del ayuntamiento de valencia",
+    "junta de gobierno local de valencia"
+  ],
+  infraAsociada: [
+    "puerto de valencia",
+    "port de valencia",
+    "valenciaport",
+    "feria valencia",
+    "fira valencia",
+    "feria de valencia",
+    "fira de valencia",
+    "aeropuerto de valencia",
+    "aeropuerto de manises",
+    "aeroport de valencia",
+    "aeroport de manises",
+    "ciudad de la justicia de valencia"
+  ],
+  marcadoresRegionales: [
+    "comunitat valenciana",
+    "comunidad valenciana",
+    "generalitat valenciana",
+    "generalitat",
+    "les corts valencianes",
+    "les corts",
+    "corts valencianes",
+    "el consell",
+    "del consell",
+    "conselleria",
+    "consellera de",
+    "conseller de",
+    "provincia de valencia",
+    "diputacion de valencia",
+    "diputacio de valencia",
+    "diputacion provincial",
+    "area metropolitana",
+    "l horta sud",
+    "l horta nord",
+    "horta sud",
+    "horta nord",
+    "la ribera alta",
+    "la ribera baixa",
+    "la safor",
+    "la costera",
+    "els serrans",
+    "la vall d albaida",
+    "el camp de turia",
+    "el camp de morvedre",
+    "la hoya de bu\xF1ol",
+    "requena utiel",
+    "la canal de navarres",
+    "president de la generalitat",
+    "presidente de la generalitat",
+    "carlos mazon",
+    "toda la comunitat",
+    "en la comunitat",
+    "alicante",
+    "alacant",
+    "castellon",
+    "castello",
+    "elche",
+    "elx",
+    "torrevieja",
+    "benidorm"
+  ],
+  desambiguacion: ["venezuela", "carabobo", "estado carabobo"],
+  deporteCronica: [
+    "fichaje",
+    "fichajes",
+    "fichar",
+    "traspaso",
+    "cedido",
+    "cesion",
+    "rueda de prensa",
+    "gol de",
+    "goles",
+    "empate",
+    "empataron",
+    "derrota por",
+    "victoria por",
+    "marcador",
+    "minuto 90",
+    "penalti",
+    "penalty",
+    "arbitro",
+    "colegiado",
+    "vestuario",
+    "once inicial",
+    "alineacion",
+    "convocatoria",
+    "lesion",
+    "lesionado",
+    "baja por lesion",
+    "mercado de fichajes",
+    "laliga",
+    "la liga",
+    "primera division",
+    "segunda division",
+    "champions league",
+    "liga de campeones",
+    "europa league",
+    "copa del rey",
+    "supercopa",
+    "descenso",
+    "ascenso",
+    "playoff",
+    "jornada liguera",
+    "partido de liga",
+    "amistoso de pretemporada",
+    "valencia cf",
+    "valencia c f",
+    "levante ud",
+    "levante u d",
+    "valencia basket",
+    "pretemporada",
+    "banquillo",
+    "delantero",
+    "centrocampista",
+    "portero titular"
+  ],
+  deporteLogistico: [
+    "dispositivo",
+    "operativo especial",
+    "operativo policial",
+    "corte de trafico",
+    "cortes de trafico",
+    "cortes al trafico",
+    "afecta al trafico",
+    "restricciones de trafico",
+    "accesos al estadio",
+    "control de accesos",
+    "dia de partido",
+    "jornada de partido",
+    "previa del partido",
+    "refuerzo de metro",
+    "refuerzo de emt",
+    "plan de movilidad",
+    "seguridad del encuentro",
+    "aforo del estadio"
+  ],
+  preposicionesLocativas: ["en", "de", "del", "a", "al", "desde", "hasta", "entre", "hacia", "fins"]
+};
+
+// data/municipios-provincia-valencia.json
+var municipios_provincia_valencia_default = {
+  descripcion: "Municipios de la prov\xEDncia de Val\xE8ncia (excluida la capital) que aparecen con frecuencia en la prensa local. Se usan como se\xF1al negativa del filtro Valencia-ciudad de la spec 009 \xA73.1: si un titular menciona uno de estos y NO hay se\xF1al positiva fuerte de ciudad, el \xEDtem se descarta. Lista curada (no exhaustiva \u2014 la prov\xEDncia tiene 266 municipios), patr\xF3n de alias ES/VA igual que los 88 barrios de la spec 023. 'ambiguo': el nombre colisiona con una palabra com\xFAn (silla, oliva...) y solo cuenta si va precedido de preposici\xF3n locativa (en/de/a...).",
+  fuente: "Recorte del nomencl\xE1tor INE prov\xEDncia 46 + comarcas de l'Horta / la Ribera / la Safor / el Camp de T\xFAria / el Camp de Morvedre / la Costera / la Hoya de Bu\xF1ol / Requena-Utiel.",
+  actualizado: "2026-09-01",
+  municipios: [
+    { nombre: "Torrent", alias: ["Torrente"] },
+    { nombre: "Paterna", alias: [] },
+    { nombre: "Sagunt", alias: ["Sagunto", "Puerto de Sagunto", "Port de Sagunt"] },
+    { nombre: "Gandia", alias: ["Gand\xEDa"] },
+    { nombre: "Alzira", alias: [] },
+    { nombre: "Mislata", alias: [] },
+    { nombre: "Burjassot", alias: [] },
+    { nombre: "X\xE0tiva", alias: ["J\xE1tiva"] },
+    { nombre: "Ontinyent", alias: ["Onteniente"] },
+    { nombre: "Paiporta", alias: [] },
+    { nombre: "Cullera", alias: [] },
+    { nombre: "Quart de Poblet", alias: ["Cuart de Poblet"] },
+    { nombre: "Manises", alias: [] },
+    { nombre: "Aldaia", alias: ["Aldaya"] },
+    { nombre: "Alaqu\xE0s", alias: ["Alacu\xE1s"] },
+    { nombre: "Catarroja", alias: [] },
+    { nombre: "Alboraia", alias: ["Alboraya"] },
+    { nombre: "Sedav\xED", alias: [] },
+    { nombre: "Benet\xFAsser", alias: ["Benetusser"] },
+    { nombre: "Massanassa", alias: [] },
+    { nombre: "Alfafar", alias: [] },
+    { nombre: "Picanya", alias: [] },
+    { nombre: "Picassent", alias: ["Picasent"] },
+    { nombre: "Silla", alias: [], ambiguo: true },
+    { nombre: "Albal", alias: [] },
+    { nombre: "Beniparrell", alias: [] },
+    { nombre: "Xirivella", alias: ["Chirivella"] },
+    { nombre: "Riba-roja de T\xFAria", alias: ["Ribarroja del Turia", "Riba-roja"] },
+    { nombre: "l'Eliana", alias: ["Eliana"] },
+    { nombre: "la Pobla de Vallbona", alias: ["Pobla de Vallbona", "Puebla de Vallbona"] },
+    { nombre: "Ll\xEDria", alias: ["Liria"] },
+    { nombre: "B\xE9tera", alias: ["Betera"] },
+    { nombre: "Godella", alias: [] },
+    { nombre: "Rocafort", alias: [] },
+    { nombre: "Moncada", alias: ["Montcada"] },
+    { nombre: "Alfara del Patriarca", alias: [] },
+    { nombre: "Meliana", alias: [] },
+    { nombre: "Foios", alias: [] },
+    { nombre: "Alm\xE0ssera", alias: ["Almacera"] },
+    { nombre: "Tavernes Blanques", alias: ["Tabernes Blanques"] },
+    { nombre: "Bonrep\xF2s i Mirambell", alias: ["Bonrepos i Mirambell"] },
+    { nombre: "Pu\xE7ol", alias: ["Puzol"] },
+    { nombre: "el Puig de Santa Maria", alias: ["El Puig"], ambiguo: true },
+    { nombre: "Massamagrell", alias: [] },
+    { nombre: "Rafelbunyol", alias: ["Rafelbu\xF1ol"] },
+    { nombre: "la Pobla de Farnals", alias: ["Pobla de Farnals", "Puebla de Farnals"] },
+    { nombre: "Museros", alias: [] },
+    { nombre: "Emperador", alias: [], ambiguo: true },
+    { nombre: "Albuixech", alias: [] },
+    { nombre: "Algemes\xED", alias: ["Algemesi"] },
+    { nombre: "Carcaixent", alias: ["Carcagente"] },
+    { nombre: "Sueca", alias: [] },
+    { nombre: "Sollana", alias: [] },
+    { nombre: "Cullera", alias: [] },
+    { nombre: "Tavernes de la Valldigna", alias: ["Tabernes de Valldigna"] },
+    { nombre: "Oliva", alias: [], ambiguo: true },
+    { nombre: "Requena", alias: [] },
+    { nombre: "Utiel", alias: [] },
+    { nombre: "Bu\xF1ol", alias: ["Bunyol"] },
+    { nombre: "Chiva", alias: [], ambiguo: true },
+    { nombre: "Cheste", alias: ["Xest"] },
+    { nombre: "Chelva", alias: [] },
+    { nombre: "Carlet", alias: [] },
+    { nombre: "l'Alc\xFAdia", alias: ["Alcudia de Carlet"] },
+    { nombre: "Alginet", alias: [] },
+    { nombre: "Benifai\xF3", alias: ["Benifayo"] },
+    { nombre: "Almussafes", alias: ["Almusafes"] },
+    { nombre: "Tur\xEDs", alias: ["Turis"] },
+    { nombre: "Godelleta", alias: [] },
+    { nombre: "Montroi", alias: ["Montroy"] },
+    { nombre: "Chera", alias: [] },
+    { nombre: "Vilamarxant", alias: ["Villamarchante"] },
+    { nombre: "Loriguilla", alias: [] },
+    { nombre: "Alfarp", alias: [] },
+    { nombre: "Real", alias: [], ambiguo: true },
+    { nombre: "Montserrat", alias: ["Monserrat"] }
+  ]
+};
+
+// src/services/filtro-ambito-ciudad.ts
+function normalizar(texto) {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+function escaparRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function preparar(lista) {
+  return [...new Set(lista.map(normalizar).filter((s) => s.length > 0))];
+}
+var HITOS = preparar(lexico_ambito_ciudad_default.hitosCiudad);
+var INSTITUCION = preparar(lexico_ambito_ciudad_default.marcadoresInstitucionCiudad);
+var INFRA = preparar(lexico_ambito_ciudad_default.infraAsociada);
+var REGIONALES = preparar(lexico_ambito_ciudad_default.marcadoresRegionales);
+var DESAMBIGUACION = preparar(lexico_ambito_ciudad_default.desambiguacion);
+var DEPORTE_CRONICA = preparar(lexico_ambito_ciudad_default.deporteCronica);
+var DEPORTE_LOGISTICO = preparar(lexico_ambito_ciudad_default.deporteLogistico);
+var PREPOSICIONES = preparar(lexico_ambito_ciudad_default.preposicionesLocativas);
+var MUNICIPIOS = municipios_provincia_valencia_default.municipios.map((m) => ({
+  etiqueta: m.nombre,
+  patrones: preparar([m.nombre, ...m.alias ?? []]),
+  ambiguo: m.ambiguo === true
+}));
+var RE_PREPOSICION = new RegExp(`(?:^| )(?:${PREPOSICIONES.join("|")}) $`);
+function contiene(textoPad, expr) {
+  return textoPad.includes(` ${expr} `);
+}
+function primeraCoincidencia(textoPad, exprs) {
+  for (const expr of exprs) {
+    if (contiene(textoPad, expr)) return expr;
+  }
+  return null;
+}
+function coincideAmbiguo(textoNorm, patron) {
+  const re = new RegExp(`(?:^| )${escaparRegex(patron)}(?: |$)`, "g");
+  for (let m = re.exec(textoNorm); m !== null; m = re.exec(textoNorm)) {
+    const prefijo = textoNorm.slice(0, m.index + 1);
+    if (RE_PREPOSICION.test(prefijo)) return true;
+  }
+  return false;
+}
+function municipioMencionado(textoNorm, textoPad) {
+  for (const municipio of MUNICIPIOS) {
+    for (const patron of municipio.patrones) {
+      const hit = municipio.ambiguo ? coincideAmbiguo(textoNorm, patron) : contiene(textoPad, patron);
+      if (hit) return municipio.etiqueta;
+    }
+  }
+  return null;
+}
+function mencionaValencia(textoPad) {
+  return contiene(textoPad, "valencia") || contiene(textoPad, "valencia ciutat") || contiene(textoPad, "valencia capital");
+}
+function clasificarAmbitoCiudad(entrada) {
+  const textoNorm = normalizar(`${entrada.titulo} ${entrada.resumen ?? ""}`);
+  const textoPad = ` ${textoNorm} `;
+  const hitLogistico = primeraCoincidencia(textoPad, DEPORTE_LOGISTICO);
+  const hitCronica = primeraCoincidencia(textoPad, DEPORTE_CRONICA);
+  const esDeporte = hitLogistico !== null || hitCronica !== null;
+  const soloCronica = hitCronica !== null && hitLogistico === null;
+  const categoria = esDeporte ? "deporte" : entrada.categoriaFuente === "ocio" ? "ocio" : "general";
+  if (entrada.distritosMencionados.length > 0) {
+    const nombres = entrada.distritosMencionados.map((d) => d.distritoNombre).join(", ");
+    return { ambito: "confirmado", categoria, motivo: `distrito/barrio: ${nombres}` };
+  }
+  const hito = primeraCoincidencia(textoPad, HITOS);
+  if (hito) return { ambito: "confirmado", categoria, motivo: `hito de ciudad: ${hito}` };
+  const institucion = primeraCoincidencia(textoPad, INSTITUCION);
+  if (institucion) return { ambito: "confirmado", categoria, motivo: `instituci\xF3n de ciudad: ${institucion}` };
+  const infra = primeraCoincidencia(textoPad, INFRA);
+  if (infra) return { ambito: "confirmado", categoria, motivo: `infraestructura asociada: ${infra}` };
+  const desambiguacion = primeraCoincidencia(textoPad, DESAMBIGUACION);
+  if (desambiguacion) return { ambito: "excluido", categoria, motivo: `desambiguaci\xF3n: ${desambiguacion}` };
+  const municipio = municipioMencionado(textoNorm, textoPad);
+  if (municipio) return { ambito: "excluido", categoria, motivo: `municipio ajeno: ${municipio}` };
+  const regional = primeraCoincidencia(textoPad, REGIONALES);
+  if (regional) return { ambito: "excluido", categoria, motivo: `\xE1mbito regional: ${regional}` };
+  if (soloCronica) {
+    return { ambito: "excluido", categoria, motivo: `deporte (cr\xF3nica): ${hitCronica}` };
+  }
+  if (entrada.fuenteCityOnly) {
+    return { ambito: "confirmado", categoria, motivo: "fuente 100% ciudad" };
+  }
+  if (mencionaValencia(textoPad)) {
+    return { ambito: "general", categoria, motivo: "menciona Val\xE8ncia, sin barrio ni hito" };
+  }
+  return { ambito: "excluido", categoria, motivo: "sin se\xF1al de Valencia ciudad" };
+}
+
 // src/services/mediatico.ts
 function enrichWithDistricts(items) {
   return items.map((item) => ({
     ...item,
     distritosMencionados: findDistrictMentions(`${item.titulo} ${item.resumen ?? ""}`)
   }));
+}
+function clasificarYFiltrar(items, cfg) {
+  const salida = [];
+  for (const item of items) {
+    const clasificacion = clasificarAmbitoCiudad({
+      titulo: item.titulo,
+      resumen: item.resumen,
+      distritosMencionados: item.distritosMencionados,
+      fuenteCityOnly: cfg.cityOnly,
+      categoriaFuente: cfg.categoriaFuente
+    });
+    if (clasificacion.ambito === "excluido") continue;
+    salida.push({
+      ...item,
+      ambitoCiudad: clasificacion.ambito,
+      categoria: clasificacion.categoria,
+      motivoAmbito: clasificacion.motivo
+    });
+  }
+  return salida;
 }
 var HEADERS2 = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
 var ENTIDADES_HTML = {
@@ -45559,7 +45975,10 @@ function decodeEntities(texto) {
   return texto.replace(/&#(\d+);/g, (_, dec2) => String.fromCharCode(Number(dec2))).replace(/&#x([0-9a-fA-F]+);/g, (_, hex2) => String.fromCharCode(parseInt(hex2, 16))).replace(/&([a-zA-Z]+);/g, (match, nombre) => ENTIDADES_HTML[nombre] ?? match);
 }
 function extraerTag(bloque, tag) {
-  const conCdata = new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`, "i").exec(bloque);
+  const conCdata = new RegExp(
+    `<${tag}[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tag}>`,
+    "i"
+  ).exec(bloque);
   if (conCdata?.[1] !== void 0) return decodeEntities(conCdata[1].trim());
   const plano = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i").exec(bloque);
   if (plano?.[1] !== void 0) return decodeEntities(plano[1].trim());
@@ -45569,7 +45988,7 @@ function extraerImagenMedia(bloque) {
   const m = /<media:content[^>]*\burl="([^"]+)"/i.exec(bloque);
   return m?.[1] ?? null;
 }
-function parsearRss(xml, fuente, fetchedAt) {
+function parsearRss(xml, fuente, fetchedAt, fuenteTipo = "rss-nativo") {
   const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
   const items = bloques.map((bloque) => {
     const titulo = extraerTag(bloque, "title");
@@ -45584,6 +46003,7 @@ function parsearRss(xml, fuente, fetchedAt) {
       resumen: extraerTag(bloque, "description"),
       url,
       fuente,
+      fuenteTipo,
       imagenUrl: extraerImagenMedia(bloque),
       publicadoEn: publicadoEnDate.toISOString(),
       fetchedAt,
@@ -45592,29 +46012,110 @@ function parsearRss(xml, fuente, fetchedAt) {
   }).filter((item) => item !== null);
   return enrichWithDistricts(items);
 }
-async function fetchRss(url, fuente) {
+function extraerFuenteGoogleNews(bloque) {
+  const m = /<source[^>]*>([\s\S]*?)<\/source>/i.exec(bloque);
+  return m?.[1] ? decodeEntities(m[1].trim()) : null;
+}
+function quitarSufijoFuente(titulo, medio) {
+  if (medio && titulo.endsWith(` - ${medio}`)) {
+    return titulo.slice(0, titulo.length - medio.length - 3).trim();
+  }
+  const idx = titulo.lastIndexOf(" - ");
+  return idx > 20 ? titulo.slice(0, idx).trim() : titulo;
+}
+function parsearGoogleNews(xml, fetchedAt, etiquetaFallback) {
+  const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
+  const items = bloques.map((bloque) => {
+    const tituloRaw = extraerTag(bloque, "title");
+    const url = extraerTag(bloque, "link");
+    const pubDate = extraerTag(bloque, "pubDate");
+    if (!tituloRaw || !url || !pubDate) return null;
+    const publicadoEnDate = new Date(pubDate);
+    if (Number.isNaN(publicadoEnDate.getTime())) return null;
+    const medio = extraerFuenteGoogleNews(bloque) ?? etiquetaFallback;
+    return {
+      id: url,
+      titulo: quitarSufijoFuente(tituloRaw, medio),
+      resumen: null,
+      url,
+      // URL de redirección de news.google.com — se sirve tal cual (spec 009 §2.2)
+      fuente: medio,
+      fuenteTipo: "google-news",
+      imagenUrl: null,
+      publicadoEn: publicadoEnDate.toISOString(),
+      fetchedAt,
+      source: "rss"
+    };
+  }).filter((item) => item !== null);
+  return enrichWithDistricts(items);
+}
+async function fetchRssFuente(url, fuente, cfg) {
   const res = await fetch(url, { headers: HEADERS2 });
   if (!res.ok) {
     throw new Error(`RSS ${fuente} respondi\xF3 HTTP ${res.status}`);
   }
   const xml = await res.text();
-  return parsearRss(xml, fuente, (/* @__PURE__ */ new Date()).toISOString());
+  return clasificarYFiltrar(parsearRss(xml, fuente, (/* @__PURE__ */ new Date()).toISOString()), cfg);
 }
-async function fetchLasProvincias() {
-  return fetchRss("https://www.lasprovincias.es/rss/2.0/?section=valencia", "Las Provincias");
+var GOOGLE_NEWS_BASE = "https://news.google.com/rss/search";
+function googleNewsUrl(query) {
+  return `${GOOGLE_NEWS_BASE}?q=${encodeURIComponent(query)}&hl=es&gl=ES&ceid=ES:es`;
 }
-async function fetchValenciaPlaza() {
-  return fetchRss("https://valenciaplaza.com/feed", "Valencia Plaza");
+async function fetchGoogleNewsFuente(query, etiqueta, cfg) {
+  const res = await fetch(googleNewsUrl(query), { headers: HEADERS2 });
+  if (!res.ok) {
+    throw new Error(`Google News (${etiqueta}) respondi\xF3 HTTP ${res.status}`);
+  }
+  const xml = await res.text();
+  return clasificarYFiltrar(parsearGoogleNews(xml, (/* @__PURE__ */ new Date()).toISOString(), etiqueta), cfg);
+}
+function fetchLasProvincias() {
+  return fetchRssFuente(
+    "https://www.lasprovincias.es/rss/2.0/?section=valencia",
+    "Las Provincias",
+    { cityOnly: false }
+  );
+}
+function fetchValenciaPlaza() {
+  return fetchRssFuente("https://valenciaplaza.com/feed", "Valencia Plaza", { cityOnly: true });
+}
+function fetchVeinteMinutos() {
+  return fetchRssFuente(
+    "https://www.20minutos.es/rss/comunidad-valenciana/valencia/",
+    "20minutos",
+    { cityOnly: false }
+  );
+}
+function fetchValenciaSecreta() {
+  return fetchRssFuente("https://valenciasecreta.com/feed/", "Valencia Secreta", {
+    cityOnly: true,
+    categoriaFuente: "ocio"
+  });
+}
+function fetchValenciaBonita() {
+  return fetchRssFuente("https://www.valenciabonita.es/feed/", "Valencia Bonita", {
+    cityOnly: true,
+    categoriaFuente: "ocio"
+  });
+}
+function fetchGoogleNewsLevante() {
+  return fetchGoogleNewsFuente("Val\xE8ncia site:levante-emv.com when:2d", "Levante-EMV", {
+    cityOnly: false
+  });
+}
+function fetchGoogleNewsApunt() {
+  return fetchGoogleNewsFuente("Val\xE8ncia site:apuntmedia.es when:3d", "\xC0 Punt", { cityOnly: false });
+}
+function fetchGoogleNewsSer() {
+  return fetchGoogleNewsFuente("Val\xE8ncia site:cadenaser.com when:2d", "Cadena SER", {
+    cityOnly: false
+  });
 }
 function normalizarFechaGdelt(seendate) {
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(seendate);
   if (!m) return null;
   const [, y, mo, d, h, mi, s] = m;
   return `${y}-${mo}-${d}T${h}:${mi}:${s}Z`;
-}
-function mencionaValencia(titulo) {
-  const normalizado = titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  return normalizado.includes("valencia");
 }
 async function fetchGdeltValencia() {
   const url = "https://api.gdeltproject.org/api/v2/doc/doc?query=Valencia%20sourcecountry:Spain&mode=artlist&maxrecords=20&format=json&sort=datedesc";
@@ -45624,7 +46125,7 @@ async function fetchGdeltValencia() {
   }
   const body = await res.json();
   const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const items = (body.articles ?? []).filter((a) => mencionaValencia(a.title)).map((a) => {
+  const nucleo = (body.articles ?? []).map((a) => {
     const publicadoEn = normalizarFechaGdelt(a.seendate);
     if (!publicadoEn) return null;
     return {
@@ -45633,32 +46134,47 @@ async function fetchGdeltValencia() {
       resumen: null,
       url: a.url,
       fuente: "GDELT",
+      fuenteTipo: "gdelt",
       imagenUrl: a.socialimage ?? null,
       publicadoEn,
       fetchedAt,
       source: "gdelt"
     };
   }).filter((item) => item !== null);
-  return enrichWithDistricts(items);
+  return clasificarYFiltrar(enrichWithDistricts(nucleo), { cityOnly: false });
 }
 
-// src/server/mediatico-items.ts
-setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-var TTL_MS8 = 15 * 60 * 1e3;
-var FUENTES = [
-  { nombre: "Las Provincias", cacheKey: "mediatico:las-provincias:v1", fetcher: fetchLasProvincias },
-  { nombre: "Valencia Plaza", cacheKey: "mediatico:valencia-plaza:v1", fetcher: fetchValenciaPlaza },
-  { nombre: "GDELT", cacheKey: "mediatico:gdelt:v1", fetcher: fetchGdeltValencia }
+// src/services/mediatico-fuentes.ts
+if (getLoadedDistricts().length === 0) {
+  setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
+}
+var FUENTES_MEDIATICAS = [
+  { nombre: "Las Provincias", cacheKey: "mediatico:las-provincias:v2", fetcher: fetchLasProvincias },
+  { nombre: "Valencia Plaza", cacheKey: "mediatico:valencia-plaza:v2", fetcher: fetchValenciaPlaza },
+  { nombre: "20minutos", cacheKey: "mediatico:20minutos:v2", fetcher: fetchVeinteMinutos },
+  { nombre: "Levante-EMV", cacheKey: "mediatico:gn-levante:v2", fetcher: fetchGoogleNewsLevante },
+  { nombre: "\xC0 Punt", cacheKey: "mediatico:gn-apunt:v2", fetcher: fetchGoogleNewsApunt },
+  { nombre: "Cadena SER", cacheKey: "mediatico:gn-ser:v2", fetcher: fetchGoogleNewsSer },
+  { nombre: "GDELT", cacheKey: "mediatico:gdelt:v2", fetcher: fetchGdeltValencia },
+  { nombre: "Valencia Secreta", cacheKey: "mediatico:valencia-secreta:v2", fetcher: fetchValenciaSecreta },
+  { nombre: "Valencia Bonita", cacheKey: "mediatico:valencia-bonita:v2", fetcher: fetchValenciaBonita }
 ];
+
+// src/server/mediatico-items.ts
+var TTL_MS8 = 15 * 60 * 1e3;
+var MAX_ITEMS = 40;
+function claveTitulo(titulo) {
+  return titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
 async function handler11() {
   const resultados = await Promise.allSettled(
-    FUENTES.map((f) => getOrFetch(f.cacheKey, TTL_MS8, f.fetcher))
+    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS8, f.fetcher))
   );
   const items = [];
   const fuentesFallidas = [];
   let fresh = true;
   resultados.forEach((resultado, i) => {
-    const nombre = FUENTES[i].nombre;
+    const nombre = FUENTES_MEDIATICAS[i].nombre;
     if (resultado.status === "fulfilled") {
       items.push(...resultado.value.value);
       if (!resultado.value.fresh) fresh = false;
@@ -45667,20 +46183,33 @@ async function handler11() {
       fresh = false;
     }
   });
-  if (items.length === 0 && fuentesFallidas.length === FUENTES.length) {
+  if (items.length === 0 && fuentesFallidas.length === FUENTES_MEDIATICAS.length) {
     return new Response(JSON.stringify({ error: "Ninguna fuente de contexto medi\xE1tico respondi\xF3" }), {
       status: 502,
       headers: { "content-type": "application/json; charset=utf-8" }
     });
   }
   items.sort((a, b) => b.publicadoEn.localeCompare(a.publicadoEn));
-  return new Response(JSON.stringify({ items: items.slice(0, 30), fresh, fuentesFallidas }), {
-    status: 200,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "public, max-age=300, stale-while-revalidate=900"
+  const vistasUrl = /* @__PURE__ */ new Set();
+  const vistasTitulo = /* @__PURE__ */ new Set();
+  const deduplicados = [];
+  for (const item of items) {
+    const claveT = claveTitulo(item.titulo);
+    if (vistasUrl.has(item.url) || claveT.length > 0 && vistasTitulo.has(claveT)) continue;
+    vistasUrl.add(item.url);
+    if (claveT.length > 0) vistasTitulo.add(claveT);
+    deduplicados.push(item);
+  }
+  return new Response(
+    JSON.stringify({ items: deduplicados.slice(0, MAX_ITEMS), fresh, fuentesFallidas }),
+    {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=300, stale-while-revalidate=900"
+      }
     }
-  });
+  );
 }
 
 // src/data/stopwords-mediatico.ts
@@ -45883,16 +46412,11 @@ function calcularTendenciaTerminos(items, ventana, ahora = /* @__PURE__ */ new D
 
 // src/server/mediatico-tendencia.ts
 var TTL_MS9 = 15 * 60 * 1e3;
-var FUENTES2 = [
-  { cacheKey: "mediatico:las-provincias:v1", fetcher: fetchLasProvincias },
-  { cacheKey: "mediatico:valencia-plaza:v1", fetcher: fetchValenciaPlaza },
-  { cacheKey: "mediatico:gdelt:v1", fetcher: fetchGdeltValencia }
-];
 async function handler12(req) {
   const url = new URL(req.url);
   const ventana = url.searchParams.get("ventana") === "dia" ? "dia" : "hora";
   const resultados = await Promise.allSettled(
-    FUENTES2.map((f) => getOrFetch(f.cacheKey, TTL_MS9, f.fetcher))
+    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS9, f.fetcher))
   );
   const items = [];
   let fuentesOk = 0;

@@ -6,12 +6,22 @@
  */
 import { construirIndiceEspacial, type IndiceRedViaria } from './red-viaria-indice';
 import type { RedViaria, Tramo, Nodo } from './red-viaria';
+import {
+  calcularSccPrincipal,
+  calcularBasePropagacion,
+  type BasePropagacion,
+} from './propagacion-corte';
 
 export interface GrafoViarioCliente {
   nodos: Nodo[];
   tramos: Tramo[];
   tramosPorId: Map<string, Tramo>;
   indice: IndiceRedViaria;
+}
+
+export interface BasePropagacionCliente {
+  sccPrincipal: Set<string>;
+  base: BasePropagacion;
 }
 
 let cache: GrafoViarioCliente | null = null;
@@ -45,8 +55,23 @@ export async function cargarGrafoViario(): Promise<GrafoViarioCliente> {
   return promesaEnCurso;
 }
 
+// Precálculo de propagación dirigida (spec 031): SCC principal + línea base de
+// alcanzabilidad. Caro-ish (una SCC + 2 BFS sobre ~13k tramos) pero
+// independiente de los cortes — se calcula una sola vez, de forma perezosa (la
+// primera vez que un modo lo pide) y se comparte entre spec 021 y spec 022.
+let basePropagacionCache: BasePropagacionCliente | null = null;
+
+export function obtenerBasePropagacion(grafo: GrafoViarioCliente): BasePropagacionCliente {
+  if (!basePropagacionCache) {
+    const sccPrincipal = calcularSccPrincipal(grafo.tramos);
+    basePropagacionCache = { sccPrincipal, base: calcularBasePropagacion(grafo.tramos, sccPrincipal) };
+  }
+  return basePropagacionCache;
+}
+
 /** Solo para tests — evita que la caché de un test contamine el siguiente. */
 export function _resetCacheGrafoViarioParaTests(): void {
   cache = null;
   promesaEnCurso = null;
+  basePropagacionCache = null;
 }

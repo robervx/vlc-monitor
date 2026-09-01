@@ -70,17 +70,23 @@ describe('construirIndiceEspacial — 5 ubicaciones reales conocidas (DoD spec 0
   const indice = construirIndiceEspacial(redReal.tramos);
 
   it.each([
-    ['Plaza del Ayuntamiento', [-0.3763, 39.4699], "Plaça de l'Ajuntament", 100],
-    ['Ciudad de las Artes y las Ciencias', [-0.3543, 39.4544], 'Carrer de Ricardo Muñoz Suay', 50],
-    ['Estación del Norte', [-0.3775, 39.4657], "Carrer d'Alacant", 100],
-    ['Mercado Central', [-0.3789, 39.4729], 'Carrer de les Carabasses', 50],
-    ['Torres de Serranos', [-0.3757, 39.4784], 'Plaça dels Furs', 100],
-  ] as [string, [number, number], string, number][])(
+    ['Plaza del Ayuntamiento', [-0.3763, 39.4699], ["Plaça de l'Ajuntament"], 100],
+    ['Ciudad de las Artes y las Ciencias', [-0.3543, 39.4544], ['Carrer de Ricardo Muñoz Suay'], 50],
+    ['Estación del Norte', [-0.3775, 39.4657], ["Carrer d'Alacant"], 100],
+    ['Mercado Central', [-0.3789, 39.4729], ['Carrer de les Carabasses'], 50],
+    // Esquina junto a las Torres de Serranos: dos calles se cruzan y sus
+    // tramos comparten el vértice más cercano a este punto (distancia
+    // idéntica hasta la centésima de metro) — el desempate depende del orden
+    // de iteración, que cambia con cada regeneración del grafo. Se acepta
+    // cualquiera de las dos: lo que verifica el DoD es que el snap cae en esa
+    // intersección concreta, no cuál de las dos ramas gana el empate.
+    ['Torres de Serranos', [-0.3757, 39.4784], ['Plaça dels Furs', 'Carrer del Comte de Trénor'], 100],
+  ] as [string, [number, number], string[], number][])(
     '%s -> tramo esperado dentro de %dm',
-    (_nombre, punto, nombreEsperado, distanciaMaxima) => {
+    (_nombre, punto, nombresEsperados, distanciaMaxima) => {
       const resultado = indice.tramoMasCercano(punto);
       expect(resultado).not.toBeNull();
-      expect(resultado?.tramo.nombreCalle).toBe(nombreEsperado);
+      expect(nombresEsperados).toContain(resultado?.tramo.nombreCalle);
       expect(resultado?.distanciaMetros).toBeLessThan(distanciaMaxima);
     },
   );

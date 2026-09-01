@@ -4,7 +4,7 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
-import { GeoJsonLayer, ScatterplotLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
 import { preloadDistrictGeometry, getDistrictCentroid, getLoadedDistricts } from './services/district-geometry';
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
@@ -33,7 +33,13 @@ import {
   actualizarEstacionesValenbisi,
   actualizarAparcamientos,
 } from './services/capas-activas-store';
-import { onCambioModoCordon, reportarUbicacionElegida, getTramoPorId, getEstadoModoCordon } from './ui/modo-cordon';
+import {
+  onCambioModoCordon,
+  reportarUbicacionElegida,
+  toggleCorteManual,
+  getTramoPorId,
+  getEstadoModoCordon,
+} from './ui/modo-cordon';
 import {
   onCambioModoSimulacion,
   toggleTramoCortado,
@@ -41,6 +47,7 @@ import {
   getEstadoModoSimulacion,
 } from './ui/modo-simulacion-cortes';
 import { cargarGrafoViario } from './services/grafo-viario-cliente';
+import { marcadoresSentido, type MarcadorSentido } from './services/flechas-sentido';
 import { puntosFlujoParaTramo } from './services/flujo-animado';
 import type { Coordenada } from './services/proximidad';
 
@@ -53,6 +60,11 @@ const DEFAULT_ZOOM = 12;
 // ritmo algo más lento para que no sature") — con ~400 tramos visibles a la
 // vez, un ritmo rápido satura visualmente y consume más CPU sin necesidad.
 const DURACION_CICLO_FLUJO_TRAFICO_MS = 4500;
+// Animación del desvío en el simulador de cortes (spec 022 v6) — el punto
+// recorre toda la ruta alternativa en este tiempo. Suele haber muy pocas
+// rutas a la vez (una por corte), así que puede ir algo más vivo que el
+// flujo de tráfico general.
+const DURACION_CICLO_RERUTA_MS = 3200;
 
 interface DistritoProperties {
   codigo: string;
@@ -97,6 +109,21 @@ function colorIntensidad(intensidad: number): Color {
   const b = Math.round(150 - intensidad * 150);
   const a = Math.round(40 + intensidad * 180);
   return [r, Math.max(0, g), Math.max(0, b), a];
+}
+
+// FeatureCollection de líneas a partir de ids de tramo del grafo viario
+// (specs 021/022/031) — resuelve cada id contra el store del modo activo.
+function featuresDeTramos(
+  ids: string[],
+  resolver: (id: string) => { geometria: GeoJSON.LineString } | undefined,
+): GeoJSON.FeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: ids
+      .map(resolver)
+      .filter((t): t is NonNullable<typeof t> => !!t)
+      .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
+  };
 }
 
 // Icono por rango de código WMO — ver src/services/estado-meteo.ts para la
@@ -915,6 +942,31 @@ async function main(): Promise<void> {
   let incidenciasViaPublica: IncidenciaViaPublica[] = [];
   const viaPublicaTooltip = buildViaPublicaTooltip();
 
+  // Flechas de sentido de circulación del grafo viario (spec 020 §5 / v4).
+  // Se pintan (a) siempre con `?debug=grafo` — verificación del grafo — y
+  // (b) mientras el modo cordón (021) o el simulador de cortes (022) están
+  // activos, para que se vea la dirección de cada vía al planificar un corte
+  // (petición del usuario, revisión del gemelo digital). Una flecha por
+  // tramo del viewport a partir de zoom de calle: azul = unidireccional,
+  // gris doble punta = bidireccional.
+  const DEBUG_GRAFO = new URLSearchParams(window.location.search).get('debug') === 'grafo';
+  const ZOOM_MINIMO_FLECHAS_SENTIDO = 15;
+  let marcadoresSentidoGrafo: MarcadorSentido[] = [];
+  function asegurarMarcadoresSentido(): void {
+    if (marcadoresSentidoGrafo.length > 0) return;
+    void cargarGrafoViario()
+      .then((grafo) => {
+        marcadoresSentidoGrafo = marcadoresSentido(grafo.tramos);
+        renderLayers();
+      })
+      .catch((err: unknown) => console.error('flechas de sentido: no se pudo cargar el grafo viario:', err));
+  }
+  const flechasSentidoActivas = (): boolean =>
+    DEBUG_GRAFO ||
+    getEstadoModoCordon().fase !== 'inactivo' ||
+    getEstadoModoSimulacion().fase !== 'inactivo';
+  if (DEBUG_GRAFO) asegurarMarcadoresSentido();
+
   const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
   map.addControl(overlay);
 
@@ -937,11 +989,38 @@ async function main(): Promise<void> {
     const estadoCordon = getEstadoModoCordon();
     const cordonPropuesta = estadoCordon.resultado?.ok ? estadoCordon.resultado.propuesta : null;
     const cordonUbicacion = estadoCordon.ubicacion;
+    const cordonCortesManuales = estadoCordon.cortesManuales;
+    const cordonPropFuera = estadoCordon.propagacionFuera;
+    const cordonSinEntradaFueraIds = cordonPropFuera?.sinEntrada.map((t) => t.idTramo) ?? [];
+    const cordonSinSalidaFueraIds = cordonPropFuera?.sinSalida.map((t) => t.idTramo) ?? [];
+    const cordonDesvioFueraIds = cordonPropFuera?.desvio.map((t) => t.idTramo) ?? [];
 
     const estadoSimulacion = getEstadoModoSimulacion();
     const tramosCortadosIds = estadoSimulacion.tramosCortados;
-    const tramosAisladosIds = estadoSimulacion.resultado?.tramosAislados.map((t) => t.idTramo) ?? [];
+    const propagacionSim = estadoSimulacion.resultado;
+    // "Sin salida" (violeta) reúne los tramos que ya no pueden volver al resto
+    // de la ciudad + los que están aislados del todo; "sin entrada" (cian)
+    // reúne los que ya no reciben tráfico + los aislados (spec 031 §3).
+    const simSinSalidaIds = propagacionSim
+      ? [...propagacionSim.tramosSinSalida, ...propagacionSim.tramosAislados].map((t) => t.idTramo)
+      : [];
+    const simSinEntradaIds = propagacionSim
+      ? [...propagacionSim.tramosSinEntrada, ...propagacionSim.tramosAislados].map((t) => t.idTramo)
+      : [];
+    const simDesvioIds = propagacionSim?.tramosDesvioForzado.map((t) => t.idTramo) ?? [];
+    const simRutas = estadoSimulacion.rutasAlternativas;
     const algunModoActivo = estadoCordon.fase !== 'inactivo' || estadoSimulacion.fase !== 'inactivo';
+
+    // Puntos animados del desvío (spec 022 v6): recorren la ruta alternativa
+    // de cada corte. La calle cortada NO se anima — lo que se ve moverse es
+    // por dónde da la vuelta el tráfico.
+    const faseReruta = (performance.now() % DURACION_CICLO_RERUTA_MS) / DURACION_CICLO_RERUTA_MS;
+    const puntosReruta: Coordenada[] = [];
+    for (const ruta of simRutas) {
+      puntosReruta.push(
+        ...puntosFlujoParaTramo(ruta.geometria, 'unidireccional', { fase: faseReruta, puntosPorSentido: 3 }),
+      );
+    }
 
     // Efecto de flujo animado — spec 004 (tráfico real), no spec 022. Se
     // quitó del simulador de cortes a petición del usuario: el simulador ya
@@ -1189,6 +1268,49 @@ async function main(): Promise<void> {
             getLineWidth: 3,
             lineWidthMinPixels: 2,
           }),
+        // Spec 021 v3 / 031 — efecto en cadena de cerrados + cortes manuales
+        // que SE ESCAPA del área de socorro (lo de dentro es esperado, no se
+        // pinta aparte). Mismos colores que el simulador de spec 022.
+        cordonSinEntradaFueraIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-propagacion-sin-entrada',
+            data: featuresDeTramos(cordonSinEntradaFueraIds, getTramoPorId),
+            stroked: true,
+            filled: false,
+            getLineColor: [6, 182, 212, 225],
+            getLineWidth: 4,
+            lineWidthMinPixels: 2,
+          }),
+        cordonSinSalidaFueraIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-propagacion-sin-salida',
+            data: featuresDeTramos(cordonSinSalidaFueraIds, getTramoPorId),
+            stroked: true,
+            filled: false,
+            getLineColor: [168, 85, 247, 225],
+            getLineWidth: 4,
+            lineWidthMinPixels: 2,
+          }),
+        cordonDesvioFueraIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-propagacion-desvio',
+            data: featuresDeTramos(cordonDesvioFueraIds, getTramoPorId),
+            stroked: true,
+            filled: false,
+            getLineColor: [59, 130, 246, 160],
+            getLineWidth: 2,
+            lineWidthMinPixels: 1,
+          }),
+        cordonCortesManuales.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'cordon-cortes-manuales',
+            data: featuresDeTramos(cordonCortesManuales, getTramoPorId),
+            stroked: true,
+            filled: false,
+            getLineColor: [249, 115, 22, 235],
+            getLineWidth: 5,
+            lineWidthMinPixels: 3,
+          }),
         cordonUbicacion &&
           new ScatterplotLayer<{ position: [number, number] }>({
             id: 'cordon-marcador',
@@ -1203,45 +1325,114 @@ async function main(): Promise<void> {
             getLineWidth: 2,
             lineWidthMinPixels: 2,
           }),
-        // Spec 022 — simulador de cortes: tramos cortados a mano por el
-        // usuario en rojo, tramos que quedan sin salida como consecuencia en
-        // violeta (color distinto del cordón de spec 021, aunque nunca
-        // coinciden activos a la vez — son modos mutuamente excluyentes).
-        tramosCortadosIds.length > 0 &&
+        // Spec 022/031 — simulador de cortes. Colores: naranja = cortado a
+        // mano; cian = el tráfico ya no puede LLEGAR a ese tramo (aguas abajo
+        // del corte); violeta = ese tramo ya no puede SALIR al resto de la
+        // ciudad (zona atrapada); azul fino = vía abierta que desemboca en el
+        // corte y obliga a desviarse. Rojo queda reservado al cordón real
+        // (spec 021), aunque nunca coinciden activos.
+        simDesvioIds.length > 0 &&
           new GeoJsonLayer<Record<string, never>>({
-            id: 'simulacion-tramos-cortados',
-            data: {
-              type: 'FeatureCollection',
-              features: tramosCortadosIds
-                .map((id) => getTramoPorIdSimulacion(id))
-                .filter((t): t is NonNullable<typeof t> => !!t)
-                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
-            },
+            id: 'simulacion-tramos-desvio',
+            data: featuresDeTramos(simDesvioIds, getTramoPorIdSimulacion),
             stroked: true,
             filled: false,
-            // Naranja, no rojo — el rojo queda reservado para el cordón de
-            // incidente real (spec 021, una emergencia de verdad). Este es
-            // un corte hipotético de una simulación, no una urgencia.
-            getLineColor: [249, 115, 22, 230],
-            getLineWidth: 5,
-            lineWidthMinPixels: 3,
+            getLineColor: [59, 130, 246, 170],
+            getLineWidth: 2,
+            lineWidthMinPixels: 1,
           }),
-        tramosAisladosIds.length > 0 &&
+        simSinEntradaIds.length > 0 &&
           new GeoJsonLayer<Record<string, never>>({
-            id: 'simulacion-tramos-aislados',
-            data: {
-              type: 'FeatureCollection',
-              features: tramosAisladosIds
-                .map((id) => getTramoPorIdSimulacion(id))
-                .filter((t): t is NonNullable<typeof t> => !!t)
-                .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
-            },
+            id: 'simulacion-tramos-sin-entrada',
+            data: featuresDeTramos(simSinEntradaIds, getTramoPorIdSimulacion),
             stroked: true,
             filled: false,
-            getLineColor: [168, 85, 247, 220],
+            getLineColor: [6, 182, 212, 225],
             getLineWidth: 4,
             lineWidthMinPixels: 2,
           }),
+        simSinSalidaIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'simulacion-tramos-sin-salida',
+            data: featuresDeTramos(simSinSalidaIds, getTramoPorIdSimulacion),
+            stroked: true,
+            filled: false,
+            getLineColor: [168, 85, 247, 225],
+            getLineWidth: 4,
+            lineWidthMinPixels: 2,
+          }),
+        // Spec 022 v6 — ruta alternativa de cada corte (verde) + puntos que la
+        // recorren (el "flujo que cambia de dirección" que pidió el usuario).
+        simRutas.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'simulacion-rutas-alternativas',
+            data: {
+              type: 'FeatureCollection',
+              features: simRutas.map((r) => ({
+                type: 'Feature' as const,
+                geometry: { type: 'LineString' as const, coordinates: r.geometria },
+                properties: {},
+              })),
+            },
+            stroked: true,
+            filled: false,
+            getLineColor: [22, 163, 74, 180],
+            getLineWidth: 3,
+            lineWidthMinPixels: 2,
+          }),
+        tramosCortadosIds.length > 0 &&
+          new GeoJsonLayer<Record<string, never>>({
+            id: 'simulacion-tramos-cortados',
+            data: featuresDeTramos(tramosCortadosIds, getTramoPorIdSimulacion),
+            stroked: true,
+            filled: false,
+            getLineColor: [249, 115, 22, 235],
+            getLineWidth: 5,
+            lineWidthMinPixels: 3,
+          }),
+        puntosReruta.length > 0 &&
+          new ScatterplotLayer<Coordenada>({
+            id: 'simulacion-flujo-reruta',
+            data: puntosReruta,
+            pickable: false,
+            getPosition: (p) => p,
+            getFillColor: [255, 255, 255, 235],
+            stroked: true,
+            getLineColor: [22, 101, 52, 230],
+            lineWidthMinPixels: 1,
+            getRadius: 7,
+            radiusMinPixels: 3,
+            radiusMaxPixels: 5,
+          }),
+        // Flechas de sentido — spec 020 v4 (con ?debug=grafo o modo cordón/simulador activo).
+        flechasSentidoActivas() &&
+          map.getZoom() >= ZOOM_MINIMO_FLECHAS_SENTIDO &&
+          marcadoresSentidoGrafo.length > 0 &&
+          (() => {
+            const b = map.getBounds();
+            const visibles = marcadoresSentidoGrafo.filter(
+              (m) =>
+                m.posicion[0] >= b.getWest() &&
+                m.posicion[0] <= b.getEast() &&
+                m.posicion[1] >= b.getSouth() &&
+                m.posicion[1] <= b.getNorth(),
+            );
+            return new TextLayer<MarcadorSentido>({
+              id: 'flechas-sentido',
+              data: visibles,
+              pickable: false,
+              getPosition: (m) => m.posicion,
+              getText: (m) => (m.sentido === 'unidireccional' ? '▶' : '◀▶'),
+              // El atlas de fuente por defecto de TextLayer es solo ASCII — sin
+              // esto los glifos de flecha no se dibujan.
+              characterSet: ['▶', '◀'],
+              getAngle: (m) => m.anguloGrados,
+              getColor: (m) => (m.sentido === 'unidireccional' ? [37, 99, 235, 235] : [107, 114, 128, 210]),
+              getSize: 18,
+              sizeUnits: 'pixels',
+              billboard: false,
+            });
+          })(),
         new GeoJsonLayer<DistritoProperties>({
           id: 'distritos',
           data: featureCollection,
@@ -1293,12 +1484,16 @@ async function main(): Promise<void> {
   // dos flujos de trabajo a la vez) y gestiona el clic único en el mapa
   // para marcar la ubicación del incidente.
   let clicCordonHandler: ((e: maplibregl.MapMouseEvent) => void) | null = null;
+  // Segundo handler: en fase 'formulario' el clic corta/descorta una calle a
+  // mano (spec 021 v3), igual que el simulador de spec 022.
+  let clicCorteManualHandler: ((e: maplibregl.MapMouseEvent) => void) | null = null;
   onCambioModoCordon((estadoCordon) => {
     const controlesEl = document.getElementById('controls');
     const infoPanelsEl = document.getElementById('info-panels');
     const activo = estadoCordon.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+    if (activo) asegurarMarcadoresSentido();
 
     if (estadoCordon.fase === 'esperandoClicMapa' && !clicCordonHandler) {
       map.getCanvas().style.cursor = 'crosshair';
@@ -1307,6 +1502,21 @@ async function main(): Promise<void> {
     } else if (estadoCordon.fase !== 'esperandoClicMapa' && clicCordonHandler) {
       map.off('click', clicCordonHandler);
       clicCordonHandler = null;
+      map.getCanvas().style.cursor = '';
+    }
+
+    if (estadoCordon.fase === 'formulario' && !clicCorteManualHandler) {
+      map.getCanvas().style.cursor = 'crosshair';
+      clicCorteManualHandler = (e) => {
+        void cargarGrafoViario().then((grafo) => {
+          const snap = grafo.indice.tramoMasCercano([e.lngLat.lng, e.lngLat.lat], 60);
+          if (snap) toggleCorteManual(snap.tramo.idTramo);
+        });
+      };
+      map.on('click', clicCorteManualHandler);
+    } else if (estadoCordon.fase !== 'formulario' && clicCorteManualHandler) {
+      map.off('click', clicCorteManualHandler);
+      clicCorteManualHandler = null;
       map.getCanvas().style.cursor = '';
     }
 
@@ -1348,12 +1558,37 @@ async function main(): Promise<void> {
     }
   }
 
+  // Animación del desvío del simulador de cortes (spec 022 v6) — sólo un
+  // puñado de rutas a la vez, así que puede refrescar algo más a menudo que
+  // el flujo de tráfico general.
+  const INTERVALO_RENDER_RERUTA_MS = 120;
+  let animacionRerutaActiva = false;
+  let ultimoRenderReruta = 0;
+  function tickAnimacionReruta(timestamp: number): void {
+    if (!animacionRerutaActiva) return;
+    if (timestamp - ultimoRenderReruta >= INTERVALO_RENDER_RERUTA_MS) {
+      ultimoRenderReruta = timestamp;
+      renderLayers();
+    }
+    requestAnimationFrame(tickAnimacionReruta);
+  }
+  function actualizarAnimacionReruta(activar: boolean): void {
+    if (activar && !animacionRerutaActiva) {
+      animacionRerutaActiva = true;
+      requestAnimationFrame(tickAnimacionReruta);
+    } else if (!activar) {
+      animacionRerutaActiva = false;
+    }
+  }
+
   onCambioModoSimulacion((estadoSimulacion) => {
     const controlesEl = document.getElementById('controls');
     const infoPanelsEl = document.getElementById('info-panels');
     const activo = estadoSimulacion.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+    if (activo) asegurarMarcadoresSentido();
+    actualizarAnimacionReruta(activo && estadoSimulacion.rutasAlternativas.length > 0);
 
     if (estadoSimulacion.fase === 'seleccionando' && !clicSimulacionHandler) {
       map.getCanvas().style.cursor = 'crosshair';
@@ -1567,7 +1802,7 @@ async function main(): Promise<void> {
   // recalcularía qué capas mostrar. 'zoomend' (no 'zoom' continuo) para no
   // reconstruir todas las capas en cada frame de un gesto de zoom.
   map.on('zoomend', () => {
-    if (viaPublicaVisible) renderLayers();
+    if (viaPublicaVisible || flechasSentidoActivas()) renderLayers();
   });
 
   const mediaPanel = buildMediaPanel();
@@ -1640,6 +1875,9 @@ async function main(): Promise<void> {
   });
 
   map.on('moveend', persistViewState);
+  map.on('moveend', () => {
+    if (flechasSentidoActivas()) renderLayers();
+  });
 
   const meteoPanelRoot = buildInfoPanel('meteo-panel');
   async function refreshMeteoPanel(): Promise<void> {

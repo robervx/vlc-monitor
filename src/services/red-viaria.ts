@@ -6,12 +6,18 @@
  *
  * Simplificaciones deliberadas de v1 (documentadas en spec 020 §7, no
  * ocultas): solo red rodada (la peatonal queda para una iteración
- * posterior), sin colapso de rotondas a nodo compuesto, `nombreCalle`
- * tomado del tag `name` de OSM sin resolver todavía contra el nomenclátor
- * oficial (CDNCV, ver spec 020 §2 — fuente ya verificada, resolución
- * pendiente), y `oneway=-1` (sentido invertido) tratado como bidireccional
- * en vez de invertir el sentido — ninguna de las tres bloquea tener un
- * grafo topológicamente correcto para el resto del gemelo digital.
+ * posterior), sin colapso de rotondas a nodo compuesto (sí se marcan como
+ * unidireccionales desde v4, ver más abajo), y `nombreCalle` tomado del tag
+ * `name` de OSM sin resolver todavía contra el nomenclátor oficial (CDNCV,
+ * ver spec 020 §2 — fuente ya verificada, resolución pendiente) — ninguna de
+ * las dos bloquea tener un grafo topológicamente correcto para el resto del
+ * gemelo digital.
+ *
+ * v4 (spec 020 §3/§8): el sentido de circulación deja de mirar solo
+ * `oneway=yes|1`. Ahora `junction=roundabout` cuenta como unidireccional
+ * implícito y `oneway=-1` invierte la geometría del tramo (dirección
+ * canónica origen->destino = sentido real). Es la base para el análisis de
+ * propagación dirigida de cortes de specs 021/022.
  */
 import { distanciaMetros, type Coordenada } from './proximidad';
 
@@ -149,6 +155,25 @@ export function construirRedViaria(
     const coords = way.nodes.map((n) => coordPorNodoOsm.get(n));
     if (coords.some((c) => c === undefined)) continue; // way con nodo no resuelto, se descarta
 
+    // Sentido de circulación (spec 020 §3, revisado en v4):
+    //  - `oneway=yes|1|true`  -> unidireccional en el orden de nodos del way.
+    //  - `junction=roundabout` -> unidireccional implícito (convención OSM: el
+    //    orden de nodos de un way de rotonda ya es el sentido de giro). Antes
+    //    de v4 estas ~650 rotondas caían a bidireccional, creando rutas de
+    //    escape fantasma para cualquier análisis dirigido (specs 021/022).
+    //  - `oneway=-1` -> unidireccional en sentido CONTRARIO al orden de nodos:
+    //    se invierte la geometría de cada tramo para que la dirección canónica
+    //    origen->destino sea siempre la de circulación real.
+    //  - `junction=circular` NO implica sentido único en OSM (a diferencia de
+    //    roundabout) — se deja como esté su tag `oneway` propio.
+    const onewayTag = way.tags?.oneway;
+    const esRotonda = way.tags?.junction === 'roundabout';
+    const invertirPorOnewayMenos1 = onewayTag === '-1' && !esRotonda;
+    const sentidoWay: Tramo['sentido'] =
+      onewayTag === 'yes' || onewayTag === '1' || onewayTag === 'true' || invertirPorOnewayMenos1 || esRotonda
+        ? 'unidireccional'
+        : 'bidireccional';
+
     // Puntos de corte: extremos del way, o cualquier nodo compartido con otro way.
     const cortes: number[] = [];
     way.nodes.forEach((nodoId, i) => {
@@ -163,6 +188,9 @@ export function construirRedViaria(
       if (fin === inicio) continue;
       const segmentoCoords = coords.slice(inicio, fin + 1) as Coordenada[];
       if (segmentoCoords.length < 2) continue;
+      // `oneway=-1`: la dirección de circulación es la contraria al orden de
+      // nodos de OSM — se invierte el tramo para que origen->destino sea real.
+      if (invertirPorOnewayMenos1) segmentoCoords.reverse();
 
       const primero = segmentoCoords[0]!;
       const ultimo = segmentoCoords[segmentoCoords.length - 1]!;
@@ -179,8 +207,6 @@ export function construirRedViaria(
         longitudM += distanciaMetros(segmentoCoords[i]!, segmentoCoords[i + 1]!);
       }
 
-      const sentido: Tramo['sentido'] =
-        way.tags?.oneway === 'yes' || way.tags?.oneway === '1' ? 'unidireccional' : 'bidireccional';
       const nombre = way.tags?.name ?? null;
 
       tramos.push({
@@ -190,7 +216,7 @@ export function construirRedViaria(
         geometria: { type: 'LineString', coordinates: segmentoCoords },
         longitudM,
         tipoVia,
-        sentido,
+        sentido: sentidoWay,
         nombreCalle: nombre,
         nombreCalleRaw: nombre,
         distrito,

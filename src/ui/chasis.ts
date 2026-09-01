@@ -15,6 +15,8 @@ import {
   confirmarPropuesta,
   volverASeleccionUbicacion,
   salirModoCordon,
+  toggleCorteManual,
+  getTramoPorId as getTramoPorIdCordon,
   type EstadoModoCordon,
   type FormularioIncidente,
 } from './modo-cordon';
@@ -222,6 +224,9 @@ function buildCordonIncidenteContent(): HTMLElement {
         <button type="button" class="proximidad-boton" id="cordon-cambiar-ubicacion">Cambiar ubicación</button>
       </div>
       <div id="cordon-resultado"></div>
+      <p class="cordon-intro" style="margin-top:10px">Haz clic en calles del mapa para cortarlas a mano (además del perímetro). Clic de nuevo para quitar el corte.</p>
+      <div id="cordon-cortes-manuales"></div>
+      <div id="cordon-propagacion"></div>
       <button type="button" class="proximidad-boton" id="cordon-salir" style="margin-top:8px">Salir del modo cordón</button>
     `;
 
@@ -268,6 +273,46 @@ function buildCordonIncidenteContent(): HTMLElement {
     });
     cuerpo.querySelector('#cordon-cambiar-ubicacion')?.addEventListener('click', () => volverASeleccionUbicacion());
     cuerpo.querySelector('#cordon-salir')?.addEventListener('click', () => salirModoCordon());
+
+    // Cortes manuales (spec 021 v3).
+    const cortesRoot = cuerpo.querySelector('#cordon-cortes-manuales')!;
+    if (e.cortesManuales.length > 0) {
+      cortesRoot.innerHTML = `
+        <div class="proximidad-seccion__titulo">Cortes manuales (${e.cortesManuales.length})</div>
+        ${e.cortesManuales
+          .map((id) => {
+            const t = getTramoPorIdCordon(id);
+            return `<div class="sim-corte-item">
+              <span>${t?.nombreCalle ?? '(sin nombre)'} <span class="sim-corte-sentido">— ${ETIQUETA_SENTIDO[t?.sentido ?? ''] ?? ''}</span></span>
+              <button type="button" class="sim-corte-quitar" data-corte="${id}" title="Quitar corte">✕</button>
+            </div>`;
+          })
+          .join('')}
+      `;
+      cortesRoot.querySelectorAll<HTMLButtonElement>('.sim-corte-quitar').forEach((boton) => {
+        boton.addEventListener('click', () => toggleCorteManual(boton.dataset.corte!));
+      });
+    }
+
+    // Efecto en cadena que se escapa del perímetro de socorro (spec 031 §5).
+    const propRoot = cuerpo.querySelector('#cordon-propagacion')!;
+    const fuera = e.propagacionFuera;
+    const totalFuera = fuera ? fuera.sinEntrada.length + fuera.sinSalida.length + fuera.desvio.length : 0;
+    if (fuera && totalFuera > 0) {
+      const bloque = (clase: string, titulo: string, tramos: { nombreCalle: string | null }[]): string =>
+        tramos.length === 0
+          ? ''
+          : `<div class="${clase}">${titulo}<ul>${nombresUnicos(tramos)
+              .map((n) => `<li>${n}</li>`)
+              .join('')}</ul></div>`;
+      propRoot.innerHTML =
+        `<div class="proximidad-seccion__titulo">⚠️ Efecto en cadena fuera del cordón</div>` +
+        bloque('sim-aviso-sin-entrada', 'Sin entrada de tráfico — aguas abajo del corte:', fuera.sinEntrada) +
+        bloque('sim-aviso-aislados', 'Sin salida — zona que quedaría atrapada:', fuera.sinSalida) +
+        bloque('sim-aviso-desvio', 'Desvío forzado — vías abiertas que desembocan en el corte:', fuera.desvio);
+    } else if (e.cortesManuales.length > 0 || (e.resultado?.ok && e.resultado.propuesta.tramosCerrados.length > 0)) {
+      propRoot.innerHTML = '<div class="sim-aviso-ok">✓ El corte no arrastra ninguna calle fuera del perímetro.</div>';
+    }
   }
 
   onCambioModoCordon(render);
@@ -286,8 +331,13 @@ const ETIQUETA_SENTIDO: Record<string, string> = {
  * ni almacenamiento: el fichero se genera enteramente en el cliente a
  * partir del estado ya visible en pantalla.
  */
+function nombresUnicos(tramos: { nombreCalle: string | null }[]): string[] {
+  return [...new Set(tramos.map((t) => t.nombreCalle ?? '(sin nombre)'))];
+}
+
 function descargarResumenSimulacion(e: EstadoModoSimulacion): void {
   const fecha = new Date().toLocaleString('es-ES');
+  const r = e.resultado;
   const lineas = [
     'Simulación de cortes de calle — Intelligent City Monitor',
     `Generado: ${fecha}`,
@@ -300,15 +350,37 @@ function descargarResumenSimulacion(e: EstadoModoSimulacion): void {
     '',
   ];
 
-  const aisladosDescarga = e.resultado?.tramosAislados ?? [];
-  if (aisladosDescarga.length > 0) {
-    const nombres = [...new Set(aisladosDescarga.map((t) => t.nombreCalle ?? '(sin nombre)'))];
-    lineas.push(`⚠️ ZONAS SIN SALIDA (${e.resultado?.nodosAisladosCount ?? 0} punto(s) de red afectados):`);
-    lineas.push(...nombres.map((n) => `- ${n}`));
+  const sinEntrada = [...(r?.tramosSinEntrada ?? []), ...(r?.tramosAislados ?? [])];
+  const sinSalida = [...(r?.tramosSinSalida ?? []), ...(r?.tramosAislados ?? [])];
+  const desvio = r?.tramosDesvioForzado ?? [];
+
+  if (sinEntrada.length + sinSalida.length + desvio.length === 0) {
+    lineas.push('✓ Sin efecto en cadena: ningún tramo se queda sin entrada ni sin salida.');
   } else {
-    lineas.push('✓ Ninguna zona se queda sin salida con esta combinación de cortes.');
+    if (sinEntrada.length > 0) {
+      lineas.push(`⚠️ SIN ENTRADA DE TRÁFICO — aguas abajo del corte (${r?.nodosSinEntradaCount ?? 0} puntos de red):`);
+      lineas.push(...nombresUnicos(sinEntrada).map((n) => `- ${n}`));
+    }
+    if (sinSalida.length > 0) {
+      lineas.push(`⚠️ SIN SALIDA — zona que quedaría atrapada (${r?.nodosSinSalidaCount ?? 0} puntos de red):`);
+      lineas.push(...nombresUnicos(sinSalida).map((n) => `- ${n}`));
+    }
+    if (desvio.length > 0) {
+      lineas.push('↪️ DESVÍO FORZADO — vías abiertas que desembocan en el corte:');
+      lineas.push(...nombresUnicos(desvio).map((n) => `- ${n}`));
+    }
   }
-  lineas.push('', 'Punto de partida orientativo — revisar sobre el terreno antes de aplicar.');
+  if (r?.tramosCortados.length) {
+    lineas.push('');
+    lineas.push(
+      e.rutasAlternativas.length > 0
+        ? `↩️ RUTA(S) ALTERNATIVA(S) DEL TRÁFICO: ${e.rutasAlternativas.length} (${Math.round(
+            e.rutasAlternativas.reduce((s, x) => s + x.longitudM, 0) / e.rutasAlternativas.length,
+          )} m de media).`
+        : '↩️ Sin ruta alternativa cercana para el tráfico cortado.',
+    );
+  }
+  lineas.push('', 'Alcanzabilidad sobre datos de OpenStreetMap — punto de partida orientativo, revisar sobre el terreno antes de aplicar.');
 
   const blob = new Blob([lineas.join('\n')], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -331,7 +403,7 @@ function buildGemeloDigitalContent(): HTMLElement {
   function render(e: EstadoModoSimulacion): void {
     if (e.fase === 'inactivo') {
       cuerpo.innerHTML = `
-        <p class="cordon-intro">Simula cortes de calle (ej. para una carrera o un evento) y comprueba si alguna zona se queda sin salida — respeta el sentido real de cada calle. No es simulación de tráfico con intensidades, solo alcanzabilidad.</p>
+        <p class="cordon-intro">Simula cortes de calle (ej. para una carrera o un evento) y comprueba el efecto en cadena siguiendo el sentido real de circulación: qué tramos se quedan sin entrada de tráfico, cuáles sin salida, qué vías obligan a desviarse y por dónde daría la vuelta el tráfico (animado). No es simulación de tráfico con intensidades, solo alcanzabilidad.</p>
         <button type="button" class="proximidad-boton" id="sim-iniciar">🗺️ Activar simulador de cortes</button>
       `;
       cuerpo.querySelector('#sim-iniciar')?.addEventListener('click', () => {
@@ -378,17 +450,34 @@ function buildGemeloDigitalContent(): HTMLElement {
     cuerpo.querySelector('#sim-descargar')?.addEventListener('click', () => descargarResumenSimulacion(e));
 
     const resultadoRoot = cuerpo.querySelector('#sim-resultado')!;
-    const aislados = e.resultado?.tramosAislados ?? [];
-    if (aislados.length > 0) {
-      const nombres = [...new Set(aislados.map((t) => t.nombreCalle ?? '(sin nombre)'))];
-      resultadoRoot.innerHTML = `
-        <div class="sim-aviso-aislados">
-          ⚠️ ${e.resultado?.nodosAisladosCount} punto(s) de la red se quedan sin salida con esta combinación de cortes:
-          <ul>${nombres.map((n) => `<li>${n}</li>`).join('')}</ul>
-        </div>
-      `;
+    const r = e.resultado;
+    const sinEntrada = [...(r?.tramosSinEntrada ?? []), ...(r?.tramosAislados ?? [])];
+    const sinSalida = [...(r?.tramosSinSalida ?? []), ...(r?.tramosAislados ?? [])];
+    const desvio = r?.tramosDesvioForzado ?? [];
+    const bloque = (clase: string, titulo: string, tramos: { nombreCalle: string | null }[]): string =>
+      tramos.length === 0
+        ? ''
+        : `<div class="${clase}">${titulo}<ul>${nombresUnicos(tramos)
+            .map((n) => `<li>${n}</li>`)
+            .join('')}</ul></div>`;
+
+    const rutasInfo =
+      e.rutasAlternativas.length > 0
+        ? `<div class="sim-aviso-reruta">↩️ Desvío del tráfico (animado en verde): ${e.rutasAlternativas.length} ruta(s) alternativa(s), ${Math.round(
+            e.rutasAlternativas.reduce((s, x) => s + x.longitudM, 0) / e.rutasAlternativas.length,
+          )} m de media.</div>`
+        : e.tramosCortados.length > 0
+          ? '<div class="sim-aviso-reruta">↩️ Sin ruta alternativa cercana para el tráfico cortado.</div>'
+          : '';
+
+    if (sinEntrada.length + sinSalida.length + desvio.length > 0) {
+      resultadoRoot.innerHTML =
+        bloque('sim-aviso-sin-entrada', `⚠️ Sin entrada de tráfico (${r?.nodosSinEntradaCount ?? 0} puntos de red) — aguas abajo del corte:`, sinEntrada) +
+        bloque('sim-aviso-aislados', `⚠️ Sin salida (${r?.nodosSinSalidaCount ?? 0} puntos de red) — zona que quedaría atrapada:`, sinSalida) +
+        bloque('sim-aviso-desvio', '↪️ Desvío forzado — vías abiertas que desembocan en el corte:', desvio) +
+        rutasInfo;
     } else if (e.tramosCortados.length > 0) {
-      resultadoRoot.innerHTML = '<div class="sim-aviso-ok">✓ Ninguna zona se queda sin salida con estos cortes.</div>';
+      resultadoRoot.innerHTML = '<div class="sim-aviso-ok">✓ Sin efecto en cadena con estos cortes.</div>' + rutasInfo;
     }
 
     cuerpo.querySelectorAll<HTMLButtonElement>('.sim-corte-quitar').forEach((boton) => {
