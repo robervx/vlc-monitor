@@ -4,7 +4,7 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
-import { GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, ScatterplotLayer, IconLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
 import { preloadDistrictGeometry, getDistrictCentroid, getLoadedDistricts } from './services/district-geometry';
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
@@ -111,6 +111,21 @@ function colorIntensidad(intensidad: number): Color {
   return [r, Math.max(0, g), Math.max(0, b), a];
 }
 
+// Flecha de sentido como icono SVG (no glifo de fuente) — el TextLayer con
+// caracteres ▶/◀ fallaba en algunos móviles (atlas de fuente sin ese glifo:
+// se veía como marcas sueltas "de error"). Blanco + `mask` para tintarlo.
+const ICONO_FLECHA_SENTIDO = {
+  id: 'flecha-sentido',
+  url:
+    'data:image/svg+xml;charset=utf-8,' +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 4 L19 12 L7 20 Z" fill="#fff"/></svg>',
+    ),
+  width: 24,
+  height: 24,
+  mask: true,
+};
+
 // FeatureCollection de líneas a partir de ids de tramo del grafo viario
 // (specs 021/022/031) — resuelve cada id contra el store del modo activo.
 function featuresDeTramos(
@@ -124,6 +139,19 @@ function featuresDeTramos(
       .filter((t): t is NonNullable<typeof t> => !!t)
       .map((t) => ({ type: 'Feature' as const, geometry: t.geometria, properties: {} })),
   };
+}
+
+// Marcadores de sentido para un conjunto concreto de tramos (los implicados
+// en el análisis activo) — mucho menos ruido visual que pintar una flecha
+// por cada calle del viewport, sobre todo en móvil.
+function marcadoresSentidoParaIds(
+  ids: Iterable<string>,
+  resolver: (id: string) => import('./services/red-viaria').Tramo | undefined,
+): MarcadorSentido[] {
+  const tramos = [...new Set(ids)]
+    .map(resolver)
+    .filter((t): t is NonNullable<typeof t> => !!t);
+  return marcadoresSentido(tramos);
 }
 
 // Icono por rango de código WMO — ver src/services/estado-meteo.ts para la
@@ -948,24 +976,23 @@ async function main(): Promise<void> {
   // activos, para que se vea la dirección de cada vía al planificar un corte
   // (petición del usuario, revisión del gemelo digital). Una flecha por
   // tramo del viewport a partir de zoom de calle: azul = unidireccional,
-  // gris doble punta = bidireccional.
+  // gris = bidireccional. En los modos cordón/simulador solo se pintan sobre
+  // los tramos implicados en el análisis (ver renderLayers).
   const DEBUG_GRAFO = new URLSearchParams(window.location.search).get('debug') === 'grafo';
   const ZOOM_MINIMO_FLECHAS_SENTIDO = 15;
   let marcadoresSentidoGrafo: MarcadorSentido[] = [];
-  function asegurarMarcadoresSentido(): void {
-    if (marcadoresSentidoGrafo.length > 0) return;
+  if (DEBUG_GRAFO) {
     void cargarGrafoViario()
       .then((grafo) => {
         marcadoresSentidoGrafo = marcadoresSentido(grafo.tramos);
         renderLayers();
       })
-      .catch((err: unknown) => console.error('flechas de sentido: no se pudo cargar el grafo viario:', err));
+      .catch((err: unknown) => console.error('?debug=grafo: no se pudo cargar el grafo viario:', err));
   }
   const flechasSentidoActivas = (): boolean =>
     DEBUG_GRAFO ||
     getEstadoModoCordon().fase !== 'inactivo' ||
     getEstadoModoSimulacion().fase !== 'inactivo';
-  if (DEBUG_GRAFO) asegurarMarcadoresSentido();
 
   const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
   map.addControl(overlay);
@@ -1010,6 +1037,45 @@ async function main(): Promise<void> {
     const simDesvioIds = propagacionSim?.tramosDesvioForzado.map((t) => t.idTramo) ?? [];
     const simRutas = estadoSimulacion.rutasAlternativas;
     const algunModoActivo = estadoCordon.fase !== 'inactivo' || estadoSimulacion.fase !== 'inactivo';
+
+    // Flechas de sentido: con ?debug=grafo se pintan en todo el viewport
+    // (ayuda de verificación); en los modos cordón/simulador solo sobre los
+    // tramos IMPLICADOS en el análisis (cortes + propagación + rutas), para
+    // no llenar el mapa de flechas — en móvil sobre todo se leía como ruido.
+    let marcadoresFlechas: MarcadorSentido[] = [];
+    if (DEBUG_GRAFO) {
+      const b = map.getBounds();
+      marcadoresFlechas = marcadoresSentidoGrafo.filter(
+        (m) =>
+          m.posicion[0] >= b.getWest() &&
+          m.posicion[0] <= b.getEast() &&
+          m.posicion[1] >= b.getSouth() &&
+          m.posicion[1] <= b.getNorth(),
+      );
+    } else if (estadoSimulacion.fase !== 'inactivo') {
+      marcadoresFlechas = marcadoresSentidoParaIds(
+        [
+          ...tramosCortadosIds,
+          ...simSinEntradaIds,
+          ...simSinSalidaIds,
+          ...simDesvioIds,
+          ...simRutas.flatMap((r) => r.tramosRuta),
+        ],
+        getTramoPorIdSimulacion,
+      );
+    } else if (estadoCordon.fase !== 'inactivo') {
+      marcadoresFlechas = marcadoresSentidoParaIds(
+        [
+          ...(cordonPropuesta?.tramosCerrados ?? []),
+          ...(cordonPropuesta?.tramosCorte ?? []),
+          ...cordonCortesManuales,
+          ...cordonSinEntradaFueraIds,
+          ...cordonSinSalidaFueraIds,
+          ...cordonDesvioFueraIds,
+        ],
+        getTramoPorId,
+      );
+    }
 
     // Puntos animados del desvío (spec 022 v6): recorren la ruta alternativa
     // de cada corte. La calle cortada NO se anima — lo que se ve moverse es
@@ -1404,35 +1470,20 @@ async function main(): Promise<void> {
             radiusMinPixels: 3,
             radiusMaxPixels: 5,
           }),
-        // Flechas de sentido — spec 020 v4 (con ?debug=grafo o modo cordón/simulador activo).
-        flechasSentidoActivas() &&
+        // Flechas de sentido — spec 020 v4 (icono SVG, no glifo de fuente).
+        marcadoresFlechas.length > 0 &&
           map.getZoom() >= ZOOM_MINIMO_FLECHAS_SENTIDO &&
-          marcadoresSentidoGrafo.length > 0 &&
-          (() => {
-            const b = map.getBounds();
-            const visibles = marcadoresSentidoGrafo.filter(
-              (m) =>
-                m.posicion[0] >= b.getWest() &&
-                m.posicion[0] <= b.getEast() &&
-                m.posicion[1] >= b.getSouth() &&
-                m.posicion[1] <= b.getNorth(),
-            );
-            return new TextLayer<MarcadorSentido>({
-              id: 'flechas-sentido',
-              data: visibles,
-              pickable: false,
-              getPosition: (m) => m.posicion,
-              getText: (m) => (m.sentido === 'unidireccional' ? '▶' : '◀▶'),
-              // El atlas de fuente por defecto de TextLayer es solo ASCII — sin
-              // esto los glifos de flecha no se dibujan.
-              characterSet: ['▶', '◀'],
-              getAngle: (m) => m.anguloGrados,
-              getColor: (m) => (m.sentido === 'unidireccional' ? [37, 99, 235, 235] : [107, 114, 128, 210]),
-              getSize: 18,
-              sizeUnits: 'pixels',
-              billboard: false,
-            });
-          })(),
+          new IconLayer<MarcadorSentido>({
+            id: 'flechas-sentido',
+            data: marcadoresFlechas,
+            pickable: false,
+            getIcon: () => ICONO_FLECHA_SENTIDO,
+            getPosition: (m) => m.posicion,
+            getAngle: (m) => m.anguloGrados,
+            getColor: (m) => (m.sentido === 'unidireccional' ? [37, 99, 235, 230] : [100, 116, 139, 205]),
+            getSize: 15,
+            sizeUnits: 'pixels',
+          }),
         new GeoJsonLayer<DistritoProperties>({
           id: 'distritos',
           data: featureCollection,
@@ -1493,7 +1544,6 @@ async function main(): Promise<void> {
     const activo = estadoCordon.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
-    if (activo) asegurarMarcadoresSentido();
 
     if (estadoCordon.fase === 'esperandoClicMapa' && !clicCordonHandler) {
       map.getCanvas().style.cursor = 'crosshair';
@@ -1587,7 +1637,6 @@ async function main(): Promise<void> {
     const activo = estadoSimulacion.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
-    if (activo) asegurarMarcadoresSentido();
     actualizarAnimacionReruta(activo && estadoSimulacion.rutasAlternativas.length > 0);
 
     if (estadoSimulacion.fase === 'seleccionando' && !clicSimulacionHandler) {
@@ -1875,9 +1924,10 @@ async function main(): Promise<void> {
   });
 
   map.on('moveend', persistViewState);
-  map.on('moveend', () => {
-    if (flechasSentidoActivas()) renderLayers();
-  });
+  // Solo con ?debug=grafo hace falta re-renderizar al desplazar (recorte por
+  // viewport de las flechas). En los modos las flechas van sobre geometría
+  // fija, no cambian al hacer pan.
+  if (DEBUG_GRAFO) map.on('moveend', () => renderLayers());
 
   const meteoPanelRoot = buildInfoPanel('meteo-panel');
   async function refreshMeteoPanel(): Promise<void> {
