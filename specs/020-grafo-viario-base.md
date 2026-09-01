@@ -96,7 +96,7 @@ Pasos del pipeline offline real (`npm run seed:red-viaria`, `scripts/seed-red-vi
 
 ## 5. Contrato de capa de mapa
 
-No es una capa visible por defecto (como spec `019`, es infraestructura). Capa de depuración opcional, **oculta salvo `?debug=grafo` en la URL** (implementada en v4): pinta una flecha por tramo del viewport a partir de zoom de calle (≥ 15), en el sentido canónico origen→destino — azul `▶` unidireccional, gris `◀▶` bidireccional. No forma parte del DoD de cara al usuario final, solo de verificación de esta spec y base visual para el pintado de sentido de specs `021`/`022`. Geometría pura reutilizable en `src/services/flechas-sentido.ts` (`marcadoresSentido`, `anguloDesdeEste`), con tests.
+No es una capa visible por defecto (como spec `019`, es infraestructura). Capa de depuración opcional, **oculta salvo `?debug=grafo` en la URL** (implementada en v4): pinta una flecha por tramo del viewport a partir de zoom de calle (≥ 15), en el sentido canónico origen→destino — azul unidireccional, gris bidireccional. La flecha es un **icono SVG** (`IconLayer`), no un glifo de fuente — el `TextLayer` con `▶`/`◀` se veía como marcas de error en móviles sin ese carácter en el atlas (corregido junto con spec `022` v7). No forma parte del DoD de cara al usuario final, solo de verificación de esta spec y base visual para el pintado de sentido de specs `021`/`022` (que en sus modos pintan flechas solo sobre los tramos del análisis, no todo el viewport). Geometría pura reutilizable en `src/services/flechas-sentido.ts` (`marcadoresSentido`, `anguloDesdeEste`), con tests.
 
 ## 6. Criterios de aceptación (Definition of Done)
 
