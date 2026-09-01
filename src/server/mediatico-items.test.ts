@@ -32,7 +32,7 @@ afterEach(() => {
 
 // Orden importa: la caché del módulo empieza vacía — ver api/meteo/v1/actual.test.ts.
 describe('GET /api/mediatico/v1/items', () => {
-  it('devuelve 502 si las 3 fuentes fallan sin caché previa', async () => {
+  it('devuelve 502 si todas las fuentes fallan sin caché previa', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }));
 
     const res = await handler();

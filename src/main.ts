@@ -575,17 +575,49 @@ function formatoTiempoRelativo(fechaIso: string): string {
   return `hace ${Math.round(horas / 24)} d`;
 }
 
-function buildMediaPanel(): { root: HTMLDivElement; list: HTMLDivElement } {
+const PREF_OCIO_DEPORTE = 'imc:media-ocio-deporte';
+
+function leerPrefOcioDeporte(): boolean {
+  try {
+    return localStorage.getItem(PREF_OCIO_DEPORTE) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function guardarPrefOcioDeporte(valor: boolean): void {
+  try {
+    localStorage.setItem(PREF_OCIO_DEPORTE, valor ? '1' : '0');
+  } catch {
+    /* almacenamiento no disponible — no bloquea el panel */
+  }
+}
+
+interface MediaPanel {
+  root: HTMLDivElement;
+  list: HTMLDivElement;
+  ocioDeporteToggle: HTMLInputElement;
+}
+
+function buildMediaPanel(): MediaPanel {
   const root = document.createElement('div');
   root.id = 'media-panel';
   root.hidden = true;
   root.innerHTML = `
-    <div class="media-panel__header">Contexto mediático</div>
+    <div class="media-panel__header">
+      Contexto mediático
+      <label class="media-panel__filtro">
+        <input type="checkbox" id="media-ocio-deporte-toggle" />
+        Ocio y deporte
+      </label>
+    </div>
     <div class="media-panel__list" id="media-panel-list"></div>
     <div class="info-panel__meta" id="media-panel-meta"></div>
   `;
   document.body.appendChild(root);
-  return { root, list: root.querySelector('#media-panel-list')! };
+  const ocioDeporteToggle = root.querySelector<HTMLInputElement>('#media-ocio-deporte-toggle')!;
+  ocioDeporteToggle.checked = leerPrefOcioDeporte();
+  return { root, list: root.querySelector('#media-panel-list')!, ocioDeporteToggle };
 }
 
 // Spec 023 §5: cada ítem enlaza a la noticia; si menciona distrito(s), se muestra
@@ -599,10 +631,11 @@ function renderItemMediatico(item: ItemMediatico): string {
     })
     .join('');
 
+  const viaGoogle = item.fuenteTipo === 'google-news' ? ' · vía Google News' : '';
   return `
     <a class="media-panel__item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
       <div class="media-panel__item-titulo">${escapeHtml(item.titulo)}</div>
-      <div class="media-panel__item-meta">${item.fuente} · ${formatoTiempoRelativo(item.publicadoEn)}</div>
+      <div class="media-panel__item-meta">${escapeHtml(item.fuente)} · ${formatoTiempoRelativo(item.publicadoEn)}${viaGoogle}</div>
       ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
     </a>
   `;
@@ -617,21 +650,28 @@ function renderGrupoMediatico(titulo: string, items: ItemMediatico[]): string {
 }
 
 function renderMediaticoPanel(
-  panel: { root: HTMLDivElement; list: HTMLDivElement },
+  panel: MediaPanel,
   items: ItemMediatico[],
   fresh: boolean,
   fuentesFallidas: string[],
 ): void {
   const validos = items.filter((item) => /^https?:\/\//i.test(item.url)); // nunca renderizar javascript:/data: aunque venga en el feed
+  const mostrarOcioDeporte = panel.ocioDeporteToggle.checked;
 
-  // Spec 023 §5: agrupar por distrito mencionado; un ítem con dos distritos
-  // aparece en los dos grupos. Sin ninguna mención -> bloque "Valencia (general)".
+  const informativos = validos.filter((i) => i.categoria === 'general');
+  const ocio = validos.filter((i) => i.categoria === 'ocio');
+  const deporte = validos.filter((i) => i.categoria === 'deporte');
+
+  // Spec 023 §5: agrupar los informativos por distrito mencionado; un ítem con
+  // dos distritos aparece en los dos grupos. Sin mención -> bucket de ciudad
+  // (confirmado por hito/institución) o "general, sin confirmar" (spec 009 §3.1).
   const porDistrito = new Map<string, { nombre: string; items: ItemMediatico[] }>();
+  const ciudadSinDistrito: ItemMediatico[] = [];
   const generales: ItemMediatico[] = [];
 
-  for (const item of validos) {
+  for (const item of informativos) {
     if (item.distritosMencionados.length === 0) {
-      generales.push(item);
+      (item.ambitoCiudad === 'confirmado' ? ciudadSinDistrito : generales).push(item);
       continue;
     }
     for (const mencion of item.distritosMencionados) {
@@ -646,11 +686,30 @@ function renderMediaticoPanel(
     .map(([, grupo]) => renderGrupoMediatico(grupo.nombre, grupo.items))
     .join('');
 
-  panel.list.innerHTML = gruposDistrito + renderGrupoMediatico('Valencia (general)', generales);
+  const partes = [
+    gruposDistrito,
+    renderGrupoMediatico('València (ciudad)', ciudadSinDistrito),
+    renderGrupoMediatico('València (general, sin confirmar)', generales),
+  ];
+  if (mostrarOcioDeporte) {
+    partes.push(renderGrupoMediatico('Ocio y cultura', ocio));
+    partes.push(renderGrupoMediatico('Deporte', deporte));
+  }
+
+  panel.list.innerHTML =
+    partes.join('') ||
+    '<div class="tendencia-panel__insuficiente">Sin titulares de la ciudad de València ahora mismo.</div>';
 
   const meta = panel.root.querySelector('#media-panel-meta')!;
+  const ocultos =
+    !mostrarOcioDeporte && ocio.length + deporte.length > 0
+      ? ` · ${ocio.length + deporte.length} de ocio/deporte ocultos`
+      : '';
   const avisoFallidas = fuentesFallidas.length > 0 ? ` · sin ${fuentesFallidas.join(', ')}` : '';
-  meta.innerHTML = metaFrescura('RSS + GDELT', items[0]?.fetchedAt ?? new Date().toISOString(), fresh) + avisoFallidas;
+  meta.innerHTML =
+    metaFrescura('Prensa local + GDELT', items[0]?.fetchedAt ?? new Date().toISOString(), fresh) +
+    ocultos +
+    avisoFallidas;
 }
 
 async function fetchItemsMediaticosActual(): Promise<{
@@ -1513,15 +1572,30 @@ async function main(): Promise<void> {
 
   const mediaPanel = buildMediaPanel();
   let mediaPollingIniciado = false;
+  let ultimoMediatico: { items: ItemMediatico[]; fresh: boolean; fuentesFallidas: string[] } | null =
+    null;
   async function refreshMediatico(): Promise<void> {
     try {
-      const { items, fresh, fuentesFallidas } = await fetchItemsMediaticosActual();
-      renderMediaticoPanel(mediaPanel, items, fresh, fuentesFallidas);
+      const datos = await fetchItemsMediaticosActual();
+      ultimoMediatico = datos;
+      renderMediaticoPanel(mediaPanel, datos.items, datos.fresh, datos.fuentesFallidas);
     } catch (err) {
       mediaPanel.list.textContent = 'Contexto mediático no disponible';
       console.error('Fallo al cargar contexto mediático:', err);
     }
   }
+
+  mediaPanel.ocioDeporteToggle.addEventListener('change', () => {
+    guardarPrefOcioDeporte(mediaPanel.ocioDeporteToggle.checked);
+    if (ultimoMediatico) {
+      renderMediaticoPanel(
+        mediaPanel,
+        ultimoMediatico.items,
+        ultimoMediatico.fresh,
+        ultimoMediatico.fuentesFallidas,
+      );
+    }
+  });
 
   panel.mediaToggle.addEventListener('change', () => {
     mediaPanel.root.hidden = !panel.mediaToggle.checked;
