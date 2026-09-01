@@ -16,11 +16,15 @@ function item(overrides: Partial<ItemMediatico> = {}): ItemMediatico {
     resumen: null,
     url: 'https://example.com',
     fuente: 'Las Provincias',
+    fuenteTipo: 'rss-nativo',
     imagenUrl: null,
     publicadoEn: AHORA.toISOString(),
     fetchedAt: AHORA.toISOString(),
     source: 'rss',
     distritosMencionados: [],
+    ambitoCiudad: 'general',
+    categoria: 'general',
+    motivoAmbito: 'test',
     ...overrides,
   };
 }

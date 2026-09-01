@@ -1,0 +1,83 @@
+{
+  "descripcion": "Léxico determinista del filtro Valencia-ciudad de la spec 009 §3.1. Sin IA: listas de expresiones que, buscadas como palabra/frase completa sobre el titular+resumen normalizado (NFD, sin acentos, minúsculas, separadores colapsados a espacio), clasifican un ítem mediático. Ver src/services/filtro-ambito-ciudad.ts.",
+  "actualizado": "2026-09-01",
+
+  "hitosCiudad": [
+    "mestalla", "roig arena", "ciutat de les arts", "ciudad de las artes",
+    "ciutat de les arts i les ciencies", "ciudad de las artes y las ciencias",
+    "ciudad de las ciencias", "oceanografic", "hemisferic", "umbracle",
+    "bioparc", "jardi del turia", "jardin del turia", "riu turia", "rio turia",
+    "cauce del turia", "parc del turia", "parque del turia", "pont de fusta",
+    "estacio del nord", "estacion del norte", "estacio joaquin sorolla",
+    "estacion joaquin sorolla", "mercat central", "mercado central",
+    "mercat de colon", "mercado de colon", "mercat de russafa",
+    "llotja de la seda", "lonja de la seda", "la marina de valencia",
+    "marina real", "malva rosa", "malvarrosa", "playa de las arenas",
+    "playa del cabanyal", "playa de la patacona", "torres de serranos",
+    "torres de serrans", "torres de quart", "plaza del ayuntamiento",
+    "plaça de l ajuntament", "plaza de la reina", "plaça de la reina",
+    "plaza de la virgen", "plaça de la mare de deu", "nuevo centro",
+    "nou centre", "ciutat fallera", "ciudad fallera", "tarongers",
+    "avinguda del port", "avenida del puerto", "gran via marques del turia",
+    "carrer de colon", "calle colon", "mercat de russafa"
+  ],
+
+  "marcadoresInstitucionCiudad": [
+    "ajuntament de valencia", "ayuntamiento de valencia",
+    "consistorio de valencia", "ciudad de valencia", "ciutat de valencia",
+    "valencia capital", "capital del turia", "alcalde de valencia",
+    "alcaldesa de valencia", "maria jose catala", "policia local de valencia",
+    "bomberos de valencia", "bombers de valencia", "emt de valencia",
+    "en la ciudad de valencia", "casco urbano de valencia",
+    "pleno del ayuntamiento de valencia", "junta de gobierno local de valencia"
+  ],
+
+  "infraAsociada": [
+    "puerto de valencia", "port de valencia", "valenciaport",
+    "feria valencia", "fira valencia", "feria de valencia", "fira de valencia",
+    "aeropuerto de valencia", "aeropuerto de manises", "aeroport de valencia",
+    "aeroport de manises", "ciudad de la justicia de valencia"
+  ],
+
+  "marcadoresRegionales": [
+    "comunitat valenciana", "comunidad valenciana", "generalitat valenciana",
+    "generalitat", "les corts valencianes", "les corts", "corts valencianes",
+    "el consell", "del consell", "conselleria", "consellera de", "conseller de",
+    "provincia de valencia", "diputacion de valencia", "diputacio de valencia",
+    "diputacion provincial", "area metropolitana", "l horta sud", "l horta nord",
+    "horta sud", "horta nord", "la ribera alta", "la ribera baixa", "la safor",
+    "la costera", "els serrans", "la vall d albaida", "el camp de turia",
+    "el camp de morvedre", "la hoya de buñol", "requena utiel",
+    "la canal de navarres", "president de la generalitat",
+    "presidente de la generalitat", "carlos mazon", "toda la comunitat",
+    "en la comunitat", "alicante", "alacant", "castellon", "castello",
+    "elche", "elx", "torrevieja", "benidorm"
+  ],
+
+  "desambiguacion": ["venezuela", "carabobo", "estado carabobo"],
+
+  "deporteCronica": [
+    "fichaje", "fichajes", "fichar", "traspaso", "cedido", "cesion",
+    "rueda de prensa", "gol de", "goles", "empate", "empataron", "derrota por",
+    "victoria por", "marcador", "minuto 90", "penalti", "penalty", "arbitro",
+    "colegiado", "vestuario", "once inicial", "alineacion", "convocatoria",
+    "lesion", "lesionado", "baja por lesion", "mercado de fichajes", "laliga",
+    "la liga", "primera division", "segunda division", "champions league",
+    "liga de campeones", "europa league", "copa del rey", "supercopa",
+    "descenso", "ascenso", "playoff", "jornada liguera", "partido de liga",
+    "amistoso de pretemporada", "valencia cf", "valencia c f", "levante ud",
+    "levante u d", "valencia basket", "pretemporada", "banquillo",
+    "delantero", "centrocampista", "portero titular"
+  ],
+
+  "deporteLogistico": [
+    "dispositivo", "operativo especial", "operativo policial", "corte de trafico",
+    "cortes de trafico", "cortes al trafico", "afecta al trafico",
+    "restricciones de trafico", "accesos al estadio", "control de accesos",
+    "dia de partido", "jornada de partido", "previa del partido",
+    "refuerzo de metro", "refuerzo de emt", "plan de movilidad",
+    "seguridad del encuentro", "aforo del estadio"
+  ],
+
+  "preposicionesLocativas": ["en", "de", "del", "a", "al", "desde", "hasta", "entre", "hacia", "fins"]
+}

@@ -1,35 +1,29 @@
 // GET /api/mediatico/v1/items — endpoint definido en specs/009-contexto-mediatico.md §4.
-// Combina 3 fuentes independientes (Las Provincias, Valencia Plaza, GDELT), cada
-// una con su propia caché — si una falla, se sirven las otras dos (spec 009 §4).
+// Combina N fuentes independientes (registro en src/services/mediatico-fuentes.ts),
+// cada una con su propia caché — si una falla, se sirven las demás (spec 009 §4).
+// El filtro Valencia-ciudad (§3.1) se aplica dentro de cada fetcher, antes de cachear.
 import { getOrFetch } from './_shared/cache';
-import {
-  fetchLasProvincias,
-  fetchValenciaPlaza,
-  fetchGdeltValencia,
-  type ItemMediatico,
-} from '../services/mediatico';
-import { distritosFromGeoJSON, setLoadedDistricts } from '../services/district-geometry';
-import distritosGeoJSON from '../../data/distritos-valencia.json' with { type: 'json' };
+import { FUENTES_MEDIATICAS } from '../services/mediatico-fuentes';
+import type { ItemMediatico } from '../services/mediatico';
 
 export const config = { runtime: 'edge' };
 
-// Spec 023 — el matching de distrito/barrio (geolocalizacion-texto.ts) necesita los
-// distritos ya cargados antes de normalizar cada fuente; los endpoints edge no
-// tienen "origen de página" implícito, así que se cargan del asset estático
-// directamente, no vía fetch (mismo patrón que api/trafico/v1/estado.ts).
-setLoadedDistricts(distritosFromGeoJSON(distritosGeoJSON));
-
 const TTL_MS = 15 * 60 * 1000;
+const MAX_ITEMS = 40;
 
-const FUENTES = [
-  { nombre: 'Las Provincias', cacheKey: 'mediatico:las-provincias:v1', fetcher: fetchLasProvincias },
-  { nombre: 'Valencia Plaza', cacheKey: 'mediatico:valencia-plaza:v1', fetcher: fetchValenciaPlaza },
-  { nombre: 'GDELT', cacheKey: 'mediatico:gdelt:v1', fetcher: fetchGdeltValencia },
-];
+/** Normaliza un titular para descartar el mismo artículo llegado por dos fuentes. */
+function claveTitulo(titulo: string): string {
+  return titulo
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
 
 export default async function handler(): Promise<Response> {
   const resultados = await Promise.allSettled(
-    FUENTES.map((f) => getOrFetch(f.cacheKey, TTL_MS, f.fetcher)),
+    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS, f.fetcher)),
   );
 
   const items: ItemMediatico[] = [];
@@ -37,7 +31,7 @@ export default async function handler(): Promise<Response> {
   let fresh = true;
 
   resultados.forEach((resultado, i) => {
-    const nombre = FUENTES[i]!.nombre;
+    const nombre = FUENTES_MEDIATICAS[i]!.nombre;
     if (resultado.status === 'fulfilled') {
       items.push(...resultado.value.value);
       if (!resultado.value.fresh) fresh = false;
@@ -47,7 +41,7 @@ export default async function handler(): Promise<Response> {
     }
   });
 
-  if (items.length === 0 && fuentesFallidas.length === FUENTES.length) {
+  if (items.length === 0 && fuentesFallidas.length === FUENTES_MEDIATICAS.length) {
     return new Response(JSON.stringify({ error: 'Ninguna fuente de contexto mediático respondió' }), {
       status: 502,
       headers: { 'content-type': 'application/json; charset=utf-8' },
@@ -56,11 +50,27 @@ export default async function handler(): Promise<Response> {
 
   items.sort((a, b) => b.publicadoEn.localeCompare(a.publicadoEn));
 
-  return new Response(JSON.stringify({ items: items.slice(0, 30), fresh, fuentesFallidas }), {
-    status: 200,
-    headers: {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'public, max-age=300, stale-while-revalidate=900',
+  // Dedup por URL y por titular normalizado (Google News + GDELT pueden traer el
+  // mismo artículo con URLs distintas). Se queda el primero -> el más reciente.
+  const vistasUrl = new Set<string>();
+  const vistasTitulo = new Set<string>();
+  const deduplicados: ItemMediatico[] = [];
+  for (const item of items) {
+    const claveT = claveTitulo(item.titulo);
+    if (vistasUrl.has(item.url) || (claveT.length > 0 && vistasTitulo.has(claveT))) continue;
+    vistasUrl.add(item.url);
+    if (claveT.length > 0) vistasTitulo.add(claveT);
+    deduplicados.push(item);
+  }
+
+  return new Response(
+    JSON.stringify({ items: deduplicados.slice(0, MAX_ITEMS), fresh, fuentesFallidas }),
+    {
+      status: 200,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': 'public, max-age=300, stale-while-revalidate=900',
+      },
     },
-  });
+  );
 }
