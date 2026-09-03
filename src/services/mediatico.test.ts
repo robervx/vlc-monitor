@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parsearRss } from './mediatico';
+import { parsearRss, parsearGoogleNews } from './mediatico';
 
 const RSS_EJEMPLO = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -69,5 +69,22 @@ describe('parsearRss', () => {
     </item></channel></rss>`;
     const items = parsearRss(xml, 'Valencia Bonita', '2026-08-18T20:00:00.000Z');
     expect(items[0]?.resumen).toBe('Nueva exposición en el centro.');
+  });
+});
+
+describe('parsearGoogleNews', () => {
+  const XML = `<rss><channel><item>
+    <title>Arqueología da el visto bueno a la climatización del Mercado Central - Levante-EMV</title>
+    <link>https://news.google.com/rss/articles/abc</link>
+    <pubDate>Wed, 03 Sep 2026 08:00:00 GMT</pubDate>
+    <source url="https://www.levante-emv.com">levante-emv.com</source>
+  </item></channel></rss>`;
+
+  it('usa la etiqueta fija del feed como fuente y recorta el sufijo " - Medio"', () => {
+    const items = parsearGoogleNews(XML, '2026-09-03T09:00:00.000Z', 'Levante-EMV');
+    expect(items).toHaveLength(1);
+    expect(items[0]?.fuente).toBe('Levante-EMV');
+    expect(items[0]?.titulo).toBe('Arqueología da el visto bueno a la climatización del Mercado Central');
+    expect(items[0]?.fuenteTipo).toBe('google-news');
   });
 });
