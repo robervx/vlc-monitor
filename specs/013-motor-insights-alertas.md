@@ -7,8 +7,12 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [001, 002, 010, 016]
 propietario: ""
-version: 3
+version: 4
 ```
+
+> **Estado:** v1–v3 `Implemented` y en producción. **v4 está en `Draft`** (ver §10 y
+> el historial) — añade disparadores nuevos y el patrón de alerta emergente. No se
+> implementa hasta que v4 pase a `Approved`.
 
 ## 0. Decisión de diseño (resuelve la tensión documentada en el backlog)
 
@@ -116,10 +120,81 @@ No es una capa de mapa — panel fijo (igual que meteo/aire), con una tarjeta po
 - **Riesgo:** con 5 reglas simples puede haber ruido (falsos positivos en umbrales límite) — aceptado en v1, se ajustan los umbrales con uso real antes de añadir más reglas.
 - **Fuera de alcance de esta spec:** cualquier envío automático (§0), integración con contexto mediático como disparador (§2), historial de insights pasados, configuración de umbrales por el usuario, agrupación/deduplicación de insights repetidos entre refrescos (cada refresco recalcula desde cero, sin persistencia).
 
-## 9. Historial
+## 9. v4 — disparadores nuevos + alertas emergentes (Draft, 2026-09-04)
+
+Petición del usuario: que las alertas **salten como popup** cuando aparecen y luego
+**se queden en un lateral**, y que haya disparadores nuevos además de los umbrales
+meteo/aire actuales. Se implementa "una a una" (cada punto es verificable por
+separado). El dashboard de KPIs va en su propia spec (`034`), esta v4 es solo el motor
++ la presentación de alertas.
+
+### 9.1 Disparador nuevo: un tramo de tráfico empeora
+
+| Tipo | Condición | Severidad |
+|---|---|---|
+| `trafico-empeora` | un tramo (spec `004`) sube de nivel entre dos refrescos consecutivos: `fluido → denso` (`aviso`), `→ congestionado` o `→ cortado` (`urgente`). Se agrupa por distrito si hay varios a la vez: "3 tramos de Extramurs han empeorado". | según destino |
+
+**Esto exige estado.** El motor actual recalcula desde cero sin memoria (§8). Para
+detectar un *cambio* hay que guardar el estado anterior:
+
+- Clave de caché nueva `insights:trafico:estado-previo` — mapa `idtramo → estado`,
+  TTL 15 min, escrita en cada evaluación con el estado que se acaba de leer.
+- Primera evaluación sin estado previo → no dispara nada (no hay "cambio" contra nada).
+- El histórico agregado de spec `017` (snapshots cada 60 min) es demasiado grueso para
+  esto; se usa la caché viva de spec `004` como "estado ahora" y esta clave nueva como
+  "estado hace un ciclo".
+
+### 9.2 Ajuste de umbrales meteo/aire (nueva banda "aviso" más temprana)
+
+Las reglas actuales solo saltan en condiciones ya extremas (38 °C, aire "Muy mala").
+El usuario quiere avisos antes:
+
+| Tipo | Cambio |
+|---|---|
+| `calor-extremo` | añadir banda `aviso` a **`temperatura >= 35`** (se mantiene `urgente` en `>= 38` / sensación `>= 42`). |
+| `aire-mala-calidad` | ya cubre `Mala` → `aviso`; añadir `aviso` también en `Moderada` **solo si** algún contaminante puntero (NO₂ / PM2.5 / O₃) supera su umbral OMS de referencia — para no avisar por un AQI 41 sin nada reseñable detrás. Umbral documentado aquí, igual criterio que §8. |
+| `lluvia-prevista` | regla nueva, más blanda que `lluvia-intensa-prevista`: `probabilidad de precipitación >= 60 %` en alguno de los tramos de la predicción a 4 h (spec `016`), o `precipitacion > 0` con `weather_code` de lluvia. Severidad `aviso`. La regla intensa (`>= 5 mm`) se mantiene como `urgente`. |
+
+`TipoInsight` gana `'trafico-empeora'` y `'lluvia-prevista'`. `fuenteSpec` pasa a
+aceptar `'004'`.
+
+### 9.3 Presentación: popup → rail lateral
+
+Cambio en `src/main.ts` / `index.html` / CSS, **sin tocar el endpoint**:
+
+- Cuando una evaluación devuelve un insight con un `id` que **no estaba** en la
+  anterior, se muestra un **toast** (esquina, no modal, auto-cierre a los ~8 s,
+  descartable) — uno por insight nuevo, apilados, máx. 3 visibles.
+- Todos los insights activos se listan en un **rail lateral** de "Alertas activas"
+  (columna estrecha, colapsable, contador en la cabecera). Sustituye/rehúbica el panel
+  de tarjetas actual de `#info-panels`; conserva el botón "Copiar borrador" por tarjeta.
+- **Historial de sesión:** un insight que deja de estar activo pasa a una lista
+  "Resueltas" dentro del rail (atenuada, con la hora), **solo en memoria** — no se
+  persiste (coherente con §8: sin persistencia de insights entre sesiones).
+- Móvil (spec `029`): el rail se integra en el bottom sheet; el toast respeta
+  `safe-area` y no tapa la cabecera.
+- Sigue siendo **"avisa, no actúa"** (`CLAUDE.md` §4): el toast informa y se descarta a
+  mano o solo; nunca lanza ninguna acción.
+
+### 9.4 DoD de v4 (pendiente)
+
+- [ ] `trafico-empeora`: función pura con fixtures del par (estado previo, estado
+      actual) cubriendo cada transición y el caso "sin estado previo"; clave de caché
+      `insights:trafico:estado-previo` con su TTL; degradación si tráfico falla.
+- [ ] Bandas nuevas de `calor-extremo` (35), `aire-mala-calidad` (Moderada + contaminante)
+      y regla `lluvia-prevista` con tests de borde.
+- [ ] Toast al aparecer un insight con `id` nuevo (no en cada refresco si el insight ya
+      estaba); apilado máx. 3; descartable; auto-cierre.
+- [ ] Rail lateral "Alertas activas" con contador, colapsable, "Copiar borrador" por
+      tarjeta, y sección "Resueltas" solo-memoria.
+- [ ] Escritorio + bottom sheet móvil (spec `029`) verificados en navegador.
+- [ ] `npm run typecheck` / `test` / `build` sin regresiones.
+
+## 10. Historial
 
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-08-18 | Creación. Diseño "alerta + borrador, envío manual" decidido explícitamente por el usuario tras la tensión documentada en el backlog (§0). Dependencias (001, 002, 010, 016) ya `Implemented`. |
 | 2 | 2026-08-18 | DoD completo: función pura + tests (`src/services/insights.ts`), endpoint que combina las cachés existentes con degradación si tráfico/predicción fallan (`api/insights/v1/actual.ts`), panel con tarjetas por severidad y botón "Copiar borrador" sin destinatarios (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (92/92) y en navegador. Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Nueva regla `viento-fuerte` (umbral por rachas, heurística documentada igual criterio que el resto de reglas de esta spec — ver §8) — `insightVientoFuerte()` en `insights.ts`, 3 tests nuevos. Los umbrales (`UMBRAL_VIENTO_AVISO_KMH`/`UMBRAL_VIENTO_URGENTE_KMH`) se exportan para que el panel de meteo (spec 001, `main.ts`) pinte el mismo semáforo de color sin duplicar el número en dos sitios. |
+| 4 | 2026-09-04 | **Draft** — §10. Disparador `trafico-empeora` (con estado previo en caché — primera vez que esta spec guarda estado), banda `aviso` de calor a 35 °C, `aire` en Moderada con contaminante, regla `lluvia-prevista` blanda, y patrón de presentación popup (toast) → rail lateral "Alertas activas" + "Resueltas" en memoria. El dashboard de KPIs se separa a la spec `034`. Pendiente de aprobación. |
