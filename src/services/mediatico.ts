@@ -1,12 +1,15 @@
 /**
  * Contrato y normalización de la spec 009 (specs/009-contexto-mediatico.md).
  *
- * v4: además de los RSS de Las Provincias / Valencia Plaza y de GDELT, se
- * agregan 20minutos (RSS), feeds de Google News por medio (Levante-EMV, À Punt,
- * Cadena SER — única vía tras la retirada de sus RSS por sección) y dos medios
- * temáticos de ocio de la ciudad. **El filtro Valencia-ciudad (§3.1) se aplica
- * ahora a TODAS las fuentes**, no solo a GDELT — ver `filtro-ambito-ciudad.ts`.
- * Reddit sigue pendiente de credenciales del usuario (spec 009 §2).
+ * v5: fuentes = RSS de Las Provincias / Valencia Plaza / 20minutos, feeds de
+ * Google News por medio (Levante-EMV, Cadena SER — única vía tras la retirada de
+ * sus RSS por sección) y dos medios temáticos de ocio de la ciudad (Valencia
+ * Secreta / Valencia Bonita). **El filtro Valencia-ciudad (§3.1) se aplica a
+ * TODAS las fuentes** — ver `filtro-ambito-ciudad.ts`. Se retiraron GDELT (ruido
+ * + caídas por rate-limit, aporta poco con 5 medios locales) y À Punt (query
+ * `site:apuntmedia.es` devolvía ~0 ítems de ciudad, es un medio autonómico).
+ * Ninguna fuente auto-confirma salvo los dos blogs de ocio, 100% ciudad por
+ * naturaleza. Reddit sigue pendiente de credenciales del usuario (spec 009 §2).
  */
 
 import { findDistrictMentions, type DistritoMencion } from './geolocalizacion-texto';
@@ -19,7 +22,7 @@ import {
 export type { AmbitoCiudad, CategoriaMediatica };
 
 /** De dónde viene el ítem — para atribución y para el aviso de "intermediario" en la UI. */
-export type FuenteTipo = 'rss-nativo' | 'google-news' | 'gdelt';
+export type FuenteTipo = 'rss-nativo' | 'google-news';
 
 export interface ItemMediaticoNucleo {
   id: string;
@@ -33,7 +36,7 @@ export interface ItemMediaticoNucleo {
   publicadoEn: string;
   fetchedAt: string;
   /** Se mantiene por compatibilidad con la spec 025; 'google-news' cuenta como 'rss'. */
-  source: 'rss' | 'gdelt';
+  source: 'rss';
 }
 
 export interface ItemMediaticoConDistrito extends ItemMediaticoNucleo {
@@ -145,6 +148,24 @@ function extraerImagenMedia(bloque: string): string | null {
   return m?.[1] ?? null;
 }
 
+/**
+ * Los `<description>` de varios feeds (Valencia Bonita, Las Provincias...) traen
+ * HTML embebido y coletillas de WordPress ("The post ... appeared first on ...").
+ * Sin limpiarlo se colaba "href"/"https"/"appeared" en la tendencia de términos
+ * (spec 025) y afeaba el panel.
+ */
+function limpiarHtml(texto: string | null): string | null {
+  if (texto === null) return null;
+  const limpio = texto
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    // Coletillas de feeds WordPress al final del extracto.
+    .replace(/\s*(?:The post .+? appeared first on|La entrada .+? se publicó primero en)[\s\S]*$/i, '')
+    .replace(/\s*(?:\[…\]|\[\.\.\.\]|Leer más|Seguir leyendo|Continue reading)\s*$/i, '')
+    .trim();
+  return limpio.length > 0 ? limpio : null;
+}
+
 /** Parser RSS 2.0 minimalista por regex — suficiente para feeds bien formados. */
 export function parsearRss(
   xml: string,
@@ -167,7 +188,7 @@ export function parsearRss(
       return {
         id: url,
         titulo,
-        resumen: extraerTag(bloque, 'description'),
+        resumen: limpiarHtml(extraerTag(bloque, 'description')),
         url,
         fuente,
         fuenteTipo,
@@ -274,7 +295,10 @@ export function fetchLasProvincias(): Promise<ItemMediatico[]> {
 }
 
 export function fetchValenciaPlaza(): Promise<ItemMediatico[]> {
-  return fetchRssFuente('https://valenciaplaza.com/feed', 'Valencia Plaza', { cityOnly: true });
+  // NO cityOnly: Valencia Plaza tiene mesa de política nacional y economía; se
+  // gana el `confirmado` con señal real de ciudad como cualquier otro medio
+  // (spec 009 §3.1, v5).
+  return fetchRssFuente('https://valenciaplaza.com/feed', 'Valencia Plaza', { cityOnly: false });
 }
 
 export function fetchVeinteMinutos(): Promise<ItemMediatico[]> {
@@ -305,66 +329,8 @@ export function fetchGoogleNewsLevante(): Promise<ItemMediatico[]> {
   });
 }
 
-export function fetchGoogleNewsApunt(): Promise<ItemMediatico[]> {
-  return fetchGoogleNewsFuente('València site:apuntmedia.es when:3d', 'À Punt', { cityOnly: false });
-}
-
 export function fetchGoogleNewsSer(): Promise<ItemMediatico[]> {
   return fetchGoogleNewsFuente('València site:cadenaser.com when:2d', 'Cadena SER', {
     cityOnly: false,
   });
-}
-
-interface GdeltArticle {
-  url: string;
-  title: string;
-  seendate: string;
-  socialimage?: string;
-  domain: string;
-}
-
-interface GdeltResponse {
-  articles?: GdeltArticle[];
-}
-
-/** "20260818T171500Z" (GDELT) -> "2026-08-18T17:15:00Z" (ISO 8601). */
-function normalizarFechaGdelt(seendate: string): string | null {
-  const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(seendate);
-  if (!m) return null;
-  const [, y, mo, d, h, mi, s] = m;
-  return `${y}-${mo}-${d}T${h}:${mi}:${s}Z`;
-}
-
-export async function fetchGdeltValencia(): Promise<ItemMediatico[]> {
-  const url =
-    'https://api.gdeltproject.org/api/v2/doc/doc?query=Valencia%20sourcecountry:Spain&mode=artlist&maxrecords=20&format=json&sort=datedesc';
-  const res = await fetch(url, { headers: HEADERS });
-  if (!res.ok) {
-    throw new Error(`GDELT respondió HTTP ${res.status}`);
-  }
-  const body = (await res.json()) as GdeltResponse;
-  const fetchedAt = new Date().toISOString();
-
-  const nucleo = (body.articles ?? [])
-    .map((a): ItemMediaticoNucleo | null => {
-      const publicadoEn = normalizarFechaGdelt(a.seendate);
-      if (!publicadoEn) return null;
-      return {
-        id: a.url,
-        titulo: a.title,
-        resumen: null,
-        url: a.url,
-        fuente: 'GDELT',
-        fuenteTipo: 'gdelt',
-        imagenUrl: a.socialimage ?? null,
-        publicadoEn,
-        fetchedAt,
-        source: 'gdelt',
-      };
-    })
-    .filter((item): item is ItemMediaticoNucleo => item !== null);
-
-  // GDELT trae ruido ("Valencia" de pasada, Valencia de Venezuela): el filtro
-  // §3.1 lo descarta igual que a cualquier otra fuente (cityOnly: false).
-  return clasificarYFiltrar(enrichWithDistricts(nucleo), { cityOnly: false });
 }

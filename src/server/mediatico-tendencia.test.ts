@@ -8,12 +8,7 @@ const RSS_OK = `<rss><channel><item>
 <pubDate>${new Date().toUTCString()}</pubDate>
 </item></channel></rss>`;
 
-const GDELT_OK = { articles: [] };
-
-function respuestaPorUrl(url: string): unknown {
-  if (url.includes('gdeltproject.org')) {
-    return { ok: true, json: () => Promise.resolve(GDELT_OK) };
-  }
+function respuestaPorUrl(_url: string): unknown {
   return { ok: true, text: () => Promise.resolve(RSS_OK) };
 }
 

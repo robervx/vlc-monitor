@@ -45363,6 +45363,106 @@ var trafico_historico_default = [
         muestras: 2
       }
     ]
+  },
+  {
+    timestamp: "2026-09-01T21:36:47.191Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0.05263157894736842,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
   }
 ];
 
@@ -46020,7 +46120,7 @@ function findDistrictMentions(texto) {
 // data/lexico-ambito-ciudad.json
 var lexico_ambito_ciudad_default = {
   descripcion: "L\xE9xico determinista del filtro Valencia-ciudad de la spec 009 \xA73.1. Sin IA: listas de expresiones que, buscadas como palabra/frase completa sobre el titular+resumen normalizado (NFD, sin acentos, min\xFAsculas, separadores colapsados a espacio), clasifican un \xEDtem medi\xE1tico. Ver src/services/filtro-ambito-ciudad.ts.",
-  actualizado: "2026-09-01",
+  actualizado: "2026-09-03",
   hitosCiudad: [
     "mestalla",
     "roig arena",
@@ -46162,6 +46262,68 @@ var lexico_ambito_ciudad_default = {
     "benidorm"
   ],
   desambiguacion: ["venezuela", "carabobo", "estado carabobo"],
+  marcadoresFueraCiudad: [
+    "pedro sanchez",
+    "presidente del gobierno",
+    "moncloa",
+    "la moncloa",
+    "consejo de ministros",
+    "gobierno de espana",
+    "gobierno central",
+    "nunez feijoo",
+    "feijoo",
+    "congreso de los diputados",
+    "el senado espanol",
+    "audiencia nacional",
+    "tribunal supremo",
+    "tribunal constitucional",
+    "la zarzuela",
+    "casa real",
+    "familia real",
+    "el rey felipe",
+    "reina letizia",
+    "puigdemont",
+    "junts per catalunya",
+    "ceuta",
+    "melilla",
+    "marruecos",
+    "rabat",
+    "estados unidos",
+    "eeuu",
+    "ee uu",
+    "casa blanca",
+    "donald trump",
+    "union europea",
+    "bruselas",
+    "otan",
+    "naciones unidas",
+    "reino unido",
+    "francia",
+    "paris",
+    "alemania",
+    "berlin",
+    "italia",
+    "roma",
+    "portugal",
+    "lisboa",
+    "rusia",
+    "moscu",
+    "ucrania",
+    "kiev",
+    "china",
+    "pekin",
+    "japon",
+    "israel",
+    "gaza",
+    "palestina",
+    "argentina",
+    "mexico",
+    "brasil",
+    "colombia",
+    "republica dominicana",
+    "estado de florida",
+    "nueva york"
+  ],
   deporteCronica: [
     "fichaje",
     "fichajes",
@@ -46214,7 +46376,18 @@ var lexico_ambito_ciudad_default = {
     "banquillo",
     "delantero",
     "centrocampista",
-    "portero titular"
+    "portero titular",
+    "us open",
+    "roland garros",
+    "wimbledon",
+    "open de australia",
+    "gran premio",
+    "motogp",
+    "formula 1",
+    "la vuelta ciclista",
+    "mundial de",
+    "eurocopa",
+    "juegos olimpicos"
   ],
   deporteLogistico: [
     "dispositivo",
@@ -46338,6 +46511,7 @@ var HITOS = preparar(lexico_ambito_ciudad_default.hitosCiudad);
 var INSTITUCION = preparar(lexico_ambito_ciudad_default.marcadoresInstitucionCiudad);
 var INFRA = preparar(lexico_ambito_ciudad_default.infraAsociada);
 var REGIONALES = preparar(lexico_ambito_ciudad_default.marcadoresRegionales);
+var FUERA_CIUDAD = preparar(lexico_ambito_ciudad_default.marcadoresFueraCiudad);
 var DESAMBIGUACION = preparar(lexico_ambito_ciudad_default.desambiguacion);
 var DEPORTE_CRONICA = preparar(lexico_ambito_ciudad_default.deporteCronica);
 var DEPORTE_LOGISTICO = preparar(lexico_ambito_ciudad_default.deporteLogistico);
@@ -46397,6 +46571,8 @@ function clasificarAmbitoCiudad(entrada) {
   if (infra) return { ambito: "confirmado", categoria, motivo: `infraestructura asociada: ${infra}` };
   const desambiguacion = primeraCoincidencia(textoPad, DESAMBIGUACION);
   if (desambiguacion) return { ambito: "excluido", categoria, motivo: `desambiguaci\xF3n: ${desambiguacion}` };
+  const fuera = primeraCoincidencia(textoPad, FUERA_CIUDAD);
+  if (fuera) return { ambito: "excluido", categoria, motivo: `fuera de la ciudad: ${fuera}` };
   const municipio = municipioMencionado(textoNorm, textoPad);
   if (municipio) return { ambito: "excluido", categoria, motivo: `municipio ajeno: ${municipio}` };
   const regional = primeraCoincidencia(textoPad, REGIONALES);
@@ -46488,6 +46664,11 @@ function extraerImagenMedia(bloque) {
   const m = /<media:content[^>]*\burl="([^"]+)"/i.exec(bloque);
   return m?.[1] ?? null;
 }
+function limpiarHtml(texto) {
+  if (texto === null) return null;
+  const limpio = texto.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").replace(/\s*(?:The post .+? appeared first on|La entrada .+? se publicó primero en)[\s\S]*$/i, "").replace(/\s*(?:\[…\]|\[\.\.\.\]|Leer más|Seguir leyendo|Continue reading)\s*$/i, "").trim();
+  return limpio.length > 0 ? limpio : null;
+}
 function parsearRss(xml, fuente, fetchedAt, fuenteTipo = "rss-nativo") {
   const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
   const items = bloques.map((bloque) => {
@@ -46500,7 +46681,7 @@ function parsearRss(xml, fuente, fetchedAt, fuenteTipo = "rss-nativo") {
     return {
       id: url,
       titulo,
-      resumen: extraerTag(bloque, "description"),
+      resumen: limpiarHtml(extraerTag(bloque, "description")),
       url,
       fuente,
       fuenteTipo,
@@ -46577,7 +46758,7 @@ function fetchLasProvincias() {
   );
 }
 function fetchValenciaPlaza() {
-  return fetchRssFuente("https://valenciaplaza.com/feed", "Valencia Plaza", { cityOnly: true });
+  return fetchRssFuente("https://valenciaplaza.com/feed", "Valencia Plaza", { cityOnly: false });
 }
 function fetchVeinteMinutos() {
   return fetchRssFuente(
@@ -46603,45 +46784,10 @@ function fetchGoogleNewsLevante() {
     cityOnly: false
   });
 }
-function fetchGoogleNewsApunt() {
-  return fetchGoogleNewsFuente("Val\xE8ncia site:apuntmedia.es when:3d", "\xC0 Punt", { cityOnly: false });
-}
 function fetchGoogleNewsSer() {
   return fetchGoogleNewsFuente("Val\xE8ncia site:cadenaser.com when:2d", "Cadena SER", {
     cityOnly: false
   });
-}
-function normalizarFechaGdelt(seendate) {
-  const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(seendate);
-  if (!m) return null;
-  const [, y, mo, d, h, mi, s] = m;
-  return `${y}-${mo}-${d}T${h}:${mi}:${s}Z`;
-}
-async function fetchGdeltValencia() {
-  const url = "https://api.gdeltproject.org/api/v2/doc/doc?query=Valencia%20sourcecountry:Spain&mode=artlist&maxrecords=20&format=json&sort=datedesc";
-  const res = await fetch(url, { headers: HEADERS2 });
-  if (!res.ok) {
-    throw new Error(`GDELT respondi\xF3 HTTP ${res.status}`);
-  }
-  const body = await res.json();
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const nucleo = (body.articles ?? []).map((a) => {
-    const publicadoEn = normalizarFechaGdelt(a.seendate);
-    if (!publicadoEn) return null;
-    return {
-      id: a.url,
-      titulo: a.title,
-      resumen: null,
-      url: a.url,
-      fuente: "GDELT",
-      fuenteTipo: "gdelt",
-      imagenUrl: a.socialimage ?? null,
-      publicadoEn,
-      fetchedAt,
-      source: "gdelt"
-    };
-  }).filter((item) => item !== null);
-  return clasificarYFiltrar(enrichWithDistricts(nucleo), { cityOnly: false });
 }
 
 // src/services/mediatico-fuentes.ts
@@ -46649,15 +46795,13 @@ if (getLoadedDistricts().length === 0) {
   setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
 }
 var FUENTES_MEDIATICAS = [
-  { nombre: "Las Provincias", cacheKey: "mediatico:las-provincias:v2", fetcher: fetchLasProvincias },
-  { nombre: "Valencia Plaza", cacheKey: "mediatico:valencia-plaza:v2", fetcher: fetchValenciaPlaza },
-  { nombre: "20minutos", cacheKey: "mediatico:20minutos:v2", fetcher: fetchVeinteMinutos },
-  { nombre: "Levante-EMV", cacheKey: "mediatico:gn-levante:v2", fetcher: fetchGoogleNewsLevante },
-  { nombre: "\xC0 Punt", cacheKey: "mediatico:gn-apunt:v2", fetcher: fetchGoogleNewsApunt },
-  { nombre: "Cadena SER", cacheKey: "mediatico:gn-ser:v2", fetcher: fetchGoogleNewsSer },
-  { nombre: "GDELT", cacheKey: "mediatico:gdelt:v2", fetcher: fetchGdeltValencia },
-  { nombre: "Valencia Secreta", cacheKey: "mediatico:valencia-secreta:v2", fetcher: fetchValenciaSecreta },
-  { nombre: "Valencia Bonita", cacheKey: "mediatico:valencia-bonita:v2", fetcher: fetchValenciaBonita }
+  { nombre: "Las Provincias", cacheKey: "mediatico:las-provincias:v3", fetcher: fetchLasProvincias },
+  { nombre: "Valencia Plaza", cacheKey: "mediatico:valencia-plaza:v3", fetcher: fetchValenciaPlaza },
+  { nombre: "20minutos", cacheKey: "mediatico:20minutos:v3", fetcher: fetchVeinteMinutos },
+  { nombre: "Levante-EMV", cacheKey: "mediatico:gn-levante:v3", fetcher: fetchGoogleNewsLevante },
+  { nombre: "Cadena SER", cacheKey: "mediatico:gn-ser:v3", fetcher: fetchGoogleNewsSer },
+  { nombre: "Valencia Secreta", cacheKey: "mediatico:valencia-secreta:v3", fetcher: fetchValenciaSecreta },
+  { nombre: "Valencia Bonita", cacheKey: "mediatico:valencia-bonita:v3", fetcher: fetchValenciaBonita }
 ];
 
 // src/server/mediatico-items.ts
