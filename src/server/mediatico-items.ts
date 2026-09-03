@@ -4,22 +4,13 @@
 // El filtro Valencia-ciudad (§3.1) se aplica dentro de cada fetcher, antes de cachear.
 import { getOrFetch } from './_shared/cache';
 import { FUENTES_MEDIATICAS } from '../services/mediatico-fuentes';
+import { deduplicarNoticias } from '../services/dedup-noticias';
 import type { ItemMediatico } from '../services/mediatico';
 
 export const config = { runtime: 'edge' };
 
 const TTL_MS = 15 * 60 * 1000;
 const MAX_ITEMS = 40;
-
-/** Normaliza un titular para descartar el mismo artículo llegado por dos fuentes. */
-function claveTitulo(titulo: string): string {
-  return titulo
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
 
 export default async function handler(): Promise<Response> {
   const resultados = await Promise.allSettled(
@@ -50,18 +41,9 @@ export default async function handler(): Promise<Response> {
 
   items.sort((a, b) => b.publicadoEn.localeCompare(a.publicadoEn));
 
-  // Dedup por URL y por titular normalizado (una noticia puede llegar por dos
-  // fuentes con URLs distintas). Se queda el primero -> el más reciente.
-  const vistasUrl = new Set<string>();
-  const vistasTitulo = new Set<string>();
-  const deduplicados: ItemMediatico[] = [];
-  for (const item of items) {
-    const claveT = claveTitulo(item.titulo);
-    if (vistasUrl.has(item.url) || (claveT.length > 0 && vistasTitulo.has(claveT))) continue;
-    vistasUrl.add(item.url);
-    if (claveT.length > 0) vistasTitulo.add(claveT);
-    deduplicados.push(item);
-  }
+  // Dedup: URL exacta -> titular idéntico -> misma noticia VA/ES del mismo medio
+  // (Levante-EMV publica cada pieza en los dos idiomas). Ver dedup-noticias.ts.
+  const deduplicados = deduplicarNoticias(items);
 
   return new Response(
     JSON.stringify({ items: deduplicados.slice(0, MAX_ITEMS), fresh, fuentesFallidas }),

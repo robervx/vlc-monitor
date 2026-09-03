@@ -45463,6 +45463,906 @@ var trafico_historico_default = [
         muestras: 2
       }
     ]
+  },
+  {
+    timestamp: "2026-09-01T23:49:37.847Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T03:11:50.829Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T08:27:22.935Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T13:18:08.823Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0.015789473684210527,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T17:39:02.337Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0.034482758620689655,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0.02857142857142857,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.1769230769230769,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0.026666666666666665,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T20:36:17.591Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-02T23:01:15.641Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-03T03:13:41.055Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-03T08:35:48.719Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0.02857142857142857,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
   }
 ];
 
@@ -46693,10 +47593,6 @@ function parsearRss(xml, fuente, fetchedAt, fuenteTipo = "rss-nativo") {
   }).filter((item) => item !== null);
   return enrichWithDistricts(items);
 }
-function extraerFuenteGoogleNews(bloque) {
-  const m = /<source[^>]*>([\s\S]*?)<\/source>/i.exec(bloque);
-  return m?.[1] ? decodeEntities(m[1].trim()) : null;
-}
 function quitarSufijoFuente(titulo, medio) {
   if (medio && titulo.endsWith(` - ${medio}`)) {
     return titulo.slice(0, titulo.length - medio.length - 3).trim();
@@ -46704,7 +47600,7 @@ function quitarSufijoFuente(titulo, medio) {
   const idx = titulo.lastIndexOf(" - ");
   return idx > 20 ? titulo.slice(0, idx).trim() : titulo;
 }
-function parsearGoogleNews(xml, fetchedAt, etiquetaFallback) {
+function parsearGoogleNews(xml, fetchedAt, etiqueta) {
   const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
   const items = bloques.map((bloque) => {
     const tituloRaw = extraerTag(bloque, "title");
@@ -46713,14 +47609,13 @@ function parsearGoogleNews(xml, fetchedAt, etiquetaFallback) {
     if (!tituloRaw || !url || !pubDate) return null;
     const publicadoEnDate = new Date(pubDate);
     if (Number.isNaN(publicadoEnDate.getTime())) return null;
-    const medio = extraerFuenteGoogleNews(bloque) ?? etiquetaFallback;
     return {
       id: url,
-      titulo: quitarSufijoFuente(tituloRaw, medio),
+      titulo: quitarSufijoFuente(tituloRaw, etiqueta),
       resumen: null,
       url,
       // URL de redirección de news.google.com — se sirve tal cual (spec 009 §2.2)
-      fuente: medio,
+      fuente: etiqueta,
       fuenteTipo: "google-news",
       imagenUrl: null,
       publicadoEn: publicadoEnDate.toISOString(),
@@ -46804,12 +47699,158 @@ var FUENTES_MEDIATICAS = [
   { nombre: "Valencia Bonita", cacheKey: "mediatico:valencia-bonita:v3", fetcher: fetchValenciaBonita }
 ];
 
+// src/services/dedup-noticias.ts
+var STOPWORDS = /* @__PURE__ */ new Set([
+  "de",
+  "del",
+  "dels",
+  "la",
+  "el",
+  "els",
+  "les",
+  "lo",
+  "los",
+  "las",
+  "un",
+  "una",
+  "uns",
+  "unes",
+  "y",
+  "i",
+  "o",
+  "en",
+  "a",
+  "al",
+  "als",
+  "con",
+  "amb",
+  "per",
+  "por",
+  "para",
+  "que",
+  "se",
+  "su",
+  "sus",
+  "the",
+  "of",
+  "and",
+  "este",
+  "esta",
+  "estos",
+  "estas",
+  "aquest",
+  "aquesta",
+  "more"
+]);
+var VENTANA_MISMA_NOTICIA_MS = 36 * 60 * 60 * 1e3;
+function normalizarTitulo(titulo) {
+  return titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+function tokensSignificativos(titulo) {
+  return normalizarTitulo(titulo).split(" ").filter((t) => t.length >= 5 && !STOPWORDS.has(t));
+}
+function distanciaAcotada(a, b, limite) {
+  if (Math.abs(a.length - b.length) > limite) return limite + 1;
+  const fila = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = fila[0];
+    fila[0] = i;
+    let minFila = fila[0];
+    for (let j = 1; j <= b.length; j++) {
+      const actual = fila[j];
+      fila[j] = Math.min(
+        fila[j] + 1,
+        fila[j - 1] + 1,
+        prev + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+      prev = actual;
+      if (fila[j] < minFila) minFila = fila[j];
+    }
+    if (minFila > limite) return limite + 1;
+  }
+  return fila[b.length];
+}
+function tokenSimilar(a, b) {
+  if (a === b) return true;
+  if (Math.min(a.length, b.length) < 5) return false;
+  const pref = 5;
+  if (a.slice(0, pref) === b.slice(0, pref) && Math.abs(a.length - b.length) <= 3) return true;
+  return distanciaAcotada(a, b, 2) <= 2;
+}
+function esMismaNoticiaCrossIdioma(a, b) {
+  if (a.fuente !== b.fuente) return false;
+  const dt = Math.abs(new Date(a.publicadoEn).getTime() - new Date(b.publicadoEn).getTime());
+  if (Number.isNaN(dt) || dt > VENTANA_MISMA_NOTICIA_MS) return false;
+  const ta = tokensSignificativos(a.titulo);
+  const tb = tokensSignificativos(b.titulo);
+  if (ta.length < 3 || tb.length < 3) return false;
+  const usados = /* @__PURE__ */ new Set();
+  let compartidos = 0;
+  for (const x of ta) {
+    for (let j = 0; j < tb.length; j++) {
+      if (usados.has(j)) continue;
+      if (tokenSimilar(x, tb[j])) {
+        usados.add(j);
+        compartidos += 1;
+        break;
+      }
+    }
+  }
+  return compartidos >= 3 && compartidos / Math.min(ta.length, tb.length) >= 0.6;
+}
+var MARCADORES_VA = [
+  " amb ",
+  " l'",
+  " d'",
+  " dels ",
+  " aix\xF2 ",
+  " aquest ",
+  " aquesta ",
+  " estes ",
+  " est\xE0 ",
+  " qu\xE8 ",
+  " pa\xEFsos ",
+  " ciutat ",
+  " av\xEDs ",
+  " groc ",
+  " dona ",
+  " vistiplau ",
+  " m\xE9s ",
+  " fins ",
+  " este dijous ",
+  " este dimarts "
+];
+function puntuaValenciano(titulo) {
+  const t = ` ${titulo.toLowerCase()} `;
+  return MARCADORES_VA.reduce((n, m) => n + (t.includes(m) ? 1 : 0), 0);
+}
+function deduplicarNoticias(items) {
+  const vistasUrl = /* @__PURE__ */ new Set();
+  const vistasTitulo = /* @__PURE__ */ new Set();
+  const salida = [];
+  for (const item of items) {
+    if (vistasUrl.has(item.url)) continue;
+    const clave = normalizarTitulo(item.titulo);
+    if (clave.length > 0 && vistasTitulo.has(clave)) continue;
+    const idxDup = salida.findIndex((kept) => esMismaNoticiaCrossIdioma(kept, item));
+    if (idxDup !== -1) {
+      if (puntuaValenciano(salida[idxDup].titulo) > puntuaValenciano(item.titulo)) {
+        salida[idxDup] = item;
+        vistasUrl.add(item.url);
+        if (clave.length > 0) vistasTitulo.add(clave);
+      }
+      continue;
+    }
+    vistasUrl.add(item.url);
+    if (clave.length > 0) vistasTitulo.add(clave);
+    salida.push(item);
+  }
+  return salida;
+}
+
 // src/server/mediatico-items.ts
 var TTL_MS8 = 15 * 60 * 1e3;
 var MAX_ITEMS = 40;
-function claveTitulo(titulo) {
-  return titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
 async function handler11() {
   const resultados = await Promise.allSettled(
     FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS8, f.fetcher))
@@ -46834,16 +47875,7 @@ async function handler11() {
     });
   }
   items.sort((a, b) => b.publicadoEn.localeCompare(a.publicadoEn));
-  const vistasUrl = /* @__PURE__ */ new Set();
-  const vistasTitulo = /* @__PURE__ */ new Set();
-  const deduplicados = [];
-  for (const item of items) {
-    const claveT = claveTitulo(item.titulo);
-    if (vistasUrl.has(item.url) || claveT.length > 0 && vistasTitulo.has(claveT)) continue;
-    vistasUrl.add(item.url);
-    if (claveT.length > 0) vistasTitulo.add(claveT);
-    deduplicados.push(item);
-  }
+  const deduplicados = deduplicarNoticias(items);
   return new Response(
     JSON.stringify({ items: deduplicados.slice(0, MAX_ITEMS), fresh, fuentesFallidas }),
     {
@@ -47011,13 +48043,13 @@ var DURACION_VENTANA_MS = {
 };
 var LONGITUD_MINIMA_TERMINO = 4;
 var TOP_N_TERMINOS = 20;
-var STOPWORDS = new Set(STOPWORDS_MEDIATICO);
+var STOPWORDS2 = new Set(STOPWORDS_MEDIATICO);
 var RANGO_DIACRITICOS_COMBINANTES = /[̀-ͯ]/g;
 function normalizarPalabra(palabra) {
   return palabra.normalize("NFD").replace(RANGO_DIACRITICOS_COMBINANTES, "").toLowerCase();
 }
 function tokenizarConOriginal(texto) {
-  return (texto.match(new RegExp("\\p{L}+", "gu")) ?? []).map((original) => ({ original, normalizado: normalizarPalabra(original) })).filter((t) => t.normalizado.length >= LONGITUD_MINIMA_TERMINO && !STOPWORDS.has(t.normalizado));
+  return (texto.match(new RegExp("\\p{L}+", "gu")) ?? []).map((original) => ({ original, normalizado: normalizarPalabra(original) })).filter((t) => t.normalizado.length >= LONGITUD_MINIMA_TERMINO && !STOPWORDS2.has(t.normalizado));
 }
 function calcularTendenciaTerminos(items, ventana, ahora = /* @__PURE__ */ new Date()) {
   const desdeMs = ahora.getTime() - DURACION_VENTANA_MS[ventana];

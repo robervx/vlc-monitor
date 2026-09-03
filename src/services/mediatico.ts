@@ -203,12 +203,11 @@ export function parsearRss(
   return enrichWithDistricts(items);
 }
 
-function extraerFuenteGoogleNews(bloque: string): string | null {
-  const m = /<source[^>]*>([\s\S]*?)<\/source>/i.exec(bloque);
-  return m?.[1] ? decodeEntities(m[1].trim()) : null;
-}
-
-/** Google News añade " - <Medio>" al final del título — se recorta para dejar el titular limpio. */
+/**
+ * Google News añade " - <Medio>" al final del título. Se recorta contra la
+ * etiqueta configurada del feed y, si no cuadra (Google a veces pone el dominio),
+ * contra el último " - ".
+ */
 function quitarSufijoFuente(titulo: string, medio: string): string {
   if (medio && titulo.endsWith(` - ${medio}`)) {
     return titulo.slice(0, titulo.length - medio.length - 3).trim();
@@ -217,11 +216,16 @@ function quitarSufijoFuente(titulo: string, medio: string): string {
   return idx > 20 ? titulo.slice(0, idx).trim() : titulo;
 }
 
-/** Parser del RSS de búsqueda de Google News (spec 009 §2.2). */
+/**
+ * Parser del RSS de búsqueda de Google News (spec 009 §2.2). Cada feed es de un
+ * único medio (`site:`), así que la atribución es la `etiqueta` fija — el tag
+ * `<source>` de Google es inconsistente (unas veces "Levante-EMV", otras
+ * "levante-emv.com").
+ */
 export function parsearGoogleNews(
   xml: string,
   fetchedAt: string,
-  etiquetaFallback: string,
+  etiqueta: string,
 ): ItemMediaticoConDistrito[] {
   const bloques = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
 
@@ -235,13 +239,12 @@ export function parsearGoogleNews(
       const publicadoEnDate = new Date(pubDate);
       if (Number.isNaN(publicadoEnDate.getTime())) return null;
 
-      const medio = extraerFuenteGoogleNews(bloque) ?? etiquetaFallback;
       return {
         id: url,
-        titulo: quitarSufijoFuente(tituloRaw, medio),
+        titulo: quitarSufijoFuente(tituloRaw, etiqueta),
         resumen: null,
         url, // URL de redirección de news.google.com — se sirve tal cual (spec 009 §2.2)
-        fuente: medio,
+        fuente: etiqueta,
         fuenteTipo: 'google-news',
         imagenUrl: null,
         publicadoEn: publicadoEnDate.toISOString(),
