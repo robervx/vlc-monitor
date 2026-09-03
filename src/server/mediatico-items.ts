@@ -50,8 +50,8 @@ export default async function handler(): Promise<Response> {
 
   items.sort((a, b) => b.publicadoEn.localeCompare(a.publicadoEn));
 
-  // Dedup por URL y por titular normalizado (Google News + GDELT pueden traer el
-  // mismo artículo con URLs distintas). Se queda el primero -> el más reciente.
+  // Dedup por URL y por titular normalizado (una noticia puede llegar por dos
+  // fuentes con URLs distintas). Se queda el primero -> el más reciente.
   const vistasUrl = new Set<string>();
   const vistasTitulo = new Set<string>();
   const deduplicados: ItemMediatico[] = [];

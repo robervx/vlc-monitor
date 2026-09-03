@@ -8,24 +8,6 @@ const RSS_OK = `<rss><channel><item>
 <pubDate>Tue, 18 Aug 2026 12:00:00 +0200</pubDate>
 </item></channel></rss>`;
 
-const GDELT_OK = {
-  articles: [
-    {
-      url: 'https://example.com/gdelt-1',
-      title: 'Valencia celebra un evento',
-      seendate: '20260818T120000Z',
-      domain: 'example.com',
-    },
-  ],
-};
-
-function respuestaPorUrl(url: string): unknown {
-  if (url.includes('gdeltproject.org')) {
-    return { ok: true, json: () => Promise.resolve(GDELT_OK) };
-  }
-  return { ok: true, text: () => Promise.resolve(RSS_OK) };
-}
-
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -39,14 +21,14 @@ describe('GET /api/mediatico/v1/items', () => {
     expect(res.status).toBe(502);
   });
 
-  it('devuelve 200 con los ítems de las fuentes que sí responden si GDELT falla sin caché previa', async () => {
-    // GDELT sigue "frío" (el test anterior falló para las 3, nunca se guardó nada)
-    // — aquí solo falla GDELT, RSS responde bien, así que se sirve lo que hay.
+  it('devuelve 200 con los ítems de las fuentes que sí responden si una falla sin caché previa', async () => {
+    // Solo falla el feed de Google News de Levante-EMV; el resto responde bien,
+    // así que se sirve lo que hay (spec 009 §4, resiliencia por fuente).
     vi.stubGlobal(
       'fetch',
       vi.fn((url: string) => {
-        if (url.includes('gdeltproject.org')) return Promise.resolve({ ok: false, status: 500 });
-        return Promise.resolve(respuestaPorUrl(url));
+        if (url.includes('levante-emv.com')) return Promise.resolve({ ok: false, status: 500 });
+        return Promise.resolve({ ok: true, text: () => Promise.resolve(RSS_OK) });
       }),
     );
 
@@ -55,12 +37,12 @@ describe('GET /api/mediatico/v1/items', () => {
 
     expect(res.status).toBe(200);
     expect(body.fresh).toBe(false);
-    expect(body.fuentesFallidas).toEqual(['GDELT']);
+    expect(body.fuentesFallidas).toEqual(['Levante-EMV']);
     expect(body.items.length).toBeGreaterThan(0);
   });
 
-  it('devuelve 200 con fresh:true y sin fuentesFallidas cuando las 3 fuentes responden', async () => {
-    vi.stubGlobal('fetch', vi.fn((url: string) => Promise.resolve(respuestaPorUrl(url))));
+  it('devuelve 200 con fresh:true y sin fuentesFallidas cuando todas las fuentes responden', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(RSS_OK) })));
 
     const res = await handler();
     const body = (await res.json()) as { items: unknown[]; fresh: boolean; fuentesFallidas: string[] };

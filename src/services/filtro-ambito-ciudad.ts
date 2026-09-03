@@ -58,6 +58,7 @@ const HITOS = preparar(lexico.hitosCiudad);
 const INSTITUCION = preparar(lexico.marcadoresInstitucionCiudad);
 const INFRA = preparar(lexico.infraAsociada);
 const REGIONALES = preparar(lexico.marcadoresRegionales);
+const FUERA_CIUDAD = preparar(lexico.marcadoresFueraCiudad);
 const DESAMBIGUACION = preparar(lexico.desambiguacion);
 const DEPORTE_CRONICA = preparar(lexico.deporteCronica);
 const DEPORTE_LOGISTICO = preparar(lexico.deporteLogistico);
@@ -118,7 +119,8 @@ function mencionaValencia(textoPad: string): boolean {
 /**
  * spec 009 §3.1 — orden de evaluación:
  *   señal positiva fuerte  -> confirmado (gana sobre cualquier negativa)
- *   desambiguación / municipio ajeno / marcador regional -> excluido
+ *   desambiguación / fuera de la ciudad (nacional/internacional) / municipio
+ *     ajeno / marcador regional -> excluido
  *   deporte solo-crónica (sin componente logístico) -> excluido
  *   fuente 100% ciudad -> confirmado
  *   menciona València -> general (bucket visible)
@@ -154,6 +156,8 @@ export function clasificarAmbitoCiudad(entrada: EntradaClasificacion): Clasifica
   // 2. Señales negativas.
   const desambiguacion = primeraCoincidencia(textoPad, DESAMBIGUACION);
   if (desambiguacion) return { ambito: 'excluido', categoria, motivo: `desambiguación: ${desambiguacion}` };
+  const fuera = primeraCoincidencia(textoPad, FUERA_CIUDAD);
+  if (fuera) return { ambito: 'excluido', categoria, motivo: `fuera de la ciudad: ${fuera}` };
   const municipio = municipioMencionado(textoNorm, textoPad);
   if (municipio) return { ambito: 'excluido', categoria, motivo: `municipio ajeno: ${municipio}` };
   const regional = primeraCoincidencia(textoPad, REGIONALES);

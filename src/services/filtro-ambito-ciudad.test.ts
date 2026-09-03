@@ -90,6 +90,37 @@ describe('clasificarAmbitoCiudad — marcadores regionales y desambiguación', (
   });
 });
 
+describe('clasificarAmbitoCiudad — fuera de la ciudad (nacional / internacional), spec 009 v5', () => {
+  const casos = [
+    'Feijóo pregunta a Sánchez por qué tiene miedo a Marruecos',
+    'El Gobierno promete a Ceuta 100 millones más de ayudas',
+    'Casual Hoteles llega a República Dominicana con su primera incursión',
+    'Directo: Pedro Sánchez comparece en el Congreso de los Diputados',
+  ];
+  for (const titulo of casos) {
+    it(`descarta política nacional / internacional: "${titulo.slice(0, 38)}…"`, () => {
+      const c = clasificarAmbitoCiudad(entrada({ titulo, fuenteCityOnly: true }));
+      expect(c.ambito).toBe('excluido');
+      expect(c.motivo).toContain('fuera de la ciudad');
+    });
+  }
+
+  it('una señal positiva de ciudad gana: "Sánchez visita el Ayuntamiento de València"', () => {
+    const c = clasificarAmbitoCiudad(
+      entrada({ titulo: 'Pedro Sánchez visita el Ayuntamiento de València' }),
+    );
+    expect(c.ambito).toBe('confirmado');
+  });
+
+  it('Valencia Plaza ya no auto-confirma: titular sin señal de ciudad se descarta', () => {
+    // v5: fuenteCityOnly pasa a false para Valencia Plaza (se prueba aquí el efecto).
+    const c = clasificarAmbitoCiudad(
+      entrada({ titulo: 'Ni tener grado de inversión logra frenar la caída en bolsa', fuenteCityOnly: false }),
+    );
+    expect(c.ambito).toBe('excluido');
+  });
+});
+
 describe('clasificarAmbitoCiudad — deporte', () => {
   it('la crónica / mercado de fichajes se descarta', () => {
     const c = clasificarAmbitoCiudad(entrada({ titulo: 'El Valencia CF cierra el fichaje de un central' }));

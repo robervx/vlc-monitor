@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parsearRss, fetchGdeltValencia } from './mediatico';
+import { describe, expect, it } from 'vitest';
+import { parsearRss } from './mediatico';
 
 const RSS_EJEMPLO = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -21,10 +21,6 @@ const RSS_EJEMPLO = `<?xml version="1.0" encoding="UTF-8"?>
 </item>
 </channel>
 </rss>`;
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
 
 describe('parsearRss', () => {
   it('extrae los items con título, url, resumen, imagen y fecha ISO', () => {
@@ -52,43 +48,26 @@ describe('parsearRss', () => {
   it('devuelve array vacío si no hay <item>', () => {
     expect(parsearRss('<rss><channel></channel></rss>', 'Las Provincias', '2026-08-18T20:00:00.000Z')).toEqual([]);
   });
-});
 
-describe('fetchGdeltValencia', () => {
-  it('normaliza fechas y filtra artículos cuyo título no menciona Valencia', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            articles: [
-              {
-                url: 'https://example.com/a',
-                title: 'El Ayuntamiento de Valencia anuncia obras',
-                seendate: '20260818T171500Z',
-                socialimage: 'https://example.com/img.jpg',
-                domain: 'example.com',
-              },
-              {
-                url: 'https://example.com/b',
-                title: 'Un jugador de tenis gana un torneo en Zaragoza',
-                seendate: '20260818T171500Z',
-                domain: 'example.com',
-              },
-            ],
-          }),
-      }),
-    );
-
-    const items = await fetchGdeltValencia();
-    expect(items).toHaveLength(1);
-    expect(items[0]?.titulo).toContain('Valencia');
-    expect(items[0]?.publicadoEn).toBe('2026-08-18T17:15:00Z');
+  it('limpia el HTML embebido en <description> (evita "href"/"https" en la tendencia)', () => {
+    const xml = `<rss><channel><item>
+      <title>Titular</title>
+      <link>https://example.com/x</link>
+      <pubDate>Tue, 18 Aug 2026 12:00:00 +0200</pubDate>
+      <description><![CDATA[<p>Un resumen con <a href="https://example.com/x">enlace</a>.</p>]]></description>
+    </item></channel></rss>`;
+    const items = parsearRss(xml, 'Valencia Bonita', '2026-08-18T20:00:00.000Z');
+    expect(items[0]?.resumen).toBe('Un resumen con enlace .');
   });
 
-  it('lanza si GDELT responde con error HTTP', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 429 }));
-    await expect(fetchGdeltValencia()).rejects.toThrow('429');
+  it('recorta la coletilla de WordPress ("The post ... appeared first on ...")', () => {
+    const xml = `<rss><channel><item>
+      <title>Titular</title>
+      <link>https://example.com/y</link>
+      <pubDate>Tue, 18 Aug 2026 12:00:00 +0200</pubDate>
+      <description><![CDATA[Nueva exposición en el centro. The post Nueva exposición appeared first on Valenciabonita.]]></description>
+    </item></channel></rss>`;
+    const items = parsearRss(xml, 'Valencia Bonita', '2026-08-18T20:00:00.000Z');
+    expect(items[0]?.resumen).toBe('Nueva exposición en el centro.');
   });
 });

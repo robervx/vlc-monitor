@@ -169,7 +169,7 @@ function iconoWeatherCode(codigo: number): string {
   return '⛈️';
 }
 
-// Escapado defensivo — títulos/URLs de spec 009 vienen de RSS/GDELT externos,
+// Escapado defensivo — títulos/URLs de spec 009 vienen de feeds RSS externos,
 // nunca se insertan en el DOM sin pasar por aquí (riesgo de XSS si un feed
 // llega corrupto o comprometido).
 function escapeHtml(texto: string): string {
@@ -762,7 +762,7 @@ function renderMediaticoPanel(
       : '';
   const avisoFallidas = fuentesFallidas.length > 0 ? ` · sin ${fuentesFallidas.join(', ')}` : '';
   meta.innerHTML =
-    metaFrescura('Prensa local + GDELT', items[0]?.fetchedAt ?? new Date().toISOString(), fresh) +
+    metaFrescura('Prensa local', items[0]?.fetchedAt ?? new Date().toISOString(), fresh) +
     ocultos +
     avisoFallidas;
 }

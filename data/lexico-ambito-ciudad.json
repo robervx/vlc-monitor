@@ -1,6 +1,6 @@
 {
   "descripcion": "Léxico determinista del filtro Valencia-ciudad de la spec 009 §3.1. Sin IA: listas de expresiones que, buscadas como palabra/frase completa sobre el titular+resumen normalizado (NFD, sin acentos, minúsculas, separadores colapsados a espacio), clasifican un ítem mediático. Ver src/services/filtro-ambito-ciudad.ts.",
-  "actualizado": "2026-09-01",
+  "actualizado": "2026-09-03",
 
   "hitosCiudad": [
     "mestalla", "roig arena", "ciutat de les arts", "ciudad de las artes",
@@ -56,6 +56,21 @@
 
   "desambiguacion": ["venezuela", "carabobo", "estado carabobo"],
 
+  "marcadoresFueraCiudad": [
+    "pedro sanchez", "presidente del gobierno", "moncloa", "la moncloa",
+    "consejo de ministros", "gobierno de espana", "gobierno central",
+    "nunez feijoo", "feijoo", "congreso de los diputados", "el senado espanol",
+    "audiencia nacional", "tribunal supremo", "tribunal constitucional",
+    "la zarzuela", "casa real", "familia real", "el rey felipe", "reina letizia",
+    "puigdemont", "junts per catalunya", "ceuta", "melilla", "marruecos", "rabat",
+    "estados unidos", "eeuu", "ee uu", "casa blanca", "donald trump",
+    "union europea", "bruselas", "otan", "naciones unidas", "reino unido",
+    "francia", "paris", "alemania", "berlin", "italia", "roma", "portugal",
+    "lisboa", "rusia", "moscu", "ucrania", "kiev", "china", "pekin", "japon",
+    "israel", "gaza", "palestina", "argentina", "mexico", "brasil", "colombia",
+    "republica dominicana", "estado de florida", "nueva york"
+  ],
+
   "deporteCronica": [
     "fichaje", "fichajes", "fichar", "traspaso", "cedido", "cesion",
     "rueda de prensa", "gol de", "goles", "empate", "empataron", "derrota por",
@@ -67,7 +82,9 @@
     "descenso", "ascenso", "playoff", "jornada liguera", "partido de liga",
     "amistoso de pretemporada", "valencia cf", "valencia c f", "levante ud",
     "levante u d", "valencia basket", "pretemporada", "banquillo",
-    "delantero", "centrocampista", "portero titular"
+    "delantero", "centrocampista", "portero titular", "us open", "roland garros",
+    "wimbledon", "open de australia", "gran premio", "motogp", "formula 1",
+    "la vuelta ciclista", "mundial de", "eurocopa", "juegos olimpicos"
   ],
 
   "deporteLogistico": [
