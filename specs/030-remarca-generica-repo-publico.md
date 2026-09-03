@@ -7,7 +7,7 @@ estado: Implemented
 tipo: fundacional
 depende_de: [019, 018]
 propietario: ""
-version: 1
+version: 3
 ```
 
 ## 0. Contexto de la decisión
@@ -80,4 +80,5 @@ No es una capa. Cambios de chasis (spec 019):
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-08-29 | Creación + implementación. Deriva de ADR-002. `scripts/generar-marca.ts` (marca radar en Node puro) + `public/assets/logo.png` + `public/icons/*`; `src/config/marca.ts`; `chasis.ts` y `pagina-login.ts` consumen la marca; `middleware.ts` fail-open; `LICENSE` MIT; README y `CLAUDE.md` §1 reescritos; specs `018`/`019` actualizadas. Escudo oficial y `generar-iconos-pwa.ts` eliminados. `typecheck` + `test` + `build` verdes, verificado en navegador. Pasa a `Implemented`. |
+| 3 | 2026-09-04 | **Pieza de portfolio.** `README.md` reescrito como presentación pública (ES + resumen EN): demo en vivo enlazada (`vlc-monitor.vercel.app`), 4 capturas reales en `docs/capturas/`, diagrama del patrón `seed→caché→endpoint`, tabla de decisiones técnicas, el proceso spec-driven como argumento, y bloque de ética. Nuevo `docs/FUENTES_Y_LICENCIAS.md` — inventario completo por capa (fuente, spec, licencia CC BY 4.0 / ODbL / etc., atribución requerida), mapa base, infraestructura (coste 0 €) y licencias de las dependencias de software. Nuevo `docs/PRESENTACION_LINKEDIN.md` con los textos de publicación. Cierra el fast-follow anotado en §7 ("un pulido de la vista por defecto de la demo / que se vea potente"). Sin cambios de código ni de comportamiento de la app. |
 | 2 | 2026-08-31 | **Primer despliegue real a Vercel** (repo hecho público). Tres límites de Hobby resueltos por el camino: (1) el grafo viario ~9 MB no cabe en función → estático del CDN (spec `020` v3); (2) ~18 funciones > límite de 12 → toda la API pasa a **una sola función**: handlers movidos a `src/server/<dominio>-<recurso>.ts`, router en `api/_router-src.ts` bundleado con esbuild a `api/router.js` (`scripts/bundle-api.mjs`, corre en `npm run build`), `vercel.json` reescribe `/api/*` → `/api/router`; (3) el runtime Node de Vercel ignora `export default` de estilo Web → el router exporta métodos HTTP con nombre (`export const GET/POST/... = dispatch`). Añadidos import attributes `with { type: 'json' }` a todos los imports de JSON (ESM estricto). Env vars `AUTH_SECRET`/`APP_USERS` retiradas del proyecto Vercel → demo abierta. 14 endpoints verificados 200 en producción + app en navegador. Arquitectura documentada en `CLAUDE.md` §6. |
