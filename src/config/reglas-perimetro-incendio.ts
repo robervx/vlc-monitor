@@ -14,8 +14,8 @@
  * - `confianza: 'estimacionPendienteValidar'` es el resto — puntos de partida
  *   razonados (ver comentario en cada bloque), siempre el valor más
  *   conservador disponible, nunca el más ajustado. Bloqueante para `Approved`
- *   (spec 021 §7): contraste con el Consorcio Provincial de Bombers de
- *   València antes de tratar cualquiera de estas cifras como fiable.
+ *   (spec 021 §7): estas cifras no deben tratarse como fiables sin contraste
+ *   previo con el servicio de bomberos competente.
  *
  * Añadido durante la implementación, no estaba en la investigación original
  * de spec 021 §2: 'vehiculoCombustion' (coche de combustión ardiendo) TAMPOCO

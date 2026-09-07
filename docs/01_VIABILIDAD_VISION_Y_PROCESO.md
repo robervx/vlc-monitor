@@ -1,11 +1,11 @@
 # VLC Monitor — Viabilidad, Visión de Producto y Proceso
 
 **Fecha:** 2026-08-17
-**Rol de este documento:** veredicto de viabilidad económica realista + estrategia de producto (PM) + proceso de trabajo (Project Manager). Es el documento que precede al Spec-Driven Development.
+Documento de viabilidad económica, estrategia de producto y proceso de trabajo. Precede al Spec-Driven Development.
 
 ---
 
-## Parte 1 — ¿Es viable hacerlo 100% gratis? (veredicto honesto)
+## Parte 1 — ¿Es viable hacerlo 100% gratis?
 
 **Sí, es viable a coste efectivamente cero (o ~10-15 €/año si quieres dominio propio) para un proyecto de esta escala — con matices concretos que detallo abajo para que no haya sorpresas a los 3 meses.**
 
@@ -74,7 +74,7 @@ Es una pregunta obligada como PM: el Ayuntamiento ya tiene un agregador en tiemp
 |---|---|
 | Ciudadano curioso | "¿Cómo está la ciudad ahora mismo? ¿Llueve, hay atascos, hay aire limpio en mi barrio?" |
 | Analista/periodista local | Necesita datos citables, con fuente y fecha, para contexto de una noticia. |
-| Vosotros (equipo) | Vitrina técnica seria: arquitectura limpia, spec-driven, sin coste, mantenible. |
+| Equipo de desarrollo | Vitrina técnica: arquitectura limpia, spec-driven, sin coste, mantenible. |
 
 ### 2.4 Alcance por fases (roadmap)
 
@@ -102,7 +102,7 @@ Es una pregunta obligada como PM: el Ayuntamiento ya tiene un agregador en tiemp
 
 ### 3.1 Principio
 
-**Ninguna capa, endpoint o componente se escribe antes de que exista su spec aprobada.** El spec es el contrato: qué problema resuelve, de qué fuente sale el dato, qué forma tiene, cada cuánto se refresca, y cómo se pinta. Esto ya lo teníais interiorizado en el proyecto anterior (`GOVERNANCE_TEMPLATE.yaml` para KPIs) — aquí se generaliza a todo el producto, no solo a KPIs.
+**Ninguna capa, endpoint o componente se escribe antes de que exista su spec aprobada.** El spec es el contrato: qué problema resuelve, de qué fuente sale el dato, qué forma tiene, cada cuánto se refresca, y cómo se pinta.
 
 ### 3.2 Estructura de specs propuesta
 
@@ -152,12 +152,8 @@ Sin ceremonias pesadas (no hace falta Scrum formal para este tamaño de equipo):
 - Capa visible en el mapa con al menos una prueba manual en los tres niveles de zoom (ciudad/distrito/calle si aplica).
 - Fuente y frescura del dato visibles en la UI (no un dato "mudo" sin atribución).
 
-### 3.6 Qué pasa con la documentación del proyecto anterior (CISE)
-
-`PRODUCT_CONTEXT.md`, `MODULES_AND_ROUTING.md`, `FUNCTIONAL_STRUCTURE.md`, `ARCHITECTURE_NORTHSTAR.md` y `SQL_UI_MAPPING.md` describen un producto distinto (sala de llamadas policial, SQL Server, módulos 1A/1B/2/3). **Los dejo intactos por ahora** — no borro nada sin que lo pidas explícitamente — pero quedan **superados** por este documento y por las specs que vienen a continuación. Cuando confirmes que el pivote es definitivo, la acción recomendada es archivarlos (ej. moverlos a un prefijo `LEGACY_`) en vez de borrarlos, para conservar el criterio de gobernanza que ya construisteis (es reutilizable en `GOVERNANCE_TEMPLATE.yaml` y en la plantilla de spec de abajo).
-
 ---
 
 ## Siguiente paso
 
-Con esto aprobado, arranco formalmente el Spec-Driven Development con dos artefactos: la plantilla de spec reutilizable, y la primera spec real (`000-mapa-base-distritos`), que es la única sin la cual ninguna capa puede existir.
+El Spec-Driven Development arranca con dos artefactos: la plantilla de spec reutilizable, y la primera spec real (`000-mapa-base-distritos`), que es la única sin la cual ninguna capa puede existir.
