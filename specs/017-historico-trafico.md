@@ -7,7 +7,7 @@ estado: Implemented
 tipo: infraestructura
 depende_de: [004]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 0. Decisión de persistencia (resuelve la pregunta pendiente del backlog)
@@ -77,7 +77,7 @@ interface HistoricoTrafico {
 | Frecuencia de refresco (cron) | GitHub Actions, cada 60 min (`0 * * * *`) — ver §0. |
 | Almacén | Ficheros versionados en el repo: `data/trafico-historico.json` (snapshots horarios, ventana móvil de 30 días) y `data/trafico-historico-diario.json` (rollup diario, sin límite de antigüedad — son ~19 filas/día, crecimiento trivial). Mismo patrón que `data/distritos-valencia.json` (asset estático versionado, spec 000). |
 | Compactación | En cada ejecución del script: cualquier snapshot horario con más de 30 días se agrupa por día (`congestionMedia` = media de sus `congestion`), se añade a `trafico-historico-diario.json` si ese día no está ya, y se elimina de `trafico-historico.json`. Idempotente — si el script se ejecuta dos veces seguidas, no duplica. |
-| Comportamiento si la fuente falla | El script no escribe nada y termina con código de error — el commit de ese run no se hace (no se inserta un snapshot vacío/falso). El workflow lo reintentará en la siguiente hora. |
+| Comportamiento si la fuente falla | El script reintenta la lectura del Geoportal 3 veces con backoff (5s, 10s) — absorbe las microcaídas de connect timeout de la fuente. Si agota los reintentos, no escribe nada y termina con código de error: el commit de ese run no se hace (no se inserta un snapshot vacío/falso) y el workflow falla visible. El siguiente run programado lo reintenta solo. |
 | Endpoint interno que sirve el dato | `GET /api/trafico/v1/historico?distrito=<codigo\|omitido>&dias=<n, default 7>` |
 
 **Nota de despliegue:** cada commit del cron dispara un redeploy automático en Vercel (integración Git estándar), así el endpoint sirve siempre los ficheros más recientes bundleados — no hace falta ninguna caché propia en el endpoint de lectura (datos estáticos en el momento del build).
@@ -119,3 +119,4 @@ No es una capa de mapa — panel con un mini-gráfico (sparkline SVG) de la cong
 |---|---|---|
 | 1 | 2026-08-18 | Creación. Persistencia decidida explícitamente por el usuario: GitHub Actions cada 60 min + snapshots agregados versionados en el repo, con compactación a diario pasados 30 días. |
 | 2 | 2026-08-18 | DoD completo: funciones puras + tests (`src/services/trafico-historico.ts`), script de snapshot verificado contra la fuente real (`scripts/snapshot-trafico-historico.ts`), workflow de GitHub Actions (`.github/workflows/trafico-historico-cron.yml`), endpoint de lectura (`api/trafico/v1/historico.ts`), panel con sparkline en el mapa (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador — se corrigió un recorte visual del sparkline detectado durante la verificación. Spec pasa a `Implemented`. |
+| 3 | 2026-09-08 | Resiliencia del cron: el `geoportal.valencia.es` tuvo un connect timeout puntual (run de las 14:55 UTC) que rompió el job y notificó, aunque el run siguiente se recuperó solo. El script ahora reintenta la lectura 3 veces con backoff (`conReintentos` en `scripts/snapshot-trafico-historico.ts`) antes de fallar; el workflow sigue fallando fuerte si se agotan los reintentos. De paso: `actions/setup-node` sube de Node 20 (deprecado en los runners) a Node 22. |

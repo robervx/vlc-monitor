@@ -37,12 +37,37 @@ async function leerJsonOVacio<T>(rutaFichero: string): Promise<T[]> {
   }
 }
 
+/**
+ * El Geoportal del Ayuntamiento tiene microcaídas ocasionales (connect timeout).
+ * Un solo run fallido rompe el job y notifica, aunque se recupera solo en la
+ * hora siguiente (spec 017 §4). Reintentar dentro del mismo run absorbe esos
+ * blips; si agota los intentos, sigue fallando fuerte para que una caída real
+ * (URL/esquema cambiados) se vea.
+ */
+async function conReintentos<T>(fn: () => Promise<T>, intentos = 3, esperaMs = 5000): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i >= intentos) throw err;
+      console.warn(
+        `Intento ${i}/${intentos} de leer la fuente falló (${(err as Error).message}). ` +
+          `Reintento en ${esperaMs / 1000}s…`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, esperaMs));
+      esperaMs *= 2;
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const distritos = distritosFromGeoJSON(distritosGeoJSON);
   const distritosBasicos = distritos.map((d) => ({ codigo: d.codigo }));
   setLoadedDistricts(distritos);
 
-  const tramos = await fetchEstadoTrafico((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null);
+  const tramos = await conReintentos(() =>
+    fetchEstadoTrafico((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null),
+  );
   const nuevoSnapshot = agregarSnapshotPorDistrito(tramos, distritosBasicos, new Date().toISOString());
 
   const snapshotsExistentes = await leerJsonOVacio<SnapshotHorario>(SNAPSHOTS_PATH);

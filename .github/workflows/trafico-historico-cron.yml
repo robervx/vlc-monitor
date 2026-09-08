@@ -25,11 +25,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - run: npm ci
 
-      # Si la fuente falla, el script termina con código de error y este paso
+      # El script reintenta 3 veces la lectura del Geoportal (blips de connect
+      # timeout). Si aun así falla, termina con código de error y este paso
       # rompe el job — no se comitea nada (spec 017 §4: nunca un snapshot
       # vacío/falso). El siguiente run programado lo reintenta solo.
       - run: npm run snapshot:trafico-historico
