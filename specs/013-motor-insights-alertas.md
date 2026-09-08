@@ -158,37 +158,54 @@ El usuario quiere avisos antes:
 `TipoInsight` gana `'trafico-empeora'` y `'lluvia-prevista'`. `fuenteSpec` pasa a
 aceptar `'004'`.
 
-### 9.3 Presentación: popup → rail lateral
+### 9.3 Presentación: el popup ("salta y se queda a un lado")
 
-Cambio en `src/main.ts` / `index.html` / CSS, **sin tocar el endpoint**:
+El panel de insights ya vive "a un lado" (`#info-panels`, esquina). Lo que falta es el
+**momento en que salta** una alerta nueva. Alcance de v4, sin blast radius:
 
-- Cuando una evaluación devuelve un insight con un `id` que **no estaba** en la
-  anterior, se muestra un **toast** (esquina, no modal, auto-cierre a los ~8 s,
-  descartable) — uno por insight nuevo, apilados, máx. 3 visibles.
-- Todos los insights activos se listan en un **rail lateral** de "Alertas activas"
-  (columna estrecha, colapsable, contador en la cabecera). Sustituye/rehúbica el panel
-  de tarjetas actual de `#info-panels`; conserva el botón "Copiar borrador" por tarjeta.
-- **Historial de sesión:** un insight que deja de estar activo pasa a una lista
-  "Resueltas" dentro del rail (atenuada, con la hora), **solo en memoria** — no se
-  persiste (coherente con §8: sin persistencia de insights entre sesiones).
-- Móvil (spec `029`): el rail se integra en el bottom sheet; el toast respeta
-  `safe-area` y no tapa la cabecera.
-- Sigue siendo **"avisa, no actúa"** (`CLAUDE.md` §4): el toast informa y se descarta a
-  mano o solo; nunca lanza ninguna acción.
+- **Toast al aparecer un insight nuevo.** Cada vez que una evaluación devuelve un
+  insight cuyo `id` **no estaba** en la anterior, se muestra un toast arriba a la
+  derecha (bajo la cabecera): título + descripción, color por severidad
+  (`urgente` rojo / `aviso` ámbar), botón ✕ y auto-cierre a los ~10 s. Apilados, máx. 3
+  visibles; si hay más, "y N más". Clic en el toast → hace scroll al panel de insights
+  y lo resalta un instante.
+- **Primera carga en silencio.** En el primer render no hay "anterior" — se puebla el
+  panel sin toasts. Los toasts solo saltan para cambios posteriores.
+- El panel de `#info-panels` no se mueve ni cambia de contrato: sigue siendo la lista
+  persistente "a un lado", con "Copiar borrador" por tarjeta.
+- Móvil (spec `029`): el toast respeta `safe-area` y no tapa la cabecera; el resto
+  igual.
+- Sigue siendo **"avisa, no actúa"** (`CLAUDE.md` §4): el toast informa y se descarta;
+  nunca lanza ninguna acción.
 
-### 9.4 DoD de v4 (pendiente)
+**Fuera de v4 (reconsiderado):** un rail lateral dedicado que sustituya al panel de
+`#info-panels` + lista "Resueltas". Toca la maqueta móvil (`029`), el modo cordón
+(`021`) y Configuración (`019`) — desproporcionado para lo que suele ser 0-1 alerta.
+Se retoma si el volumen de alertas lo justifica.
+
+### 9.4 DoD
+
+**v4a — el popup (§9.3), `Implemented` 2026-09-09:**
+
+- [x] Toast al aparecer un insight con `id` nuevo; **nunca en la primera carga**
+      (`idsInsightsPrevios === null` → se puebla en silencio) ni si el insight ya
+      estaba; apilado máx. 3 + "y N más"; descartable con ✕; auto-cierre 10 s; clic en
+      el cuerpo → scroll + resalte (`info-panel--resaltado`) del panel de insights.
+      `procesarNuevasAlertas()` en `renderInsightsPanel()`, sin tocar el endpoint.
+- [x] Color por severidad (rojo `urgente` / ámbar `aviso`); `#alert-toasts` arriba a la
+      derecha bajo la cabecera; `safe-area` en móvil.
+- [x] `npm run typecheck` / `test` (276/276) / `build` sin regresiones. Hook de dev
+      `__toastAlertaDemo` (solo `import.meta.env.DEV`, ausente del bundle de prod).
+      Verificado en navegador: 0 toasts en primera carga, 5 disparados → 3 + "y 2 más",
+      ✕ y clic-a-panel OK.
+
+**v4b — disparadores nuevos (§9.1-9.2), después:**
 
 - [ ] `trafico-empeora`: función pura con fixtures del par (estado previo, estado
       actual) cubriendo cada transición y el caso "sin estado previo"; clave de caché
       `insights:trafico:estado-previo` con su TTL; degradación si tráfico falla.
 - [ ] Bandas nuevas de `calor-extremo` (35), `aire-mala-calidad` (Moderada + contaminante)
       y regla `lluvia-prevista` con tests de borde.
-- [ ] Toast al aparecer un insight con `id` nuevo (no en cada refresco si el insight ya
-      estaba); apilado máx. 3; descartable; auto-cierre.
-- [ ] Rail lateral "Alertas activas" con contador, colapsable, "Copiar borrador" por
-      tarjeta, y sección "Resueltas" solo-memoria.
-- [ ] Escritorio + bottom sheet móvil (spec `029`) verificados en navegador.
-- [ ] `npm run typecheck` / `test` / `build` sin regresiones.
 
 ## 10. Historial
 
@@ -197,4 +214,4 @@ Cambio en `src/main.ts` / `index.html` / CSS, **sin tocar el endpoint**:
 | 1 | 2026-08-18 | Creación. Diseño "alerta + borrador, envío manual" decidido explícitamente por el usuario tras la tensión documentada en el backlog (§0). Dependencias (001, 002, 010, 016) ya `Implemented`. |
 | 2 | 2026-08-18 | DoD completo: función pura + tests (`src/services/insights.ts`), endpoint que combina las cachés existentes con degradación si tráfico/predicción fallan (`api/insights/v1/actual.ts`), panel con tarjetas por severidad y botón "Copiar borrador" sin destinatarios (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (92/92) y en navegador. Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Nueva regla `viento-fuerte` (umbral por rachas, heurística documentada igual criterio que el resto de reglas de esta spec — ver §8) — `insightVientoFuerte()` en `insights.ts`, 3 tests nuevos. Los umbrales (`UMBRAL_VIENTO_AVISO_KMH`/`UMBRAL_VIENTO_URGENTE_KMH`) se exportan para que el panel de meteo (spec 001, `main.ts`) pinte el mismo semáforo de color sin duplicar el número en dos sitios. |
-| 4 | 2026-09-04 | **Draft** — §10. Disparador `trafico-empeora` (con estado previo en caché — primera vez que esta spec guarda estado), banda `aviso` de calor a 35 °C, `aire` en Moderada con contaminante, regla `lluvia-prevista` blanda, y patrón de presentación popup (toast) → rail lateral "Alertas activas" + "Resueltas" en memoria. El dashboard de KPIs se separa a la spec `034`. Pendiente de aprobación. |
+| 4 | 2026-09-04 | Alcance v4 (§9). **v4a `Implemented` 2026-09-09**: el "popup" — toast arriba a la derecha cuando aparece un insight con `id` nuevo (nunca en la primera carga), apilado máx. 3, auto-cierre, clic → resalta el panel de insights. `#alert-toasts` + `procesarNuevasAlertas()` en `main.ts`, CSS en `index.html`, sin tocar el endpoint. **v4b pendiente**: disparadores nuevos (`trafico-empeora` con estado en caché, calor a 35 °C, `lluvia-prevista`). El rail lateral dedicado se descarta como desproporcionado (§9.3). El dashboard de KPIs es la spec `034`. |

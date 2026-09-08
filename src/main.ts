@@ -10,7 +10,7 @@ import { preloadDistrictGeometry, getDistrictCentroid, getLoadedDistricts } from
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
 import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
-import type { PanelInsights } from './services/insights';
+import type { Insight, PanelInsights } from './services/insights';
 import { UMBRAL_VIENTO_AVISO_KMH, UMBRAL_VIENTO_URGENTE_KMH } from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
@@ -279,8 +279,111 @@ async function fetchPrediccionCortoPlazoActual(): Promise<{ prediccion: Predicci
 // (delegado, ver más abajo) pueda leer el texto exacto a copiar.
 let ultimoPanelInsights: PanelInsights | null = null;
 
+// Spec 013 v4 — el "popup": cuando aparece un insight con un id que no estaba
+// en la evaluación anterior, salta un toast arriba a la derecha. `null` =
+// todavía no ha habido primera carga → esa primera se puebla en silencio.
+let idsInsightsPrevios: Set<string> | null = null;
+
+function contenedorToasts(): HTMLDivElement {
+  let cont = document.getElementById('alert-toasts') as HTMLDivElement | null;
+  if (!cont) {
+    cont = document.createElement('div');
+    cont.id = 'alert-toasts';
+    document.body.appendChild(cont);
+  }
+  return cont;
+}
+
+function mostrarToastAlerta(insight: Insight): void {
+  const cont = contenedorToasts();
+  // máx. 3 visibles; el resto se resume en "y N más".
+  const visibles = cont.querySelectorAll('.alert-toast:not(.alert-toast--resumen)');
+  if (visibles.length >= 3) {
+    let resumen = cont.querySelector<HTMLDivElement>('.alert-toast--resumen');
+    const n = Number(resumen?.dataset.n ?? '0') + 1;
+    if (!resumen) {
+      resumen = document.createElement('div');
+      resumen.className = 'alert-toast alert-toast--resumen';
+      cont.appendChild(resumen);
+    }
+    resumen.dataset.n = String(n);
+    resumen.textContent = `y ${n} alerta${n === 1 ? '' : 's'} más`;
+    return;
+  }
+
+  const el = document.createElement('div');
+  el.className = `alert-toast alert-toast--${insight.severidad}`;
+  el.setAttribute('role', 'status');
+
+  const cuerpo = document.createElement('div');
+  cuerpo.className = 'alert-toast__cuerpo';
+  const titulo = document.createElement('div');
+  titulo.className = 'alert-toast__titulo';
+  titulo.textContent = insight.titulo;
+  const desc = document.createElement('div');
+  desc.className = 'alert-toast__desc';
+  desc.textContent = insight.descripcion;
+  cuerpo.append(titulo, desc);
+
+  const cerrar = document.createElement('button');
+  cerrar.className = 'alert-toast__cerrar';
+  cerrar.type = 'button';
+  cerrar.setAttribute('aria-label', 'Descartar aviso');
+  cerrar.textContent = '✕';
+
+  el.append(cuerpo, cerrar);
+  cont.appendChild(el);
+
+  const quitar = (): void => {
+    el.remove();
+    if (!cont.querySelector('.alert-toast:not(.alert-toast--resumen)')) {
+      cont.querySelector('.alert-toast--resumen')?.remove();
+    }
+  };
+  const timer = window.setTimeout(quitar, 10_000);
+  cerrar.addEventListener('click', () => {
+    window.clearTimeout(timer);
+    quitar();
+  });
+  cuerpo.addEventListener('click', () => {
+    const panel = document.getElementById('insights-panel');
+    panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    panel?.classList.add('info-panel--resaltado');
+    window.setTimeout(() => panel?.classList.remove('info-panel--resaltado'), 1500);
+  });
+}
+
+function procesarNuevasAlertas(panel: PanelInsights): void {
+  const idsAhora = new Set(panel.insights.map((i) => i.id));
+  if (idsInsightsPrevios !== null) {
+    for (const insight of panel.insights) {
+      if (!idsInsightsPrevios.has(insight.id)) mostrarToastAlerta(insight);
+    }
+  }
+  idsInsightsPrevios = idsAhora;
+}
+
+if (import.meta.env.DEV) {
+  // Ayuda de verificación en dev: dispara un toast de alerta de prueba.
+  (window as unknown as { __toastAlertaDemo?: (sev?: 'aviso' | 'urgente') => void }).__toastAlertaDemo = (
+    sev = 'urgente',
+  ) =>
+    mostrarToastAlerta({
+      id: `demo:${Date.now()}`,
+      tipo: 'calor-extremo',
+      severidad: sev,
+      titulo: sev === 'urgente' ? 'Calor extremo — 39°C en Valencia' : 'Aviso de calor — 35°C',
+      descripcion: 'Alerta de prueba para verificar el toast (spec 013 v4).',
+      protocoloSugerido: { asunto: '', cuerpo: '' },
+      fuenteSpec: ['001'],
+      detectedAt: new Date().toISOString(),
+      fetchedAt: new Date().toISOString(),
+    } as Insight);
+}
+
 function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: boolean): void {
   ultimoPanelInsights = panel;
+  procesarNuevasAlertas(panel);
 
   if (panel.insights.length === 0) {
     root.innerHTML = `

@@ -595,6 +595,92 @@
       }
 
       /* Aviso de nueva versión (PWA) — spec 028 */
+      /* spec 013 v4 — el "popup": alertas nuevas saltan arriba a la derecha
+         y se van solas; el panel de #info-panels sigue siendo la lista fija. */
+      #alert-toasts {
+        position: fixed;
+        top: calc(var(--header-h) + 12px);
+        right: 12px;
+        z-index: 900;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: min(320px, calc(100vw - 24px));
+        pointer-events: none;
+      }
+
+      .alert-toast {
+        pointer-events: auto;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 10px 10px 12px;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+        border-left: 4px solid #94a3b8;
+        animation: alert-toast-in 0.16s ease;
+      }
+
+      @keyframes alert-toast-in {
+        from {
+          opacity: 0;
+          transform: translateX(12px);
+        }
+      }
+
+      .alert-toast--aviso {
+        border-left-color: #f2c744;
+      }
+
+      .alert-toast--urgente {
+        border-left-color: #d64545;
+      }
+
+      .alert-toast--resumen {
+        justify-content: center;
+        font-size: 12px;
+        color: #64748b;
+        border-left-color: transparent;
+      }
+
+      .alert-toast__cuerpo {
+        flex: 1;
+        cursor: pointer;
+        min-width: 0;
+      }
+
+      .alert-toast__titulo {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .alert-toast__desc {
+        font-size: 12px;
+        color: #475569;
+        margin-top: 2px;
+      }
+
+      .alert-toast__cerrar {
+        background: transparent;
+        border: 0;
+        color: #94a3b8;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 0 4px;
+        line-height: 1.4;
+      }
+
+      .info-panel--resaltado {
+        box-shadow: 0 0 0 2px #f2c744;
+        transition: box-shadow 0.2s ease;
+      }
+
+      :root[data-layout='movil'] #alert-toasts {
+        top: calc(var(--header-h) + 8px + env(safe-area-inset-top));
+      }
+
       #pwa-toast {
         position: fixed;
         left: 50%;
