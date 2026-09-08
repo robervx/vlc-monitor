@@ -855,55 +855,91 @@ interface ControlPanel {
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
   viaPublicaToggle: HTMLInputElement;
+  /** spec 033: grupo plegable "Contexto e informativas" y sus adornos. */
+  contextoDetails: HTMLDetailsElement;
+  contextoContador: HTMLSpanElement;
+  presetOperativaBtn: HTMLButtonElement;
 }
+
+const SELECTOR_CONTEXTO_ABIERTO_KEY = 'imc:selector-contexto-abierto';
 
 function buildControlPanel(): ControlPanel {
   const panel = document.createElement('div');
   panel.id = 'controls';
+
+  let contextoAbiertoInicial = false;
+  try {
+    contextoAbiertoInicial = localStorage.getItem(SELECTOR_CONTEXTO_ABIERTO_KEY) === '1';
+  } catch {
+    /* localStorage no disponible — arranca plegado */
+  }
+
   panel.innerHTML = `
-    <label class="controls__row">
-      <input type="checkbox" id="toggle-mock" />
-      Densidad de personas
-      <span class="mock-badge" title="Datos sintéticos — spec 003, no representan actividad real">MOCK</span>
-    </label>
-    <div class="controls__row controls__row--hora" id="hora-control" hidden>
-      <input type="range" id="hora-slider" min="0" max="23" step="1" value="14" />
-      <span id="hora-label">14:00</span>
+    <div class="controls__head">
+      <span class="controls__title">Capas</span>
+      <button type="button" id="preset-operativa" class="controls__preset" title="Enciende tráfico, Pulso de Distrito e incidencias de vía pública">Vista operativa</button>
     </div>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-trafico" />
-      Tráfico en tiempo real
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-valenbisi" />
-      Valenbisi
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-aparcamiento" />
-      Aparcamiento
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-pulso" />
-      Pulso de Distrito
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-fallas" />
-      Fallas
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-media" />
-      Contexto mediático
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-tendencia" />
-      Términos en tendencia
-    </label>
-    <label class="controls__row controls__row--trafico">
-      <input type="checkbox" id="toggle-via-publica" />
-      Incidencias de vía pública
-    </label>
+    <div class="controls__group controls__group--primaria">
+      <div class="controls__group-head">Prioritarias</div>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-trafico" />
+        Tráfico en tiempo real
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-pulso" />
+        Pulso de Distrito
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-via-publica" />
+        Incidencias de vía pública
+      </label>
+    </div>
+    <details class="controls__group controls__group--contexto" id="controls-contexto"${contextoAbiertoInicial ? ' open' : ''}>
+      <summary class="controls__group-head">
+        Contexto e informativas
+        <span id="contexto-contador" class="controls__badge"></span>
+      </summary>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-mock" />
+        Densidad de personas
+        <span class="mock-badge" title="Datos sintéticos — spec 003, no representan actividad real">MOCK</span>
+      </label>
+      <div class="controls__row controls__row--hora" id="hora-control" hidden>
+        <input type="range" id="hora-slider" min="0" max="23" step="1" value="14" />
+        <span id="hora-label">14:00</span>
+      </div>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-valenbisi" />
+        Valenbisi
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-aparcamiento" />
+        Aparcamiento
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-fallas" />
+        Fallas
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-media" />
+        Contexto mediático
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-tendencia" />
+        Términos en tendencia
+      </label>
+    </details>
   `;
   document.body.appendChild(panel);
+
+  const contextoDetails = panel.querySelector<HTMLDetailsElement>('#controls-contexto')!;
+  contextoDetails.addEventListener('toggle', () => {
+    try {
+      localStorage.setItem(SELECTOR_CONTEXTO_ABIERTO_KEY, contextoDetails.open ? '1' : '0');
+    } catch {
+      /* no-op */
+    }
+  });
 
   const banner = document.createElement('div');
   banner.id = 'mock-banner';
@@ -925,6 +961,9 @@ function buildControlPanel(): ControlPanel {
     mediaToggle: panel.querySelector('#toggle-media')!,
     tendenciaToggle: panel.querySelector('#toggle-tendencia')!,
     viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
+    contextoDetails,
+    contextoContador: panel.querySelector('#contexto-contador')!,
+    presetOperativaBtn: panel.querySelector('#preset-operativa')!,
   };
 }
 
@@ -1660,6 +1699,39 @@ async function main(): Promise<void> {
   const panel = buildControlPanel();
   panel.horaSlider.value = horaSimulada.slice(0, 2);
   panel.horaLabel.textContent = horaSimulada;
+
+  // spec 033 — grupo "Contexto e informativas": contador de capas activas + se
+  // abre solo si hay alguna encendida (p. ej. al llegar por una URL compartida).
+  const togglesContexto = [
+    panel.mockToggle,
+    panel.valenbisiToggle,
+    panel.aparcamientoToggle,
+    panel.fallasToggle,
+    panel.mediaToggle,
+    panel.tendenciaToggle,
+  ];
+  function actualizarContextoSelector(): void {
+    const activas = togglesContexto.filter((t) => t.checked).length;
+    panel.contextoContador.textContent = `${activas} / ${togglesContexto.length}`;
+    panel.contextoContador.classList.toggle('is-active', activas > 0);
+    if (activas > 0 && !panel.contextoDetails.open) panel.contextoDetails.open = true;
+  }
+  togglesContexto.forEach((t) => t.addEventListener('change', actualizarContextoSelector));
+
+  // spec 033 — preset "Vista operativa": enciende las 3 capas prioritarias que
+  // estén apagadas (dispara su `change` real, que ya persiste), sin tocar las de
+  // contexto, y pliega el grupo de contexto.
+  panel.presetOperativaBtn.addEventListener('click', () => {
+    for (const t of [panel.traficoToggle, panel.pulsoToggle, panel.viaPublicaToggle]) {
+      if (!t.checked) {
+        t.checked = true;
+        t.dispatchEvent(new Event('change'));
+      }
+    }
+    panel.contextoDetails.open = false;
+  });
+
+  actualizarContextoSelector();
 
   async function refreshMockLayer(): Promise<void> {
     densidadMock = await fetchDensidadMock(horaSimulada);
