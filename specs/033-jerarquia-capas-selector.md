@@ -19,11 +19,10 @@ Valenbisi, aparcamiento, Fallas, el contexto de prensa o los términos en tenden
 información de apoyo que no hace falta tener siempre delante. Agruparlas reduce la
 carga visual y deja claro qué mirar primero.
 
-**Framing (decidido con el usuario, 2026-09-04):** los grupos se nombran con criterio
-**neutro** — *estado en tiempo real* vs *contexto e informativas*. No se etiqueta por
-tipo de usuario (p. ej. "policía" / "ciudadano"): eso reintroduciría la orientación de
-audiencia institucional que [ADR-002](../docs/decisiones/ADR-002-repo-publico-marca-generica.md)
-retiró (`CLAUDE.md` §1).
+**Framing:** los grupos se nombran con criterio **neutro** — *estado en tiempo real*
+vs *contexto e informativas*. No se etiqueta por tipo de usuario ni audiencia, en
+coherencia con [ADR-002](../docs/decisiones/ADR-002-repo-publico-marca-generica.md) y
+`CLAUDE.md` §1.
 
 ## 2. Fuente(s) de datos
 
@@ -114,4 +113,4 @@ en el estado en URL (spec `012`): esto solo reordena y agrupa casillas.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
-| 1 | 2026-09-04 | Creación (Draft). Framing neutro de los grupos decidido con el usuario (no por audiencia, por ADR-002). Pendiente de aprobación antes de implementar. |
+| 1 | 2026-09-04 | Creación (Draft). Framing neutro de los grupos (no por audiencia, por ADR-002). Pendiente de aprobación antes de implementar. |

@@ -12,7 +12,7 @@ version: 2
 
 ## 0. Contexto
 
-Idea original en `docs/investigacion/un backlog archivado` §1: una persona usando la herramienta en campo necesita poder posicionarse y ver qué es lo más cercano de cada capa activa (incidencia de tráfico, aparcamiento libre, estación Valenbisi). Quedó explícitamente bloqueada hasta decidir el framing "herramienta policial" — resuelto por `docs/decisiones/ADR-002-repo-publico-marca-generica.md` (Aceptado, 2026-08-18). Esta spec desbloquea y redacta esa idea.
+Idea original en un backlog de ideas previo: una persona usando la herramienta en campo necesita poder posicionarse y ver qué es lo más cercano de cada capa activa (incidencia de tráfico, aparcamiento libre, estación Valenbisi). Quedó explícitamente bloqueada hasta decidir el framing de audiencia — resuelto por `docs/decisiones/ADR-002-repo-publico-marca-generica.md` (Aceptado, 2026-08-18). Esta spec desbloquea y redacta esa idea.
 
 ## 1. Problema / motivación
 

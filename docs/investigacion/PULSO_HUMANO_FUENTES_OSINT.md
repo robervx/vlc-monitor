@@ -66,7 +66,7 @@ Esta es, en mi opinión como PM, **la fuente más infravalorada y más útil**: 
 | Fuente | Qué aporta | ¿Gratis? |
 |---|---|---|
 | 112 Comunitat Valenciana | Incidencias de emergencia oficiales | A verificar si publican feed/dataset, o solo redes propias |
-| gestión municipal | Avisos de tráfico/seguridad | A verificar canal — si solo lo publican en redes sociales, no en web/RSS, entonces sí tocaría plantearse una integración puntual con la cuenta oficial (que es contenido público institucional, no de una persona privada — matiz ético distinto al de rastrear usuarios) |
+| Cuentas oficiales de emergencias y tráfico | Avisos de incidencias en vía pública | A verificar canal — si solo se publica en redes sociales, no en web/RSS, tocaría plantearse una integración puntual con la cuenta oficial (contenido público institucional, no de una persona privada — matiz ético distinto al de rastrear usuarios) |
 | AEMET — avisos por fenómenos adversos (ya en roadmap) | Contexto de por qué hay una alteración de la normalidad | Sí |
 
 ---

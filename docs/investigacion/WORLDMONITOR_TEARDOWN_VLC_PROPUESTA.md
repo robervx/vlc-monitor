@@ -2,7 +2,7 @@
 
 **Fecha:** 2026-08-17
 **Fuente primaria:** código fuente real de [`github.com/koala73/worldmonitor`](https://github.com/koala73/worldmonitor) (AGPL-3.0-only, v2.10.0), clonado y auditado directamente — no solo la web pública. Complementado con [`docs.worldmonitor.app`](https://www.worldmonitor.app/docs/documentation) y con investigación del panorama de datos abiertos de Valencia.
-**Objetivo del documento:** extraer el máximo conocimiento reutilizable de cómo está construido World Monitor, y traducirlo a una propuesta concreta para el nuevo objetivo del proyecto — antes conocido como un proyecto anterior (centro de gestión) y ahora reorientado a un **monitor en tiempo real de la ciudad de Valencia**, a escala distrito/barrio/calle.
+**Objetivo del documento:** extraer el máximo conocimiento reutilizable de cómo está construido World Monitor, y traducirlo a una propuesta concreta para el nuevo objetivo del proyecto: un **monitor en tiempo real de la ciudad de Valencia**, a escala distrito/barrio/calle.
 
 ---
 
@@ -86,7 +86,7 @@ Características clave del diseño (todas trasladables):
 - **Múltiples fuentes corroborándose** antes de mover el score (ACLED + GDELT para protestas, USGS + GDACS + NASA EONET para desastres) — nunca una sola fuente decide.
 - **Escalado logarítmico vs. lineal según contexto** (protestas en democracias vs. autocracias) — el equivalente en Valencia sería, por ejemplo, no tratar igual una incidencia de tráfico en una calle con aforo bajo constante que en una arteria principal.
 - **Suelos y techos (floors/boosts):** ciertos eventos fuerzan un mínimo de score (ej. conflicto activo = mínimo 70/100) para que el índice nunca "parezca tranquilo" durante una crisis real por falta de datos frescos.
-- **Niveles con nombre, no solo número:** Crítico (81-100) / Alto (66-80) / Elevado (51-65) / Normal (31-50) / Bajo (0-30) — igual que un semáforo de mando, que es exactamente el lenguaje que ya usáis en `un documento archivado` ("cabecera operativa... semáforo").
+- **Niveles con nombre, no solo número:** Crítico (81-100) / Alto (66-80) / Elevado (51-65) / Normal (31-50) / Bajo (0-30) — igual que un semáforo operativo.
 - **Detección de tendencia:** publican un `dynamicScore` (-100..100) comparado contra el snapshot de ~24h antes, con bandas de histéresis (>±1 punto para no generar ruido de "sube/baja" con cambios de redondeo).
 
 **Aplicación directa a Valencia:** un "Índice de Actividad/Tensión de Distrito" combinando, por ejemplo, saturación de tráfico + incidencias abiertas + ocupación de aparcamiento + alertas de calidad del aire + eventos programados, con la misma filosofía de baseline + señal en vivo + corroboración multi-fuente, publicado por distrito/barrio en vez de por país.
@@ -103,20 +103,20 @@ Fuente externa (API pública, scraping, feed)
    → Cliente hidrata todos los paneles de golpe en la primera carga
 ```
 
-Esto resuelve exactamente el problema que ya identificasteis en `un documento archivado` ("sin dependencia de consultas manuales... toda lectura vía API sobre capas de reporting") — es el mismo principio de capas (`origen → normalización → negocio → agregados → serving`) que ya definisteis para SQL Server, aplicado aquí a APIs externas + Redis en vez de SQL Server. **Es el mismo patrón arquitectónico, ejecutado con otra tecnología de persistencia.**
+Es un patrón de capas estándar (`origen → normalización → negocio → agregados → serving`), aquí sobre APIs externas + Redis.
 
 Detalles de resiliencia que vale la pena copiar tal cual:
 
 - **Caché negativa:** si una fuente falla, se cachea el estado de fallo 5 minutos en vez de reintentar sin parar — evita tormentas de peticiones a una API caída.
 - **Stale-on-error:** si la fuente está caída, se sirve el último dato bueno cacheado en vez de romper el panel.
 - **Circuit breaker por fuente** con cooldown de 5 min.
-- **Cada respuesta indica su frescura** (`X-Cache` header) — el "gap tracker" muestra explícitamente qué fuente está caída en vez de ocultarlo silenciosamente. Esto es literalmente lo que pedís en `un documento archivado`: *"la UI debe mostrar honestamente retraso/lag"*.
+- **Cada respuesta indica su frescura** (`X-Cache` header) — el "gap tracker" muestra explícitamente qué fuente está caída en vez de ocultarlo silenciosamente.
 
 ### 3.5 Contratos API "primero la especificación" (Protocol Buffers + sebuf)
 
 Todo el API de dominio se define primero como `.proto` con validación de campos (`buf.validate`, ej. latitud ∈ [-90,90]), y de ahí se **genera automáticamente**: cliente TypeScript tipado, stubs de servidor, y documentación OpenAPI 3.1. Los cambios incompatibles se detectan en CI (`buf breaking`) antes de mergear.
 
-Esto es, casi literalmente, la misma filosofía **spec-driven** que mencionáis querer adoptar — solo que World Monitor usa Protocol Buffers como fuente de verdad en vez de (u además de) OpenAPI a mano. Es un patrón maduro y os ahorraría el problema de "schema drift" entre frontend/backend que ya identificasteis como riesgo en `un documento archivado`.
+Es la misma filosofía **spec-driven** que adopta este proyecto — solo que World Monitor usa Protocol Buffers como fuente de verdad en vez de OpenAPI a mano. Es un patrón maduro que evita el "schema drift" entre frontend y backend.
 
 ### 3.6 Sistema de componentes sin framework (Panel pattern)
 
@@ -174,7 +174,7 @@ Investigado en paralelo. Es un ecosistema fragmentado en varios portales — nor
 | `ciiChoropleth` (Country Instability Index) | País | **Índice de Pulso/Tensión de Distrito** (tráfico + incidencias + aforo + calidad aire + eventos) | Distrito/barrio |
 | Capas: conflicts, ais, military, sanctions... | Geopolítica | Capas: tráfico en tiempo real, Valenbisi, aparcamiento, calidad del aire, ruido, obras, incidencias, eventos, EMT | Urbano |
 | Seeds cron (21 jobs) → Redis → bootstrap | Fuentes globales | Seeds cron adaptados a APIs valencianas (tráfico, Valenbisi, AEMET, calidad aire) → caché → bootstrap | Ciudad |
-| Proto-first API (`sebuf`) | — | Mismo patrón spec-first, aplicable con Protocol Buffers u OpenAPI (ya es lo que exige `un documento archivado`) | — |
+| Proto-first API (`sebuf`) | — | Mismo patrón spec-first, aplicable con Protocol Buffers u OpenAPI | — |
 | `map-layer-definitions.ts` (registro único) | — | Registro único de capas urbanas, mismo patrón `def()` | — |
 | Zoom progresivo (ciudad → cluster → detalle) | Mundo → país → ciudad | Ciudad → distrito → barrio → calle | Urbano |
 | `SmartPollLoop` con backoff/visibilidad | — | Igual, aplicado a paneles de sala/consulta operativa | — |
@@ -183,9 +183,9 @@ Investigado en paralelo. Es un ecosistema fragmentado en varios portales — nor
 
 ## 7. Próximos pasos sugeridos (sin ejecutar nada todavía)
 
-1. **Decidir el alcance real del pivote**: ¿el monitor de Valencia sustituye por completo al aquel proyecto (proyecto anterior), o convive como un nuevo módulo/producto? Esto determina si `un documento archivado`, `un documento archivado`, etc. se reescriben desde cero o se bifurcan.
+1. **Decidir el alcance**: el monitor de Valencia es un proyecto independiente.
 2. **Verificar manualmente las 3-4 APIs candidatas clave** (tráfico tiempo real OpendataSoft, capas Geoportal, Valenbisi, calidad del aire) — algunas bloquearon el acceso automatizado en esta sesión y requieren confirmación directa (campos, rate limits, necesidad de key).
-3. **Definir el índice compuesto de distrito/barrio** (equivalente al CII) como primer artefacto "spec" — igual que hicisteis con `una plantilla archivada` para KPIs, esto encaja perfectamente en ese mismo patrón de gobernanza que ya teníais.
+3. **Definir el índice compuesto de distrito/barrio** (equivalente al CII) como primer artefacto "spec".
 4. **Elegir motor de mapa**: recomendación — MapLibre GL + deck.gl (2D), sin globo 3D, dado que la escala calle no lo necesita.
 5. **Especificar el catálogo de capas v1** (probablemente: tráfico, Valenbisi, aparcamiento, calidad del aire, incidencias) siguiendo el patrón `LayerDefinition` de World Monitor.
 6. Solo entonces — spec-driven development: contratos primero (OpenAPI o Protobuf), luego capa de datos, luego UI — reescribir los documentos del proyecto.

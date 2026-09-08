@@ -12,19 +12,19 @@ version: 4
 
 ## 0. Contexto de la decisión
 
-Ver `docs/decisiones/ADR-002-repo-publico-marca-generica.md` (Aceptado, 2026-08-18) y `CLAUDE.md` §1. El producto pivota de audiencia — de panel ciudadano a herramienta de gestión para responsables municipales, bajo el nombre de marca **"Intelligent City Monitor"**. Es una única plataforma: la pantalla principal ya construida (mapa + capas F0-F4) pasa a ser el marco base sobre el que se añade identidad institucional y un punto de entrada organizado para funcionalidad futura (insights, widgets de cuentas oficiales, y — si se aprueba por spec propia — lo descrito en `docs/investigacion/un documento de diseño archivado`).
+Ver `docs/decisiones/ADR-002-repo-publico-marca-generica.md` (Aceptado, 2026-08-18) y `CLAUDE.md` §1. El producto se organiza como una única plataforma bajo el nombre de marca **"Intelligent City Monitor"**: la pantalla principal ya construida (mapa + capas F0-F4) pasa a ser el marco base sobre el que se añaden identidad de marca y un punto de entrada organizado para funcionalidad futura (insights, widgets y herramientas de gestión municipal, cada una con su propia spec).
 
 Esta spec cubre únicamente el **chasis**: cabecera + navegación lateral. No implementa ninguna funcionalidad nueva de datos — esas son specs propias que cuelgan de este chasis (empezando por spec `012`, ya desbloqueada por el ADR-002).
 
 ## 1. Problema / motivación
 
-Hasta ahora la pantalla no tenía identidad institucional ni un sitio organizado donde ir añadiendo funcionalidad nueva sin amontonarla en el mapa. Un responsable municipal que abre la herramienta necesita reconocer de un vistazo que es su herramienta (marca), y necesita un punto de navegación estable a medida que se añaden piezas (configuración, gemelo digital, lo que venga) sin que cada una compita por espacio con el mapa.
+Hasta ahora la pantalla no tenía identidad de marca ni un sitio organizado donde ir añadiendo funcionalidad nueva sin amontonarla en el mapa. Quien abre la herramienta necesita reconocer de un vistazo qué es, y necesita un punto de navegación estable a medida que se añaden piezas (configuración, gemelo digital, lo que venga) sin que cada una compita por espacio con el mapa.
 
 ## 2. Fuente(s) de datos
 
 No aplica — esta spec no consume ninguna fuente externa ni añade ningún dato nuevo. Es chasis de interfaz (cabecera + navegación) sobre datos que ya sirven las specs existentes.
 
-**Activo de marca (v4, spec `030` / ADR-002):** placeholder neutro generado (`public/assets/logo.png`, marca tipo radar sobre transparente; `scripts/generar-marca.ts`, Node puro). El logo del proyecto que introdujo ADR-002 se retiró al publicar el repo. El nombre/tagline/pie viven en `src/config/marca.ts`.
+**Activo de marca (v4, spec `030` / ADR-002):** placeholder neutro generado (`public/assets/logo.png`, marca tipo radar sobre transparente; `scripts/generar-marca.ts`, Node puro). El logo anterior se retiró al publicar el repo. El nombre/tagline/pie viven en `src/config/marca.ts`.
 
 ## 3. Contrato de datos (normalizado)
 
@@ -78,6 +78,6 @@ No es una capa de mapa — es chasis de aplicación (cabecera fija + navegación
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-08-18 | Creación, `Draft`. Pendiente: fichero de logo oficial y verificación visual en navegador antes de pasar a `Implemented`. |
-| 2 | 2026-08-19 | DoD completo: `src/ui/chasis.ts` (cabecera + sidebar con `SIDEBAR_REGISTRY`), CSS en `index.html`, mapa reanclado bajo la cabecera, paneles existentes reposicionados sin pérdida de funcionalidad. Logo oficial recibido y colocado en `public/assets/logo-anterior.png`. Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador (colapsado, expandido, persistencia tras recarga). Spec pasa a `Implemented`. |
+| 2 | 2026-08-19 | DoD completo: `src/ui/chasis.ts` (cabecera + sidebar con `SIDEBAR_REGISTRY`), CSS en `index.html`, mapa reanclado bajo la cabecera, paneles existentes reposicionados sin pérdida de funcionalidad. Logo del proyecto colocado en `public/assets/`. Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador (colapsado, expandido, persistencia tras recarga). Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Ajustes tras feedback de uso: (1) renombrado "Intelligent MonitorCity" → "Intelligent City Monitor" (el orden original no es inglés correcto); (2) tagline sin "— herramienta interna"; (3) `#info-panels` con `flex-wrap` + scroll interno, corrige amontonamiento de leyendas de capa; (4) sección "Configuración" pasa de `placeholder` a `disponible`, con `src/ui/panel-preferences.ts` nuevo (registro + persistencia de qué paneles fijos se muestran); (5) reloj de cabecera rediseñado con fecha. Verificado con `npm run typecheck`, `npm run test` (108/108) y en navegador (checkboxes de capa simultáneos, toggle de Configuración, persistencia tras recarga). |
-| 4 | 2026-08-29 | Re-marca genérica (spec `030` / ADR-002): se retira el logo del proyecto (`public/assets/logo-anterior.png` eliminado) y el lenguaje institucional. Logo → placeholder neutro `public/assets/logo.png` (`scripts/generar-marca.ts`). Nombre/tagline/pie centralizados en `src/config/marca.ts`, consumidos por `chasis.ts` y `pagina-login.ts`. El contexto §0 y la motivación §1 de esta spec quedan como registro histórico de ADR-002. |
+| 4 | 2026-08-29 | Re-marca genérica (spec `030` / ADR-002): se retira el logo anterior y el lenguaje de un caso de uso concreto. Logo → placeholder neutro `public/assets/logo.png` (`scripts/generar-marca.ts`). Nombre/tagline/pie centralizados en `src/config/marca.ts`, consumidos por `chasis.ts` y `pagina-login.ts`. El contexto §0 y la motivación §1 de esta spec quedan como registro histórico de ADR-002. |

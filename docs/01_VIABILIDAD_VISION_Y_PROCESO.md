@@ -138,7 +138,7 @@ Cada spec tiene un número correlativo (no se reordena, no se reutiliza), vive e
 7. Merge — la spec pasa de estado "Draft" a "Implemented"
 ```
 
-Este orden es deliberado y calca el patrón que vimos en World Monitor (seed → Redis → bootstrap → panel), y es exactamente el mismo principio de capas que ya definisteis para el proyecto anterior (`origen → normalización → agregados → serving → UI`), solo que aquí el "origen" es una API pública en vez de SQL Server.
+Este orden es deliberado y calca el patrón de World Monitor (seed → Redis → bootstrap → panel): un principio de capas estándar (`origen → normalización → agregados → serving → UI`) donde el "origen" es una API pública.
 
 ### 3.4 Cadencia
 

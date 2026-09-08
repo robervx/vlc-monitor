@@ -12,7 +12,7 @@ version: 3
 
 ## 0. Contexto de la decisión
 
-`ROADMAP.md` F5 y `docs/decisiones/ADR-002-repo-publico-marca-generica.md`: el producto es una herramienta de gestión con identidad institucional de gestión municipal, desplegada en internet público (Vercel Hobby). La spec `019` §7 ya señala el riesgo: publicar la identidad institucional sin control de acceso es un problema antes de ser un problema de diseño. Esta spec lo resuelve.
+`ROADMAP.md` F5 y `docs/decisiones/ADR-002-repo-publico-marca-generica.md`: un despliegue puede querer servirse en internet público con acceso restringido. La spec `019` §7 ya señala el riesgo: exponer un despliegue privado sin control de acceso es un problema antes de ser un problema de diseño. Esta spec lo resuelve con un gate opcional.
 
 Petición explícita del propietario (2026-08-28): poder abrir la herramienta desde su móvil "en cualquier lado, con contraseña", con UX ágil — es decir, la barrera no puede obligar a re-autenticarse en cada apertura.
 
@@ -21,13 +21,13 @@ Petición explícita del propietario (2026-08-28): poder abrir la herramienta de
 Verificado antes de redactar (lo pedía la fila `Planned` original de esta spec):
 
 - **Password Protection** de Vercel (contraseña única para ver el deployment) es un **add-on de pago**, no disponible en el plan Hobby.
-- **Vercel Authentication** (gratis en todos los planes) exige que **cada visitante tenga una cuenta de Vercel con acceso al equipo** — inservible para un responsable que no está en el equipo de Vercel.
+- **Vercel Authentication** (gratis en todos los planes) exige que **cada visitante tenga una cuenta de Vercel con acceso al equipo** — inservible para cualquier usuario que no esté en el equipo de Vercel.
 
 Conclusión: no se puede prometer protección nativa en Hobby. Se implementa un gate propio con **Vercel Middleware** (`middleware.ts` en la raíz, runtime edge, incluido en Hobby), que ya es el runtime que usan todos los endpoints de `api/` (`export const config = { runtime: 'edge' }`).
 
 ## 1. Problema / motivación
 
-Cualquiera que dé con la URL del despliegue ve hoy el mapa completo, la identidad de gestión municipal y todos los endpoints `/api/*`. Hace falta una pantalla de acceso con credenciales antes de servir nada, que en el móvil recuerde la sesión ~30 días para no ser un incordio, y que también proteja los endpoints de datos (no solo el HTML).
+Cualquiera que dé con la URL de un despliegue privado ve hoy el mapa completo y todos los endpoints `/api/*`. Hace falta una pantalla de acceso con credenciales antes de servir nada, que en el móvil recuerde la sesión ~30 días para no ser un incordio, y que también proteja los endpoints de datos (no solo el HTML).
 
 ## 2. Fuente(s) de datos
 
@@ -139,4 +139,4 @@ No es una capa. La pantalla de login es una página propia (`api/_shared/pagina-
 |---|---|---|
 | 1 | 2026-08-28 | Creación, `Draft`. Sustituye la fila `Planned` "Publicación con contraseña en dominio propio". Verificado que Vercel no ofrece password-protection en Hobby → se opta por gate propio en middleware. Contrato de cookie, endpoints y rate-limit congelados. |
 | 2 | 2026-08-28 | Implementado. `api/_shared/auth.ts` (PBKDF2, HMAC de cookie, rate-limit en memoria), `api/_shared/pagina-login.ts`, `middleware.ts` + `authDevPlugin` en `vite.config.ts` para dev, `api/auth/v1/{login,logout,estado}.ts`, `scripts/auth-hash.ts` (`npm run auth:hash`), indicador de sesión + logout en `src/ui/chasis.ts`. 26 tests nuevos (224/224), `typecheck` y `build` verdes, flujo completo verificado con `curl` y en navegador (login, gate de `/api/*`, logout, responsive 375×812). Cambio de diseño respecto a v1: la pantalla de login se sirve en la misma URL desde el middleware (no `rewrite` a `/login`), evitando la dependencia `@vercel/edge` y una ruta estática extra. Pasa a `Implemented`; único punto abierto: persistencia de sesión en PWA iOS, que se cierra con la spec 028. |
-| 3 | 2026-08-29 | Spec `030` / ADR-002: el gate pasa de **fail-closed a fail-open**. Sin `AUTH_SECRET`, `middleware.ts` hace `return undefined` (app abierta, repo público / demo); con `AUTH_SECRET` + `APP_USERS`, el gate funciona igual que en v2. Marca de la pantalla de login desde `src/config/marca.ts` (sin escudo institucional). Verificado con `curl` (sin `.env`: `/` y `/api/*` a 200; con `.env`: gate). |
+| 3 | 2026-08-29 | Spec `030` / ADR-002: el gate pasa de **fail-closed a fail-open**. Sin `AUTH_SECRET`, `middleware.ts` hace `return undefined` (app abierta, repo público / demo); con `AUTH_SECRET` + `APP_USERS`, el gate funciona igual que en v2. Marca de la pantalla de login desde `src/config/marca.ts` (logo neutro). Verificado con `curl` (sin `.env`: `/` y `/api/*` a 200; con `.env`: gate). |

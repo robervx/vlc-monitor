@@ -16,13 +16,13 @@ version: 3
 
 ## 1. Problema / motivación
 
-Hoy la app lleva el logo del proyecto, la tagline del proyecto y el pie "Uso interno — no es un servicio público", y el middleware es fail-closed (sin `AUTH_SECRET` no arranca). Para poder publicar el repo y ofrecer una demo abierta hace falta: sin marca de ningún cuerpo, con un logo neutro, y que arranque sin configuración de acceso.
+Antes de esta spec, la app llevaba una identidad de marca de un caso de uso concreto, el pie "Uso interno — no es un servicio público", y el middleware era fail-closed (sin `AUTH_SECRET` no arrancaba). Para publicar el repo y ofrecer una demo abierta hace falta: sin marca de ningún organismo, con un logo neutro, y que arranque sin configuración de acceso.
 
 ## 2. Fuente(s) de datos
 
 No aplica — no consume ninguna fuente externa. Sustituye un asset estático y cambia copy/config.
 
-**Asset de marca**: se retira `public/assets/logo-anterior.png` (logo). Se genera un **placeholder neutro** con `scripts/generar-marca.ts` (Node puro, sin dependencias: dibuja la marca y la codifica a PNG). Diseño: anillos concéntricos tipo radar + punto central + un "blip" de acento, sobre transparente para la cabecera y sobre el navy `#0b1f33` para los iconos PWA. Es un placeholder explícito: cualquiera que despliegue el repo pone el suyo.
+**Asset de marca**: se retira el logo anterior. Se genera un **placeholder neutro** con `scripts/generar-marca.ts` (Node puro, sin dependencias: dibuja la marca y la codifica a PNG). Diseño: anillos concéntricos tipo radar + punto central + un "blip" de acento, sobre transparente para la cabecera y sobre el navy `#0b1f33` para los iconos PWA. Es un placeholder explícito: cualquiera que despliegue el repo pone el suyo.
 
 ## 3. Contrato de datos (normalizado)
 
@@ -58,8 +58,8 @@ No es una capa. Cambios de chasis (spec 019):
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [x] No queda "gestión municipal" / "escudo" / "uso interno" como identidad del producto en `src/`, `index.html`, `api/`, `README.md` ni `CLAUDE.md` §1 — verificado con `grep -ri`. (El contexto histórico de ADR-002 en las specs `019`/`012`/`021` se conserva como registro, marcado como tal.)
-- [x] `public/assets/logo-anterior.png` y `scripts/generar-iconos-pwa.ts` eliminados; `public/assets/logo.png` (placeholder radar, transparente) + `public/icons/*` (incl. `favicon-32.png`) generados por `npm run marca` (`scripts/generar-marca.ts`, Node puro — rasterizador SDF + codificador PNG, sin `sips` ni dependencias). Verificados visualmente.
+- [x] No queda marca ni identidad de un organismo de terceros como identidad del producto en `src/`, `index.html`, `api/`, `README.md` ni `CLAUDE.md` §1 — verificado con `grep -ri`.
+- [x] Logo anterior y `scripts/generar-iconos-pwa.ts` eliminados; `public/assets/logo.png` (placeholder radar, transparente) + `public/icons/*` (incl. `favicon-32.png`) generados por `npm run marca` (`scripts/generar-marca.ts`, Node puro — rasterizador SDF + codificador PNG, sin `sips` ni dependencias). Verificados visualmente.
 - [x] `src/config/marca.ts` — único sitio con nombre/tagline/pie; `src/ui/chasis.ts` y `api/_shared/pagina-login.ts` lo consumen.
 - [x] `middleware.ts`: sin `AUTH_SECRET` → `return undefined` (app abierta). Con `AUTH_SECRET`+`APP_USERS` → gate de la spec 018. Verificado con `curl` en ambos modos y en navegador.
 - [x] `LICENSE` (MIT) en la raíz; `package.json` `"license": "MIT"`, descripción neutra, `vercel` movido a `devDependencies`, script `marca` (sustituye `iconos:pwa`).
@@ -70,8 +70,8 @@ No es una capa. Cambios de chasis (spec 019):
 
 ## 7. Riesgos y fuera de alcance
 
-- **El nombre "Intelligent City Monitor" se hereda de ADR-002** (donde era la marca del producto de una iteración anterior). Se mantiene por ser genérico y por no re-cablear todo; si el product owner quiere otro nombre, es cambiar `src/config/marca.ts` y este documento.
-- **Historial de git**: el logo seguirá existiendo en commits antiguos aunque se borre el fichero. Reescribir historia (`git filter-repo`) es desproporcionado y arriesgado para un asset que era de acceso público de todas formas; se decide **no** hacerlo. Si en el futuro se considera necesario, es su propia tarea con backup previo.
+- **El nombre "Intelligent City Monitor" viene de una iteración anterior del producto**. Se mantiene por ser genérico y por no re-cablear todo; si el product owner quiere otro nombre, es cambiar `src/config/marca.ts` y este documento.
+- **Historial de git**: v3 (2026-09) purga el historial con `git filter-repo` — logo anterior, documentos de diseño internos y lenguaje de un caso de uso concreto se eliminan de todos los commits, con backup previo. Ver la entrada de v3 en §8.
 - **Fuera de alcance**: la versión privada aumentada (otro repo/proyecto), cualquier rediseño visual más allá de sustituir marca y logo, i18n del copy nuevo (sigue en ES como el resto).
 - **Demo en Vercel**: que "se vea potente" es fuera del alcance estricto de esta spec (la app ya renderiza mapa + capas + datos reales). Un pulido de la vista por defecto de la demo, si se quiere, es fast-follow con su nota propia.
 
@@ -79,6 +79,6 @@ No es una capa. Cambios de chasis (spec 019):
 
 | Versión | Fecha | Cambio |
 |---|---|---|
-| 1 | 2026-08-29 | Creación + implementación. Deriva de ADR-002. `scripts/generar-marca.ts` (marca radar en Node puro) + `public/assets/logo.png` + `public/icons/*`; `src/config/marca.ts`; `chasis.ts` y `pagina-login.ts` consumen la marca; `middleware.ts` fail-open; `LICENSE` MIT; README y `CLAUDE.md` §1 reescritos; specs `018`/`019` actualizadas. Escudo oficial y `generar-iconos-pwa.ts` eliminados. `typecheck` + `test` + `build` verdes, verificado en navegador. Pasa a `Implemented`. |
+| 1 | 2026-08-29 | Creación + implementación. Deriva de ADR-002. `scripts/generar-marca.ts` (marca radar en Node puro) + `public/assets/logo.png` + `public/icons/*`; `src/config/marca.ts`; `chasis.ts` y `pagina-login.ts` consumen la marca; `middleware.ts` fail-open; `LICENSE` MIT; README y `CLAUDE.md` §1 reescritos; specs `018`/`019` actualizadas. Logo anterior y `generar-iconos-pwa.ts` eliminados. `typecheck` + `test` + `build` verdes, verificado en navegador. Pasa a `Implemented`. |
 | 3 | 2026-09-04 | **Pieza de portfolio.** `README.md` reescrito como presentación pública (ES + resumen EN): demo en vivo enlazada (`vlc-monitor.vercel.app`), 4 capturas reales en `docs/capturas/`, diagrama del patrón `seed→caché→endpoint`, tabla de decisiones técnicas, el proceso spec-driven como argumento, y bloque de ética. Nuevo `docs/FUENTES_Y_LICENCIAS.md` — inventario completo por capa (fuente, spec, licencia CC BY 4.0 / ODbL / etc., atribución requerida), mapa base, infraestructura (coste 0 €) y licencias de las dependencias de software. Nuevo `docs/PRESENTACION_LINKEDIN.md` con los textos de publicación. Cierra el fast-follow anotado en §7 ("un pulido de la vista por defecto de la demo / que se vea potente"). Sin cambios de código ni de comportamiento de la app. |
 | 2 | 2026-08-31 | **Primer despliegue real a Vercel** (repo hecho público). Tres límites de Hobby resueltos por el camino: (1) el grafo viario ~9 MB no cabe en función → estático del CDN (spec `020` v3); (2) ~18 funciones > límite de 12 → toda la API pasa a **una sola función**: handlers movidos a `src/server/<dominio>-<recurso>.ts`, router en `api/_router-src.ts` bundleado con esbuild a `api/router.js` (`scripts/bundle-api.mjs`, corre en `npm run build`), `vercel.json` reescribe `/api/*` → `/api/router`; (3) el runtime Node de Vercel ignora `export default` de estilo Web → el router exporta métodos HTTP con nombre (`export const GET/POST/... = dispatch`). Añadidos import attributes `with { type: 'json' }` a todos los imports de JSON (ESM estricto). Env vars `AUTH_SECRET`/`APP_USERS` retiradas del proyecto Vercel → demo abierta. 14 endpoints verificados 200 en producción + app en navegador. Arquitectura documentada en `CLAUDE.md` §6. |
