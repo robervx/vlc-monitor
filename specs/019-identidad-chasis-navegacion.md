@@ -7,7 +7,7 @@ estado: Implemented
 tipo: fundacional
 depende_de: [000]
 propietario: ""
-version: 4
+version: 5
 ```
 
 ## 0. Contexto de la decisión
@@ -73,6 +73,40 @@ No es una capa de mapa — es chasis de aplicación (cabecera fija + navegación
 - **Riesgo — activo de marca ausente**: si el fichero de logo no llega, esta spec no se bloquea entera — se implementa con placeholder y se sustituye en una revisión menor cuando el archivo esté disponible.
 - **Fuera de alcance de esta spec**: cualquier funcionalidad nueva de datos (gemelo digital, configuración real, etc.) — esta spec solo construye el sitio donde esas piezas futuras se van a enganchar, cada una con su propia spec.
 
+## v5 — pulido del sidebar (Draft, 2026-09-09)
+
+Dos defectos de uso en el sidebar de escritorio, reportados tras uso real:
+
+1. **Letras que asoman al plegar.** Con el sidebar colapsado (52 px), `.sidebar-section__label`
+   no se oculta — solo lo recorta el `overflow: hidden` del `#app-sidebar`, y queda un
+   sliver del primer carácter de cada etiqueta. **Fix:** cuando el sidebar no está
+   `.is-expanded`, las etiquetas y los tags de sección se ocultan
+   (`visibility: hidden` / `opacity: 0`, no `display: none`, para no romper la
+   transición de anchura). El pie (`#app-footer-attrib`, `#app-sidebar__sesion`) se
+   trata igual. El rail colapsado queda como una columna limpia de solo iconos.
+
+2. **Se queda abierto y tapa el selector de capas.** En escritorio el sidebar
+   expandido (280 px, `z-index: 150`) se dibuja por encima de `#controls` (que está a
+   `left: 64 px`, `z-index: 1`), y no hay forma de cerrarlo salvo el propio botón `⟨`.
+   **Fix:** en escritorio, un clic fuera del `#app-sidebar` (y del `#app-header`) lo
+   colapsa. El listener se añade solo mientras está expandido y en layout escritorio;
+   se limpia al colapsar y en `onCambioLayout`. En móvil no cambia nada (ya se cierra
+   con backdrop / Esc / swipe / ✕).
+
+No cambia el contrato del `SIDEBAR_REGISTRY` ni la persistencia en `localStorage`; es
+CSS + un listener acotado en `buildSidebar()`.
+
+### DoD de v5
+
+- [x] Sidebar colapsado en escritorio: ninguna etiqueta ni tag visible, solo iconos
+      (`.sidebar-section__label` a `visibility: hidden`); verificado en navegador y por DOM.
+- [x] Sidebar expandido en escritorio: clic en el mapa / fuera del sidebar y la cabecera
+      → se colapsa (`onClicFueraEscritorio` en `pointerdown` capture, acotado a expandido +
+      escritorio). `#controls` vuelve a quedar visible. Verificado en navegador.
+- [x] Móvil sin regresión: FAB abre la hoja, backdrop la cierra; el listener de escritorio
+      no se registra en `movil`. Verificado por DOM.
+- [x] `npm run typecheck` / `test` (276/276) sin regresiones.
+
 ## 8. Historial
 
 | Versión | Fecha | Cambio |
@@ -81,3 +115,4 @@ No es una capa de mapa — es chasis de aplicación (cabecera fija + navegación
 | 2 | 2026-08-19 | DoD completo: `src/ui/chasis.ts` (cabecera + sidebar con `SIDEBAR_REGISTRY`), CSS en `index.html`, mapa reanclado bajo la cabecera, paneles existentes reposicionados sin pérdida de funcionalidad. Logo del proyecto colocado en `public/assets/`. Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador (colapsado, expandido, persistencia tras recarga). Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Ajustes tras feedback de uso: (1) renombrado "Intelligent MonitorCity" → "Intelligent City Monitor" (el orden original no es inglés correcto); (2) tagline sin "— herramienta interna"; (3) `#info-panels` con `flex-wrap` + scroll interno, corrige amontonamiento de leyendas de capa; (4) sección "Configuración" pasa de `placeholder` a `disponible`, con `src/ui/panel-preferences.ts` nuevo (registro + persistencia de qué paneles fijos se muestran); (5) reloj de cabecera rediseñado con fecha. Verificado con `npm run typecheck`, `npm run test` (108/108) y en navegador (checkboxes de capa simultáneos, toggle de Configuración, persistencia tras recarga). |
 | 4 | 2026-08-29 | Re-marca genérica (spec `030` / ADR-002): se retira el logo anterior y el lenguaje de un caso de uso concreto. Logo → placeholder neutro `public/assets/logo.png` (`scripts/generar-marca.ts`). Nombre/tagline/pie centralizados en `src/config/marca.ts`, consumidos por `chasis.ts` y `pagina-login.ts`. El contexto §0 y la motivación §1 de esta spec quedan como registro histórico de ADR-002. |
+| 5 | 2026-09-09 | **Draft** — pulido del sidebar (ver sección "v5"): ocultar etiquetas al plegar (fix del sliver de letras) y cerrar el sidebar de escritorio al hacer clic fuera (dejaba de tapar `#controls`). CSS + listener acotado en `buildSidebar()`. |

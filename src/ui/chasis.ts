@@ -735,6 +735,22 @@ function buildSidebar(): void {
         focoPrevio = null;
       }
     }
+
+    // Escritorio (spec 019 v5): al expandir, un clic fuera del sidebar y de la
+    // cabecera lo colapsa — expandido tapa el selector de capas (`#controls`) y
+    // solo se podía cerrar con el botón `⟨`. En móvil ya lo cierran backdrop/Esc/swipe.
+    if (expanded && !esMovil()) {
+      document.addEventListener('pointerdown', onClicFueraEscritorio, true);
+    } else {
+      document.removeEventListener('pointerdown', onClicFueraEscritorio, true);
+    }
+  }
+
+  function onClicFueraEscritorio(ev: PointerEvent): void {
+    if (esMovil() || !sidebar.classList.contains('is-expanded')) return;
+    const t = ev.target as Node | null;
+    if (t && (sidebar.contains(t) || document.getElementById('app-header')?.contains(t))) return;
+    setExpandido(false);
   }
 
   function onKeydown(ev: KeyboardEvent): void {
@@ -784,13 +800,17 @@ function buildSidebar(): void {
     { passive: true },
   );
 
-  // Al pasar de móvil a escritorio con la hoja abierta, normaliza el estado.
+  // Al cambiar de layout con la hoja abierta, normaliza el estado.
   onCambioLayout((layout) => {
     if (layout === 'escritorio') {
       backdrop.hidden = true;
       document.removeEventListener('keydown', onKeydown);
-    } else if (sidebar.classList.contains('is-expanded')) {
-      backdrop.hidden = false;
+      if (sidebar.classList.contains('is-expanded')) {
+        document.addEventListener('pointerdown', onClicFueraEscritorio, true);
+      }
+    } else {
+      document.removeEventListener('pointerdown', onClicFueraEscritorio, true);
+      if (sidebar.classList.contains('is-expanded')) backdrop.hidden = false;
     }
   });
 

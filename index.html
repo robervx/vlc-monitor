@@ -520,6 +520,17 @@
       .sidebar-section__label {
         overflow: hidden;
         text-overflow: ellipsis;
+        transition: opacity 0.12s ease;
+      }
+
+      /* Sidebar colapsado en escritorio: solo iconos, sin slivers de texto
+         asomando por el borde (spec 019 v5). */
+      :root:not([data-layout='movil']) #app-sidebar:not(.is-expanded) .sidebar-section__label,
+      :root:not([data-layout='movil']) #app-sidebar:not(.is-expanded) .sidebar-section__tag,
+      :root:not([data-layout='movil']) #app-sidebar:not(.is-expanded) #app-footer-attrib,
+      :root:not([data-layout='movil']) #app-sidebar:not(.is-expanded) #app-sidebar__sesion {
+        opacity: 0;
+        visibility: hidden;
       }
 
       .sidebar-section__tag {

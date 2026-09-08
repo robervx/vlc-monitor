@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "bash",
       "runtimeArgs": [
-        "run",
-        "dev"
+        "-lc",
+        "cd /Users/Rober/Desktop/vlc-monitor && exec npm run dev"
       ],
       "port": 3000
     }
