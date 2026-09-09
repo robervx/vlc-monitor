@@ -280,6 +280,87 @@
         margin-bottom: 6px;
       }
 
+      /* Glosario — spec 037 */
+      .glosario-entrada {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .glosario-entrada__titulo {
+        font-size: 12px;
+        font-weight: 600;
+        color: #dbe6f0;
+        padding: 8px 0;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .glosario-entrada__titulo::-webkit-details-marker {
+        display: none;
+      }
+
+      .glosario-entrada__titulo::before {
+        content: '▸';
+        display: inline-block;
+        width: 1em;
+        color: #7d90a6;
+      }
+
+      .glosario-entrada[open] .glosario-entrada__titulo::before {
+        content: '▾';
+      }
+
+      .glosario-entrada__cuerpo {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #b9c6d6;
+        padding: 0 0 10px 1em;
+      }
+
+      .glosario-entrada__cuerpo p {
+        margin: 0 0 8px;
+      }
+
+      .glosario-entrada__cuerpo code {
+        font-size: 11px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
+
+      .glosario-entrada__cuerpo a {
+        color: #8bb8e8;
+      }
+
+      .glosario-lista {
+        margin: 0 0 8px;
+        padding-left: 18px;
+      }
+
+      .glosario-lista li {
+        margin-bottom: 4px;
+      }
+
+      .glosario-meta {
+        display: block;
+        font-size: 11px;
+        color: #7d90a6;
+      }
+
+      .glosario-nota {
+        font-size: 11px;
+        color: #9db3c9;
+        font-style: italic;
+      }
+
+      .glosario-punto {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
       .proximidad-boton {
         width: 100%;
         padding: 7px 10px;

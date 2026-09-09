@@ -31,6 +31,7 @@ import {
   getTramoPorIdSimulacion,
   type EstadoModoSimulacion,
 } from './modo-simulacion-cortes';
+import { buildGlosarioContent } from './glosario';
 
 export interface SidebarSectionDefinition {
   key: string;
@@ -547,6 +548,14 @@ export const SIDEBAR_REGISTRY: SidebarSectionDefinition[] = [
     estado: 'disponible',
     specId: '022',
     render: buildGemeloDigitalContent,
+  },
+  {
+    key: 'glosario',
+    label: 'Glosario',
+    icono: '📖',
+    estado: 'disponible',
+    specId: '037',
+    render: buildGlosarioContent,
   },
   {
     key: 'configuracion',

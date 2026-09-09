@@ -25287,6 +25287,9 @@ async function handler4() {
 }
 
 // src/services/pulso-distrito.ts
+var PESOS_PULSO = { trafico: 0.45, incidencias: 0.15, aire: 0.25, meteo: 0.15 };
+var AMPLIFICACION_TRAFICO_PULSO = 2.5;
+var UMBRALES_CATEGORIA_PULSO = { Moderado: 18, Tenso: 38, Cr\u00EDtico: 62 };
 function clamp01(x) {
   return Math.min(1, Math.max(0, x));
 }
@@ -25303,23 +25306,32 @@ function componenteTrafico(tramosDistrito) {
   const suma = conDato.reduce((acc, t) => acc + PESO_TRAFICO_POR_ESTADO[t.estado], 0);
   return clamp01(suma / conDato.length);
 }
+function componenteIncidencias(incidenciasDistrito) {
+  const peso = incidenciasDistrito.reduce((acc, i) => {
+    if (i.tipo === "obras") return acc + 0.06;
+    if (i.tipo === "festejos") return acc + 0.3;
+    return acc + 0.35;
+  }, 0);
+  return clamp01(peso / 22);
+}
 function componenteAire(aire) {
-  return clamp01(aire.indiceEuropeo / 100);
+  return clamp01((aire.indiceEuropeo - 15) / 65);
 }
 function componenteMeteo(meteo) {
-  const calor = clamp01((meteo.temperatura - 35) / 7);
-  const frio = clamp01((5 - meteo.temperatura) / 10);
-  const viento = clamp01((meteo.vientoRachas - 50) / 40);
-  const lluvia = clamp01((meteo.precipitacion - 2) / 8);
+  const tCalor = Math.max(meteo.temperatura, meteo.sensacionTermica);
+  const calor = clamp01((tCalor - 28) / 12);
+  const frio = clamp01((6 - meteo.temperatura) / 8);
+  const viento = clamp01((meteo.vientoRachas - 40) / 45);
+  const lluvia = clamp01((meteo.precipitacion - 0.5) / 6);
   return Math.max(calor, frio, viento, lluvia);
 }
 function categoriaPulso(indice) {
-  if (indice < 25) return "Tranquilo";
-  if (indice < 50) return "Moderado";
-  if (indice < 75) return "Tenso";
+  if (indice < UMBRALES_CATEGORIA_PULSO.Moderado) return "Tranquilo";
+  if (indice < UMBRALES_CATEGORIA_PULSO.Tenso) return "Moderado";
+  if (indice < UMBRALES_CATEGORIA_PULSO.Cr\u00EDtico) return "Tenso";
   return "Cr\xEDtico";
 }
-function calcularPulsoDistrito(distritos2, meteo, aire, tramos) {
+function calcularPulsoDistrito(distritos2, meteo, aire, tramos, incidencias = []) {
   const aireScore = componenteAire(aire);
   const meteoScore = componenteMeteo(meteo);
   const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
@@ -25331,15 +25343,27 @@ function calcularPulsoDistrito(distritos2, meteo, aire, tramos) {
     lista.push(tramo);
     tramosPorDistrito.set(tramo.distrito, lista);
   }
+  const incidenciasPorDistrito = /* @__PURE__ */ new Map();
+  for (const inc of incidencias) {
+    if (!inc.distritoCodigo) continue;
+    const lista = incidenciasPorDistrito.get(inc.distritoCodigo) ?? [];
+    lista.push(inc);
+    incidenciasPorDistrito.set(inc.distritoCodigo, lista);
+  }
   return distritos2.map((distrito) => {
-    const traficoScore = componenteTrafico(tramosPorDistrito.get(distrito.codigo) ?? []);
-    const indice = Math.round(100 * (0.5 * traficoScore + 0.3 * aireScore + 0.2 * meteoScore));
+    const traficoScore = clamp01(
+      componenteTrafico(tramosPorDistrito.get(distrito.codigo) ?? []) * AMPLIFICACION_TRAFICO_PULSO
+    );
+    const incidenciasScore = componenteIncidencias(incidenciasPorDistrito.get(distrito.codigo) ?? []);
+    const indice = Math.round(
+      100 * (PESOS_PULSO.trafico * traficoScore + PESOS_PULSO.incidencias * incidenciasScore + PESOS_PULSO.aire * aireScore + PESOS_PULSO.meteo * meteoScore)
+    );
     return {
       distritoCodigo: distrito.codigo,
       distritoNombre: distrito.nombre,
       indice,
       categoria: categoriaPulso(indice),
-      componentes: { trafico: traficoScore, aire: aireScore, meteo: meteoScore },
+      componentes: { trafico: traficoScore, incidencias: incidenciasScore, aire: aireScore, meteo: meteoScore },
       observedAt,
       fetchedAt,
       source: "vlc-monitor-compuesto"
@@ -50726,6 +50750,47 @@ async function handler7() {
   }
 }
 
+// src/services/via-publica.ts
+var TIPO_POR_VALOR_ORIGEN = {
+  OBRAS: "obras",
+  INCIDENCIAS: "incidencias",
+  FESTEJOS: "festejos"
+};
+var GEOPORTAL_VIA_PUBLICA_URL = "https://geoportal.valencia.es/server/rest/services/OPENDATA/Trafico/MapServer/209/query?where=1=1&outFields=*&f=geojson";
+async function fetchIncidenciasViaPublica(resolverDistrito2) {
+  const res = await fetch(GEOPORTAL_VIA_PUBLICA_URL, {
+    headers: { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" }
+  });
+  if (!res.ok) {
+    throw new Error(`Geoportal (v\xEDa p\xFAblica) respondi\xF3 HTTP ${res.status}`);
+  }
+  const body = await res.json();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  return body.features.map((feature) => {
+    const p = feature.properties;
+    if (feature.geometry === null || p.id_incidencia === null || p.desc_incidencia === null || p.tipo_incidencia === null || p.desc_calle === null || p.tipo_afectacion === null || p.fecha_inicio === null || p.fecha_fin === null) {
+      return null;
+    }
+    const tipo = TIPO_POR_VALOR_ORIGEN[p.tipo_incidencia];
+    if (!tipo) return null;
+    const [lon, lat] = feature.geometry.coordinates;
+    return {
+      id: String(p.id_incidencia),
+      descripcion: p.desc_incidencia,
+      tipo,
+      calle: p.desc_calle,
+      afectacion: p.tipo_afectacion,
+      lat,
+      lon,
+      distritoCodigo: resolverDistrito2(lat, lon),
+      vigenciaDesde: new Date(p.fecha_inicio).toISOString(),
+      vigenciaHasta: new Date(p.fecha_fin).toISOString(),
+      fetchedAt,
+      source: "ajuntament-valencia-geoportal"
+    };
+  }).filter((item) => item !== null);
+}
+
 // src/server/pulso-distrito.ts
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
 var distritosBasicos = distritosFromGeoJSON(distritos_valencia_default).map((d) => ({
@@ -50734,20 +50799,29 @@ var distritosBasicos = distritosFromGeoJSON(distritos_valencia_default).map((d) 
 }));
 async function handler8() {
   try {
+    const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
     const [meteoResult, aireResult, traficoResult] = await Promise.all([
       getOrFetch("meteo:valencia-actual:v1", 15 * 60 * 1e3, fetchEstadoMeteo),
       getOrFetch("aire:valencia-actual:v1", 60 * 60 * 1e3, fetchCalidadAire),
-      getOrFetch(
-        "trafico:valencia-estado:v1",
-        3 * 60 * 1e3,
-        () => fetchEstadoTrafico((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
-      )
+      getOrFetch("trafico:valencia-estado:v1", 3 * 60 * 1e3, () => fetchEstadoTrafico(resolverDistrito2))
     ]);
+    let incidencias = [];
+    try {
+      const r = await getOrFetch(
+        "via-publica:incidencias-valencia:v1",
+        60 * 60 * 1e3,
+        () => fetchIncidenciasViaPublica(resolverDistrito2)
+      );
+      const ahora = Date.now();
+      incidencias = r.value.filter((i) => new Date(i.vigenciaHasta).getTime() >= ahora);
+    } catch {
+    }
     const distritos2 = calcularPulsoDistrito(
       distritosBasicos,
       meteoResult.value,
       aireResult.value,
-      traficoResult.value
+      traficoResult.value,
+      incidencias
     );
     const fresh = meteoResult.fresh && aireResult.fresh && traficoResult.fresh;
     return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
@@ -52404,47 +52478,6 @@ async function handler12(req) {
       "cache-control": "public, max-age=300, stale-while-revalidate=900"
     }
   });
-}
-
-// src/services/via-publica.ts
-var TIPO_POR_VALOR_ORIGEN = {
-  OBRAS: "obras",
-  INCIDENCIAS: "incidencias",
-  FESTEJOS: "festejos"
-};
-var GEOPORTAL_VIA_PUBLICA_URL = "https://geoportal.valencia.es/server/rest/services/OPENDATA/Trafico/MapServer/209/query?where=1=1&outFields=*&f=geojson";
-async function fetchIncidenciasViaPublica(resolverDistrito2) {
-  const res = await fetch(GEOPORTAL_VIA_PUBLICA_URL, {
-    headers: { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" }
-  });
-  if (!res.ok) {
-    throw new Error(`Geoportal (v\xEDa p\xFAblica) respondi\xF3 HTTP ${res.status}`);
-  }
-  const body = await res.json();
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  return body.features.map((feature) => {
-    const p = feature.properties;
-    if (feature.geometry === null || p.id_incidencia === null || p.desc_incidencia === null || p.tipo_incidencia === null || p.desc_calle === null || p.tipo_afectacion === null || p.fecha_inicio === null || p.fecha_fin === null) {
-      return null;
-    }
-    const tipo = TIPO_POR_VALOR_ORIGEN[p.tipo_incidencia];
-    if (!tipo) return null;
-    const [lon, lat] = feature.geometry.coordinates;
-    return {
-      id: String(p.id_incidencia),
-      descripcion: p.desc_incidencia,
-      tipo,
-      calle: p.desc_calle,
-      afectacion: p.tipo_afectacion,
-      lat,
-      lon,
-      distritoCodigo: resolverDistrito2(lat, lon),
-      vigenciaDesde: new Date(p.fecha_inicio).toISOString(),
-      vigenciaHasta: new Date(p.fecha_fin).toISOString(),
-      fetchedAt,
-      source: "ajuntament-valencia-geoportal"
-    };
-  }).filter((item) => item !== null);
 }
 
 // src/server/via-publica-incidencias.ts

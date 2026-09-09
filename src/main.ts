@@ -682,11 +682,13 @@ function renderPulsoLeyenda(root: HTMLDivElement, distritos: PulsoDistrito[], fr
 
   const criticos = distritos.filter((d) => d.categoria === 'Crítico').length;
   const tensos = distritos.filter((d) => d.categoria === 'Tenso').length;
+  const moderados = distritos.filter((d) => d.categoria === 'Moderado').length;
+  const noTranquilos = criticos + tensos + moderados;
   registrarKpi({
     clave: 'pulso',
     etiqueta: 'Pulso',
-    valor: criticos + tensos === 0 ? 'tranquilo' : `${criticos + tensos} distrito${criticos + tensos === 1 ? '' : 's'}`,
-    tono: criticos > 0 ? 'urgente' : tensos > 0 ? 'aviso' : 'ok',
+    valor: noTranquilos === 0 ? 'tranquilo' : `${noTranquilos} distrito${noTranquilos === 1 ? '' : 's'}`,
+    tono: criticos > 0 ? 'urgente' : tensos > 0 ? 'aviso' : moderados > 0 ? 'neutro' : 'ok',
     capaRelacionada: 'toggle-pulso',
   });
 

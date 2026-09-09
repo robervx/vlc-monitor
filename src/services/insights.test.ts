@@ -68,7 +68,7 @@ const DISTRITO_TRANQUILO: PulsoDistrito = {
   distritoNombre: 'Ciutat Vella',
   indice: 10,
   categoria: 'Tranquilo',
-  componentes: { trafico: 0, aire: 0.1, meteo: 0 },
+  componentes: { trafico: 0, incidencias: 0, aire: 0.1, meteo: 0 },
   observedAt: '2026-08-18T10:00:00.000Z',
   fetchedAt: '2026-08-18T10:01:00.000Z',
   source: 'vlc-monitor-compuesto',
