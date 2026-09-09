@@ -3,106 +3,97 @@
 ```yaml
 id: 034
 titulo: "Fila de indicadores (KPIs) del estado de la ciudad, siempre visible"
-estado: Draft
+estado: Implemented
 tipo: indice-compuesto
 depende_de: [004, 001, 002, 010, 013]
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
 
-Hoy, para saber "cómo está la ciudad de un vistazo" hay que activar capas y leer varios
-paneles. Falta un **resumen numérico compacto y permanente**: cuántos tramos están
-densos o cortados, la temperatura, el índice de aire, cuántas alertas hay activas. Un
-dashboard de KPIs da ese vistazo sin tocar el mapa.
-
-Complementa la spec `013` (que dice *qué* pasa y por qué) con el *cuánto* agregado.
+Para saber "cómo está la ciudad de un vistazo" hay que leer varios paneles. Falta un
+**resumen numérico compacto y permanente**: temperatura, índice de aire, tramos con
+carga, alertas activas, distritos tensos. Complementa la spec `013` (qué pasa y por
+qué) con el *cuánto* agregado.
 
 ## 2. Fuente(s) de datos
 
-Ninguna fuente externa nueva. Cálculo derivado, mismo patrón que `010` / `013`:
-reutiliza endpoints internos ya en producción.
+Ninguna nueva, y **sin endpoint nuevo** (v2, ver §4). El frontend ya fetchea meteo,
+aire, tráfico, Pulso e insights para sus paneles; el dashboard **reutiliza esos mismos
+datos ya en memoria** — cada panel, al refrescarse, empuja su cifra clave a un store
+(`src/ui/dashboard-kpis.ts`), igual patrón que `estado-frescura.ts` (spec `035`).
 
-| Indicador | Endpoint interno reutilizado | Cálculo |
+| KPI | De dónde | Tono |
 |---|---|---|
-| Tramos por estado | `GET /api/trafico/v1/estado` (spec `004`) | conteo por `estado`: fluido / denso / congestionado / cortado |
-| Temperatura y viento | `GET /api/meteo/v1/actual` (spec `001`) | valor directo |
-| Índice de aire | `GET /api/aire/v1/actual` (spec `002`) | European AQI + categoría |
-| Distritos por categoría de Pulso | `calcularPulsoDistrito` (spec `010`) | conteo por categoría |
-| Alertas activas | `GET /api/insights/v1/actual` (spec `013`) | `insights.length` y desglose por severidad |
-| Incidencias de vía pública activas | `GET /api/via-publica/v1/incidencias` (spec `026`) | conteo total *(v2, si aporta)* |
+| Temperatura | panel meteo (`001`) | `urgente` ≥ 38 / `aviso` ≥ 35 / `neutro` |
+| Aire (AQI + categoría) | panel aire (`002`) | por categoría EEA (Mala/Muy mala → aviso/urgente) |
+| Tráfico | leyenda tráfico (`004`) | nº tramos denso+congestionado+cortado; `aviso` si > 0, `urgente` si hay cortados |
+| Pulso | leyenda Pulso (`010`) | nº distritos en `Tenso`/`Crítico`; `urgente` si hay crítico |
+| Alertas | panel insights (`013`) | nº insights activos; tono = severidad máxima |
 
 ## 3. Contrato de datos (normalizado)
 
-```typescript
-interface Indicador {
-  clave: string;            // 'trafico-denso' | 'temperatura' | 'aire-aqi' | 'alertas-activas' | ...
-  etiqueta: string;         // "Tramos densos"
-  valor: number | string;   // 12  |  "31 °C"  |  "Aceptable"
-  detalle?: string;         // "de 412 monitorizados"
-  tono: 'neutro' | 'ok' | 'aviso' | 'urgente';  // color del KPI, reutiliza el semáforo de 013
-  fuenteSpec: '004' | '001' | '002' | '010' | '013' | '026';
-}
+Store en memoria, sin persistencia:
 
-interface DashboardIndicadores {
-  indicadores: Indicador[];
-  fetchedAt: string;
-  parcial: boolean;         // true si alguna fuente falló y su KPI se omitió
-  source: 'vlc-monitor-dashboard';
+```typescript
+type TonoKpi = 'neutro' | 'ok' | 'aviso' | 'urgente';
+interface Kpi {
+  clave: 'temperatura' | 'aire' | 'trafico' | 'pulso' | 'alertas';
+  etiqueta: string;      // "Aire"
+  valor: string;         // "42 · Moderada"
+  tono: TonoKpi;
+  capaRelacionada?: string; // id de toggle a activar al hacer clic (spec 033)
 }
+registrarKpi(kpi: Kpi): void;   // idempotente por `clave`
+onCambioKpis(cb: (kpis: Kpi[]) => void): void;
 ```
+
+Orden fijo: temperatura, aire, tráfico, pulso, alertas. Un KPI que aún no ha
+reportado no se pinta (aparece cuando su panel carga por primera vez).
 
 ## 4. Pipeline (seed → caché → endpoint)
 
-| Parámetro | Valor |
-|---|---|
-| Frecuencia de refresco (cron) | Ninguno propio — se recalcula por petición desde las cachés existentes (igual que `010`/`013`). El frontend lo repide con el mismo intervalo que ya usa para refrescar paneles. |
-| TTL en caché | Sin caché propia — el agregado es barato y sin red si las cachés de origen están calientes. |
-| Comportamiento si la fuente falla | **Degradación por indicador**: si una fuente falla, se omite su KPI y `parcial = true` (mejor 4 KPIs que un dashboard roto). Nunca 502 por un solo origen caído. |
-| Clave de caché | No aplica. |
-| Endpoint interno que sirve el dato | `GET /api/dashboard/v1/indicadores` |
+**No aplica — no hay endpoint ni caché nuevos.** El agregado vive en el cliente sobre
+datos ya fetcheados. Si un panel falla, su `registrarKpi` no se llama y ese KPI
+simplemente no aparece (degradación natural, sin flag `parcial`).
+
+Se descarta el `GET /api/dashboard/v1/indicadores` de la v1: añadir una función y una
+ruta para reagregar datos que el cliente ya tiene es coste sin valor.
 
 ## 5. Contrato de capa de mapa
 
-No es una capa. Es una **fila de KPIs** en el chasis (spec `019`):
+No es una capa. **Fila de KPIs** (`#dashboard-kpis`), chip por indicador (etiqueta
+pequeña + valor + color de tono):
 
-- Barra horizontal compacta sobre `#info-panels` (o en la cabecera, se decide en
-  implementación por espacio), con una celda por indicador: valor grande + etiqueta
-  pequeña + color de `tono`.
-- Siempre visible; no depende de ninguna capa activa.
-- Click en un KPI = activa/enfoca la capa o panel relacionado (p. ej. "Tramos densos"
-  → activa Tráfico). Opcional en v1.
-- Móvil (spec `029`): la fila pasa a scroll horizontal o rejilla 2×N dentro del bottom
-  sheet; nunca provoca scroll horizontal de la página.
-- Atribución: "VLC Monitor (dashboard)" + frescura, mismo patrón que el resto.
+- Escritorio: barra fija abajo a la izquierda, sobre la atribución del mapa, encima de
+  `#info-panels`. Siempre visible, no depende de ninguna capa.
+- Clic en un chip con `capaRelacionada` → activa esa capa (dispara su toggle, spec
+  `033`) y hace scroll a su leyenda.
+- Móvil (spec `029`): se integra como primera fila del bottom sheet, scroll horizontal
+  propio; nunca provoca scroll horizontal de la página.
+- Se oculta mientras el modo cordón / simulador está activo (igual que `#info-panels`).
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] Función pura `calcularIndicadores` con fixtures — sin red — cubriendo cada KPI,
-      cada `tono`, y el caso "fuente caída → KPI omitido + `parcial`".
-- [ ] `GET /api/dashboard/v1/indicadores` responde con el contrato de §3 reutilizando
-      las cachés de 004/001/002/010/013 sin llamada de red propia si están calientes.
-- [ ] Fila de KPIs visible y legible en escritorio y en el bottom sheet móvil, sin
-      scroll horizontal de página.
-- [ ] Colores de `tono` consistentes con el semáforo de la spec `013` (sin duplicar
-      umbrales: se importan de donde ya viven).
-- [ ] Atribución y frescura visibles; `parcial` se indica en la UI ("datos parciales").
-- [ ] `npm run typecheck` / `test` / `build` sin regresiones.
+- [x] `dashboard-kpis.ts` con el store + suscripción; los 5 paneles (`meteo`, `aire`,
+      `trafico`-leyenda, `pulso`-leyenda, `insights`) llaman `registrarKpi` al renderizar.
+- [x] `#dashboard-kpis` visible en escritorio, un chip por KPI reportado, color por
+      tono. Orden fijo.
+- [x] Clic en el chip de tráfico/pulso → activa la capa y hace scroll a su leyenda.
+- [x] Tonos consistentes con el semáforo de `013` (umbrales importados, no recopiados).
+- [x] Se oculta en modo cordón/simulador; en móvil no provoca scroll horizontal.
+- [x] `npm run typecheck` / `test` / `build` sin regresiones.
 
 ## 7. Riesgos y fuera de alcance
 
-- **Fuera de alcance:** históricos/sparklines por KPI (el de tráfico ya lo tiene la
-  spec `017`; los demás serían otra spec), KPIs configurables por el usuario,
-  exportar el dashboard, cualquier disparador de alerta (eso es `013` v4).
-- **Riesgo:** si la fila crece demasiado, satura; se acota a ~5-6 KPIs en v1 y se
-  prioriza por utilidad, no por "porque el dato existe".
-- **Dependencia de `013` v4:** el KPI "alertas activas" cuenta insights; si `013` v4
-  cambia el contrato de `Insight`, este dashboard se ajusta — pero el KPI funciona ya
-  con `013` v3.
+- **Fuera de alcance:** sparklines por KPI, KPIs configurables, exportar, un endpoint
+  servidor (v1, descartado).
+- **Riesgo:** si la fila crece, satura — se acota a estos 5.
 
 ## 8. Historial
 
 | Versión | Fecha | Cambio |
 |---|---|---|
-| 1 | 2026-09-04 | Creación (Draft). Sale de la petición del usuario de "un dashboard con indicadores" junto con las alertas emergentes (que van en `013` v4). Todas las fuentes ya `Implemented`. Pendiente de aprobación. |
+| 1 | 2026-09-04 | Creación (Draft). Diseñada con endpoint servidor `GET /api/dashboard/v1/indicadores`. |
+| 2 | 2026-09-09 | Replanteada a **agregación en cliente** sobre datos que los paneles ya fetchean (`dashboard-kpis.ts`, patrón de `estado-frescura.ts`). Se descarta el endpoint. 5 KPIs (temperatura, aire, tráfico, pulso, alertas), chip clicable → activa la capa. Implementado y verificado. Pasa a `Implemented`. |

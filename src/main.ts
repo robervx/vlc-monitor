@@ -11,7 +11,12 @@ import type { DensidadDistritoMock } from './services/densidad-personas-mock';
 import type { EstadoMeteo } from './services/estado-meteo';
 import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
 import type { Insight, PanelInsights } from './services/insights';
-import { UMBRAL_VIENTO_AVISO_KMH, UMBRAL_VIENTO_URGENTE_KMH } from './services/insights';
+import {
+  UMBRAL_VIENTO_AVISO_KMH,
+  UMBRAL_VIENTO_URGENTE_KMH,
+  UMBRAL_CALOR_TEMPERATURA,
+  UMBRAL_CALOR_SENSACION,
+} from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
 import type { HistoricoTrafico } from './services/trafico-historico';
@@ -26,6 +31,7 @@ import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility } from './ui/panel-preferences';
 import { registrarFrescura } from './ui/estado-frescura';
+import { montarDashboardKpis, registrarKpi } from './ui/dashboard-kpis';
 import { initPwa } from './pwa';
 import { initDeteccionDispositivo } from './ui/deteccion-dispositivo';
 import { initLayoutMovil } from './ui/layout-movil';
@@ -243,6 +249,19 @@ function renderMeteoPanel(root: HTMLDivElement, estado: EstadoMeteo, fresh: bool
     </div>
     <div class="info-panel__meta">${metaFrescura('Open-Meteo', estado.fetchedAt, fresh)}</div>
   `;
+
+  const t = estado.temperatura;
+  registrarKpi({
+    clave: 'temperatura',
+    etiqueta: 'Temp.',
+    valor: `${Math.round(t)}°C`,
+    tono:
+      t >= UMBRAL_CALOR_TEMPERATURA || estado.sensacionTermica >= UMBRAL_CALOR_SENSACION
+        ? 'urgente'
+        : t >= 35
+          ? 'aviso'
+          : 'neutro',
+  });
 }
 
 async function fetchEstadoMeteoActual(): Promise<{ estado: EstadoMeteo; fresh: boolean }> {
@@ -397,6 +416,14 @@ function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: 
   ultimoPanelInsights = panel;
   procesarNuevasAlertas(panel);
 
+  const nUrgentes = panel.insights.filter((i) => i.severidad === 'urgente').length;
+  registrarKpi({
+    clave: 'alertas',
+    etiqueta: 'Alertas',
+    valor: panel.insights.length === 0 ? '0' : String(panel.insights.length),
+    tono: panel.insights.length === 0 ? 'ok' : nUrgentes > 0 ? 'urgente' : 'aviso',
+  });
+
   if (panel.insights.length === 0) {
     root.innerHTML = `
       <div class="info-panel__desc">✓ Sin alertas activas</div>
@@ -460,6 +487,20 @@ function renderAirePanel(root: HTMLDivElement, calidad: CalidadAire, fresh: bool
     <div class="info-panel__desc">PM2.5 ${calidad.pm25.toFixed(1)} · NO₂ ${calidad.dioxidoNitrogeno.toFixed(1)} µg/m³</div>
     <div class="info-panel__meta">${metaFrescura('Open-Meteo', calidad.fetchedAt, fresh)}</div>
   `;
+
+  registrarKpi({
+    clave: 'aire',
+    etiqueta: 'Aire',
+    valor: `${calidad.indiceEuropeo} · ${calidad.categoria}`,
+    tono:
+      calidad.categoria === 'Muy mala' || calidad.categoria === 'Extremadamente mala'
+        ? 'urgente'
+        : calidad.categoria === 'Mala'
+          ? 'aviso'
+          : calidad.categoria === 'Buena'
+            ? 'ok'
+            : 'neutro',
+  });
 }
 
 async function fetchCalidadAireActual(): Promise<{ calidad: CalidadAire; fresh: boolean }> {
@@ -505,13 +546,21 @@ function renderTraficoLeyenda(root: HTMLDivElement, tramos: TramoTrafico[], fres
     })
     .join('');
 
-  const problematicos =
-    (conteos.get('denso') ?? 0) + (conteos.get('congestionado') ?? 0) + (conteos.get('cortado') ?? 0);
+  const cortados = conteos.get('cortado') ?? 0;
+  const problematicos = (conteos.get('denso') ?? 0) + (conteos.get('congestionado') ?? 0) + cortados;
   root.innerHTML = `
     <div class="info-panel__desc">Tráfico — ${problematicos === 0 ? 'todo fluido' : `${problematicos} tramo${problematicos === 1 ? '' : 's'} con carga`}</div>
     ${filas}
     <div class="info-panel__meta">${metaFrescura('Ajuntament de València', tramos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
   `;
+
+  registrarKpi({
+    clave: 'trafico',
+    etiqueta: 'Tráfico',
+    valor: problematicos === 0 ? 'fluido' : `${problematicos} con carga`,
+    tono: cortados > 0 ? 'urgente' : problematicos > 0 ? 'aviso' : 'ok',
+    capaRelacionada: 'toggle-trafico',
+  });
 }
 
 async function fetchEstadoTraficoActual(): Promise<{ tramos: TramoTrafico[]; fresh: boolean }> {
@@ -629,6 +678,16 @@ function renderPulsoLeyenda(root: HTMLDivElement, distritos: PulsoDistrito[], fr
       </div>`;
     })
     .join('');
+
+  const criticos = distritos.filter((d) => d.categoria === 'Crítico').length;
+  const tensos = distritos.filter((d) => d.categoria === 'Tenso').length;
+  registrarKpi({
+    clave: 'pulso',
+    etiqueta: 'Pulso',
+    valor: criticos + tensos === 0 ? 'tranquilo' : `${criticos + tensos} distrito${criticos + tensos === 1 ? '' : 's'}`,
+    tono: criticos > 0 ? 'urgente' : tensos > 0 ? 'aviso' : 'ok',
+    capaRelacionada: 'toggle-pulso',
+  });
 
   root.innerHTML = `
     <div class="info-panel__desc">Pulso de Distrito${masTenso ? ` — ${masTenso.distritoNombre} (${masTenso.indice})` : ''}</div>
@@ -1700,6 +1759,8 @@ async function main(): Promise<void> {
     const activo = estadoCordon.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+    const kpisEl = document.getElementById('dashboard-kpis');
+    if (kpisEl) kpisEl.style.display = activo ? 'none' : '';
 
     if (estadoCordon.fase === 'esperandoClicMapa' && !clicCordonHandler) {
       map.getCanvas().style.cursor = 'crosshair';
@@ -1793,6 +1854,8 @@ async function main(): Promise<void> {
     const activo = estadoSimulacion.fase !== 'inactivo';
     if (controlesEl) controlesEl.style.display = activo ? 'none' : '';
     if (infoPanelsEl) infoPanelsEl.style.display = activo ? 'none' : '';
+    const kpisEl = document.getElementById('dashboard-kpis');
+    if (kpisEl) kpisEl.style.display = activo ? 'none' : '';
     actualizarAnimacionReruta(activo && estadoSimulacion.rutasAlternativas.length > 0);
 
     if (estadoSimulacion.fase === 'seleccionando' && !clicSimulacionHandler) {
@@ -1849,6 +1912,19 @@ async function main(): Promise<void> {
   });
 
   actualizarContextoSelector();
+
+  // spec 034 — dashboard de KPIs: los paneles empujan sus cifras vía registrarKpi()
+  // al renderizarse. Clic en un chip con capa relacionada → la activa y hace scroll
+  // a su leyenda.
+  montarDashboardKpis((idToggle) => {
+    const toggle = document.getElementById(idToggle) as HTMLInputElement | null;
+    if (toggle && !toggle.checked) {
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event('change'));
+    }
+    const leyenda = document.getElementById(idToggle.replace('toggle-', '') + '-leyenda');
+    leyenda?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
 
   async function refreshMockLayer(): Promise<void> {
     densidadMock = await fetchDensidadMock(horaSimulada);

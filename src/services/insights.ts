@@ -58,8 +58,10 @@ export interface PanelInsights {
   source: 'vlc-monitor-insights';
 }
 
-const UMBRAL_CALOR_TEMPERATURA = 38;
-const UMBRAL_CALOR_SENSACION = 42;
+// Exportados para que el dashboard de KPIs (spec 034) pinte el mismo semáforo
+// sin duplicar el número.
+export const UMBRAL_CALOR_TEMPERATURA = 38;
+export const UMBRAL_CALOR_SENSACION = 42;
 const UMBRAL_FRIO_TEMPERATURA = 0;
 const UMBRAL_LLUVIA_MM = 5;
 // Basado en rachas (vientoRachas), no en velocidad sostenida — más indicativo

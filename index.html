@@ -621,6 +621,78 @@
       }
 
       /* Aviso de nueva versión (PWA) — spec 028 */
+      /* spec 034 — fila de KPIs del estado de la ciudad, siempre visible. */
+      #dashboard-kpis {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(var(--header-h) + 10px);
+        z-index: 120;
+        display: flex;
+        gap: 6px;
+        max-width: min(70vw, 720px);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      #dashboard-kpis::-webkit-scrollbar {
+        display: none;
+      }
+
+      .kpi-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+        border-left: 3px solid #cbd5e1;
+        font: inherit;
+        text-align: left;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      button.kpi-chip {
+        cursor: pointer;
+      }
+
+      button.kpi-chip:hover {
+        background: #fff;
+      }
+
+      .kpi-chip--ok {
+        border-left-color: #4caf50;
+      }
+
+      .kpi-chip--aviso {
+        border-left-color: #f2c744;
+      }
+
+      .kpi-chip--urgente {
+        border-left-color: #d64545;
+      }
+
+      .kpi-chip__etiqueta {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #94a3b8;
+      }
+
+      .kpi-chip__valor {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      :root[data-layout='movil'] #dashboard-kpis {
+        display: none;
+      }
+
       /* spec 013 v4 — el "popup": alertas nuevas saltan arriba a la derecha
          y se van solas; el panel de #info-panels sigue siendo la lista fija. */
       #alert-toasts {
