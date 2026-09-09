@@ -24,7 +24,7 @@ export const PESOS_PULSO = { trafico: 0.45, incidencias: 0.15, aire: 0.25, meteo
  * índice, sin cambiar el significado de `componenteTrafico` para otros usos
  * (spec 017). Spec 010 §9 v3.
  */
-const AMPLIFICACION_TRAFICO_PULSO = 2.5;
+export const AMPLIFICACION_TRAFICO_PULSO = 2.5;
 
 /** Umbral inferior de cada categoría — `indice < 18` = Tranquilo, etc. Spec 010 §3 v3. */
 export const UMBRALES_CATEGORIA_PULSO = { Moderado: 18, Tenso: 38, Crítico: 62 } as const;

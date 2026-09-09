@@ -9,7 +9,7 @@
 // alguien recalibra un peso el glosario lo refleja sin tocar este fichero.
 
 import { LAYER_REGISTRY } from '../config/map-layer-definitions';
-import { PESOS_PULSO, UMBRALES_CATEGORIA_PULSO } from '../services/pulso-distrito';
+import { PESOS_PULSO, UMBRALES_CATEGORIA_PULSO, AMPLIFICACION_TRAFICO_PULSO } from '../services/pulso-distrito';
 import {
   UMBRAL_CALOR_TEMPERATURA,
   UMBRAL_CALOR_SENSACION,
@@ -52,7 +52,7 @@ const META_CAPAS: Record<string, MetaCapa> = {
   movimientoPersonasMock: {
     nombre: 'Densidad de personas',
     mide: 'Concentración de personas por distrito — 100 % sintética, no representa nada real',
-    frecuencia: 'Generada en el cliente',
+    frecuencia: 'Generada por el propio proyecto (algoritmo determinista por hora)',
     fuente: 'MOCK — sin fuente (ver "MOCK" más abajo)',
   },
   meteo: {
@@ -88,7 +88,7 @@ const META_CAPAS: Record<string, MetaCapa> = {
   pulsoDistrito: {
     nombre: 'Pulso de Distrito',
     mide: 'Índice compuesto de tensión del distrito (ver "Pulso de Distrito" arriba)',
-    frecuencia: 'Se recalcula en cliente con sus fuentes (tráfico, aire, meteo, incidencias)',
+    frecuencia: 'Se recalcula a partir de sus fuentes (tráfico, incidencias, aire, meteo)',
     fuente: 'Compuesto — VLC Monitor, sin fuente externa propia',
   },
   fallas: {
@@ -148,7 +148,10 @@ function cuerpoPulso(): string {
     </ul>
     <p>Fórmula: <code>índice = 100 × (${trafico}·tráfico + ${incidencias}·incidencias
     + ${aire}·aire + ${meteo}·meteo)</code>, donde cada componente va de 0 a 1. En la
-    meteo domina el factor más adverso (calor, frío, viento o lluvia), no la media.</p>
+    meteo domina el factor más adverso (calor, frío, viento o lluvia), no la media.
+    El componente de tráfico se amplifica ×${AMPLIFICACION_TRAFICO_PULSO} (con tope en 1)
+    antes de entrar en la fórmula, para que unos pocos tramos cortados o congestionados
+    entre cientos de tramos fluidos muevan el índice.</p>
     <p>Categorías por umbral: <strong>Tranquilo</strong> si el índice &lt; ${Moderado},
     <strong>Moderado</strong> de ${Moderado} a ${Tenso - 1},
     <strong>Tenso</strong> de ${Tenso} a ${Crítico - 1},
@@ -161,8 +164,9 @@ function cuerpoPulso(): string {
 
 function cuerpoAlertas(): string {
   return `
-    <p>El motor de <strong>insights</strong> revisa las capas cada vez que se
-    refrescan y levanta una alerta cuando algo cruza un umbral. Tipos actuales:</p>
+    <p>El motor de <strong>insights</strong> se recalcula cada pocos minutos a partir
+    de las capas ya cacheadas y levanta una alerta cuando algo cruza un umbral. Tipos
+    actuales:</p>
     <ul class="glosario-lista">
       <li><strong>Calor</strong> — aviso a partir de ${UMBRAL_CALOR_AVISO_TEMPERATURA} °C;
       calor extremo a ${UMBRAL_CALOR_TEMPERATURA} °C o ${UMBRAL_CALOR_SENSACION} °C de sensación.</li>
@@ -170,7 +174,8 @@ function cuerpoAlertas(): string {
       <strong>lluvia probable</strong> (señal blanda).</li>
       <li><strong>Viento fuerte</strong> — aviso con rachas ≥ ${UMBRAL_VIENTO_AVISO_KMH} km/h,
       urgente ≥ ${UMBRAL_VIENTO_URGENTE_KMH} km/h.</li>
-      <li><strong>Calidad del aire mala</strong> y <strong>distrito crítico</strong> (Pulso alto).</li>
+      <li><strong>Calidad del aire mala</strong> (categoría "Mala" o "Muy mala") y
+      <strong>distrito crítico</strong> (el Pulso de un distrito entra en "Crítico").</li>
       <li><strong>Tráfico</strong> — concentración de tramos afectados en un distrito,
       tráfico en zona de Fallas, empeoramiento respecto al ciclo anterior y lluvia + tráfico denso.</li>
     </ul>
@@ -195,7 +200,8 @@ export function construirEntradasGlosario(): EntradaGlosario[] {
       cuerpo: `<p>Qué mide cada capa, cada cuánto se refresca su caché y de dónde
         sale el dato:</p>${listaCapasHtml()}
         <p class="glosario-nota">Las frecuencias son el intervalo de refresco de la
-        caché del servidor, orientativas.</p>`,
+        caché del servidor, orientativas. Meteo y calidad del aire no están en el
+        selector de capas: se ven siempre en sus paneles.</p>`,
     },
     {
       termino: 'Prioritarias vs. Contexto',
@@ -212,18 +218,20 @@ export function construirEntradasGlosario(): EntradaGlosario[] {
     },
     {
       termino: '"En vivo" y "no actualizado"',
-      cuerpo: `<p>La cabecera resume la frescura de todas las fuentes:</p>
+      cuerpo: `<p>La marca <strong>EN VIVO</strong> de la cabecera resume la frescura
+        de todas las fuentes a la vez:</p>
         <ul class="glosario-lista">
-          <li><span class="glosario-punto" style="background:#16a34a"></span>
+          <li><span class="glosario-punto" style="background:#22c55e"></span>
           <strong>Verde</strong> — todas las fuentes al día.</li>
-          <li><span class="glosario-punto" style="background:#f59e0b"></span>
+          <li><span class="glosario-punto" style="background:#fbbf24"></span>
           <strong>Ámbar</strong> — alguna fuente sirve datos cacheados antiguos
           ("N/N con retraso").</li>
-          <li><span class="glosario-punto" style="background:#9db3c9"></span>
+          <li><span class="glosario-punto" style="background:#94a3b8"></span>
           <strong>Gris</strong> — aún cargando.</li>
         </ul>
-        <p>Cada panel avisa por separado cuando su dato no está en vivo: significa que
-        la fuente falló y se muestra la última respuesta buena guardada.</p>`,
+        <p>Además, cada panel avisa por su cuenta cuando su dato no está en vivo: quiere
+        decir que la última llamada a la fuente falló y se muestra la última respuesta
+        buena guardada (patrón "stale-on-error"), no que el dato sea de ahora.</p>`,
     },
     { termino: 'Alertas e insights', cuerpo: cuerpoAlertas() },
     {
@@ -244,17 +252,26 @@ export function construirEntradasGlosario(): EntradaGlosario[] {
           buckets de ciudad).</li>
           <li>El Pulso antepone el índice de ese distrito.</li>
         </ul>
-        <p>Clic de nuevo en el mismo distrito, o en el chip, para quitar el foco. No
-        se guarda entre sesiones.</p>`,
+        <p>Para quitar el foco: clic de nuevo en el mismo distrito, o el <strong>✕</strong>
+        del chip. No se guarda entre sesiones.</p>`,
     },
     {
       termino: 'Fuentes y licencias',
-      cuerpo: `<p>Todos los datos de esta app son públicos y gratuitos: Geoportal y
-        Portal de Datos Abiertos del Ajuntament de València, Open-Meteo, AEMET,
-        OpenStreetMap y RSS de medios locales.</p>
-        <p>El inventario completo (fuente, licencia y atribución por capa) está en
+      cuerpo: `<p>Todos los datos de esta app son públicos y gratuitos, sin contratos
+        ni claves de pago (la única clave, AEMET, es gratuita y opcional):</p>
+        <ul class="glosario-lista">
+          <li>Geoportal y Portal de Datos Abiertos del Ajuntament de València —
+          <strong>CC BY 4.0</strong>.</li>
+          <li>Open-Meteo y Open-Meteo Air Quality — CC BY 4.0.</li>
+          <li>AEMET OpenData (avisos) — reutilización con atribución a © AEMET.</li>
+          <li>OpenStreetMap vía Overpass (grafo viario) y el mapa base
+          (OpenFreeMap / OpenMapTiles) — <strong>ODbL</strong>, © OpenStreetMap contributors.</li>
+          <li>Prensa: RSS de medios locales y Google News RSS (para medios sin RSS propio).</li>
+        </ul>
+        <p>Inventario completo (fuente, licencia y atribución por capa) en
         <a href="${REPO_URL}/blob/master/${RUTA_FUENTES}" target="_blank" rel="noopener">
-        ${RUTA_FUENTES}</a> del repositorio.</p>`,
+        ${RUTA_FUENTES}</a>. El código es MIT; no se usa ninguna fuente de localización
+        individual (CLAUDE.md §4).</p>`,
     },
   ];
 }

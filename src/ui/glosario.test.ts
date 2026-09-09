@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { construirEntradasGlosario, capasSinMetadato } from './glosario';
 import { LAYER_REGISTRY } from '../config/map-layer-definitions';
-import { PESOS_PULSO, UMBRALES_CATEGORIA_PULSO } from '../services/pulso-distrito';
+import {
+  PESOS_PULSO,
+  UMBRALES_CATEGORIA_PULSO,
+  AMPLIFICACION_TRAFICO_PULSO,
+} from '../services/pulso-distrito';
 import { UMBRAL_VIENTO_AVISO_KMH, UMBRAL_CALOR_TEMPERATURA } from '../services/insights';
 
 const entrada = (termino: string) => {
@@ -46,6 +50,10 @@ describe('construirEntradasGlosario', () => {
     const cuerpo = entrada('Pulso de Distrito').cuerpo;
     const esperado = `${Math.round(PESOS_PULSO.trafico * 100)} %`;
     expect(cuerpo).toContain(esperado);
+  });
+
+  it('la entrada del Pulso explica la amplificación de tráfico con la constante', () => {
+    expect(entrada('Pulso de Distrito').cuerpo).toContain(`×${AMPLIFICACION_TRAFICO_PULSO}`);
   });
 
   it('la entrada de alertas cita los umbrales exportados de insights.ts', () => {
