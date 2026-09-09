@@ -3,11 +3,11 @@
 ```yaml
 id: 037
 titulo: "Sección del sidebar que explica los conceptos y cómo se calcula cada cosa"
-estado: Draft
+estado: Implemented
 tipo: capa
 depende_de: [019, 010]
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
@@ -69,14 +69,19 @@ glosario lo refleja sin editar texto.
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] Entrada `glosario` en `SIDEBAR_REGISTRY`; al abrirla se ve el contenido en el
-      sidebar.
-- [ ] La entrada "Pulso de Distrito" muestra los pesos y umbrales **leídos de las
-      constantes**, no escritos a mano (verificado cambiando un peso en dev y viendo
-      que el texto cambia).
-- [ ] Las 8 entradas de §3 presentes, legibles en escritorio y en la hoja móvil.
-- [ ] Enlace a `docs/FUENTES_Y_LICENCIAS.md` correcto.
-- [ ] `npm run typecheck` / `test` / `build` sin regresiones.
+- [x] Entrada `glosario` en `SIDEBAR_REGISTRY`; al abrirla se ve el contenido en el
+      sidebar. (`src/ui/chasis.ts`, `src/ui/glosario.ts`)
+- [x] La entrada "Pulso de Distrito" muestra los pesos y umbrales **leídos de las
+      constantes** (`PESOS_PULSO`, `UMBRALES_CATEGORIA_PULSO` de `pulso-distrito.ts`),
+      no escritos a mano — `src/ui/glosario.test.ts` falla si se cuela un literal, y
+      verificado en navegador (peso de tráfico "45 %" = `PESOS_PULSO.trafico`).
+- [x] Las 8 entradas de §3 presentes, legibles en escritorio y en la hoja móvil
+      (acordeón, una abierta a la vez).
+- [x] Enlace a `docs/FUENTES_Y_LICENCIAS.md` correcto (a la vista raw del repo,
+      `target="_blank"`).
+- [x] La lista de "Capas del mapa" se deriva de `LAYER_REGISTRY` — un test guarda
+      que no quede ninguna capa sin su metadato (`capasSinMetadato()` = []).
+- [x] `npm run typecheck` / `test` (302) / `build` sin regresiones.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -92,3 +97,4 @@ glosario lo refleja sin editar texto.
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-09 | Creación (Draft). Sale de la petición del usuario de una página de glosario en el lateral, junto con la recalibración del Pulso (spec `010` v3). |
+| 2 | 2026-09-09 | **Implemented.** `src/ui/glosario.ts` (contenido puro `construirEntradasGlosario()` + `buildGlosarioContent()` acordeón), entrada en `SIDEBAR_REGISTRY`, CSS `.glosario-*` en `index.html`. Las 8 entradas de §3; Pulso y alertas leen sus números de `pulso-distrito.ts` / `insights.ts`; lista de capas derivada de `LAYER_REGISTRY` + `META_CAPAS` (con guardarraíl de cobertura). 9 tests en `src/ui/glosario.test.ts`. typecheck/test (302)/build verdes, verificado en navegador (acordeón, valores en vivo). |
