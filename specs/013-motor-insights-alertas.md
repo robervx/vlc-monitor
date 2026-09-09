@@ -199,13 +199,20 @@ Se retoma si el volumen de alertas lo justifica.
       Verificado en navegador: 0 toasts en primera carga, 5 disparados → 3 + "y 2 más",
       ✕ y clic-a-panel OK.
 
-**v4b — disparadores nuevos (§9.1-9.2), después:**
+**v4b — disparadores nuevos (§9.1-9.2), `Implemented` 2026-09-09:**
 
-- [ ] `trafico-empeora`: función pura con fixtures del par (estado previo, estado
-      actual) cubriendo cada transición y el caso "sin estado previo"; clave de caché
-      `insights:trafico:estado-previo` con su TTL; degradación si tráfico falla.
-- [ ] Bandas nuevas de `calor-extremo` (35), `aire-mala-calidad` (Moderada + contaminante)
-      y regla `lluvia-prevista` con tests de borde.
+- [x] `trafico-empeora`: función pura `insightsTraficoEmpeora(actual, previo, fetchedAt)`
+      — cada transición, agrupación por distrito, `→ congestionado/cortado` = `urgente`,
+      `→ denso` = `aviso`, mejoras y tramos nuevos no disparan, y **sin estado previo no
+      dispara** (5 tests). El endpoint guarda el estado con `cachePeek`/`cachePoke`
+      (`insights:trafico:estado-previo`, TTL 15 min); en arranque en frío no hay previo.
+- [x] Banda `aviso` de `calor-extremo` a 35 °C (se mantiene `urgente` ≥ 38 / sensación
+      ≥ 42), regla `lluvia-prevista` blanda (prob. ≥ 60 % o `weather_code` de lluvia con
+      precipitación > 0, excluyendo lo que ya cubre `lluvia-intensa-prevista`). Tests de
+      borde. **`aire-mala-calidad` en Moderada + contaminante queda fuera** — sin dato
+      de umbrales OMS por contaminante puntero en la respuesta actual de Open-Meteo; se
+      reevalúa si la fuente lo trae.
+- [x] `npm run typecheck` / `test` (284/284) / `build` sin regresiones.
 
 ## 10. Historial
 

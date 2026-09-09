@@ -25,10 +25,12 @@ export type TipoInsight =
   | 'frio-extremo'
   | 'aire-mala-calidad'
   | 'lluvia-intensa-prevista'
+  | 'lluvia-prevista'
   | 'distrito-critico'
   | 'viento-fuerte'
   | 'trafico-concentrado-distrito'
   | 'trafico-en-zona-fallas'
+  | 'trafico-empeora'
   | 'lluvia-mas-trafico-denso';
 
 export interface ProtocoloSugerido {
@@ -62,8 +64,12 @@ export interface PanelInsights {
 // sin duplicar el número.
 export const UMBRAL_CALOR_TEMPERATURA = 38;
 export const UMBRAL_CALOR_SENSACION = 42;
+/** Banda de aviso más temprana — spec 013 v4b §9.2. */
+export const UMBRAL_CALOR_AVISO_TEMPERATURA = 35;
 const UMBRAL_FRIO_TEMPERATURA = 0;
 const UMBRAL_LLUVIA_MM = 5;
+/** Probabilidad de precipitación que dispara `lluvia-prevista` (regla blanda, v4b §9.2). */
+const UMBRAL_LLUVIA_PROB_PCT = 60;
 // Basado en rachas (vientoRachas), no en velocidad sostenida — más indicativo
 // del riesgo real, mismo criterio que usan los avisos AEMET por viento.
 // Heurística documentada, no un umbral oficial — igual disclaimer que spec 010 §7.
@@ -73,20 +79,25 @@ export const UMBRAL_VIENTO_AVISO_KMH = 50;
 export const UMBRAL_VIENTO_URGENTE_KMH = 70;
 
 function insightCalorExtremo(meteo: EstadoMeteo, fetchedAt: string): Insight | null {
-  if (meteo.temperatura < UMBRAL_CALOR_TEMPERATURA && meteo.sensacionTermica < UMBRAL_CALOR_SENSACION) {
-    return null;
-  }
+  const esExtremo = meteo.temperatura >= UMBRAL_CALOR_TEMPERATURA || meteo.sensacionTermica >= UMBRAL_CALOR_SENSACION;
+  const esAviso = meteo.temperatura >= UMBRAL_CALOR_AVISO_TEMPERATURA;
+  if (!esExtremo && !esAviso) return null;
+
+  const severidad: SeveridadInsight = esExtremo ? 'urgente' : 'aviso';
+  const umbral = esExtremo
+    ? `umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}°C / ${UMBRAL_CALOR_SENSACION}°C sensación)`
+    : `umbral de aviso de calor (${UMBRAL_CALOR_AVISO_TEMPERATURA}°C)`;
   return {
     id: 'calor-extremo:ciudad',
     tipo: 'calor-extremo',
-    severidad: 'urgente',
-    titulo: `Calor extremo — ${Math.round(meteo.temperatura)}°C en Valencia`,
-    descripcion: `Temperatura ${meteo.temperatura}°C, sensación térmica ${meteo.sensacionTermica}°C — por encima del umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}°C / ${UMBRAL_CALOR_SENSACION}°C sensación).`,
+    severidad,
+    titulo: `${esExtremo ? 'Calor extremo' : 'Aviso de calor'} — ${Math.round(meteo.temperatura)}°C en Valencia`,
+    descripcion: `Temperatura ${meteo.temperatura}°C, sensación térmica ${meteo.sensacionTermica}°C — por encima del ${umbral}.`,
     protocoloSugerido: {
-      asunto: 'Posible activación de protocolo de calor — Valencia',
+      asunto: `${esExtremo ? 'Posible activación de protocolo de calor' : 'Aviso de calor'} — Valencia`,
       cuerpo:
         `Se ha detectado una temperatura de ${meteo.temperatura}°C (sensación térmica ${meteo.sensacionTermica}°C) ` +
-        `en Valencia a las ${meteo.observedAt}. Se sugiere valorar la activación del protocolo de calor extremo: ` +
+        `en Valencia a las ${meteo.observedAt}. Se sugiere valorar ${esExtremo ? 'la activación del protocolo de calor extremo' : 'medidas preventivas de calor'}: ` +
         'hidratación y rotación de las unidades en calle, prioridad a zonas sin sombra. ' +
         'Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.',
     },
@@ -184,6 +195,116 @@ function insightsLluviaIntensa(prediccion: PrediccionCortoPlazo, fetchedAt: stri
       detectedAt: tramo.horaObjetivo,
       fetchedAt,
     }));
+}
+
+// weather_code WMO de lluvia/chubascos/tormenta (51-67 llovizna/lluvia, 80-82 chubascos, 95-99 tormenta).
+function esCodigoLluvia(weatherCode: number): boolean {
+  return (
+    (weatherCode >= 51 && weatherCode <= 67) ||
+    (weatherCode >= 80 && weatherCode <= 82) ||
+    (weatherCode >= 95 && weatherCode <= 99)
+  );
+}
+
+/**
+ * Regla blanda (spec 013 v4b §9.2): "va a llover" en las próximas horas, sin
+ * llegar al umbral de lluvia *intensa* (`insightsLluviaIntensa`, >= 5 mm). Se
+ * excluyen los tramos que ya cubre esa regla para no duplicar el aviso.
+ */
+function insightsLluviaPrevista(prediccion: PrediccionCortoPlazo, fetchedAt: string): Insight[] {
+  return prediccion.predicciones
+    .filter((tramo) => tramo.precipitacion < UMBRAL_LLUVIA_MM)
+    .filter(
+      (tramo) =>
+        tramo.probabilidadPrecipitacion >= UMBRAL_LLUVIA_PROB_PCT ||
+        (tramo.precipitacion > 0 && esCodigoLluvia(tramo.weatherCode)),
+    )
+    .map((tramo) => ({
+      id: `lluvia-prevista:${tramo.horaObjetivo}`,
+      tipo: 'lluvia-prevista' as const,
+      severidad: 'aviso' as const,
+      titulo: `Lluvia prevista hacia las ${tramo.horaObjetivo}`,
+      descripcion: `Predicción: ${tramo.probabilidadPrecipitacion}% de probabilidad de precipitación (${tramo.precipitacion} mm) para ${tramo.horaObjetivo}.`,
+      protocoloSugerido: {
+        asunto: 'Aviso de lluvia prevista — Valencia',
+        cuerpo:
+          `Open-Meteo prevé lluvia hacia las ${tramo.horaObjetivo} en Valencia ` +
+          `(${tramo.probabilidadPrecipitacion}% de probabilidad, ${tramo.precipitacion} mm estimados). ` +
+          'Se sugiere aviso preventivo a unidades y atención a puntos de acumulación de agua habituales. ' +
+          'Dato de origen: Open-Meteo (VLC Monitor, spec 016). Revisar y decidir antes de actuar.',
+      },
+      fuenteSpec: ['016'] as FuenteInsight[],
+      detectedAt: tramo.horaObjetivo,
+      fetchedAt,
+    }));
+}
+
+// Peso ordinal de cada estado de tráfico para detectar "empeora" (spec 013 v4b §9.1).
+const NIVEL_TRAFICO: Record<string, number> = { fluido: 0, denso: 1, congestionado: 2, cortado: 3 };
+
+/**
+ * Un tramo sube de nivel entre dos lecturas consecutivas de tráfico. Requiere
+ * estado previo (lo guarda el endpoint); en la primera evaluación no hay previo
+ * y no dispara nada. Se agrupa por distrito.
+ */
+function insightsTraficoEmpeora(
+  actual: TramoTrafico[],
+  previo: TramoTrafico[] | null,
+  fetchedAt: string,
+): Insight[] {
+  if (!previo || previo.length === 0) return [];
+  const nivelPrevio = new Map(previo.map((t) => [t.id, NIVEL_TRAFICO[t.estado] ?? 0]));
+
+  interface Empeorado {
+    tramo: TramoTrafico;
+    destino: number;
+  }
+  const empeorados: Empeorado[] = [];
+  for (const t of actual) {
+    const nivelAhora = NIVEL_TRAFICO[t.estado];
+    if (nivelAhora === undefined) continue; // 'sin-datos'
+    const antes = nivelPrevio.get(t.id);
+    if (antes === undefined) continue; // tramo nuevo, no hay con qué comparar
+    if (nivelAhora > antes) empeorados.push({ tramo: t, destino: nivelAhora });
+  }
+  if (empeorados.length === 0) return [];
+
+  const porDistrito = new Map<string, Empeorado[]>();
+  for (const e of empeorados) {
+    const clave = e.tramo.distrito ?? '__ciudad__';
+    const lista = porDistrito.get(clave);
+    if (lista) lista.push(e);
+    else porDistrito.set(clave, [e]);
+  }
+
+  return [...porDistrito.entries()].map(([clave, lista]) => {
+    const hayGrave = lista.some((e) => e.destino >= 2); // congestionado o cortado
+    const nombreZona = clave === '__ciudad__' ? 'Valencia' : lista[0]!.tramo.distrito!;
+    return {
+      id: `trafico-empeora:${clave}`,
+      tipo: 'trafico-empeora' as const,
+      severidad: (hayGrave ? 'urgente' : 'aviso') as SeveridadInsight,
+      titulo: `Tráfico a peor — ${lista.length} tramo${lista.length === 1 ? '' : 's'} en ${nombreZona}`,
+      descripcion:
+        `${lista.length} tramo${lista.length === 1 ? ' ha' : 's han'} subido de nivel de tráfico respecto a la lectura anterior` +
+        ` (${lista
+          .slice(0, 3)
+          .map((e) => `${e.tramo.nombre}: ${e.tramo.estado}`)
+          .join('; ')}${lista.length > 3 ? '…' : ''}).`,
+      protocoloSugerido: {
+        asunto: `Empeoramiento de tráfico — ${nombreZona}`,
+        cuerpo:
+          `Se ha detectado que ${lista.length} tramo${lista.length === 1 ? '' : 's'} de ${nombreZona} ` +
+          `ha${lista.length === 1 ? '' : 'n'} pasado a un estado de tráfico peor entre dos lecturas consecutivas. ` +
+          'Se sugiere valorar si hace falta reforzar la regulación en la zona o avisar de rutas alternativas. ' +
+          'Dato de origen: Ajuntament de València (VLC Monitor, spec 004). Revisar y decidir antes de actuar.',
+      },
+      distritoCodigo: clave === '__ciudad__' ? undefined : clave,
+      fuenteSpec: ['004'] as FuenteInsight[],
+      detectedAt: fetchedAt,
+      fetchedAt,
+    };
+  });
 }
 
 function insightsDistritoCritico(distritos: PulsoDistrito[], fetchedAt: string): Insight[] {
@@ -354,6 +475,7 @@ export function calcularInsights(
   prediccion: PrediccionCortoPlazo | null,
   tramosTrafico: TramoTrafico[] | null = null,
   datosFallas: DatosFallas | null = null,
+  tramosTraficoPrevios: TramoTrafico[] | null = null,
 ): PanelInsights {
   const fetchedAt = new Date().toISOString();
 
@@ -365,9 +487,11 @@ export function calcularInsights(
     insightVientoFuerte(meteo, fetchedAt),
     insightAireMalaCalidad(aire, fetchedAt),
     ...insightsLluvia,
+    ...(prediccion ? insightsLluviaPrevista(prediccion, fetchedAt) : []),
     ...(distritos ? insightsDistritoCritico(distritos, fetchedAt) : []),
     ...(tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos, fetchedAt) : []),
     ...(tramosTrafico && datosFallas ? insightsTraficoEnZonaFallas(tramosTrafico, datosFallas, distritos, fetchedAt) : []),
+    ...(tramosTrafico ? insightsTraficoEmpeora(tramosTrafico, tramosTraficoPrevios, fetchedAt) : []),
     ...(tramosTrafico ? [insightLluviaMasTrafico(insightsLluvia, tramosTrafico, distritos, fetchedAt)] : []),
   ].filter((insight): insight is Insight => insight !== null);
 

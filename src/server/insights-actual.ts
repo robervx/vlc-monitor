@@ -5,7 +5,8 @@
 // 008 (Fallas), 010 (Pulso de Distrito, recalculado con las mismas cachés de
 // 001/002/004) y 016 (predicción a corto plazo). Mismo patrón que
 // api/pulso/v1/distrito.ts.
-import { getOrFetch } from './_shared/cache';
+import { getOrFetch, cachePeek, cachePoke } from './_shared/cache';
+import type { TramoTrafico } from '../services/trafico';
 import { calcularInsights } from '../services/insights';
 import { fetchEstadoMeteo } from '../services/estado-meteo';
 import { fetchCalidadAire } from '../services/calidad-aire';
@@ -52,7 +53,23 @@ export default async function handler(): Promise<Response> {
       ? calcularPulsoDistrito(distritosBasicos, meteoResult.value, aireResult.value, tramosTrafico)
       : null;
 
-    const panel = calcularInsights(meteoResult.value, aireResult.value, distritos, prediccion, tramosTrafico, datosFallas);
+    // spec 013 v4b §9.1 — `trafico-empeora` compara el estado de tráfico con el
+    // de la evaluación anterior. En un arranque en frío no hay previo y no
+    // dispara nada (correcto). Se actualiza el previo tras cada evaluación.
+    const CLAVE_TRAFICO_PREVIO = 'insights:trafico:estado-previo';
+    const tramosTraficoPrevios = cachePeek<TramoTrafico[]>(CLAVE_TRAFICO_PREVIO) ?? null;
+
+    const panel = calcularInsights(
+      meteoResult.value,
+      aireResult.value,
+      distritos,
+      prediccion,
+      tramosTrafico,
+      datosFallas,
+      tramosTraficoPrevios,
+    );
+
+    if (tramosTrafico) cachePoke(CLAVE_TRAFICO_PREVIO, tramosTrafico, 15 * 60 * 1000);
     const fresh = meteoResult.fresh && aireResult.fresh;
 
     return new Response(JSON.stringify({ panel, fresh }), {

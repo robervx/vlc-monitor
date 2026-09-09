@@ -17,6 +17,12 @@ async function getOrFetch(key, ttlMs, fetcher) {
     throw err;
   }
 }
+function cachePeek(key) {
+  return store.get(key)?.value;
+}
+function cachePoke(key, value, ttlMs) {
+  store.set(key, { value, expiresAt: Date.now() + ttlMs });
+}
 
 // src/services/estado-meteo.ts
 var VALENCIA_LAT = 39.4699;
@@ -50262,23 +50268,27 @@ async function handler8() {
 // src/services/insights.ts
 var UMBRAL_CALOR_TEMPERATURA = 38;
 var UMBRAL_CALOR_SENSACION = 42;
+var UMBRAL_CALOR_AVISO_TEMPERATURA = 35;
 var UMBRAL_FRIO_TEMPERATURA = 0;
 var UMBRAL_LLUVIA_MM = 5;
+var UMBRAL_LLUVIA_PROB_PCT = 60;
 var UMBRAL_VIENTO_AVISO_KMH = 50;
 var UMBRAL_VIENTO_URGENTE_KMH = 70;
 function insightCalorExtremo(meteo, fetchedAt) {
-  if (meteo.temperatura < UMBRAL_CALOR_TEMPERATURA && meteo.sensacionTermica < UMBRAL_CALOR_SENSACION) {
-    return null;
-  }
+  const esExtremo = meteo.temperatura >= UMBRAL_CALOR_TEMPERATURA || meteo.sensacionTermica >= UMBRAL_CALOR_SENSACION;
+  const esAviso = meteo.temperatura >= UMBRAL_CALOR_AVISO_TEMPERATURA;
+  if (!esExtremo && !esAviso) return null;
+  const severidad = esExtremo ? "urgente" : "aviso";
+  const umbral = esExtremo ? `umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}\xB0C / ${UMBRAL_CALOR_SENSACION}\xB0C sensaci\xF3n)` : `umbral de aviso de calor (${UMBRAL_CALOR_AVISO_TEMPERATURA}\xB0C)`;
   return {
     id: "calor-extremo:ciudad",
     tipo: "calor-extremo",
-    severidad: "urgente",
-    titulo: `Calor extremo \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
-    descripcion: `Temperatura ${meteo.temperatura}\xB0C, sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C \u2014 por encima del umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}\xB0C / ${UMBRAL_CALOR_SENSACION}\xB0C sensaci\xF3n).`,
+    severidad,
+    titulo: `${esExtremo ? "Calor extremo" : "Aviso de calor"} \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
+    descripcion: `Temperatura ${meteo.temperatura}\xB0C, sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C \u2014 por encima del ${umbral}.`,
     protocoloSugerido: {
-      asunto: "Posible activaci\xF3n de protocolo de calor \u2014 Valencia",
-      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C (sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C) en Valencia a las ${meteo.observedAt}. Se sugiere valorar la activaci\xF3n del protocolo de calor extremo: hidrataci\xF3n y rotaci\xF3n de las unidades en calle, prioridad a zonas sin sombra. Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.`
+      asunto: `${esExtremo ? "Posible activaci\xF3n de protocolo de calor" : "Aviso de calor"} \u2014 Valencia`,
+      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C (sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C) en Valencia a las ${meteo.observedAt}. Se sugiere valorar ${esExtremo ? "la activaci\xF3n del protocolo de calor extremo" : "medidas preventivas de calor"}: hidrataci\xF3n y rotaci\xF3n de las unidades en calle, prioridad a zonas sin sombra. Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.`
     },
     fuenteSpec: ["001"],
     detectedAt: meteo.observedAt,
@@ -50353,6 +50363,67 @@ function insightsLluviaIntensa(prediccion, fetchedAt) {
     detectedAt: tramo.horaObjetivo,
     fetchedAt
   }));
+}
+function esCodigoLluvia(weatherCode) {
+  return weatherCode >= 51 && weatherCode <= 67 || weatherCode >= 80 && weatherCode <= 82 || weatherCode >= 95 && weatherCode <= 99;
+}
+function insightsLluviaPrevista(prediccion, fetchedAt) {
+  return prediccion.predicciones.filter((tramo) => tramo.precipitacion < UMBRAL_LLUVIA_MM).filter(
+    (tramo) => tramo.probabilidadPrecipitacion >= UMBRAL_LLUVIA_PROB_PCT || tramo.precipitacion > 0 && esCodigoLluvia(tramo.weatherCode)
+  ).map((tramo) => ({
+    id: `lluvia-prevista:${tramo.horaObjetivo}`,
+    tipo: "lluvia-prevista",
+    severidad: "aviso",
+    titulo: `Lluvia prevista hacia las ${tramo.horaObjetivo}`,
+    descripcion: `Predicci\xF3n: ${tramo.probabilidadPrecipitacion}% de probabilidad de precipitaci\xF3n (${tramo.precipitacion} mm) para ${tramo.horaObjetivo}.`,
+    protocoloSugerido: {
+      asunto: "Aviso de lluvia prevista \u2014 Valencia",
+      cuerpo: `Open-Meteo prev\xE9 lluvia hacia las ${tramo.horaObjetivo} en Valencia (${tramo.probabilidadPrecipitacion}% de probabilidad, ${tramo.precipitacion} mm estimados). Se sugiere aviso preventivo a unidades y atenci\xF3n a puntos de acumulaci\xF3n de agua habituales. Dato de origen: Open-Meteo (VLC Monitor, spec 016). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["016"],
+    detectedAt: tramo.horaObjetivo,
+    fetchedAt
+  }));
+}
+var NIVEL_TRAFICO = { fluido: 0, denso: 1, congestionado: 2, cortado: 3 };
+function insightsTraficoEmpeora(actual, previo, fetchedAt) {
+  if (!previo || previo.length === 0) return [];
+  const nivelPrevio = new Map(previo.map((t) => [t.id, NIVEL_TRAFICO[t.estado] ?? 0]));
+  const empeorados = [];
+  for (const t of actual) {
+    const nivelAhora = NIVEL_TRAFICO[t.estado];
+    if (nivelAhora === void 0) continue;
+    const antes = nivelPrevio.get(t.id);
+    if (antes === void 0) continue;
+    if (nivelAhora > antes) empeorados.push({ tramo: t, destino: nivelAhora });
+  }
+  if (empeorados.length === 0) return [];
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const e of empeorados) {
+    const clave = e.tramo.distrito ?? "__ciudad__";
+    const lista = porDistrito.get(clave);
+    if (lista) lista.push(e);
+    else porDistrito.set(clave, [e]);
+  }
+  return [...porDistrito.entries()].map(([clave, lista]) => {
+    const hayGrave = lista.some((e) => e.destino >= 2);
+    const nombreZona = clave === "__ciudad__" ? "Valencia" : lista[0].tramo.distrito;
+    return {
+      id: `trafico-empeora:${clave}`,
+      tipo: "trafico-empeora",
+      severidad: hayGrave ? "urgente" : "aviso",
+      titulo: `Tr\xE1fico a peor \u2014 ${lista.length} tramo${lista.length === 1 ? "" : "s"} en ${nombreZona}`,
+      descripcion: `${lista.length} tramo${lista.length === 1 ? " ha" : "s han"} subido de nivel de tr\xE1fico respecto a la lectura anterior (${lista.slice(0, 3).map((e) => `${e.tramo.nombre}: ${e.tramo.estado}`).join("; ")}${lista.length > 3 ? "\u2026" : ""}).`,
+      protocoloSugerido: {
+        asunto: `Empeoramiento de tr\xE1fico \u2014 ${nombreZona}`,
+        cuerpo: `Se ha detectado que ${lista.length} tramo${lista.length === 1 ? "" : "s"} de ${nombreZona} ha${lista.length === 1 ? "" : "n"} pasado a un estado de tr\xE1fico peor entre dos lecturas consecutivas. Se sugiere valorar si hace falta reforzar la regulaci\xF3n en la zona o avisar de rutas alternativas. Dato de origen: Ajuntament de Val\xE8ncia (VLC Monitor, spec 004). Revisar y decidir antes de actuar.`
+      },
+      distritoCodigo: clave === "__ciudad__" ? void 0 : clave,
+      fuenteSpec: ["004"],
+      detectedAt: fetchedAt,
+      fetchedAt
+    };
+  });
 }
 function insightsDistritoCritico(distritos2, fetchedAt) {
   return distritos2.filter((d) => d.categoria === "Cr\xEDtico").map((d) => ({
@@ -50464,7 +50535,7 @@ function insightLluviaMasTrafico(insightsLluvia, tramos, distritos2, fetchedAt) 
     fetchedAt
   };
 }
-function calcularInsights(meteo, aire, distritos2, prediccion, tramosTrafico = null, datosFallas = null) {
+function calcularInsights(meteo, aire, distritos2, prediccion, tramosTrafico = null, datosFallas = null, tramosTraficoPrevios = null) {
   const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
   const insightsLluvia = prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : [];
   const insights = [
@@ -50473,9 +50544,11 @@ function calcularInsights(meteo, aire, distritos2, prediccion, tramosTrafico = n
     insightVientoFuerte(meteo, fetchedAt),
     insightAireMalaCalidad(aire, fetchedAt),
     ...insightsLluvia,
+    ...prediccion ? insightsLluviaPrevista(prediccion, fetchedAt) : [],
     ...distritos2 ? insightsDistritoCritico(distritos2, fetchedAt) : [],
     ...tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos2, fetchedAt) : [],
     ...tramosTrafico && datosFallas ? insightsTraficoEnZonaFallas(tramosTrafico, datosFallas, distritos2, fetchedAt) : [],
+    ...tramosTrafico ? insightsTraficoEmpeora(tramosTrafico, tramosTraficoPrevios, fetchedAt) : [],
     ...tramosTrafico ? [insightLluviaMasTrafico(insightsLluvia, tramosTrafico, distritos2, fetchedAt)] : []
   ].filter((insight) => insight !== null);
   return { insights, fetchedAt, source: "vlc-monitor-insights" };
@@ -50603,7 +50676,18 @@ async function handler9() {
     const tramosTrafico = traficoResult.status === "fulfilled" ? traficoResult.value.value : null;
     const datosFallas = fallasResult.status === "fulfilled" ? fallasResult.value.value : null;
     const distritos2 = tramosTrafico ? calcularPulsoDistrito(distritosBasicos2, meteoResult.value, aireResult.value, tramosTrafico) : null;
-    const panel = calcularInsights(meteoResult.value, aireResult.value, distritos2, prediccion, tramosTrafico, datosFallas);
+    const CLAVE_TRAFICO_PREVIO = "insights:trafico:estado-previo";
+    const tramosTraficoPrevios = cachePeek(CLAVE_TRAFICO_PREVIO) ?? null;
+    const panel = calcularInsights(
+      meteoResult.value,
+      aireResult.value,
+      distritos2,
+      prediccion,
+      tramosTrafico,
+      datosFallas,
+      tramosTraficoPrevios
+    );
+    if (tramosTrafico) cachePoke(CLAVE_TRAFICO_PREVIO, tramosTrafico, 15 * 60 * 1e3);
     const fresh = meteoResult.fresh && aireResult.fresh;
     return new Response(JSON.stringify({ panel, fresh }), {
       status: 200,

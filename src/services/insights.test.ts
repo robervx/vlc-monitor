@@ -129,14 +129,16 @@ describe('calcularInsights', () => {
     expect(resultado.insights[0]?.protocoloSugerido.cuerpo).not.toMatch(/@/); // sin destinatarios/emails
   });
 
-  it('no genera calor-extremo un grado por debajo del umbral', () => {
+  it('calor entre 35 y 38 es aviso, no urgente (banda de aviso, v4b)', () => {
     const resultado = calcularInsights(
       { ...METEO_NEUTRA, temperatura: 37.9, sensacionTermica: 37.9 },
       AIRE_BUENA,
       null,
       null,
     );
-    expect(resultado.insights.filter((i) => i.tipo === 'calor-extremo')).toHaveLength(0);
+    const calor = resultado.insights.filter((i) => i.tipo === 'calor-extremo');
+    expect(calor).toHaveLength(1);
+    expect(calor[0]?.severidad).toBe('aviso');
   });
 
   it('genera frio-extremo cuando la temperatura llega a 0°C', () => {
@@ -296,6 +298,75 @@ describe('calcularInsights', () => {
     it('no revienta si tramosTrafico/datosFallas no están disponibles (null, valor por defecto)', () => {
       const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null);
       expect(resultado.insights.filter((i) => i.tipo.startsWith('trafico-') || i.tipo === 'lluvia-mas-trafico-denso')).toHaveLength(0);
+    });
+  });
+
+  describe('v4b — disparadores nuevos', () => {
+    it('calor: banda de aviso a 35 °C (no urgente hasta 38)', () => {
+      const r = calcularInsights({ ...METEO_NEUTRA, temperatura: 36, sensacionTermica: 36 }, AIRE_BUENA, null, null);
+      const calor = r.insights.find((i) => i.tipo === 'calor-extremo');
+      expect(calor?.severidad).toBe('aviso');
+      expect(calor?.titulo).toContain('Aviso de calor');
+    });
+
+    it('calor: sigue siendo urgente a 38 °C', () => {
+      const r = calcularInsights({ ...METEO_NEUTRA, temperatura: 38, sensacionTermica: 38 }, AIRE_BUENA, null, null);
+      expect(r.insights.find((i) => i.tipo === 'calor-extremo')?.severidad).toBe('urgente');
+    });
+
+    it('calor: nada por debajo de 35 °C', () => {
+      const r = calcularInsights({ ...METEO_NEUTRA, temperatura: 34.9, sensacionTermica: 34.9 }, AIRE_BUENA, null, null);
+      expect(r.insights.some((i) => i.tipo === 'calor-extremo')).toBe(false);
+    });
+
+    it('lluvia-prevista: dispara con probabilidad >= 60 % aunque la precipitación sea baja', () => {
+      const prediccion: PrediccionCortoPlazo = {
+        ...PREDICCION_SIN_LLUVIA,
+        predicciones: [
+          { ...PREDICCION_SIN_LLUVIA.predicciones[0]!, probabilidadPrecipitacion: 70, precipitacion: 1, weatherCode: 61 },
+        ],
+      };
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, prediccion);
+      const lluvia = r.insights.find((i) => i.tipo === 'lluvia-prevista');
+      expect(lluvia?.severidad).toBe('aviso');
+      expect(lluvia?.fuenteSpec).toEqual(['016']);
+    });
+
+    it('lluvia-prevista: no duplica cuando ya hay lluvia intensa (>= 5 mm)', () => {
+      const prediccion: PrediccionCortoPlazo = {
+        ...PREDICCION_SIN_LLUVIA,
+        predicciones: [
+          { ...PREDICCION_SIN_LLUVIA.predicciones[0]!, probabilidadPrecipitacion: 90, precipitacion: 8, weatherCode: 65 },
+        ],
+      };
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, prediccion);
+      expect(r.insights.filter((i) => i.tipo === 'lluvia-prevista')).toHaveLength(0);
+      expect(r.insights.filter((i) => i.tipo === 'lluvia-intensa-prevista')).toHaveLength(1);
+    });
+
+    it('trafico-empeora: sin estado previo no dispara nada', () => {
+      const actual = [tramo('1', '05', 'congestionado')];
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, actual, FALLAS_SIN_ZONAS, null);
+      expect(r.insights.some((i) => i.tipo === 'trafico-empeora')).toBe(false);
+    });
+
+    it('trafico-empeora: un tramo que sube de fluido a congestionado → urgente, agrupado por distrito', () => {
+      const previo = [tramo('1', '05', 'fluido'), tramo('2', '05', 'fluido')];
+      const actual = [tramo('1', '05', 'congestionado'), tramo('2', '05', 'fluido')];
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, actual, FALLAS_SIN_ZONAS, previo);
+      const e = r.insights.find((i) => i.tipo === 'trafico-empeora');
+      expect(e?.severidad).toBe('urgente');
+      expect(e?.distritoCodigo).toBe('05');
+      expect(e?.fuenteSpec).toEqual(['004']);
+    });
+
+    it('trafico-empeora: fluido → denso es solo aviso; una mejora no dispara', () => {
+      const previo = [tramo('1', '05', 'fluido'), tramo('2', '05', 'congestionado')];
+      const actual = [tramo('1', '05', 'denso'), tramo('2', '05', 'fluido')];
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, actual, FALLAS_SIN_ZONAS, previo);
+      const empeora = r.insights.filter((i) => i.tipo === 'trafico-empeora');
+      expect(empeora).toHaveLength(1);
+      expect(empeora[0]!.severidad).toBe('aviso');
     });
   });
 });

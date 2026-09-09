@@ -49,3 +49,18 @@ export async function getOrFetch<T>(
     throw err;
   }
 }
+
+/**
+ * Lee un valor de la caché sin llamar a ningún fetcher (aunque esté caducado
+ * de TTL — devuelve el último valor guardado). Para estado derivado que se
+ * compara entre peticiones, p. ej. el estado de tráfico previo de la spec 013 v4b.
+ * `undefined` si nunca se guardó (típico en un arranque en frío del proceso).
+ */
+export function cachePeek<T>(key: string): T | undefined {
+  return store.get(key)?.value as T | undefined;
+}
+
+/** Guarda un valor arbitrario en la caché en memoria (contrapartida de `cachePeek`). */
+export function cachePoke<T>(key: string, value: T, ttlMs: number): void {
+  store.set(key, { value, expiresAt: Date.now() + ttlMs });
+}
