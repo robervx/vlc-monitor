@@ -3,11 +3,11 @@
 ```yaml
 id: 027
 titulo: "Agenda general de eventos culturales — scraping resiliente de valencia.es"
-estado: Draft
+estado: Approved
 tipo: capa
 depende_de: [000, 023]
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
@@ -18,13 +18,40 @@ La spec [008](008-agenda-aglomeraciones-fallas.md) acota v1 a Fallas porque no h
 
 | Fuente | URL | Formato | Verificada manualmente el ___ |
 |---|---|---|---|
-| Agenda de la ciudad | `https://www.valencia.es/cas/agenda-de-la-ciudad` (listado, paginado) + `https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/<slug>` (ficha por evento) | HTML, **requiere navegador con JavaScript** (ver hallazgo abajo) | **Verificada 2026-08-26** |
+| Agenda de la ciudad | `https://www.valencia.es/cas/agenda-de-la-ciudad` (listado, paginado) + `https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/<slug>` (ficha por evento) | HTML, **requiere navegador con JavaScript** (ver hallazgo abajo) | **Verificada 2026-08-26; re-verificada en vivo 2026-09-10** (selectores, paginación y `robots.txt` confirmados — ver §2.1) |
 
 **Hallazgos de la verificación en vivo, que fijan el diseño técnico:**
 
-1. **La web requiere un cliente con JavaScript.** Una petición HTTP simple (`curl`, `fetch`) a la agenda o a `robots.txt` no devuelve el contenido; un navegador completo sí carga la página con normalidad. La información es pública, pero no se sirve a clientes sin renderizado.
-2. **El listado carga completo en un navegador**: ~20 eventos con título, fechas, categoría y enlace, con paginación numerada.
-3. **`robots.txt` autoriza estas rutas.** Regla general `Disallow: /-/`, con excepción explícita `Allow: /-/content/` — justo el patrón de las fichas de evento (`/cas/agenda-de-la-ciudad/-/content/<slug>`). El listado (`/cas/agenda-de-la-ciudad`) no tiene restricción. El rastreo se limita a lo que `robots.txt` permite; si el sitio dejara de servir el contenido, no se insiste.
+1. **La web requiere un cliente con JavaScript.** Una petición HTTP simple (`curl`, `fetch` fuera de navegador) a la agenda queda bloqueada por el WAF; un navegador completo sí carga la página con normalidad. `robots.txt` sí se sirve a `fetch` (200). La información es pública, pero el HTML de contenido no se sirve a clientes sin renderizado.
+2. **El listado carga completo en un navegador**: 20 eventos por página con título, fechas, categoría y enlace, con paginación numerada. Hoy 4 páginas (20/20/20/12 = 72 eventos).
+3. **`robots.txt` autoriza estas rutas.** Regla general `Disallow: /-/`, con excepción explícita `Allow: /-/content/` — justo el patrón de las fichas de evento (`/cas/agenda-de-la-ciudad/-/content/<slug>`). El listado (`/cas/agenda-de-la-ciudad`) no empieza por `/-/`, no tiene restricción. También expone `Sitemap: https://www.valencia.es/sitemap.xml`. El rastreo se limita a lo que `robots.txt` permite; si el sitio dejara de servir el contenido, no se insiste.
+
+## 2.1 Contrato técnico verificado (2026-09-10, en navegador real)
+
+**Listado** (`/cas/agenda-de-la-ciudad`):
+
+| Dato | Selector | Notas |
+|---|---|---|
+| Item de evento | `a.a-actualidad` | dentro de `div.div-bloque-actualidad`; `href` = `/cas/agenda-de-la-ciudad/-/content/<slug>` |
+| `id` (slug) | último segmento del `href` | estable entre refrescos |
+| `titulo` | `p.label-title-agenda` | |
+| fechas | `p.label-fecha-actualidad` | texto `DD/MM/YYYY - DD/MM/YYYY`; contiene un `<span class="fa fa-calendar">` a descartar |
+| `categoria` | `p.label-categoria-actualidad span` | mayúsculas tal cual (ej. `VISITAS GUIADAS`, `EXPOSICIONES`) |
+
+**Paginación:** portlet Liferay (`p_p_id` = `CalendarAc_INSTANCE_iWBt6iPSuFjM`, acción `cargarEventosAv`, POST AJAX). Los enlaces de página **no tienen `href`** (los cablea el framework "insuit" vía `data-insuit-uuid`); la URL del navegador no cambia. El scraper **hace click en el número de página siguiente (o «»») y espera a que cambie la lista de `a.a-actualidad`**. Los números de todas las páginas se muestran a la vez (sin `…`), así que el máximo se lee directo del DOM.
+
+**Ficha** (`/-/content/<slug>`, contenedor `div.container-agenda-ciudad`):
+
+| Dato | Selector | Notas |
+|---|---|---|
+| `titulo` | `h2.agenda-titulo` | |
+| lugar | `li.elementoLista` | ej. `València` (no siempre útil, informativo) |
+| fechas | `p.bloque_texto.fecha` | texto `FECHA: DD mmm YYYY - DD mmm YYYY`, **mes abreviado en español** (`ene feb mar abr may jun jul ago sep oct nov dic`) |
+| descripción | `p.bloque_texto` (los que **no** llevan `.fecha`) | unir el texto de los párrafos; `resumen` = recorte a ~300 car. |
+
+**Dos formatos de fecha a normalizar:** listado `DD/MM/YYYY`, ficha `DD mmm YYYY`. Ambos → ISO 8601.
+
+Hay banner de cookies (`Aceptar` / `Configurar`); el scraper elige la opción que **no** acepta rastreo no esencial (equivalente a "Configurar" → rechazar, o ignorarlo — el contenido carga igual sin aceptar).
 
 **Consecuencia arquitectónica (importante, no encaja en el patrón habitual de este proyecto):** hace falta un navegador headless (Playwright), no un `fetch()` en una función edge de Vercel. Una función serverless de Vercel Hobby no es un sitio razonable para arrancar Chromium (límite de tamaño de despliegue y de tiempo de ejecución, 10s en Hobby). El precedente ya existe en este mismo proyecto: la spec [017](017-historico-trafico.md) corre su cron en **GitHub Actions**, no en Vercel — esta spec sigue el mismo patrón: un job de GitHub Actions con Playwright que escrapea, normaliza y escribe el snapshot ya cacheado; el endpoint interno de Vercel solo lee ese snapshot, nunca lanza el navegador.
 
@@ -95,3 +122,4 @@ Panel de lista (mismo patrón visual que contexto mediático, spec 009), agrupad
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-08-26 | Creación (Draft) — verificación en vivo: la web requiere un cliente con JavaScript, `robots.txt` autoriza explícitamente las páginas de ficha. Arquitectura fijada en GitHub Actions + Playwright (no Vercel function), siguiendo el precedente de la spec 017. Pendiente de aprobación antes de implementar. |
+| 2 | 2026-09-10 | **Approved.** Re-verificación en navegador real: selectores de listado (`a.a-actualidad`, `p.label-title-agenda`, `p.label-fecha-actualidad`, `p.label-categoria-actualidad`), de ficha (`h2.agenda-titulo`, `p.bloque_texto.fecha`, `p.bloque_texto`), mecánica de paginación (portlet Liferay `CalendarAc`, click en número de página) y `robots.txt` (`Disallow: /-/` + `Allow: /-/content/`) confirmados y anotados en §2.1. Dos formatos de fecha (`DD/MM/YYYY` en listado, `DD mmm YYYY` en ficha). Contrato de datos (§3) sin cambios. Lista para implementar. |
