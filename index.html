@@ -32,6 +32,11 @@
       })();
     </script>
     <style>
+      /* `hidden` siempre oculta, aunque una regla de `#id` ponga `display`. */
+      [hidden] {
+        display: none !important;
+      }
+
       :root {
         --header-h: 56px;
         --sidebar-w-collapsed: 52px;
