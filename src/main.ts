@@ -25,6 +25,7 @@ import type { VentanaTendencia } from './services/tendencia-terminos';
 import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility } from './ui/panel-preferences';
+import { registrarFrescura } from './ui/estado-frescura';
 import { initPwa } from './pwa';
 import { initDeteccionDispositivo } from './ui/deteccion-dispositivo';
 import { initLayoutMovil } from './ui/layout-movil';
@@ -195,7 +196,7 @@ function metaFrescura(fuente: string, fetchedAt: string, fresh: boolean): string
   return `${fuente} · actualizado ${formatoFrescura(fetchedAt)} ${aviso}`;
 }
 
-function buildInfoPanel(id: string): HTMLDivElement {
+function buildInfoPanel(id: string, opciones?: { colapsable?: boolean }): HTMLDivElement {
   let container = document.getElementById('info-panels') as HTMLDivElement | null;
   if (!container) {
     container = document.createElement('div');
@@ -205,6 +206,17 @@ function buildInfoPanel(id: string): HTMLDivElement {
   const root = document.createElement('div');
   root.id = id;
   root.className = 'info-panel';
+  // spec 035 §5.2 — las leyendas de capa arrancan colapsadas a su título y se
+  // expanden al hover/foco/tap. Los paneles de datos fijos no se colapsan.
+  if (opciones?.colapsable) {
+    root.classList.add('info-panel--colapsable');
+    root.tabIndex = 0;
+    root.addEventListener('click', (ev) => {
+      // en táctil no hay hover: un toque en el cuerpo (no en un botón/enlace) alterna.
+      if ((ev.target as HTMLElement).closest('button, a')) return;
+      root.classList.toggle('is-expandida');
+    });
+  }
   root.textContent = 'Cargando…';
   container.appendChild(root);
   return root;
@@ -493,8 +505,10 @@ function renderTraficoLeyenda(root: HTMLDivElement, tramos: TramoTrafico[], fres
     })
     .join('');
 
+  const problematicos =
+    (conteos.get('denso') ?? 0) + (conteos.get('congestionado') ?? 0) + (conteos.get('cortado') ?? 0);
   root.innerHTML = `
-    <div class="info-panel__desc">Tráfico en tiempo real</div>
+    <div class="info-panel__desc">Tráfico — ${problematicos === 0 ? 'todo fluido' : `${problematicos} tramo${problematicos === 1 ? '' : 's'} con carga`}</div>
     ${filas}
     <div class="info-panel__meta">${metaFrescura('Ajuntament de València', tramos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
   `;
@@ -617,9 +631,9 @@ function renderPulsoLeyenda(root: HTMLDivElement, distritos: PulsoDistrito[], fr
     .join('');
 
   root.innerHTML = `
-    <div class="info-panel__desc">Pulso de Distrito — tráfico + aire + meteo</div>
+    <div class="info-panel__desc">Pulso de Distrito${masTenso ? ` — ${masTenso.distritoNombre} (${masTenso.indice})` : ''}</div>
     ${filas}
-    ${masTenso ? `<div class="info-panel__desc">Más tenso: ${masTenso.distritoNombre} (${masTenso.indice})</div>` : ''}
+    ${masTenso ? `<div class="info-panel__meta">Más tenso: ${masTenso.distritoNombre} · índice ${masTenso.indice}</div>` : ''}
     <div class="info-panel__meta">${metaFrescura('VLC Monitor (compuesto)', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
   `;
 }
@@ -640,7 +654,7 @@ function renderFallasLeyenda(root: HTMLDivElement, datos: DatosFallas, fresh: bo
   const adultos = datos.monumentos.filter((m) => !m.esInfantil).length;
   const infantiles = datos.monumentos.filter((m) => m.esInfantil).length;
   root.innerHTML = `
-    <div class="info-panel__desc">Fallas</div>
+    <div class="info-panel__desc">Fallas — ${adultos + infantiles} monumentos</div>
     <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(230,160,20)"></span>${adultos} monumentos</div>
     <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(240,195,100)"></span>${infantiles} infantiles</div>
     <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(230,100,20)"></span>${datos.carpas.length} carpas</div>
@@ -1860,7 +1874,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const traficoLeyendaRoot = buildInfoPanel('trafico-leyenda');
+  const traficoLeyendaRoot = buildInfoPanel('trafico-leyenda', { colapsable: true });
   traficoLeyendaRoot.hidden = true;
   let traficoPollingIniciado = false;
   async function refreshTrafico(): Promise<void> {
@@ -1888,7 +1902,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const valenbisiLeyendaRoot = buildInfoPanel('valenbisi-leyenda');
+  const valenbisiLeyendaRoot = buildInfoPanel('valenbisi-leyenda', { colapsable: true });
   valenbisiLeyendaRoot.hidden = true;
   let valenbisiPollingIniciado = false;
   async function refreshValenbisi(): Promise<void> {
@@ -1915,7 +1929,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const aparcamientoLeyendaRoot = buildInfoPanel('aparcamiento-leyenda');
+  const aparcamientoLeyendaRoot = buildInfoPanel('aparcamiento-leyenda', { colapsable: true });
   aparcamientoLeyendaRoot.hidden = true;
   let aparcamientoPollingIniciado = false;
   async function refreshAparcamiento(): Promise<void> {
@@ -1942,7 +1956,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const pulsoLeyendaRoot = buildInfoPanel('pulso-leyenda');
+  const pulsoLeyendaRoot = buildInfoPanel('pulso-leyenda', { colapsable: true });
   pulsoLeyendaRoot.hidden = true;
   let pulsoPollingIniciado = false;
   async function refreshPulso(): Promise<void> {
@@ -1968,7 +1982,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const fallasLeyendaRoot = buildInfoPanel('fallas-leyenda');
+  const fallasLeyendaRoot = buildInfoPanel('fallas-leyenda', { colapsable: true });
   fallasLeyendaRoot.hidden = true;
   let fallasPollingIniciado = false;
   async function refreshFallas(): Promise<void> {
@@ -1994,7 +2008,7 @@ async function main(): Promise<void> {
     }
   });
 
-  const viaPublicaLeyendaRoot = buildInfoPanel('via-publica-leyenda');
+  const viaPublicaLeyendaRoot = buildInfoPanel('via-publica-leyenda', { colapsable: true });
   viaPublicaLeyendaRoot.hidden = true;
   let viaPublicaPollingIniciado = false;
   async function refreshViaPublica(): Promise<void> {
@@ -2109,8 +2123,10 @@ async function main(): Promise<void> {
     try {
       const { estado, fresh } = await fetchEstadoMeteoActual();
       renderMeteoPanel(meteoPanelRoot, estado, fresh);
+      registrarFrescura('meteo', { ok: true, fresh, fetchedAt: estado.fetchedAt });
     } catch (err) {
       meteoPanelRoot.textContent = 'Meteo no disponible';
+      registrarFrescura('meteo', { ok: false, fresh: false });
       console.error('Fallo al cargar meteo:', err);
     }
   }
@@ -2121,8 +2137,10 @@ async function main(): Promise<void> {
     try {
       const { prediccion, fresh } = await fetchPrediccionCortoPlazoActual();
       renderPrediccionPanel(prediccionPanelRoot, prediccion, fresh);
+      registrarFrescura('prediccion', { ok: true, fresh, fetchedAt: prediccion.fetchedAt });
     } catch (err) {
       prediccionPanelRoot.textContent = 'Predicción no disponible';
+      registrarFrescura('prediccion', { ok: false, fresh: false });
       console.error('Fallo al cargar predicción a corto plazo:', err);
     }
   }
@@ -2133,8 +2151,10 @@ async function main(): Promise<void> {
     try {
       const { calidad, fresh } = await fetchCalidadAireActual();
       renderAirePanel(airePanelRoot, calidad, fresh);
+      registrarFrescura('aire', { ok: true, fresh, fetchedAt: calidad.fetchedAt });
     } catch (err) {
       airePanelRoot.textContent = 'Calidad del aire no disponible';
+      registrarFrescura('aire', { ok: false, fresh: false });
       console.error('Fallo al cargar calidad del aire:', err);
     }
   }
@@ -2163,8 +2183,10 @@ async function main(): Promise<void> {
     try {
       const { panel, fresh } = await fetchInsightsActual();
       renderInsightsPanel(insightsPanelRoot, panel, fresh);
+      registrarFrescura('insights', { ok: true, fresh, fetchedAt: panel.fetchedAt });
     } catch (err) {
       insightsPanelRoot.textContent = 'Insights no disponibles';
+      registrarFrescura('insights', { ok: false, fresh: false });
       console.error('Fallo al cargar insights:', err);
     }
   }
@@ -2175,8 +2197,10 @@ async function main(): Promise<void> {
     try {
       const { historico, fresh } = await fetchTraficoHistoricoCiudad();
       renderTraficoHistoricoPanel(traficoHistoricoPanelRoot, historico, fresh);
+      registrarFrescura('trafico-historico', { ok: true, fresh, fetchedAt: historico.fetchedAt });
     } catch (err) {
       traficoHistoricoPanelRoot.textContent = 'Histórico de tráfico no disponible';
+      registrarFrescura('trafico-historico', { ok: false, fresh: false });
       console.error('Fallo al cargar histórico de tráfico:', err);
     }
   }

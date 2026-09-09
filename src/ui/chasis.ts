@@ -4,6 +4,7 @@
 // apareciendo vía document.body.appendChild sin cambios).
 import { PANEL_PREFERENCES_REGISTRY, isPanelVisible, setPanelVisible } from './panel-preferences';
 import { limpiarCacheDatos } from '../pwa';
+import { onCambioFrescura } from './estado-frescura';
 import { MARCA } from '../config/marca';
 import { esMovil, getLayoutForzado, setLayoutForzado, onCambioLayout } from './deteccion-dispositivo';
 import { calcularCercania, formatoDistancia, type ResultadoCercania } from '../services/proximidad';
@@ -594,7 +595,32 @@ function buildHeader(): HTMLElement {
   const liveLabel = document.createElement('span');
   liveLabel.id = 'app-header__live-label';
   liveLabel.textContent = 'EN VIVO';
-  live.append(dot, liveLabel);
+  const frescura = document.createElement('span');
+  frescura.id = 'app-header__frescura';
+  live.append(dot, liveLabel, frescura);
+
+  // spec 034b — rollup de frescura: la cabecera resume el estado de todas las
+  // fuentes en un vistazo (verde/ámbar) sin tener que leer panel por panel.
+  onCambioFrescura((r) => {
+    live.dataset.frescura = r.estado;
+    if (r.estado === 'cargando') {
+      frescura.textContent = '';
+      live.title = 'Cargando datos…';
+      return;
+    }
+    const edadMin =
+      r.masReciente != null ? Math.max(0, Math.round((Date.now() - Date.parse(r.masReciente)) / 60000)) : null;
+    frescura.textContent =
+      r.conRetraso === 0
+        ? edadMin != null
+          ? `· ${r.total} fuentes · hace ${edadMin} min`
+          : `· ${r.total} fuentes`
+        : `· ${r.conRetraso}/${r.total} con retraso`;
+    live.title =
+      r.conRetraso === 0
+        ? `${r.total} fuentes al día`
+        : `${r.alDia} al día · ${r.conRetraso} sirviendo datos no en vivo`;
+  });
 
   const divider = document.createElement('span');
   divider.id = 'app-header__divider';

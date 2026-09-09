@@ -122,6 +122,23 @@
         letter-spacing: 0.08em;
         color: #86efac;
         text-transform: uppercase;
+        cursor: default;
+      }
+
+      /* spec 034b — el color de "EN VIVO" y del punto resume la frescura global. */
+      #app-header__live[data-frescura='retraso'] {
+        color: #fbbf24;
+      }
+
+      #app-header__live[data-frescura='cargando'] {
+        color: #94a3b8;
+      }
+
+      #app-header__frescura {
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        opacity: 0.75;
       }
 
       #app-header__status-dot {
@@ -130,6 +147,15 @@
         border-radius: 50%;
         background: #22c55e;
         animation: imc-pulse 2s infinite;
+      }
+
+      #app-header__live[data-frescura='retraso'] #app-header__status-dot {
+        background: #fbbf24;
+      }
+
+      #app-header__live[data-frescura='cargando'] #app-header__status-dot {
+        background: #94a3b8;
+        animation: none;
       }
 
       #app-header__divider {
@@ -895,6 +921,41 @@
         min-width: 140px;
       }
 
+      /* spec 035 §5.2 — las leyendas de capa arrancan colapsadas a su título;
+         al pasar el ratón (o hacer foco / tocar) se expande la leyenda entera. */
+      .info-panel--colapsable {
+        cursor: pointer;
+      }
+
+      .info-panel--colapsable > *:not(:first-child) {
+        overflow: hidden;
+        max-height: 0;
+        margin-top: 0;
+        opacity: 0;
+        transition:
+          max-height 0.16s ease,
+          opacity 0.12s ease;
+      }
+
+      .info-panel--colapsable > :first-child::after {
+        content: ' ▾';
+        color: #94a3b8;
+        font-size: 11px;
+      }
+
+      .info-panel--colapsable:hover > *,
+      .info-panel--colapsable:focus-within > *,
+      .info-panel--colapsable.is-expandida > * {
+        max-height: 320px;
+        opacity: 1;
+      }
+
+      .info-panel--colapsable:hover > :first-child::after,
+      .info-panel--colapsable:focus-within > :first-child::after,
+      .info-panel--colapsable.is-expandida > :first-child::after {
+        content: ' ▴';
+      }
+
       .info-panel__main {
         display: flex;
         align-items: center;
@@ -1310,6 +1371,7 @@
       }
       :root[data-layout='movil'] #app-header__tagline,
       :root[data-layout='movil'] #app-header__date,
+      :root[data-layout='movil'] #app-header__frescura,
       :root[data-layout='movil'] #app-header__divider {
         display: none;
       }
