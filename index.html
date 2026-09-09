@@ -693,6 +693,53 @@
         display: none;
       }
 
+      /* spec 036 — foco de distrito: chip bajo la tira de KPIs. */
+      #foco-distrito-chip {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(var(--header-h) + 44px);
+        z-index: 120;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 4px 3px 10px;
+        border-radius: 999px;
+        background: #0b1f33;
+        color: #eef3f8;
+        font-size: 12px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      #foco-distrito-chip button {
+        border: 0;
+        background: rgba(255, 255, 255, 0.14);
+        color: #eef3f8;
+        border-radius: 999px;
+        width: 18px;
+        height: 18px;
+        line-height: 1;
+        cursor: pointer;
+        font-size: 10px;
+      }
+
+      .media-panel__foco,
+      .pulso-leyenda__foco {
+        font-size: 12px;
+        font-weight: 600;
+        color: #0b1f33;
+        background: #fef9e7;
+        border-left: 3px solid #f2c744;
+        padding: 3px 8px;
+        margin-bottom: 4px;
+        border-radius: 3px;
+      }
+
+      :root[data-layout='movil'] #foco-distrito-chip {
+        top: calc(var(--header-h) + 8px + env(safe-area-inset-top));
+      }
+
       /* spec 013 v4 — el "popup": alertas nuevas saltan arriba a la derecha
          y se van solas; el panel de #info-panels sigue siendo la lista fija. */
       #alert-toasts {

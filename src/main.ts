@@ -32,6 +32,7 @@ import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility } from './ui/panel-preferences';
 import { registrarFrescura } from './ui/estado-frescura';
 import { montarDashboardKpis, registrarKpi } from './ui/dashboard-kpis';
+import { setFocoDistrito, getFocoDistrito, onCambioFoco, montarChipFoco } from './ui/foco-distrito';
 import { initPwa } from './pwa';
 import { initDeteccionDispositivo } from './ui/deteccion-dispositivo';
 import { initLayoutMovil } from './ui/layout-movil';
@@ -689,8 +690,13 @@ function renderPulsoLeyenda(root: HTMLDivElement, distritos: PulsoDistrito[], fr
     capaRelacionada: 'toggle-pulso',
   });
 
+  // spec 036 — si hay un distrito en foco, se antepone su índice.
+  const foco = getFocoDistrito();
+  const enFoco = foco ? distritos.find((d) => d.distritoCodigo === foco.codigo) : undefined;
+
   root.innerHTML = `
     <div class="info-panel__desc">Pulso de Distrito${masTenso ? ` — ${masTenso.distritoNombre} (${masTenso.indice})` : ''}</div>
+    ${enFoco ? `<div class="pulso-leyenda__foco">${enFoco.distritoNombre}: <strong>${enFoco.indice}</strong> · ${enFoco.categoria}</div>` : ''}
     ${filas}
     ${masTenso ? `<div class="info-panel__meta">Más tenso: ${masTenso.distritoNombre} · índice ${masTenso.indice}</div>` : ''}
     <div class="info-panel__meta">${metaFrescura('VLC Monitor (compuesto)', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
@@ -912,8 +918,14 @@ function renderMediaticoPanel(
     }
   }
 
-  const gruposDistrito = [...porDistrito.entries()]
-    .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre))
+  // spec 036 — si hay un distrito en foco, se filtra a su grupo + los buckets de
+  // ciudad/general (que también pueden afectarle); los demás distritos se ocultan.
+  const foco = getFocoDistrito();
+  const entradasDistrito = foco
+    ? [...porDistrito.entries()].filter(([codigo]) => codigo === foco.codigo)
+    : [...porDistrito.entries()].sort((a, b) => a[1].nombre.localeCompare(b[1].nombre));
+
+  const gruposDistrito = entradasDistrito
     .map(([, grupo]) => renderGrupoMediatico(grupo.nombre, grupo.items))
     .join('');
 
@@ -927,9 +939,10 @@ function renderMediaticoPanel(
     partes.push(renderGrupoMediatico('Deporte', deporte));
   }
 
-  panel.list.innerHTML =
-    partes.join('') ||
-    '<div class="tendencia-panel__insuficiente">Sin titulares de la ciudad de València ahora mismo.</div>';
+  const vacio = foco
+    ? `<div class="tendencia-panel__insuficiente">Sin titulares que mencionen ${foco.nombre} ahora mismo.</div>`
+    : '<div class="tendencia-panel__insuficiente">Sin titulares de la ciudad de València ahora mismo.</div>';
+  panel.list.innerHTML = (foco ? `<div class="media-panel__foco">Foco: ${foco.nombre}</div>` : '') + (partes.join('') || vacio);
 
   const meta = panel.root.querySelector('#media-panel-meta')!;
   const ocultos =
@@ -1735,7 +1748,11 @@ async function main(): Promise<void> {
           },
           onClick: (info: PickingInfo<GeoJSON.Feature<GeoJSON.Geometry, DistritoProperties>>) => {
             if (getEstadoModoCordon().fase !== 'inactivo' || getEstadoModoSimulacion().fase !== 'inactivo') return;
-            selectedDistrito = info.object?.properties.codigo ?? null;
+            const props = info.object?.properties ?? null;
+            // Clic en el distrito ya seleccionado → lo deselecciona (toggle).
+            const nuevo = props && props.codigo !== selectedDistrito ? props.codigo : null;
+            selectedDistrito = nuevo;
+            setFocoDistrito(nuevo && props ? { codigo: props.codigo, nombre: props.nombre } : null);
             renderLayers();
             persistViewState();
           },
@@ -2152,6 +2169,22 @@ async function main(): Promise<void> {
       mediaPollingIniciado = true;
       startPolling(refreshMediatico, 15 * 60 * 1000); // igual TTL que la caché del endpoint, spec 009 §4
     }
+  });
+
+  // spec 036 — foco de distrito: clic en un distrito del mapa → los paneles con
+  // dato por distrito (prensa, Pulso) se filtran/resaltan a ese distrito. El
+  // chip "Foco: <distrito> ✕" lo limpia (y deselecciona el distrito en el mapa).
+  montarChipFoco(() => {
+    selectedDistrito = null;
+    setFocoDistrito(null);
+    renderLayers();
+    persistViewState();
+  });
+  onCambioFoco(() => {
+    if (ultimoMediatico) {
+      renderMediaticoPanel(mediaPanel, ultimoMediatico.items, ultimoMediatico.fresh, ultimoMediatico.fuentesFallidas);
+    }
+    if (pulsoDistritos.length > 0) renderPulsoLeyenda(pulsoLeyendaRoot, pulsoDistritos, true);
   });
 
   const tendenciaPanel = buildTendenciaPanel();
