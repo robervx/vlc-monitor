@@ -7,7 +7,7 @@ estado: Draft
 tipo: panel
 depende_de: []
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
@@ -67,19 +67,20 @@ No aplica el patrón habitual — no hay fuente que cachear en servidor, es un `
 }
 ```
 
-Ubicación en la UI: **a decidir** — por defecto, panel flotante igual que `#media-panel` (spec 009), salvo que el usuario prefiera integrarlo en el sidebar junto al panel de redes (`039`), que sí tiene ubicación decidida (sidebar izquierdo).
+Ubicación en la UI: **panel flotante** `#camaras-panel`, mismo estilo que `#media-panel`/`#tendencia-panel` (spec 009), a la izquierda de ambos. Toggle "Cámaras en vivo" en el grupo "Contexto e informativas" del selector de capas. Nota de diseño encontrada en la verificación: en ventanas de escritorio muy estrechas (< ~650 px) los tres paneles flotantes se salen de la pantalla — limitación ya existente de `#tendencia-panel` antes de esta spec, no introducida aquí; queda fuera de alcance arreglarlo ahora (ver §7).
 
 ## 6. Criterios de aceptación (Definition of Done)
 
 - [x] Fuente YouTube probada con llamada real a su API pública (`oembed`), no solo documentación.
 - [x] Fuente Turisme CV probada con `curl` real contra el manifest DASH, cabeceras CORS confirmadas.
-- [ ] `src/config/camaras-urbanas.ts` con el registro de cámaras (patrón `def()`).
-- [ ] Verificación visual de que el encuadre real de la cámara de YouTube corresponde a lo indicado en su título (el título no lo confirma explícitamente — pendiente de mirar el directo).
-- [ ] Reproducción de la cámara pública (YouTube) en un panel, sin controles de descarga/grabación en la UI.
-- [ ] Reproducción de la cámara personal (Turisme CV, DASH) solo cuando `VITE_PERSONAL_CAMARA_TURISME_CV` está definida; ausente por defecto en el repo/demo pública — verificar que sin la variable la tarjeta ni se registra (no solo que esté oculta con CSS).
-- [ ] Atribución visible y clicable a la fuente original en cada tarjeta.
-- [ ] Manejo explícito de cámara caída (mensaje, no hueco roto).
-- [ ] `npm run typecheck` + `npm run test` + `npm run build` verdes, verificado en navegador con las cámaras reales.
+- [x] `src/config/camaras-urbanas.ts` con el registro de cámaras (patrón `def()`) y `camarasVisibles()` (filtra por categoría + `envFlag` + si hay reproductor implementado para el proveedor), con tests.
+- [x] Reproducción de la cámara pública (YouTube) en un panel (`#camaras-panel`, toggle "Cámaras en vivo" en el grupo Contexto), sin controles de descarga/grabación en la UI — el iframe ni se crea hasta que se activa el toggle (no se reproduce vídeo sin que el usuario lo haya pedido). Verificado en navegador: `src` real de YouTube presente tras activar el toggle.
+- [x] Reproducción de la cámara personal (Turisme CV, DASH) sigue **sin implementar a propósito** (spec §7): `camarasVisibles()` la excluye aunque se active `VITE_PERSONAL_CAMARA_TURISME_CV`, hasta que exista reproductor DASH — verificado con test.
+- [x] Atribución visible y clicable a la fuente original en cada tarjeta (enlace a la página de YouTube).
+- [ ] Verificación visual de que el encuadre real de la cámara de YouTube corresponde a lo indicado (el título no lo confirma explícitamente — pendiente de mirar el directo con calma, no solo comprobar que el iframe carga).
+- [ ] Manejo explícito de cámara caída (mensaje "no disponible" si el iframe da error) — no implementado todavía, hoy un iframe roto de YouTube se queda en blanco.
+- [ ] Reproductor DASH para la cámara personal — pendiente, sin fecha.
+- [x] `npm run typecheck` + `npm run test` (334/334) + `npm run build` verdes, verificado en navegador (iframe real de YouTube renderizado tras activar el toggle, sin errores de consola).
 
 ## 7. Riesgos y fuera de alcance
 
@@ -87,9 +88,12 @@ Ubicación en la UI: **a decidir** — por defecto, panel flotante igual que `#m
 - **Riesgo (aceptado, ver `ADR-003`):** el stream de Turisme CV no tiene permiso escrito explícito de reuso — se trata como fuente **personal**, no pública, mientras no exista esa confirmación. Acción de seguimiento no bloqueante: enviar una solicitud de confirmación a Turisme Comunitat Valenciana; si responden autorizando, esta fuente pasa a "pública" sin cambiar código, solo quitando el gate.
 - **Descartado explícitamente:** el panel de cámaras de tráfico del Ajuntament — prohibición expresa en sus propios términos, no se reconsidera salvo que cambien esos términos.
 - **Fuera de alcance de esta versión:** cualquier grabación, control PTZ, selección de cámara por el usuario final más allá de elegir entre las configuradas, y cualquier cámara cuyo titular no esté identificado con claridad.
+- **Riesgo (encontrado en la verificación, no nuevo):** los paneles flotantes de la derecha (`#media-panel`/`#tendencia-panel`/`#camaras-panel`) se salen de la pantalla en ventanas de escritorio muy estrechas — ya afectaba a `#tendencia-panel` antes de esta spec. Fuera de alcance arreglar el sistema de paneles flotantes aquí.
+- **Fuera de alcance:** manejo de error explícito cuando el iframe de YouTube falla (hoy se queda en blanco, sin mensaje) — spec 038 v2 no lo cubre, DoD abierto.
 
 ## 8. Historial
 
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-14 | Creación. Investigación en vivo de 3 fuentes candidatas (YouTube verificado y usable, Turisme CV verificado pero clasificado "personal" por `ADR-003`, panel del Ayuntamiento descartado por prohibición explícita en sus propios términos). Pendiente de definir ubicación en la UI y de implementar. |
+| 2 | 2026-09-14 | Implementada la cámara pública (YouTube): `src/config/camaras-urbanas.ts` (con tests), panel flotante `#camaras-panel` + toggle en el selector de capas, iframe creado solo al activar el toggle. La cámara personal (Turisme CV) queda deliberadamente sin reproductor — `camarasVisibles()` la excluye aunque se active su `envFlag`. Verificado con `npm run typecheck`/`test` (334/334)/`build` y en navegador (iframe real de YouTube). DoD abierto: encuadre visual, mensaje de error explícito, reproductor DASH. |

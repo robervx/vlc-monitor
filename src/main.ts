@@ -55,6 +55,7 @@ import {
   getEstadoModoSimulacion,
 } from './ui/modo-simulacion-cortes';
 import { cargarGrafoViario } from './services/grafo-viario-cliente';
+import { camarasVisibles, type CamaraUrbana } from './config/camaras-urbanas';
 import { marcadoresSentido, type MarcadorSentido } from './services/flechas-sentido';
 import { puntosFlujoParaTramo } from './services/flujo-animado';
 import type { Coordenada } from './services/proximidad';
@@ -1032,6 +1033,44 @@ async function fetchTendenciaActual(ventana: 'hora' | 'dia'): Promise<{ panel: V
   return (await res.json()) as { panel: VentanaTendencia; fresh: boolean };
 }
 
+// Spec 038 — sin endpoint propio: son embeds de terceros reproducidos directo
+// en el navegador de quien mira, nunca grabados ni rehosteados por nosotros.
+function buildCamarasPanel(): { root: HTMLDivElement; list: HTMLDivElement } {
+  const root = document.createElement('div');
+  root.id = 'camaras-panel';
+  root.hidden = true;
+  root.innerHTML = `
+    <div class="media-panel__header">Cámaras en vivo</div>
+    <div class="media-panel__list" id="camaras-panel-list"></div>
+  `;
+  document.body.appendChild(root);
+  return { root, list: root.querySelector('#camaras-panel-list')! };
+}
+
+function renderCamarasPanel(panel: { list: HTMLDivElement }, camaras: CamaraUrbana[]): void {
+  panel.list.innerHTML = camaras
+    .filter((c) => c.proveedor === 'youtube' && c.embedId)
+    .map((c) => {
+      const src = `https://www.youtube.com/embed/${encodeURIComponent(c.embedId!)}?autoplay=0&mute=1`;
+      return `
+        <div class="camara-card">
+          <div class="camara-card__titulo">${escapeHtml(c.nombre)}</div>
+          <iframe
+            class="camara-card__frame"
+            src="${escapeHtml(src)}"
+            title="${escapeHtml(c.nombre)}"
+            loading="lazy"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+          <a class="camara-card__atribucion" href="${escapeHtml(c.fuenteUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.atribucion)} ↗</a>
+        </div>
+      `;
+    })
+    .join('');
+}
+
 interface ControlPanel {
   mockToggle: HTMLInputElement;
   horaSlider: HTMLInputElement;
@@ -1046,6 +1085,7 @@ interface ControlPanel {
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
   viaPublicaToggle: HTMLInputElement;
+  camarasToggle: HTMLInputElement;
   /** spec 033: grupo plegable "Contexto e informativas" y sus adornos. */
   contextoDetails: HTMLDetailsElement;
   contextoContador: HTMLSpanElement;
@@ -1119,6 +1159,10 @@ function buildControlPanel(): ControlPanel {
         <input type="checkbox" id="toggle-tendencia" />
         Términos en tendencia
       </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-camaras" />
+        Cámaras en vivo
+      </label>
     </details>
   `;
   document.body.appendChild(panel);
@@ -1152,6 +1196,7 @@ function buildControlPanel(): ControlPanel {
     mediaToggle: panel.querySelector('#toggle-media')!,
     tendenciaToggle: panel.querySelector('#toggle-tendencia')!,
     viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
+    camarasToggle: panel.querySelector('#toggle-camaras')!,
     contextoDetails,
     contextoContador: panel.querySelector('#contexto-contador')!,
     presetOperativaBtn: panel.querySelector('#preset-operativa')!,
@@ -1908,6 +1953,7 @@ async function main(): Promise<void> {
     panel.fallasToggle,
     panel.mediaToggle,
     panel.tendenciaToggle,
+    panel.camarasToggle,
   ];
   function actualizarContextoSelector(): void {
     const activas = togglesContexto.filter((t) => t.checked).length;
@@ -2212,6 +2258,25 @@ async function main(): Promise<void> {
     if (panel.tendenciaToggle.checked && !tendenciaPollingIniciado) {
       tendenciaPollingIniciado = true;
       startPolling(refreshTendencia, 15 * 60 * 1000); // igual TTL que la caché del endpoint, spec 025 §4
+    }
+  });
+
+  // spec 038 — sin backend ni polling: el iframe de YouTube solo se crea la
+  // primera vez que se activa el panel, nunca antes (no se reproduce vídeo sin
+  // que el usuario lo haya pedido). Las cámaras "personales" (spec 038 §7,
+  // ver ADR-003) no aparecen aquí hasta tener reproductor implementado.
+  const camarasPanel = buildCamarasPanel();
+  let camarasCargadas = false;
+  panel.camarasToggle.addEventListener('change', () => {
+    camarasPanel.root.hidden = !panel.camarasToggle.checked;
+    if (panel.camarasToggle.checked && !camarasCargadas) {
+      camarasCargadas = true;
+      const camaras = camarasVisibles();
+      if (camaras.length > 0) {
+        renderCamarasPanel(camarasPanel, camaras);
+      } else {
+        camarasPanel.list.textContent = 'No hay cámaras disponibles en esta build.';
+      }
     }
   });
 

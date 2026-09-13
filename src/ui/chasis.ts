@@ -32,6 +32,7 @@ import {
   type EstadoModoSimulacion,
 } from './modo-simulacion-cortes';
 import { buildGlosarioContent } from './glosario';
+import { buildActualidadRedesContent } from './actualidad-redes';
 
 export interface SidebarSectionDefinition {
   key: string;
@@ -548,6 +549,14 @@ export const SIDEBAR_REGISTRY: SidebarSectionDefinition[] = [
     estado: 'disponible',
     specId: '022',
     render: buildGemeloDigitalContent,
+  },
+  {
+    key: 'actualidad-redes',
+    label: 'Actualidad institucional',
+    icono: '📣',
+    estado: 'disponible',
+    specId: '039',
+    render: buildActualidadRedesContent,
   },
   {
     key: 'glosario',

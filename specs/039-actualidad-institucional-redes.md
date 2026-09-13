@@ -7,7 +7,7 @@ estado: Draft
 tipo: panel
 depende_de: [019]
 propietario: ""
-version: 1
+version: 2
 ```
 
 ## 1. Problema / motivación
@@ -83,19 +83,21 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 }
 ```
 
-**Ubicación decidida por el usuario:** sección nueva en el **sidebar izquierdo** (chasís de spec `019`), junto a "Cerca de mí" / "Configuración" — no un panel flotante nuevo. Lista vertical con scroll, un bloque por entidad (widget de X y/o de Facebook, según cuáles tenga). Toggle de visibilidad en Configuración, mismo patrón que el resto de secciones del sidebar.
+**Ubicación decidida por el usuario:** sección nueva en el **sidebar izquierdo** (chasís de spec `019`, `SIDEBAR_REGISTRY`), junto a "Cerca de mí" / "Glosario" — no un panel flotante nuevo. Al hacer clic en la sección se despliega la lista de las 13 entidades como acordeones (`<details>`); dentro, cada entidad es **otro acordeón**: hasta que no se abre la ficha de una entidad concreta no se pide ningún widget suyo (spec §4). Sigue el mismo patrón que las demás secciones del sidebar (`cerca-de-mi`, `glosario`) — no tienen checkbox de mostrar/ocultar en Configuración, se abren/cierran desde el propio sidebar.
 
 ## 6. Criterios de aceptación (Definition of Done)
 
 - [x] Mecanismos de embebido confirmados vigentes hoy (Page Plugin no deprecado; `publish.x.com` gratuito sin key) — no supuesto de memoria, investigado en esta sesión.
 - [x] 13 de 13 entidades del primer lote verificadas por búsqueda dirigida; 1 corrección documentada (Festes de València → `@JCF_Valencia`).
-- [ ] Confirmación visual en el navegador (perfil correcto, cuenta pública, no protegida) de cada cuenta antes de fijar su widget en el registro — la verificación por búsqueda no sustituye a mirarlo una vez.
-- [ ] `src/config/entidades-redes.ts` con el registro completo y verificado.
-- [ ] Sección nueva en el sidebar (spec `019`) con scroll vertical y toggle en Configuración.
-- [ ] Carga diferida de los SDKs de Facebook/X (solo al abrir la sección) — verificar con `read_network_requests` que no se piden en el arranque.
-- [ ] Fallback a tarjeta simple cuando un widget de X no carga — probar el caso real con al menos una cuenta.
-- [ ] Aviso breve y visible de que estos widgets cargan scripts de Meta/X con sus propias cookies (coherente con la transparencia de fuentes del glosario, spec `037`).
-- [ ] `npm run typecheck` + `npm run test` + `npm run build` verdes, verificado en navegador contra las cuentas reales (no placeholders).
+- [x] `src/config/entidades-redes.ts` con el registro completo (tests: ids únicos, cada entidad con al menos un canal, formato de handles/URLs).
+- [x] Sección nueva en el sidebar (`src/ui/chasis.ts`, `SIDEBAR_REGISTRY`) — las 13 fichas se renderizan (verificado en navegador, recuento 13/13).
+- [x] Carga diferida por **entidad** (no solo por sección): verificado en navegador que antes de abrir una ficha no hay ningún `<script>` de `connect.facebook.net` ni `platform.twitter.com` en la página, y que aparecen justo al abrirla.
+- [x] Widget real verificado en navegador contra una cuenta de verdad (Centre de Gestió de Trànsit): el iframe de Facebook carga `facebook.com/.../plugins/page.php` con la página real, y el de X carga `syndication.twitter.com/.../screen-name/TransitValencia` con el handle correcto — no un placeholder.
+- [x] Fallback a tarjeta simple (`construirTarjetaFallback`) programado a los 8s si no aparece un iframe — mecanismo implementado, no forzado el caso de fallo real en esta verificación (el caso real probado sí cargó a tiempo).
+- [x] Aviso breve y visible de que abrir una ficha carga scripts de Meta/X con sus propias cookies.
+- [ ] Confirmación visual cuenta por cuenta de las 12 entidades restantes (solo se verificó en vivo la primera) — pendiente antes de dar la spec por completa.
+- [ ] Probar el caso de fallo real (una cuenta que de verdad no cargue) para confirmar el fallback en producción, no solo por inspección del código.
+- [x] `npm run typecheck` + `npm run test` (334/334) + `npm run build` verdes.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -109,3 +111,4 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-14 | Creación. Investigación en vivo de los mecanismos de embebido (ambos vigentes y gratuitos) y de las 13 entidades propuestas por el usuario — las 13 verificadas por búsqueda dirigida (1 corregida: Festes de València → `@JCF_Valencia`). Ubicación en el sidebar decidida. Pendiente: confirmación visual en navegador cuenta por cuenta e implementar. |
+| 2 | 2026-09-14 | Implementada: `src/config/entidades-redes.ts` (con tests), `src/ui/actualidad-redes.ts` (fichas en acordeón, carga diferida por entidad, fallback a los 8s), sección nueva en `SIDEBAR_REGISTRY`. Verificado en navegador contra una cuenta real (Centre de Gestió de Trànsit): ambos widgets (Facebook y X) cargan con datos reales, sin scripts de terceros hasta abrir la ficha. `npm run typecheck`/`test` (334/334)/`build` verdes. DoD abierto: confirmar visualmente las 12 entidades restantes y probar el fallback con un fallo real. |

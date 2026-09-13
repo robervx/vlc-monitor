@@ -361,6 +361,63 @@
         vertical-align: middle;
       }
 
+      /* Actualidad institucional en redes — spec 039 */
+      .red-entidad {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .red-entidad__titulo {
+        font-size: 12px;
+        font-weight: 600;
+        color: #dbe6f0;
+        padding: 8px 0;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .red-entidad__titulo::-webkit-details-marker {
+        display: none;
+      }
+
+      .red-entidad__titulo::before {
+        content: '▸';
+        display: inline-block;
+        width: 1em;
+        color: #7d90a6;
+      }
+
+      .red-entidad[open] .red-entidad__titulo::before {
+        content: '▾';
+      }
+
+      .red-entidad__cuerpo {
+        padding: 0 0 10px 1em;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .red-entidad__widget {
+        min-height: 60px;
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 4px;
+      }
+
+      .red-entidad__fallback {
+        display: block;
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #8bb8e8;
+        text-decoration: none;
+      }
+
+      .red-entidad__fallback:hover {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
       .proximidad-boton {
         width: 100%;
         padding: 7px 10px;
@@ -1401,6 +1458,59 @@
         display: none;
       }
 
+      /* Cámaras en vivo — spec 038, mismo estilo visual que #tendencia-panel */
+      #camaras-panel {
+        position: absolute;
+        top: calc(var(--header-h) + 12px);
+        right: 624px;
+        z-index: 1;
+        width: 280px;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        overflow: hidden;
+      }
+
+      #camaras-panel[hidden] {
+        display: none;
+      }
+
+      .camara-card {
+        padding: 8px 10px 10px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .camara-card__titulo {
+        font-size: 12px;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 5px;
+      }
+
+      .camara-card__frame {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 0;
+        border-radius: 4px;
+        display: block;
+      }
+
+      .camara-card__atribucion {
+        display: block;
+        margin-top: 4px;
+        font-size: 10px;
+        color: #888;
+        text-decoration: none;
+      }
+
+      .camara-card__atribucion:hover {
+        text-decoration: underline;
+      }
+
       .tendencia-panel__select {
         float: right;
         font-size: 11px;
@@ -1775,6 +1885,7 @@
       :root[data-layout='movil'] #info-panels > #controls,
       :root[data-layout='movil'] #info-panels > #media-panel,
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
+      :root[data-layout='movil'] #info-panels > #camaras-panel,
       :root[data-layout='movil'] #info-panels > .info-panel {
         position: static !important;
         inset: auto !important;
@@ -1785,11 +1896,13 @@
         box-sizing: border-box;
       }
       :root[data-layout='movil'] #info-panels > #media-panel,
-      :root[data-layout='movil'] #info-panels > #tendencia-panel {
+      :root[data-layout='movil'] #info-panels > #tendencia-panel,
+      :root[data-layout='movil'] #info-panels > #camaras-panel {
         display: flex !important;
       }
       :root[data-layout='movil'] #info-panels > #media-panel[hidden],
-      :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden] {
+      :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #camaras-panel[hidden] {
         display: none !important;
       }
 
