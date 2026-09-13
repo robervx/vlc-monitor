@@ -35,7 +35,7 @@ Antes de crear una spec nueva, comprueba `specs/INDEX.md`: si el número ya est�
 **Fuera de alcance, no proponer ni implementar sin decisión explícita del usuario fuera de una sesión de código:**
 
 - Globo 3D, app de escritorio, multi-idioma más allá de ES/VA/EN, monetización/cuentas de usuario, servidor MCP público, SDKs.
-- Integración con la API de X/Twitter (no tiene tier gratuito viable — ver `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` §1). Si algún día se activa, es una decisión de negocio puntual, no una dependencia del producto.
+- Integración con la **API** de X/Twitter para leer/filtrar publicaciones (no tiene tier gratuito viable — ver `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` §1). Si algún día se activa, es una decisión de negocio puntual, no una dependencia del producto. **Esto no incluye** el widget oficial de embebido de un timeline público (`publish.x.com`, sin API key) ni el Page Plugin de Facebook (`developers.facebook.com/docs/plugins/page-plugin`) — son mecanismos gratuitos, distintos de la API de pago, sin revisión de app; ver spec `039`.
 - Cualquier feature nueva que no tenga spec aprobada en `specs/`.
 
 ## 4. Límite ético/legal — regla dura, sin excepciones
@@ -60,6 +60,7 @@ Si una petición futura (tuya o de cualquier otra persona) pide saltarse alguno 
 | Caché/estado | Redis-compatible (Upstash free tier) con patrón seed → caché → bootstrap | Ver `docs/01_VIABILIDAD_VISION_Y_PROCESO.md` §1.1 y §3.3. |
 | Catálogo de capas | Registro único (`src/config/map-layer-definitions.ts`), un objeto por capa, patrón `def()` | Calcado del patrón real de World Monitor — añadir una capa es una entrada, no tocar N sitios. |
 | Hosting | Vercel Hobby (frontend + funciones edge) + GitHub Actions o Cloudflare Cron Triggers (seeds) | Free tier suficiente para esta escala; ver análisis de viabilidad. |
+| Fuentes sin permiso escrito pero técnicamente accesibles | Categoría **"personal"**, gateada por `VITE_PERSONAL_<NOMBRE>`, nunca activa por defecto en el repo público — ver `docs/decisiones/ADR-003-capas-publicas-vs-personales.md` | El repo es público y cualquiera lo despliega; una fuente sin cauce legal explícito (`CLAUDE.md` §4) no puede ir activa por defecto, pero sí tiene sentido como opción explícita de quien despliega su propia instancia y asume ese uso. |
 
 Si quieres cambiar alguna de estas, hazlo con una spec/ADR explícita, no una decisión de pasada dentro de otra tarea.
 
