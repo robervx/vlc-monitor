@@ -38,12 +38,12 @@ Ambos mecanismos son **Públicos** (`ADR-003`): gratuitos, oficiales, sin API de
 | À Punt Notícies | `@apuntnoticies` | `facebook.com/apuntnoticies` | **Verificado** (ambos) |
 | Mobilitat València | `@VlcMobilitat` | — | **Verificado** (X) |
 | Festes de València | `@JCF_Valencia` (Junta Central Fallera) | `facebook.com/JCFValencia` | **Corrección**: el usuario propuso `@festesdeVLC`, no se encontró esa cuenta en la búsqueda — la cuenta real y activa es la de la Junta Central Fallera |
-| Levante-EMV | `@levante_emv` | — | Pendiente de verificar directamente (alta confianza, no confirmado en esta sesión) |
-| El País — Comunitat Valenciana | `@elpais_valencia` | — | Pendiente de verificar directamente |
-| EMT València | `@emtvalencia` | — | Pendiente de verificar directamente (alta confianza) |
-| Metrovalencia | `@metrovalencia` | — | Pendiente de verificar directamente (alta confianza) |
+| Levante-EMV | `@levante_emv` | `facebook.com/levante.emv` | **Verificado** (X; FB de búsqueda, sin `curl` directo) |
+| El País — Comunitat Valenciana | `@elpais_valencia` | — | **Verificado** (X) |
+| EMT València | `@emtvalencia` | — | **Verificado** (X) |
+| Metrovalencia (FGV) | `@metrovalencia` | — | **Verificado** (X) — cuenta de atención al cliente, activa |
 
-**No implementar ninguna fila "Pendiente" sin verificarla primero** (`CLAUDE.md` §8.2) — antes de escribir el registro final, comprobar cada handle/página con una petición real o, si X/Facebook bloquean la verificación automática, visualmente en el navegador.
+**Las 13 entidades del primer lote quedan verificadas** (12 confirmadas tal cual + 1 corrección, Festes de València). Verificación hecha por búsqueda dirigida, no visitando cada perfil en el navegador (X/Facebook bloquean scraping no autenticado) — antes de implementar el widget de una cuenta, confirmar visualmente en el navegador que el `data-href`/handle exacto carga el perfil correcto, una vez por cuenta.
 
 ## 3. Contrato de datos (normalizado)
 
@@ -88,8 +88,8 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 ## 6. Criterios de aceptación (Definition of Done)
 
 - [x] Mecanismos de embebido confirmados vigentes hoy (Page Plugin no deprecado; `publish.x.com` gratuito sin key) — no supuesto de memoria, investigado en esta sesión.
-- [x] 9 de 13 entidades del primer lote verificadas con su cuenta real; 1 corrección documentada (Festes de València).
-- [ ] Verificar las 4 entidades "pendientes" antes de escribir el registro final.
+- [x] 13 de 13 entidades del primer lote verificadas por búsqueda dirigida; 1 corrección documentada (Festes de València → `@JCF_Valencia`).
+- [ ] Confirmación visual en el navegador (perfil correcto, cuenta pública, no protegida) de cada cuenta antes de fijar su widget en el registro — la verificación por búsqueda no sustituye a mirarlo una vez.
 - [ ] `src/config/entidades-redes.ts` con el registro completo y verificado.
 - [ ] Sección nueva en el sidebar (spec `019`) con scroll vertical y toggle en Configuración.
 - [ ] Carga diferida de los SDKs de Facebook/X (solo al abrir la sección) — verificar con `read_network_requests` que no se piden en el arranque.
@@ -108,4 +108,4 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
-| 1 | 2026-09-14 | Creación. Investigación en vivo de los mecanismos de embebido (ambos vigentes y gratuitos) y de 13 entidades propuestas por el usuario (9 verificadas, 1 corregida, 4 pendientes). Ubicación en el sidebar decidida. Pendiente: verificar las 4 entidades restantes e implementar. |
+| 1 | 2026-09-14 | Creación. Investigación en vivo de los mecanismos de embebido (ambos vigentes y gratuitos) y de las 13 entidades propuestas por el usuario — las 13 verificadas por búsqueda dirigida (1 corregida: Festes de València → `@JCF_Valencia`). Ubicación en el sidebar decidida. Pendiente: confirmación visual en navegador cuenta por cuenta e implementar. |
