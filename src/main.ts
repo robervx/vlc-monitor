@@ -1033,42 +1033,113 @@ async function fetchTendenciaActual(ventana: 'hora' | 'dia'): Promise<{ panel: V
   return (await res.json()) as { panel: VentanaTendencia; fresh: boolean };
 }
 
-// Spec 038 — sin endpoint propio: son embeds de terceros reproducidos directo
-// en el navegador de quien mira, nunca grabados ni rehosteados por nosotros.
-function buildCamarasPanel(): { root: HTMLDivElement; list: HTMLDivElement } {
+// Spec 038 v3 — sin endpoint propio: son embeds de terceros reproducidos
+// directo en el navegador de quien mira, nunca grabados ni rehosteados por
+// nosotros. Diseño en tarjetas "clic para reproducir" (como el panel de
+// referencia de World Monitor): nada de vídeo se carga hasta que se pulsa su
+// tarjeta — así ninguna tarjeta se queda a medio cargar mostrando el título y
+// la interfaz de YouTube por encima en vez de la imagen.
+function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement } {
   const root = document.createElement('div');
   root.id = 'camaras-panel';
   root.hidden = true;
   root.innerHTML = `
     <div class="media-panel__header">Cámaras en vivo</div>
-    <div class="media-panel__list" id="camaras-panel-list"></div>
+    <div class="camaras-grid" id="camaras-panel-grid"></div>
   `;
   document.body.appendChild(root);
-  return { root, list: root.querySelector('#camaras-panel-list')! };
+  return { root, grid: root.querySelector('#camaras-panel-grid')! };
 }
 
-function renderCamarasPanel(panel: { list: HTMLDivElement }, camaras: CamaraUrbana[]): void {
-  panel.list.innerHTML = camaras
-    .filter((c) => c.proveedor === 'youtube' && c.embedId)
-    .map((c) => {
-      const src = `https://www.youtube.com/embed/${encodeURIComponent(c.embedId!)}?autoplay=0&mute=1`;
-      return `
-        <div class="camara-card">
-          <div class="camara-card__titulo">${escapeHtml(c.nombre)}</div>
-          <iframe
-            class="camara-card__frame"
-            src="${escapeHtml(src)}"
-            title="${escapeHtml(c.nombre)}"
-            loading="lazy"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowfullscreen
-            referrerpolicy="strict-origin-when-cross-origin"
-          ></iframe>
-          <a class="camara-card__atribucion" href="${escapeHtml(c.fuenteUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.atribucion)} ↗</a>
+/** Parámetros que minimizan la interfaz propia de YouTube (título, sugerencias, marca). */
+function iframeYoutubeCanal(channelId: string, nombre: string): HTMLIFrameElement {
+  const src =
+    `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}` +
+    '&autoplay=1&mute=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1';
+  const iframe = document.createElement('iframe');
+  iframe.className = 'camara-tile__player';
+  iframe.src = src;
+  iframe.title = nombre;
+  iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+  iframe.allowFullscreen = true;
+  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+  return iframe;
+}
+
+/** Reproductor DASH (spec 038 §7, cámara "personal" — solo llega aquí si su envFlag está activo). */
+async function reproducirDash(stage: HTMLElement, manifestUrl: string): Promise<void> {
+  const video = document.createElement('video');
+  video.className = 'camara-tile__player camara-tile__player--video';
+  video.muted = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.controls = true;
+  stage.appendChild(video);
+  try {
+    const { MediaPlayer } = await import('dashjs');
+    const player = MediaPlayer().create();
+    // El "live catchup" (acelerar/recortar buffer para pegarse al directo) de
+    // dashjs entraba en un bucle play/pause en este stream — se desactiva y se
+    // deja un colchón de buffer algo mayor antes del borde en directo.
+    player.updateSettings({
+      streaming: { liveCatchup: { enabled: false }, delay: { liveDelayFragmentCount: 4 } },
+    });
+    player.initialize(video, manifestUrl, true);
+    // Chrome pausa por ahorro de energía el vídeo-solo-sin-audio que queda en
+    // una pestaña en segundo plano ("video-only background media was paused
+    // to save power") — se reintenta al volver a primer plano. Con controles
+    // nativos visibles (arriba), la persona siempre puede darle a play a mano.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && video.paused && video.isConnected) {
+        void video.play().catch(() => {});
+      }
+    });
+  } catch (err) {
+    console.error('Fallo al iniciar el reproductor DASH:', err);
+    stage.innerHTML = '<div class="camara-tile__error">No disponible ahora mismo</div>';
+  }
+}
+
+function reproducirCamara(stage: HTMLElement, camara: CamaraUrbana): void {
+  stage.innerHTML = '';
+  if (camara.proveedor === 'youtube-canal' && camara.youtubeChannelId) {
+    stage.appendChild(iframeYoutubeCanal(camara.youtubeChannelId, camara.nombre));
+  } else if (camara.proveedor === 'turisme-cv-dash' && camara.manifestUrl) {
+    void reproducirDash(stage, camara.manifestUrl);
+  } else {
+    stage.innerHTML = '<div class="camara-tile__error">No disponible</div>';
+  }
+}
+
+function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrbana[]): void {
+  panel.grid.innerHTML = camaras
+    .map(
+      (_, i) => `
+        <div class="camara-tile">
+          <div class="camara-tile__stage" data-camara-index="${i}">
+            <span class="camara-tile__nombre"></span>
+            <button type="button" class="camara-tile__play">▶</button>
+          </div>
+          <a class="camara-tile__atribucion" target="_blank" rel="noopener noreferrer"></a>
         </div>
-      `;
-    })
+      `,
+    )
     .join('');
+
+  panel.grid.querySelectorAll<HTMLDivElement>('.camara-tile').forEach((tile, i) => {
+    const camara = camaras[i];
+    if (!camara) return;
+    const stage = tile.querySelector<HTMLDivElement>('.camara-tile__stage')!;
+    stage.querySelector('.camara-tile__nombre')!.textContent = camara.nombre;
+    const atribucion = tile.querySelector<HTMLAnchorElement>('.camara-tile__atribucion')!;
+    atribucion.href = camara.fuenteUrl;
+    atribucion.textContent = `${camara.atribucion} ↗`;
+    stage.querySelector('.camara-tile__play')!.addEventListener(
+      'click',
+      () => reproducirCamara(stage, camara),
+      { once: true },
+    );
+  });
 }
 
 interface ControlPanel {
@@ -2261,10 +2332,9 @@ async function main(): Promise<void> {
     }
   });
 
-  // spec 038 — sin backend ni polling: el iframe de YouTube solo se crea la
-  // primera vez que se activa el panel, nunca antes (no se reproduce vídeo sin
-  // que el usuario lo haya pedido). Las cámaras "personales" (spec 038 §7,
-  // ver ADR-003) no aparecen aquí hasta tener reproductor implementado.
+  // spec 038 v3 — sin backend ni polling: las tarjetas se construyen la primera
+  // vez que se activa el panel, pero ningún vídeo se reproduce hasta que se
+  // pulsa "Reproducir" en su tarjeta (ver renderCamarasPanel).
   const camarasPanel = buildCamarasPanel();
   let camarasCargadas = false;
   panel.camarasToggle.addEventListener('change', () => {
@@ -2275,7 +2345,7 @@ async function main(): Promise<void> {
       if (camaras.length > 0) {
         renderCamarasPanel(camarasPanel, camaras);
       } else {
-        camarasPanel.list.textContent = 'No hay cámaras disponibles en esta build.';
+        camarasPanel.grid.textContent = 'No hay cámaras disponibles en esta build.';
       }
     }
   });
