@@ -1458,16 +1458,16 @@
         display: none;
       }
 
-      /* Cámaras en vivo — spec 038 v3. Rejilla de tarjetas "clic para
-         reproducir" (patrón del panel de referencia de World Monitor): nada
-         de vídeo se carga hasta pulsar la tarjeta, así nunca se ve el título
-         ni la interfaz de YouTube tapando una imagen a medio cargar. */
+      /* Cámaras en vivo — spec 038 v4. Tarjetas "clic para reproducir" (patrón
+         del panel de referencia de World Monitor): nada de vídeo se carga
+         hasta pulsar la tarjeta. Columna única a 16:9 real (las cámaras de
+         Turisme CV son 1920×1080) — con un recuadro 4:3 salía recortada. */
       #camaras-panel {
         position: absolute;
         top: calc(var(--header-h) + 12px);
         right: 664px;
         z-index: 1;
-        width: 320px;
+        width: 300px;
         max-height: 70vh;
         display: flex;
         flex-direction: column;
@@ -1483,22 +1483,23 @@
       }
 
       .camaras-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         padding: 8px;
         overflow-y: auto;
       }
 
-      .camara-tile {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
+      .camara-tile__nombre {
+        font-size: 12px;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 4px;
       }
 
       .camara-tile__stage {
         position: relative;
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 16 / 9;
         border-radius: 5px;
         overflow: hidden;
         background: linear-gradient(160deg, #2a3b52, #16202e);
@@ -1507,26 +1508,14 @@
         justify-content: center;
       }
 
-      .camara-tile__nombre {
-        position: absolute;
-        left: 6px;
-        right: 6px;
-        bottom: 5px;
-        font-size: 10px;
-        font-weight: 600;
-        color: #fff;
-        line-height: 1.25;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-      }
-
       .camara-tile__play {
-        width: 34px;
-        height: 34px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         border: 1px solid rgba(255, 255, 255, 0.5);
         background: rgba(255, 255, 255, 0.15);
         color: #fff;
-        font-size: 13px;
+        font-size: 15px;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -1547,19 +1536,18 @@
       }
 
       .camara-tile__error {
-        font-size: 10px;
+        font-size: 11px;
         color: #cbd5e1;
         text-align: center;
         padding: 0 8px;
       }
 
       .camara-tile__atribucion {
-        font-size: 9px;
+        display: block;
+        margin-top: 4px;
+        font-size: 10px;
         color: #888;
         text-decoration: none;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .camara-tile__atribucion:hover {

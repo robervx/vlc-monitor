@@ -1,22 +1,30 @@
 /**
- * Registro de cámaras urbanas en directo — spec 038 v3. Sin backend: son embeds
+ * Registro de cámaras urbanas en directo — spec 038 v4. Sin backend: son embeds
  * de terceros que el navegador reproduce directamente desde el proveedor (nunca
  * se graba ni se rehostea nada). Mismo patrón `def()` que `map-layer-definitions.ts`,
  * sin pipeline seed→caché→endpoint porque no hay dato que normalizar.
  *
  * Categorías (`ADR-003`, `docs/decisiones/ADR-003-capas-publicas-vs-personales.md`):
  *  - 'publica'  → activa siempre, mecanismo de embebido explícitamente autorizado
- *                 por la propia plataforma (embed de canal en directo de YouTube).
+ *                 por la propia plataforma.
  *  - 'personal' → técnicamente accesible pero sin permiso escrito de reuso; solo
  *                 se activa si quien despliega define su propio `envFlag`
  *                 (`VITE_<NOMBRE>`, prefijo obligatorio de Vite para llegar al
  *                 bundle de cliente). Nunca encendida por defecto en el repo público.
  *
- * v3 — lección de v2: un ID de vídeo concreto de YouTube no es estable (el directo
- * de v2 había terminado, el vídeo era una grabación de 2022). Se usa en su lugar
- * el embed de **canal** (`youtube.com/embed/live_stream?channel=<id>`), que
- * siempre resuelve al directo que esté activo ahora mismo en ese canal — o no
- * reproduce nada si no hay ninguno, nunca contenido viejo.
+ * v4 — a petición del usuario tras ver v3 en vivo:
+ *  - Se retira la cámara de YouTube (canal "Wolkam IT"): el canal no estaba
+ *    emitiendo ("no disponible") y no hay garantía de que lo esté nunca — de
+ *    momento **no hay ninguna cámara "pública" activa por defecto**, las dos
+ *    que quedan son "personales" (Turisme CV). Ver spec 038 §7.
+ *  - Se corrige el nombre de la cámara de la playa: se llamaba "Les Arenes /
+ *    Ciutat de les Arts" porque su manifest aparecía también en la página de
+ *    Turisme CV de "Ciutat de les Arts i les Ciències" — pero esa cámara NO
+ *    muestra el complejo, muestra la Platja de Les Arenes / El Cabanyal (junto
+ *    al Hostal Miramar). La propia nota de prensa de Turisme CV la describe
+ *    así ("la animada zona portuaria desde la playa de Las Arenas en
+ *    València"). El nombre anterior prometía algo que la cámara no enseña —
+ *    corregido para que la etiqueta coincida con lo que de verdad se ve.
  */
 
 export type ProveedorCamara = 'youtube-canal' | 'turisme-cv-dash';
@@ -28,7 +36,7 @@ export interface CamaraUrbana {
   categoria: 'publica' | 'personal';
   /** Solo si categoria === 'personal'. Nombre de la variable VITE_* que la activa. */
   envFlag?: string;
-  /** Solo proveedor 'youtube-canal' — id de canal, no de vídeo (ver nota v3). */
+  /** Solo proveedor 'youtube-canal' — id de canal, no de vídeo. */
   youtubeChannelId?: string;
   /** Solo proveedor 'turisme-cv-dash'. */
   manifestUrl?: string;
@@ -38,20 +46,8 @@ export interface CamaraUrbana {
 
 export const CAMARAS_URBANAS: CamaraUrbana[] = [
   {
-    id: 'youtube-wolkam-plaza',
-    nombre: 'Plaça de l’Ajuntament',
-    proveedor: 'youtube-canal',
-    categoria: 'publica',
-    // Canal "Wolkam IT" — verificado en vivo el 2026-09-14 (isLiveNow:true en su
-    // vídeo activo de ese momento). Al ser amateur/monetizado con publicidad,
-    // no hay garantía de disponibilidad continua — de ahí el fallback de la UI.
-    youtubeChannelId: 'UCq19Y98jvY_Tjgm6QMk6vWA',
-    atribucion: 'Wolkam IT · YouTube',
-    fuenteUrl: 'https://www.youtube.com/channel/UCq19Y98jvY_Tjgm6QMk6vWA/live',
-  },
-  {
     id: 'turisme-cv-plaza-ayuntamiento',
-    nombre: 'Plaça de l’Ajuntament (HD)',
+    nombre: 'Plaça de l’Ajuntament',
     proveedor: 'turisme-cv-dash',
     categoria: 'personal',
     envFlag: 'VITE_PERSONAL_CAMARA_TURISME_CV',
@@ -61,17 +57,15 @@ export const CAMARAS_URBANAS: CamaraUrbana[] = [
   },
   {
     id: 'turisme-cv-las-arenas',
-    nombre: 'Les Arenes / Ciutat de les Arts',
+    nombre: 'Platja de Les Arenes / El Cabanyal',
     proveedor: 'turisme-cv-dash',
     categoria: 'personal',
     envFlag: 'VITE_PERSONAL_CAMARA_TURISME_CV',
-    // Nota: la página de Turisme CV para "Ciutat de les Arts i les Ciències"
-    // sirve este mismo stream con id "ValenciaLasArenas" (verificado en el HTML
-    // real, elemento #featured-webcam-visor) — probablemente la cámara está en
-    // el paseo de Les Arenes con vista hacia el complejo, no es un error nuestro.
+    // Página dedicada real de esta cámara (no la de "Ciutat de les Arts", que
+    // solo la reutilizaba) — "Valencia, Las Arenas Beach (Hostal Miramar)".
     manifestUrl: 'https://streaming.comunitatvalenciana.com/webcam/ValenciaLasArenas/manifest.mpd',
     atribucion: 'Xarxa de Webcams — Turisme Comunitat Valenciana',
-    fuenteUrl: 'https://www.comunitatvalenciana.com/en/valencia/valencia/webcams/valencia-ciutat-de-les-arts-y-les-ciencies',
+    fuenteUrl: 'https://www.comunitatvalenciana.com/en/valencia/valencia/webcams/valencia-las-arenas',
   },
 ];
 

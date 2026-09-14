@@ -1112,12 +1112,14 @@ function reproducirCamara(stage: HTMLElement, camara: CamaraUrbana): void {
 }
 
 function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrbana[]): void {
+  // El nombre vive fuera del "stage" (a diferencia de v3) para que se siga
+  // viendo una vez reproduciendo — antes se borraba junto al placeholder.
   panel.grid.innerHTML = camaras
     .map(
       (_, i) => `
         <div class="camara-tile">
+          <div class="camara-tile__nombre"></div>
           <div class="camara-tile__stage" data-camara-index="${i}">
-            <span class="camara-tile__nombre"></span>
             <button type="button" class="camara-tile__play">▶</button>
           </div>
           <a class="camara-tile__atribucion" target="_blank" rel="noopener noreferrer"></a>
@@ -1130,7 +1132,7 @@ function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrba
     const camara = camaras[i];
     if (!camara) return;
     const stage = tile.querySelector<HTMLDivElement>('.camara-tile__stage')!;
-    stage.querySelector('.camara-tile__nombre')!.textContent = camara.nombre;
+    tile.querySelector('.camara-tile__nombre')!.textContent = camara.nombre;
     const atribucion = tile.querySelector<HTMLAnchorElement>('.camara-tile__atribucion')!;
     atribucion.href = camara.fuenteUrl;
     atribucion.textContent = `${camara.atribucion} ↗`;

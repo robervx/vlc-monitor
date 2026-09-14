@@ -6,21 +6,20 @@ afterEach(() => {
 });
 
 describe('camarasVisibles', () => {
-  it('sin ninguna variable VITE_PERSONAL_* definida, solo devuelve las cámaras públicas', () => {
-    // Fuerza el caso "sin flag" con independencia de .env.local del entorno de
-    // quien ejecute los tests (spec 038/ADR-003: la cámara personal se activa
-    // ahí para desarrollo, pero el test debe ser determinista).
+  it('sin ninguna variable VITE_PERSONAL_* definida, no hay ninguna cámara visible', () => {
+    // v4: la única cámara "pública" (YouTube, canal amateur poco fiable) se
+    // retiró a petición del usuario — hoy las dos que quedan son "personales".
     vi.stubEnv('VITE_PERSONAL_CAMARA_TURISME_CV', '');
-    const visibles = camarasVisibles();
-    expect(visibles.every((c) => c.categoria === 'publica')).toBe(true);
-    expect(visibles.map((c) => c.id)).toContain('youtube-wolkam-plaza');
+    expect(camarasVisibles()).toEqual([]);
   });
 
-  it('activar el flag de las cámaras de Turisme CV las añade', () => {
+  it('activar el flag de las cámaras de Turisme CV las añade, con nombres distintos', () => {
     vi.stubEnv('VITE_PERSONAL_CAMARA_TURISME_CV', '1');
     const visibles = camarasVisibles();
-    expect(visibles.map((c) => c.id)).toContain('turisme-cv-plaza-ayuntamiento');
-    expect(visibles.map((c) => c.id)).toContain('turisme-cv-las-arenas');
+    const ids = visibles.map((c) => c.id);
+    expect(ids).toContain('turisme-cv-plaza-ayuntamiento');
+    expect(ids).toContain('turisme-cv-las-arenas');
+    expect(new Set(visibles.map((c) => c.nombre)).size).toBe(visibles.length);
   });
 
   it('cada cámara declara su categoría de ADR-003 y, si es personal, su envFlag', () => {
@@ -30,9 +29,8 @@ describe('camarasVisibles', () => {
     }
   });
 
-  it('las cámaras de YouTube usan id de canal (embed de canal en directo), no de vídeo', () => {
-    for (const c of CAMARAS_URBANAS) {
-      if (c.proveedor === 'youtube-canal') expect(c.youtubeChannelId).toMatch(/^UC/);
-    }
+  it('la cámara de la playa no se llama como el complejo Ciutat de les Arts (corrección v4)', () => {
+    const playa = CAMARAS_URBANAS.find((c) => c.id === 'turisme-cv-las-arenas');
+    expect(playa?.nombre.toLowerCase()).not.toContain('ciutat de les arts');
   });
 });
