@@ -965,7 +965,7 @@ function buildAgendaPanel(): AgendaPanel {
   root.hidden = true;
   root.innerHTML = `
     <div class="media-panel__header">Agenda de eventos</div>
-    <div class="agenda-panel__aviso">Contenido extraído por scraping de valencia.es — no es una API ni un dataset oficial.</div>
+    <div class="agenda-panel__aviso">Contenido extraído por scraping de fuentes públicas (valencia.es, Valencia CF, Levante UD, Roig Arena, Fundación Deportiva Municipal) — no es una API ni un dataset oficial.</div>
     <div class="media-panel__list" id="agenda-panel-list"></div>
     <div class="info-panel__meta" id="agenda-panel-meta"></div>
   `;
@@ -986,11 +986,12 @@ function renderItemAgenda(evento: EventoAgenda): string {
   const chips = evento.distritosMencionados
     .map((m) => `<span class="media-panel__chip">${escapeHtml(m.distritoNombre)}</span>`)
     .join('');
+  const chipImpacto = evento.impactoViaPublica ? '<span class="media-panel__chip media-panel__chip--impacto">⚠ Impacto en vía pública</span>' : '';
   return `
     <a class="media-panel__item" href="${escapeHtml(evento.url)}" target="_blank" rel="noopener noreferrer">
       <div class="media-panel__item-titulo">${escapeHtml(evento.titulo)}</div>
       <div class="media-panel__item-meta">${escapeHtml(evento.categoria || 'Sin categoría')} · ${formatoFechaEvento(evento.fechaInicio, evento.fechaFin)}</div>
-      ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
+      ${chipImpacto || chips ? `<div class="media-panel__chips">${chipImpacto}${chips}</div>` : ''}
     </a>
   `;
 }
@@ -1007,6 +1008,15 @@ function renderAgendaPanel(panel: AgendaPanel, snapshot: SnapshotAgenda): void {
   const avisoSospechoso = snapshot.estructuraSospechosa
     ? '<div class="tendencia-panel__insuficiente">⚠ Agenda posiblemente desactualizada — la fuente parece haber cambiado de estructura, revisar el scraper. Mostrando el último dato bueno conocido.</div>'
     : '';
+
+  // spec 027 v4 §9 — sección propia con los eventos que generan afluencia/tráfico/
+  // cortes reales (fútbol como local, Roig Arena, carreras), ordenados por fecha.
+  // No se excluyen de la agrupación por distrito de más abajo — es una prioridad
+  // visual añadida, no un reemplazo.
+  const eventosImpacto = snapshot.eventos
+    .filter((ev) => ev.impactoViaPublica)
+    .sort((a, b) => a.fechaInicio.localeCompare(b.fechaInicio));
+  const seccionImpacto = renderGrupoAgenda('⚠ Impacto en vía pública', eventosImpacto);
 
   const porDistrito = new Map<string, { nombre: string; eventos: EventoAgenda[] }>();
   const generales: EventoAgenda[] = [];
@@ -1027,7 +1037,7 @@ function renderAgendaPanel(panel: AgendaPanel, snapshot: SnapshotAgenda): void {
     .map(([, grupo]) => renderGrupoAgenda(grupo.nombre, grupo.eventos))
     .join('');
 
-  const listaHtml = [gruposDistrito, renderGrupoAgenda('València (general)', generales)].join('');
+  const listaHtml = [seccionImpacto, gruposDistrito, renderGrupoAgenda('València (general)', generales)].join('');
   const vacio = '<div class="tendencia-panel__insuficiente">Sin eventos en la agenda ahora mismo.</div>';
   panel.list.innerHTML = avisoSospechoso + (listaHtml || (avisoSospechoso ? '' : vacio));
 

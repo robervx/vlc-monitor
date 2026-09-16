@@ -20,7 +20,19 @@ export interface EventoAgenda {
   url: string;
   distritosMencionados: DistritoMencion[];
   fetchedAt: string;
-  source: 'ajuntament-valencia-scraping';
+  source:
+    | 'ajuntament-valencia-scraping'
+    | 'valencia-cf-scraping'
+    | 'levante-ud-scraping'
+    | 'roig-arena-scraping'
+    | 'fdm-valencia-carreras-scraping';
+  /**
+   * true si el evento genera afluencia/tráfico/cortes reales en vía pública
+   * (fútbol en Mestalla/Ciutat de València, conciertos del Roig Arena,
+   * carreras populares) — spec 027 v4 §9. Ausente/false para la agenda
+   * general de valencia.es (v1-v3), que no se filtra por impacto.
+   */
+  impactoViaPublica?: boolean;
 }
 
 export interface SnapshotAgenda {

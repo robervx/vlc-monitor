@@ -122,9 +122,9 @@ const META_CAPAS: Record<string, MetaCapa> = {
   },
   agendaEventos: {
     nombre: 'Agenda de eventos',
-    mide: 'Agenda general de eventos culturales de la ciudad — conciertos, exposiciones, rutas guiadas, festivales',
+    mide: 'Agenda general de eventos culturales (conciertos, exposiciones, rutas guiadas, festivales) más una sección destacada de eventos con impacto real en vía pública: fútbol de Valencia CF/Levante UD como local, conciertos/eventos del Roig Arena, carreras populares',
     frecuencia: 'Caché refrescada cada ~6 h',
-    fuente: 'Scraping de valencia.es (no es una API/dataset oficial, se avisa en el propio panel)',
+    fuente: 'Scraping de valencia.es, valenciacf.com, levanteud.com, roigarena.com y fdmvalencia.es (ninguna es una API/dataset oficial, se avisa en el propio panel)',
   },
 };
 

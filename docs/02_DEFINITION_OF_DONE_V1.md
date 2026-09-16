@@ -36,7 +36,7 @@ mostrarse.
 | [`013` v5](../specs/013-motor-insights-alertas.md) | ~~Alertas como modal bloqueante; insight de tráfico nombra la calle~~ — **hecho (2026-09-16)** | Modal nuevo con cola (no existía ningún `<dialog>` en el repo) que exige cierre explícito; título de `trafico-empeora` incluye la calle más severa |
 | [`019` v6](../specs/019-identidad-chasis-navegacion.md) | ~~Bug: el sidebar no cierra bien~~ — **hecho (2026-09-16)** | `onCambioLayout` no reconciliaba el listener de `keydown` (Esc) al pasar a layout móvil con la hoja ya abierta desde escritorio — corregido en `src/ui/chasis.ts` |
 | [`021` v4](../specs/021-motor-cordon-incidentes.md) | ~~Bloqueante de bomberos~~ — **ya resuelto** | Retirado por decisión de producto (2026-09-16): primera aproximación editable para cuando llega la policía primero. Software ya completo. Spec ya en `Implemented` |
-| [`027`](../specs/027-agenda-eventos-scraping.md) | ~~Implementar tal cual redactada~~ — **hecho (2026-09-16)**, con una verificación pendiente | Agenda general de eventos culturales vía GH Actions + Playwright. Job de CI aún sin su primera ejecución real (Playwright no corre en este host) |
+| [`027`](../specs/027-agenda-eventos-scraping.md) | ~~Implementar tal cual redactada~~ — **hecho (2026-09-16)** | Agenda general de eventos culturales vía GH Actions + Playwright. Job de CI con su primera ejecución real verificada (2026-09-17, `workflow_dispatch`, commit `b8d129d`) |
 | [`030` v4](../specs/030-remarca-generica-repo-publico.md) | ~~Rebranding a Mirall~~ — **hecho (2026-09-16)** | `src/config/marca.ts`, `index.html`, `vite.config.ts` (manifest PWA), README, `CLAUDE.md` §1, `src/ui/chasis.ts` y demás sitios de `docs/decisiones/ADR-004-rebranding-mirall.md` actualizados; cabecera con descriptor "Urban Intelligence Platform" en tipografía propia |
 | [`032`](../specs/032-reconciliacion-trafico-grafo.md) | ~~Implementar tal cual redactada~~ — **hecho (2026-09-16)** | Reconciliación tráfico real ↔ grafo viario — 99,5 % de cobertura geométrica verificada contra datos reales |
 | [`033` v3](../specs/033-jerarquia-capas-selector.md) | ~~Reordenar selector + registrar cámaras~~ — **hecho (2026-09-16)** | Tráfico/contexto mediático/cámaras arriba, incidencias 4ª, Pulso última; "cámaras" entra en `map-layer-definitions.ts` |
@@ -82,11 +82,20 @@ rápida, una spec detrás de otra (`CLAUDE.md` §3.4), no todas a la vez:
     usuario el 2026-09-17, sin cambios** — bloqueante de revisión resuelto.
 12. ~~`037` (glosario)~~ — adelantado al paso 5, junto con `010` v4. Pendiente solo una v4 futura cuando existan `040`/`041`/`042`.
 
-**Plan de ejecución completo (2026-09-17)** — los 12 pasos están hechos. El DoD de V1 (§1)
-queda cerrado salvo revisar la tabla de arriba fila por fila antes de dar la V1 por
-completa formalmente. Trabajo posterior a esta fecha (arreglos reportados por el usuario,
-features nuevas) no forma parte de este plan cerrado — ver historial de cada spec para lo
-que venga después.
+**Plan de ejecución completo (2026-09-17)** — los 12 pasos están hechos. Trabajo posterior
+a esta fecha (arreglos reportados por el usuario, features nuevas) no forma parte de este
+plan cerrado — ver historial de cada spec para lo que venga después.
+
+**V1 dada por completa formalmente (2026-09-17)** — revisada la tabla de §1 fila por fila:
+las 20 specs están `Implemented` con su criterio de cierre cumplido. El único punto que
+seguía abierto era el job de CI de spec `027` (nunca se había disparado en GitHub Actions
+real porque el commit que lo añadía, `e1eba18`, no estaba pusheado — `master` local iba 5
+commits por delante de `origin/master`). Resuelto: merge con los 14 commits automáticos de
+`origin/master` (snapshots de spec 017), push, y `workflow_dispatch` manual de
+`agenda-eventos-cron.yml` — ejecución real verificada con éxito
+(`https://github.com/robervx/vlc-monitor/actions/runs/35162167241`, commit
+`b8d129d`, snapshot con datos reales). No queda ningún criterio de cierre pendiente de
+verificar.
 
 ### Notas operativas para la siguiente sesión
 
