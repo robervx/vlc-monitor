@@ -1,6 +1,8 @@
 <div align="center">
 
-# Intelligent City Monitor
+# Mirall
+
+### La ciudad reflejada en tiempo real
 
 **Un mapa vivo de la ciudad de València: movilidad, meteorología, calidad del aire,
 eventos e incidencias, agregados en un solo panel a partir de datos abiertos y
@@ -18,7 +20,7 @@ gratuitos.**
 
 <em>English summary <a href="#english">below ↓</a></em>
 
-![Intelligent City Monitor — tráfico en tiempo real, Valenbisi y el Índice de Pulso de Distrito sobre el mapa de València](docs/capturas/hero-escritorio.jpg)
+![Mirall — tráfico en tiempo real, Valenbisi y el Índice de Pulso de Distrito sobre el mapa de València](docs/capturas/hero-escritorio.jpg)
 
 </div>
 
@@ -191,7 +193,7 @@ licencias — ver [`docs/FUENTES_Y_LICENCIAS.md`](docs/FUENTES_Y_LICENCIAS.md).
 
 ## English
 
-**Intelligent City Monitor** is a live map of the city of València that aggregates
+**Mirall** ("mirror" in Valencian — Urban Intelligence Platform) is a live map of the city of València that aggregates
 public, free data sources into a single interactive panel: real-time traffic, bike
 share, parking, weather, air quality, events, roadworks and street closures, and local
 press context.

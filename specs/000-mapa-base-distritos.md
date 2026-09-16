@@ -7,8 +7,11 @@ estado: Implemented
 tipo: fundacional
 depende_de: []
 propietario: ""
-version: 3
+version: 4
 ```
+
+> **Estado:** v1-v4 `Implemented` y en producción. **v4 (2026-09-16)**: se retiró el
+> resaltado visual de distrito al pasar el ratón y al hacer clic — ver §8.
 
 ## 1. Problema / motivación
 
@@ -94,3 +97,4 @@ Servicio de geometría (equivalente a `country-geometry.ts` de World Monitor, a 
 | 2 | 2026-08-18 | Fuente verificada con llamada real: OpendataSoft descartado (dominio caído), sustituido por Geoportal ArcGIS (`geoportal.valencia.es`, capas 225/224). Decisión tomada de posponer barrios a spec futura. Implementación del DoD en curso. |
 | 3 | 2026-08-18 | DoD completo: seed (`scripts/seed-distritos.mjs`), endpoint (`api/geo/v1/distritos.ts`), servicio de geometría con point-in-polygon (`src/services/district-geometry.ts` + tests), capa registrada (`src/config/map-layer-definitions.ts`), mapa base con hover/click y estado en URL (`src/main.ts`). Verificado con `npm run typecheck`, `npm run test`, `npm run build` y en navegador. Spec pasa a `Implemented`. |
 | 4 | 2026-08-26 | La ingesta de barrios pospuesta en §2/§7 (referida ahí como spec futura `001b-geometria-barrios`, nunca creada con ese id) queda recogida por la spec [023](023-geolocalizacion-contexto-mediatico.md) — usa la misma fuente (`MapServer/224`, re-verificada), pero solo ingiere `nombre`+`coddistrit` (no la geometría de barrio) porque su caso de uso es matching de texto, no point-in-polygon a nivel barrio. `Distrito.barrios` pasa de `string[]` a `BarrioInfo[]` (ver contrato de datos de la spec 023) para poder llevar alias y marca de ambigüedad — cambio de tipo, no de fuente ni de geometría de distrito. Point-in-polygon a nivel barrio sigue sin implementarse; sigue siendo una spec futura si hace falta. |
+| 4 | 2026-09-16 | Quitado el resaltado por hover y por clic de la capa de distritos en `src/main.ts`: `getFillColor` pasa de función (con ramas por `selectedDistrito`/`hoveredDistrito`) a un color constante; se elimina la variable `hoveredDistrito` y el handler `onHover` entero. `onClick` sigue disparando `setFocoDistrito` (spec 036) sin cambio de color del polígono — el único indicador visual de foco activo es el chip "Foco: X". Verificado en navegador: clic en un distrito muestra el chip sin pintar el polígono de naranja. `npm run typecheck`/`test` (335/335) verdes. |

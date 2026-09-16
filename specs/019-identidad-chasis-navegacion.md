@@ -7,8 +7,11 @@ estado: Implemented
 tipo: fundacional
 depende_de: [000]
 propietario: ""
-version: 5
+version: 6
 ```
+
+> **Estado:** v1-v6 `Implemented` y en producción. **v6 (2026-09-16)**: bug real
+> reproducido y corregido — ver §8.
 
 ## 0. Contexto de la decisión
 
@@ -116,3 +119,4 @@ CSS + un listener acotado en `buildSidebar()`.
 | 3 | 2026-08-19 | Ajustes tras feedback de uso: (1) renombrado "Intelligent MonitorCity" → "Intelligent City Monitor" (el orden original no es inglés correcto); (2) tagline sin "— herramienta interna"; (3) `#info-panels` con `flex-wrap` + scroll interno, corrige amontonamiento de leyendas de capa; (4) sección "Configuración" pasa de `placeholder` a `disponible`, con `src/ui/panel-preferences.ts` nuevo (registro + persistencia de qué paneles fijos se muestran); (5) reloj de cabecera rediseñado con fecha. Verificado con `npm run typecheck`, `npm run test` (108/108) y en navegador (checkboxes de capa simultáneos, toggle de Configuración, persistencia tras recarga). |
 | 4 | 2026-08-29 | Re-marca genérica (spec `030` / ADR-002): se retira el logo anterior y el lenguaje de un caso de uso concreto. Logo → placeholder neutro `public/assets/logo.png` (`scripts/generar-marca.ts`). Nombre/tagline/pie centralizados en `src/config/marca.ts`, consumidos por `chasis.ts` y `pagina-login.ts`. El contexto §0 y la motivación §1 de esta spec quedan como registro histórico de ADR-002. |
 | 5 | 2026-09-09 | **Draft** — pulido del sidebar (ver sección "v5"): ocultar etiquetas al plegar (fix del sliver de letras) y cerrar el sidebar de escritorio al hacer clic fuera (dejaba de tapar `#controls`). CSS + listener acotado en `buildSidebar()`. |
+| 6 | 2026-09-16 | **Bug real reproducido y corregido.** Se probaron sistemáticamente los cierres del sidebar (toggle, FAB, botón ✕, backdrop, Esc, clic fuera en escritorio) cruzados con cambios de layout escritorio↔móvil en caliente. La mayoría funcionaban; el caso roto: abrir el sidebar en **escritorio** y luego pasar a **layout móvil sin volver a cerrarlo** — `onCambioLayout()` (`chasis.ts`) reconciliaba el listener de `pointerdown` (clic fuera, escritorio) pero no el de `keydown` (Esc + trampa de foco, pensado solo para la hoja móvil), así que Esc dejaba de cerrar la hoja en ese caso concreto (el backdrop seguía cerrando bien). Corregido añadiendo la misma reconciliación de `keydown` que ya existía para `pointerdown` en la rama `movil` de `onCambioLayout`. Verificado en navegador simulando la secuencia exacta (abrir en escritorio → redimensionar a móvil → Esc cierra). `npm run typecheck`/`test` (335/335) verdes. |

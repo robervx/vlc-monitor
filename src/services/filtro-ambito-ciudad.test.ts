@@ -121,19 +121,45 @@ describe('clasificarAmbitoCiudad — fuera de la ciudad (nacional / internaciona
   });
 });
 
-describe('clasificarAmbitoCiudad — deporte', () => {
-  it('la crónica / mercado de fichajes se descarta', () => {
+describe('clasificarAmbitoCiudad — deporte (v6: solo interesa el fútbol)', () => {
+  it('la crónica de fútbol (Valencia CF) ya NO se descarta — antes de v6 sí', () => {
     const c = clasificarAmbitoCiudad(entrada({ titulo: 'El Valencia CF cierra el fichaje de un central' }));
-    expect(c.ambito).toBe('excluido');
+    expect(c.ambito).not.toBe('excluido');
     expect(c.categoria).toBe('deporte');
   });
 
-  it('lo logístico (dispositivo + Mestalla) se mantiene como deporte confirmado', () => {
+  it('lo logístico de fútbol (dispositivo + Mestalla) se mantiene como deporte confirmado', () => {
     const c = clasificarAmbitoCiudad(
       entrada({ titulo: 'Dispositivo especial de tráfico por el partido en Mestalla' }),
     );
     expect(c.ambito).toBe('confirmado');
     expect(c.categoria).toBe('deporte');
+  });
+
+  it('la crónica de baloncesto (Valencia Basket) se descarta — no es fútbol', () => {
+    const c = clasificarAmbitoCiudad(entrada({ titulo: 'El Valencia Basket ficha a un nuevo pívot' }));
+    expect(c.ambito).toBe('excluido');
+    expect(c.motivo).toContain('deporte no-fútbol');
+  });
+
+  it('lo logístico de otro deporte se descarta igualmente, aunque mencione un distrito', () => {
+    // Decisión explícita del usuario: el filtro de "solo fútbol" gana incluso
+    // sobre una señal positiva de ciudad (distrito/hito) — a diferencia del
+    // resto de exclusiones, que las señales positivas sí superan.
+    const c = clasificarAmbitoCiudad(
+      entrada({
+        titulo: 'Operativo especial de tráfico en Benimaclem por el partido de baloncesto',
+        distritosMencionados: [{ distritoNombre: 'Benimaclem' }],
+      }),
+    );
+    expect(c.ambito).toBe('excluido');
+    expect(c.motivo).toContain('deporte no-fútbol');
+  });
+
+  it('tenis/motor/ciclismo se descartan igual que cualquier otro deporte no-fútbol', () => {
+    for (const titulo of ['València sigue el Wimbledon con atención', 'El Gran Premio de MotoGP hace parada en la ciudad']) {
+      expect(clasificarAmbitoCiudad(entrada({ titulo })).ambito).toBe('excluido');
+    }
   });
 });
 
@@ -151,11 +177,9 @@ describe('clasificarAmbitoCiudad — bucket general y fuentes', () => {
     expect(clasificarAmbitoCiudad(entrada({ titulo, fuenteCityOnly: true })).ambito).toBe('confirmado');
   });
 
-  it('la fuente de ocio etiqueta la categoría', () => {
-    const c = clasificarAmbitoCiudad(
-      entrada({ titulo: 'Nueva exposición en el IVAM', fuenteCityOnly: true, categoriaFuente: 'ocio' }),
-    );
+  it('una fuente temática de ocio/cultura ya no tiene categoría propia (v6) — es "general" como cualquier otra', () => {
+    const c = clasificarAmbitoCiudad(entrada({ titulo: 'Nueva exposición en el IVAM', fuenteCityOnly: true }));
     expect(c.ambito).toBe('confirmado');
-    expect(c.categoria).toBe('ocio');
+    expect(c.categoria).toBe('general');
   });
 });

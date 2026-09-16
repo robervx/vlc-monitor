@@ -4,13 +4,23 @@
  * y el endpoint de lectura (api/trafico/v1/historico.ts) son los únicos
  * puntos de I/O.
  */
-import type { TramoTrafico } from './trafico';
+import type { TramoTrafico, EstadoTramo } from './trafico';
 import { componenteTrafico } from './pulso-distrito';
+
+/** Conteo de tramos por estado dentro de un distrito (excluye 'sin-datos'). Spec 017 §9 v4. */
+export type ConteoPorEstado = Record<Exclude<EstadoTramo, 'sin-datos'>, number>;
 
 export interface SnapshotDistrito {
   codigo: string;
   congestion: number;
   muestras: number;
+  /**
+   * v4 (spec 017 §9): conteo de tramos por estado — prerrequisito de la
+   * calibración en sombra del Pulso de Distrito (spec 010 v4), cuyos escenarios
+   * se definen sobre "≥N tramos congestionado/cortado". Opcional: los snapshots
+   * escritos antes de v4 no lo llevan y todo lector tolera su ausencia.
+   */
+  porEstado?: ConteoPorEstado;
 }
 
 export interface SnapshotHorario {
@@ -51,10 +61,14 @@ export function agregarSnapshotPorDistrito(
     timestamp,
     distritos: distritos.map((d) => {
       const tramosDistrito = tramosPorDistrito.get(d.codigo) ?? [];
+      const conDato = tramosDistrito.filter((t) => t.estado !== 'sin-datos');
+      const porEstado: ConteoPorEstado = { fluido: 0, denso: 0, congestionado: 0, cortado: 0 };
+      for (const t of conDato) porEstado[t.estado as Exclude<EstadoTramo, 'sin-datos'>] += 1;
       return {
         codigo: d.codigo,
         congestion: componenteTrafico(tramosDistrito),
-        muestras: tramosDistrito.filter((t) => t.estado !== 'sin-datos').length,
+        muestras: conDato.length,
+        porEstado,
       };
     }),
   };

@@ -31,6 +31,7 @@ import viaPublicaIncidencias from '../src/server/via-publica-incidencias';
 import geoDistritos from '../src/server/geo-distritos';
 import mockDensidad from '../src/server/mock-densidad';
 import agendaEventos from '../src/server/agenda-eventos';
+import decisionSugerencias from '../src/server/decision-sugerencias';
 import authLogin from '../src/server/auth-login';
 import authLogout from '../src/server/auth-logout';
 import authEstado from '../src/server/auth-estado';
@@ -55,6 +56,7 @@ const RUTAS: Record<string, Handler> = {
   'geo/v1/distritos': geoDistritos,
   'mock/v1/densidad-personas': mockDensidad,
   'agenda/v1/eventos': agendaEventos,
+  'decision/v1/sugerencias': decisionSugerencias,
   'auth/v1/login': authLogin,
   'auth/v1/logout': authLogout,
   'auth/v1/estado': authEstado,

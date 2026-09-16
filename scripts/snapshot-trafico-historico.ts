@@ -83,8 +83,13 @@ async function main(): Promise<void> {
   await writeFile(ROLLUPS_PATH, `${JSON.stringify(rollupsActualizados, null, 2)}\n`);
 
   const totalMuestras = nuevoSnapshot.distritos.reduce((acc, d) => acc + d.muestras, 0);
+  const totalAfectados = nuevoSnapshot.distritos.reduce(
+    (acc, d) => acc + (d.porEstado ? d.porEstado.congestionado + d.porEstado.cortado : 0),
+    0,
+  );
   console.log(
-    `Snapshot ${nuevoSnapshot.timestamp}: ${nuevoSnapshot.distritos.length} distritos, ${totalMuestras} tramos con dato. ` +
+    `Snapshot ${nuevoSnapshot.timestamp}: ${nuevoSnapshot.distritos.length} distritos, ${totalMuestras} tramos con dato ` +
+      `(${totalAfectados} congestionado/cortado). ` +
       `Histórico: ${snapshotsRecientes.length} snapshots horarios, ${rollupsActualizados.length} días compactados.`,
   );
 }

@@ -7,8 +7,11 @@ estado: Implemented
 tipo: capa
 depende_de: [019]
 propietario: ""
-version: 1
+version: 2
 ```
+
+> **Estado:** v1-v2 `Implemented` y en producción. **v2 (2026-09-16)**: se quitó el
+> auto-expandir-con-hover de las 6 leyendas colapsables — ver §8.
 
 ## 1. Problema / motivación
 
@@ -94,3 +97,4 @@ histórico) **no** se colapsan — son el contenido principal, no leyendas.
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-09 | Creación + implementación completa. §5.1 rollup de frescura en la cabecera (`estado-frescura.ts` + 5 fuentes + color verde/ámbar/gris). §5.2 mini-leyendas colapsables (`buildInfoPanel(..., { colapsable })` + CSS `:hover`/`:focus-within`/`.is-expandida`), títulos de leyenda enriquecidos con el dato clave. typecheck/test 276/276, verificado en navegador. Pasa a `Implemented`. |
+| 2 | 2026-09-16 | Quitados los selectores `:hover`/`:focus-within` de `.info-panel--colapsable` en `index.html` — las 6 leyendas (tráfico, Valenbisi, aparcamiento, Pulso, Fallas, vía pública) ya no se expanden solas al pasar el ratón, solo con clic/tap (`.is-expandida`, toggle de clic que ya existía en `src/ui/panel-utils.ts` sin cambios). Verificado en navegador: hover sobre la leyenda de tráfico ya no la expande; clic sí la expande y muestra el desglose completo por estado. `npm run typecheck`/`test` (335/335) verdes. |

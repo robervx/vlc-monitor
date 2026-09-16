@@ -43,6 +43,28 @@ describe('agregarSnapshotPorDistrito', () => {
     const snap = agregarSnapshotPorDistrito(tramos, [{ codigo: '01' }], '2026-08-18T10:00:00.000Z');
     expect(snap.distritos[0]?.muestras).toBe(0);
   });
+
+  it('cuenta los tramos por estado (v4) excluyendo sin-datos', () => {
+    const tramos = [
+      tramo('01', 'fluido'),
+      tramo('01', 'fluido'),
+      tramo('01', 'denso'),
+      tramo('01', 'congestionado'),
+      tramo('01', 'cortado'),
+      tramo('01', 'sin-datos'),
+    ];
+    const snap = agregarSnapshotPorDistrito(tramos, [{ codigo: '01' }, { codigo: '02' }], '2026-08-18T10:00:00.000Z');
+
+    const d01 = snap.distritos.find((d) => d.codigo === '01')!;
+    expect(d01.porEstado).toEqual({ fluido: 2, denso: 1, congestionado: 1, cortado: 1 });
+    // los enteros de porEstado (sin 'sin-datos') suman exactamente `muestras`
+    const d01Suma = Object.values(d01.porEstado!).reduce((a, b) => a + b, 0);
+    expect(d01Suma).toBe(d01.muestras);
+
+    // distrito sin ningún tramo → conteo en cero, no `undefined`
+    const d02 = snap.distritos.find((d) => d.codigo === '02')!;
+    expect(d02.porEstado).toEqual({ fluido: 0, denso: 0, congestionado: 0, cortado: 0 });
+  });
 });
 
 describe('compactarSnapshotsAntiguos', () => {
@@ -69,6 +91,17 @@ describe('compactarSnapshotsAntiguos', () => {
     expect(rollupsActualizados).toHaveLength(1);
     expect(rollupsActualizados[0]?.distritos[0]?.congestionMedia).toBeCloseTo(0.4);
     expect(rollupsActualizados[0]?.distritos[0]?.muestras).toBe(2);
+  });
+
+  it('tolera snapshots legacy sin porEstado (v4) al compactar', () => {
+    const hace40dias = new Date(AHORA.getTime() - 40 * 24 * 60 * 60 * 1000).toISOString();
+    const snapshots: SnapshotHorario[] = [
+      // sin porEstado, como los escritos antes de spec 017 v4
+      { timestamp: hace40dias, distritos: [{ codigo: '01', congestion: 0.3, muestras: 4 }] },
+    ];
+    const { snapshotsRecientes, rollupsActualizados } = compactarSnapshotsAntiguos(snapshots, [], AHORA, 30);
+    expect(snapshotsRecientes).toHaveLength(0);
+    expect(rollupsActualizados[0]?.distritos[0]?.congestionMedia).toBeCloseTo(0.3);
   });
 
   it('es idempotente: no duplica un día ya compactado en una ejecución anterior', () => {

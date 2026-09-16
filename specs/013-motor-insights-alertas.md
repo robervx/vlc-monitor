@@ -7,10 +7,18 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [001, 002, 010, 016]
 propietario: ""
-version: 7
+version: 8
 ```
 
-> **Estado:** v1-v7 `Implemented` y en producción. **v7 (2026-09-16)**: consumidor de
+> **Estado:** v1-v8 `Implemented` y en producción. **v8 (2026-09-17) — bug real reportado
+> por el usuario**: la tarjeta del panel de alertas (`#insights-panel`) crecía en altura
+> con el número de alertas y quedaba mucho más alta que sus vecinas (meteo, predicción,
+> aire), rompiendo la alineación en `#info-panels`. Corregido en `.info-panel` (CSS
+> compartida, `index.html`) — todas las tarjetas pasan a **ancho y alto fijos** (280×280px)
+> con scroll interno (`overflow-y: auto`) si el contenido no cabe, en vez de crecer sin
+> límite. Afecta a las 4 tarjetas fijas (meteo, predicción, aire, insights) y a las 6
+> leyendas de capa colapsables por igual, no solo a esta spec — se documenta aquí porque
+> el síntoma reportado fue específicamente el panel de alertas. **v7 (2026-09-16)**: consumidor de
 > spec 001 v4 — nueva regla `aviso-oficial-meteo` (avisos oficiales de fenómenos
 > adversos por scraping de GVA Emergencias e Interior), un `Insight` por aviso vigente,
 > severidad por nivel (amarillo→aviso, naranja/rojo→urgente). Sin UI nueva: el panel y el
@@ -232,3 +240,4 @@ Se retoma si el volumen de alertas lo justifica.
 | 5 | 2026-09-16 | **Modal bloqueante** (`#alert-modal-backdrop`/`#alert-modal` en `src/main.ts`) sustituye el toast de esquina — no existía ningún `<dialog>`/modal en el repo, se construyó reutilizando el patrón de backdrop/focus-trap/Esc del sidebar móvil (`chasis.ts`), adaptado localmente. Cola (`colaAlertasModal`): si llegan varias alertas nuevas a la vez, se ven una a una con contador "1 de N"; se cierra con ✕, Esc, clic en el backdrop o "Ver en el panel" (que además hace scroll y resalta el panel de insights, como antes). Sin autocierre por temporizador. **`trafico-empeora`** (`src/services/insights.ts`): el título pasa de nombrar solo el distrito a nombrar la calle del tramo más severo (`"Tráfico a peor en <calle> y N más (<distrito>)"`), ordenando por nivel de destino. 2 tests nuevos de insights + verificado en navegador con el hook de demo (`window.__toastAlertaDemo`): modal centrado, contador "1 de 3" con 3 alertas encoladas, Esc avanza una a una, clic en el backdrop cierra. 343/343 tests, `npm run typecheck` verde. |
 | 6 | 2026-09-16 | Consumidor de spec 010 v4: `insightsDistritoCritico` (dependía de `categoria`/`indice`/`componentes`, eliminados) se retira; `'distrito-critico'` sale de `TipoInsight`. Nueva `insightsPulsoDistrito()` — un `Insight` agrupado por distrito a partir de `d.escenariosActivos.filter(e => e.modo==='vivo' && e.confirmado)`, severidad urgente si algún escenario es `prioritario`, chips de `fuenteSpec` por escenario contribuyente (`FUENTES_POR_ESCENARIO`). `FuenteInsight` gana `'026'` (incidencias de vía pública, ahora fuente real del motor). 3 tests nuevos en `insights.test.ts`. `npm run typecheck`/`test` (346/346)/`build` verdes. |
 | 7 | 2026-09-16 | Consumidor de spec 001 v4: `TipoInsight` gana `'aviso-oficial-meteo'`. Nueva `insightsAvisoOficial()` en `insights.ts` — un `Insight` por `AvisoMeteo` vigente que llega de `fetchAvisosVigentes()` (spec 001), severidad por `SEVERIDAD_POR_NIVEL_AVISO` (amarillo→aviso, naranja/rojo→urgente). `calcularInsights()` gana un octavo parámetro opcional `avisosOficiales`; `insights-actual.ts` lo obtiene con `Promise.allSettled` igual que el resto de fuentes "opcionales" (si el scraping falla, el resto de reglas se sirve igual). No se toca `FuenteInsight` (ya incluía `'001'`). Verificado contra el dev server real: la alerta naranja real del 15/09/2026 aparece en el panel sin ningún cambio de UI. `npm run typecheck`/`test` (357/357)/`build` verdes. |
+| 8 | 2026-09-17 | **Bug real reportado por el usuario**: `#insights-panel` crecía en altura con el número de alertas, mucho más que sus vecinas (meteo/predicción/aire), rompiendo la alineación de `#info-panels`. Corregido en la clase compartida `.info-panel` (`index.html`): ancho y alto fijos (280×280px) + `overflow-y: auto`, en vez de crecer sin límite — afecta por igual a las 4 tarjetas fijas y a las 6 leyendas de capa. Verificado en navegador: las 4 tarjetas quedan del mismo tamaño, el panel de alertas hace scroll interno en vez de desbordar. `npm run typecheck`/`test` (367/367)/`build` verdes. |

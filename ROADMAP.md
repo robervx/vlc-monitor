@@ -4,7 +4,7 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 
 | Fase | Nombre | Contenido | Specs |
 |---|---|---|---|
-| **F0** | Cimientos | Mapa base (MapLibre + deck.gl), geometría de distritos, arquitectura de registro de capas, pipeline seed→caché→endpoint, identidad de marca (Intelligent City Monitor) + chasis de navegación | `000`, `019` |
+| **F0** | Cimientos | Mapa base (MapLibre + deck.gl), geometría de distritos, arquitectura de registro de capas, pipeline seed→caché→endpoint, identidad de marca (Mirall, ex-"Intelligent City Monitor") + chasis de navegación | `000`, `019` |
 | — | *Prototipo paralelo* | Capa de movimiento de personas con datos sintéticos (mock), para validar UI de choropleth antes de tener fuente real | `003` |
 | **F1** | MVP — 3 capas | Meteorología, calidad del aire, tráfico en tiempo real | `001`, `002`, `004` |
 | **F2** | Movilidad completa | Valenbisi, aparcamiento, EMT (si hay fuente viable) | `005`, `006`, `007` |
@@ -18,6 +18,7 @@ Fuente única de verdad de fases. Cada fase referencia sus specs por id — ver 
 | **F7** | Integraciones externas de navegación | Publicación de cortes/incidencias en formato consumible por Waze/Google Maps — sujeta a investigación de viabilidad y posible convenio con el Ayuntamiento | `015` |
 | **F8** | Apoyo a decisión — herramientas de gestión municipal | Grafo viario base (sin simulador de tráfico) + motor de propuesta de perímetro/calles a cortar según tipo e intensidad de incidente, editable por la persona responsable, nunca automático (`CLAUDE.md` §4) + simulador de cortes de calle + motor compartido de propagación dirigida de cortes (efecto en cadena por sentido de circulación) + reconciliación de la capa de tráfico real con el grafo (aplazada) + motor de insights v2 con correlación declarativa entre señales ya existentes (tráfico, Fallas, contexto mediático), sin modelo estadístico nuevo | `020`, `021`, `022`, `024`, `031`, `032` |
 | **F9** | Multimedia complementaria — cámaras y redes institucionales | Cámaras urbanas en directo vía embeds de terceros (YouTube público; stream de la Xarxa de Webcams de Turisme CV como fuente **personal**, ver `ADR-003`), sin captura ni almacenamiento propio; panel de actualidad institucional con widgets oficiales de Facebook (Page Plugin) y X (embed de timeline, no la API de pago) de una lista curada de entidades — inspirado en los paneles "Noticias/Cámaras en vivo" de World Monitor | `038`, `039` |
+| **F10** | Reestructura de navegación y apoyo a decisión (cierre de V1) | Router cliente simple en dos vistas — mapa operativo (`/`) y hub de inteligencia (`/inteligencia`, con cámaras/contexto mediático/redes/tendencia) — más una página de apoyo a decisión operativa (cruce declarativo de señales ya existentes, "avisa no actúa") y una página de protocolos de actuación revisada explícitamente por el usuario. Ver `docs/02_DEFINITION_OF_DONE_V1.md` | `040`, `041`, `042` |
 
 ## Fuera de alcance (recordatorio — detalle completo en `CLAUDE.md` §3-4)
 

@@ -3,6 +3,7 @@ import { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Connect, type Plugin, type ViteDevServer } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { MARCA } from './src/config/marca';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const apiDir = path.join(rootDir, 'api');
@@ -132,9 +133,9 @@ function pwaPlugin(): Plugin[] {
     registerType: 'prompt',
     includeAssets: ['icons/apple-touch-icon.png', 'icons/favicon-32.png', 'assets/logo.png'],
     manifest: {
-      name: 'Intelligent City Monitor',
-      short_name: 'IC Monitor',
-      description: 'Datos abiertos de València en tiempo real: movilidad, meteo, aire, eventos e incidencias.',
+      name: MARCA.nombre,
+      short_name: MARCA.nombre,
+      description: `${MARCA.descriptor} — movilidad, meteo, aire, eventos e incidencias de València.`,
       lang: 'es',
       start_url: '/',
       scope: '/',

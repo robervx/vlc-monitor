@@ -4,6 +4,9 @@ name: Histórico de tráfico (snapshot horario)
 # a propósito: el repo es privado, así que GitHub Actions consume minutos del
 # plan gratuito (2.000/mes) — a 60 min de cadencia son ~720 min/mes, muy
 # holgado. No subir la frecuencia sin revisar antes esa cuenta.
+#
+# También corre aquí el snapshot del Pulso en modo sombra (spec 010 v4
+# §10.3) — se engancha a este cron en vez de crear uno propio.
 
 on:
   schedule:
@@ -35,10 +38,18 @@ jobs:
       # vacío/falso). El siguiente run programado lo reintenta solo.
       - run: npm run snapshot:trafico-historico
 
-      - name: Comitear el snapshot si hay cambios
+      # Spec 010 v4 §10.3 — snapshot del escenario en modo sombra, enganchado
+      # a este mismo cron horario (no uno propio). `continue-on-error` a
+      # propósito: un fallo aquí (p. ej. el nowcast de spec 016 caído) no debe
+      # bloquear el commit del snapshot de tráfico, que es la pieza más
+      # madura y no depende de esta.
+      - run: npm run snapshot:pulso-sombra
+        continue-on-error: true
+
+      - name: Comitear los snapshots si hay cambios
         run: |
           git config user.name "vlc-monitor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/trafico-historico.json data/trafico-historico-diario.json
-          git diff --cached --quiet || git commit -m "chore: snapshot de tráfico histórico $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git add data/trafico-historico.json data/trafico-historico-diario.json data/pulso-sombra.json
+          git diff --cached --quiet || git commit -m "chore: snapshot de tráfico histórico + Pulso en sombra $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push

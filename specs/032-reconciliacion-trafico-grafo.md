@@ -3,12 +3,14 @@
 ```yaml
 id: 032
 titulo: "Llevar el estado y el sentido reales de la capa de tráfico (spec 004) a los tramos del grafo (spec 020)"
-estado: Draft
+estado: Implemented
 tipo: infraestructura
 depende_de: [004, 020]
 propietario: ""
-version: 1
+version: 2
 ```
+
+> **Estado:** v2 (2026-09-16) `Implemented`. Ver §8.
 
 ## 0. Contexto
 
@@ -70,10 +72,10 @@ Sin capa nueva propia. Consumidores:
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] Emparejamiento probado con datos reales: % de los ~412 tramos de tráfico conciliados con al menos un `Tramo` del grafo, inspección visual de una muestra, revisión de los tramos con nombre ambiguo/duplicado.
-- [ ] Función pura de emparejamiento con tests de fixture (solape total, solape parcial, nombre que coincide pero geometría no, tramo de tráfico que cruza varios tramos de grafo).
-- [ ] Documentado el % de cobertura y los casos que quedan `sinEmparejar`, sin forzar emparejamientos de baja confianza.
-- [ ] `npm run typecheck` / `npm run test` sin regresiones.
+- [x] Emparejamiento probado con datos reales (`npm run verificar:reconciliacion-trafico-grafo`, script nuevo): **410/412 tramos de tráfico (99,5 %) conciliados geométricamente** con al menos un `Tramo` del grafo (13.233 tramos). Los 2 sin emparejar son enlaces de autovía/paso inferior fuera de la trama urbana normal ("A-3 SENTIDO SALIDA", "PASO INFERIOR DE TRES FORQUES HACIA ROS CASARES") — esperable, no un fallo del algoritmo.
+- [x] Función pura de emparejamiento (`src/services/reconciliacion-trafico-grafo.ts`) con tests de fixture (solape total, solape parcial, nombre que coincide pero geometría no, tramo de tráfico que cruza varios tramos de grafo) — 9 tests en `reconciliacion-trafico-grafo.test.ts`.
+- [x] Documentado el % de cobertura y los casos que quedan `sinEmparejar` (ver arriba e historial) — **hallazgo real, no forzado**: la coincidencia de **nombre** solo se confirma en el 3,9 % de los emparejamientos (16/410) — la mayoría de los nombres del Geoportal (MAYÚSCULAS, sin artículo) y los `name` de OSM no normalizan igual, sin resolver contra el nomenclátor oficial (misma limitación ya anotada en spec 020 §7, CDNCV pendiente). El resto (95,6 %) se emparejó **solo por solape geométrico**, con confianza mayoritariamente `media` (95,4 %) — nunca se sube a `alta` sin confirmación de nombre, tal como exige el DoD ("sin forzar emparejamientos de baja confianza").
+- [x] `npm run typecheck` / `npm run test` (355/355) sin regresiones.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -86,3 +88,4 @@ Sin capa nueva propia. Consumidores:
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-01 | Creación, `Draft`. Aplazamiento explícito del paso 5 de la revisión del gemelo digital a spec propia. Sin implementar. |
+| 2 | 2026-09-16 | **DoD completo, pasa a `Implemented`.** `src/services/reconciliacion-trafico-grafo.ts`: `normalizarNombreCalle()` (quita acentos/mayúsculas/prefijo de tipo de vía), `emparejarTraficoConGrafo()` (muestrea el tramo de tráfico en sus vértices + puntos medios, usa el índice espacial ya existente de spec 020 `red-viaria-indice.ts` para encontrar el tramo de grafo más cercano a cada punto dentro de un buffer de 20 m, agrupa por tramo de grafo, calcula `solapeFraccion` y sube a `confianza: 'alta'` solo si además el nombre coincide y el solape ≥70 %), `proyectarEstadoSobreGrafo()` (para que 021/022/031 puedan ofrecer un `cortado` real como pre-marcado, nunca aplicado solo — excluye `sinEmparejar` y confianza `baja`). Sin artefacto pre-calculado ni endpoint nuevo — no hay consumidor todavía (021/022/031 seguir usándolo es trabajo futuro, fuera del DoD de esta spec). Script de verificación `scripts/verificar-reconciliacion-trafico-grafo.ts` (`npm run verificar:reconciliacion-trafico-grafo`), ejecutado contra datos reales — resultados en §6. |

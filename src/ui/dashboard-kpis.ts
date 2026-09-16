@@ -6,7 +6,7 @@
 
 export type TonoKpi = 'neutro' | 'ok' | 'aviso' | 'urgente';
 
-export type ClaveKpi = 'temperatura' | 'aire' | 'trafico' | 'pulso' | 'alertas';
+export type ClaveKpi = 'aire' | 'trafico' | 'pulso' | 'alertas';
 
 export interface Kpi {
   clave: ClaveKpi;
@@ -17,7 +17,7 @@ export interface Kpi {
   capaRelacionada?: string;
 }
 
-const ORDEN: ClaveKpi[] = ['temperatura', 'aire', 'trafico', 'pulso', 'alertas'];
+const ORDEN: ClaveKpi[] = ['aire', 'trafico', 'pulso', 'alertas'];
 
 const kpis = new Map<ClaveKpi, Kpi>();
 const subs = new Set<(k: Kpi[]) => void>();

@@ -7,10 +7,22 @@ estado: Implemented
 tipo: panel
 depende_de: [019, 040]
 propietario: ""
-version: 4
+version: 5
 ```
 
-> **Estado:** v4 `Implemented` (2026-09-16) — reubicación: sale del sidebar (`SIDEBAR_REGISTRY`)
+> **Estado:** v5 `Implemented` (2026-09-17) — **bug real reportado por el usuario**: "el
+> widget de X no funciona". Causa raíz: si el script `platform.twitter.com/widgets.js` (o
+> el de Facebook) no llegaba a cargar — típico con un bloqueador de anuncios, muy común, ya
+> que ambos dominios están en listas de bloqueo habituales — la promesa que lo carga
+> (`cargarXSdk`/`cargarFacebookSdk`) no tenía `onerror`, así que se quedaba colgada para
+> siempre; y como el fallback de las 8s (`programarFallback`) se programaba *después* de
+> esperar esa promesa, nunca llegaba a dispararse. Resultado: la ficha se quedaba en blanco
+> para siempre, sin aviso — exactamente "no funciona". Corregido en dos frentes (§6):
+> `onerror` en ambos `<script>` para que la promesa resuelva igual si el script se bloquea,
+> y el fallback se programa *antes* de esperar el SDK, no después — así se dispara pase lo
+> que pase. Verificado en navegador simulando el bloqueo real (interceptando el script de
+> X para que falle): la ficha cae a "ver publicaciones ↗" a los 8s en vez de quedarse en
+> blanco. **v4 `Implemented` (2026-09-16)** — reubicación: sale del sidebar (`SIDEBAR_REGISTRY`)
 > a un panel propio (`#actualidad-redes-panel`) dentro de la vista `/inteligencia` de spec
 > `040`. Mismo `buildActualidadRedesContent()` de v3, sin cambios — la spec `040` es la que
 > decide dónde vive, no esta. **v3 `Implemented` (2026-09-16)** — cierra el DoD de V1: las
@@ -110,6 +122,7 @@ fichas en acordeón, el selector "Elegir qué cuentas leer") no cambia — solo 
 - [x] Carga diferida por **entidad** (no solo por sección): verificado en navegador que antes de abrir una ficha no hay ningún `<script>` de `connect.facebook.net` ni `platform.twitter.com` en la página, y que aparecen justo al abrirla.
 - [x] Widget real verificado en navegador contra una cuenta de verdad (Centre de Gestió de Trànsit): el iframe de Facebook carga `facebook.com/.../plugins/page.php` con la página real, y el de X carga `syndication.twitter.com/.../screen-name/TransitValencia` con el handle correcto — no un placeholder.
 - [x] Fallback a tarjeta simple (`construirTarjetaFallback`) programado a los 8s si no aparece un iframe — mecanismo implementado, no forzado el caso de fallo real en esta verificación (el caso real probado sí cargó a tiempo).
+- [x] **v5**: fallback robusto también si el *script del SDK* nunca llega a cargar (bloqueador de anuncios, red), no solo si el widget carga el script pero no renderiza — `onerror` en el `<script>` + fallback programado antes de esperar la promesa del SDK. Verificado interceptando la carga del script de X para simular el bloqueo real.
 - [x] Aviso breve y visible de que abrir una ficha carga scripts de Meta/X con sus propias cookies.
 - [x] **Confirmación visual de las 13 entidades (v3)**: abiertas las 13 fichas en el dev server real y comprobado, por JS, el `src` de cada iframe resultante — los 8 widgets de Facebook cargan `facebook.com/v21.0/plugins/page.php?...&href=<page-url-exacta>` y los 13 de X cargan `syndication.twitter.com/.../screen-name/<handle-exacto>`, coincidiendo uno a uno con `entidades-redes.ts`. Ninguna cayó a fallback (las 13 cargaron a tiempo).
 - [x] **Caso de fallo real probado (v3)**: entidad temporal con `xHandle` inexistente (`esta_cuenta_no_existe_de_verdad_zzz999`) añadida, abierta y verificada en el dev server real — a los 8s, sin ningún iframe creado (el SDK de X no lo generó para una cuenta que no existe), `programarFallback` sustituyó el contenedor por la tarjeta "@esta_cuenta_no_existe_de_verdad_zzz999 — ver publicaciones ↗" enlazando a `x.com/esta_cuenta_no_existe_de_verdad_zzz999`. Entidad de prueba retirada tras la verificación, no queda en el registro.
@@ -131,3 +144,4 @@ fichas en acordeón, el selector "Elegir qué cuentas leer") no cambia — solo 
 | 2 | 2026-09-14 | Implementada: `src/config/entidades-redes.ts` (con tests), `src/ui/actualidad-redes.ts` (fichas en acordeón, carga diferida por entidad, fallback a los 8s), sección nueva en `SIDEBAR_REGISTRY`. Verificado en navegador contra una cuenta real (Centre de Gestió de Trànsit): ambos widgets (Facebook y X) cargan con datos reales, sin scripts de terceros hasta abrir la ficha. `npm run typecheck`/`test` (334/334)/`build` verdes. DoD abierto: confirmar visualmente las 12 entidades restantes y probar el fallback con un fallo real. |
 | 3 | 2026-09-16 | **Cierre de DoD de V1.** Las 13 entidades verificadas en navegador (iframes reales con handle/URL exactos, ver §6); fallback probado con una cuenta inexistente real, no simulada por inspección de código. Nuevo selector "Elegir qué cuentas leer" (`buildSelectorEntidades` en `src/ui/actualidad-redes.ts`) — 13 checkboxes, preferencia persistida en `localStorage` (`imc:entidades-redes-ocultas`, mismo espíritu invertido que `panel-preferences.ts` de spec 019), CSS nuevo en `index.html` (`.red-entidad-selector*`). Sin test unitario para la persistencia (el proyecto no usa `jsdom`/`localStorage` en tests — mismo criterio que `panel-preferences.ts`, que tampoco lo tiene; verificado en navegador real en su lugar). `npm run typecheck`/`test` (357/357)/`build` verdes. Spec pasa a `Implemented`. |
 | 4 | 2026-09-16 | Reubicación por spec `040`: sale de `SIDEBAR_REGISTRY` (`src/ui/chasis.ts`) a un panel propio (`#actualidad-redes-panel`) dentro de `/inteligencia`, montado desde `src/main.ts` con la misma `buildActualidadRedesContent()`. Sin cambios de lógica ni de contrato — depende ahora también de `040`. |
+| 5 | 2026-09-17 | **Bug real reportado por el usuario** ("el widget de X no funciona"): `cargarXSdk()`/`cargarFacebookSdk()` no tenían `onerror` en el `<script>` del SDK — con un bloqueador de anuncios (`platform.twitter.com` es de los más bloqueados), la promesa se quedaba colgada para siempre; y el fallback de 8s se programaba *después* de esperar esa promesa, así que tampoco llegaba a dispararse nunca. Ficha en blanco para siempre, sin aviso. Corregido: `onerror` resuelve la promesa igualmente, y `programarFallback` se llama antes de `await cargarXSdk()`/`await cargarFacebookSdk()`, no después — el fallback se dispara a los 8s pase lo que pase con el SDK. Verificado en navegador interceptando el script de X para simular el bloqueo real: cae a "ver publicaciones ↗" correctamente mientras el widget de Facebook (no bloqueado en la prueba) sigue cargando normal. `npm run typecheck`/`test` (367/367)/`build` verdes. |

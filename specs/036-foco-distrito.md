@@ -7,15 +7,20 @@ estado: Implemented
 tipo: capa
 depende_de: [000, 009, 010, 023]
 propietario: ""
-version: 1
+version: 2
 ```
+
+> **Estado:** v1 `Implemented` y en producción. **v2 (2026-09-16)**: consumidor de spec
+> 010 v4 — ver §8.
 
 ## 1. Problema / motivación
 
-El mapa ya deja seleccionar un distrito (clic → se resalta). Pero esa selección no
-hace nada más: para responder *"¿qué está pasando en Ciutat Vella?"* hay que leer
-todos los paneles y filtrar mentalmente. Esta spec convierte la selección en un
-**foco**: los paneles que tienen dato por distrito se acotan a él.
+El mapa ya deja seleccionar un distrito (clic). Esa selección, por sí sola, no hace
+nada más: para responder *"¿qué está pasando en Ciutat Vella?"* hay que leer todos los
+paneles y filtrar mentalmente. Esta spec convierte la selección en un **foco**: los
+paneles que tienen dato por distrito se acotan a él. (El resaltado visual del polígono
+al seleccionar se retiró en spec `000` v4 — el foco sigue funcionando igual, el único
+indicador visual pasa a ser el chip "Foco: X".)
 
 ## 2. Fuente(s) de datos
 
@@ -80,3 +85,4 @@ No es una capa. Cambios de UI:
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-09 | Creación + implementación. Store `foco-distrito.ts`, chip, filtro del contexto mediático y línea de índice en el Pulso. typecheck/test 284/284, verificado en navegador. Pasa a `Implemented`. |
+| 2 | 2026-09-16 | Consumidor de spec 010 v4: la línea de "antepone" en `renderPulsoLeyenda` pasa de mostrar `índice`/`categoria` a mostrar `nivel` (`prioritario`/`seguimiento`/`sin señal`). El resaltado por hover/clic del distrito se retira en spec `000` v4 (§1 actualizado); el foco en sí no cambia de mecanismo. |

@@ -7,8 +7,14 @@ estado: Implemented
 tipo: infraestructura
 depende_de: [004]
 propietario: ""
-version: 3
+version: 4
 ```
+
+> **v4 (2026-09-10, `Implemented`):** el snapshot horario guarda además el **conteo de
+> tramos por estado** por distrito (`porEstado`), no solo la media de congestión. Es el
+> prerrequisito de la recalibración del Pulso (spec `010` v4): sus escenarios se
+> definen sobre "≥N tramos congestionados/cortados" y la media 0-1 no permite
+> reconstruir ese conteo. Cambio aditivo y retrocompatible — ver §9.
 
 ## 0. Decisión de persistencia (resuelve la pregunta pendiente del backlog)
 
@@ -43,6 +49,12 @@ interface SnapshotDistrito {
   codigo: string;
   congestion: number;   // 0-1, misma fórmula que componenteTrafico (spec 010) — reutilizada, no reinventada
   muestras: number;      // nº de tramos con dato que entraron en el cálculo
+  porEstado?: {          // v4 — conteo de tramos del distrito por estado (excluye 'sin-datos')
+    fluido: number;
+    denso: number;
+    congestionado: number;
+    cortado: number;
+  };
 }
 
 interface SnapshotHorario {
@@ -113,6 +125,47 @@ No es una capa de mapa — panel con un mini-gráfico (sparkline SVG) de la cong
 - **Riesgo:** un repo privado con GitHub Actions activo consume minutos incluso si nadie los mira — a 60 min de cadencia se queda muy por debajo del límite gratis (ver §0), pero si en el futuro se añaden más workflows programados hay que revisar la suma total.
 - **Fuera de alcance de esta spec:** comparación automática "este jueves vs jueves anterior" o detección de anomalías sobre el histórico (eso, si se hace, sería una regla más del motor de insights, spec `013`), selector de distrito en la UI del sparkline (v1 es solo ciudad, el endpoint sí soporta `distrito` para uso futuro), exportar/descargar el histórico.
 
+## 9. v4 — conteo de tramos por estado en el snapshot (2026-09-10)
+
+**Motivación:** la recalibración del Pulso de Distrito (spec `010` v4) sustituye el
+índice ponderado por escenarios de conjunción definidos sobre **conteo de tramos**
+(p. ej. "≥3 tramos congestionado/cortado en el distrito **y** lluvia inminente"). Para
+calibrar los umbrales de esos escenarios en modo sombra (spec `010` v4 §10) hace falta
+histórico del conteo, no de la media: `congestion` (0-1) no permite reconstruir cuántos
+tramos había en cada estado.
+
+**Cambio (aditivo, retrocompatible):**
+
+- `SnapshotDistrito` gana `porEstado?` (4 enteros/distrito/snapshot → ~76 enteros por
+  snapshot horario, crecimiento trivial). `agregarSnapshotPorDistrito` lo rellena
+  contando los tramos ya agrupados por distrito.
+- **Campo opcional**: los snapshots escritos antes de v4 no lo llevan. Todo lector
+  (`compactarSnapshotsAntiguos`, `construirHistoricoDistrito`, y el análisis de sombra
+  de spec `010`) tolera su ausencia — un snapshot sin `porEstado` simplemente no aporta
+  conteo a la calibración.
+- **El rollup diario (`RollupDiario`) no cambia**: la ventana horaria de 30 días cubre
+  de sobra el periodo de sombra de 3-4 semanas de spec `010` v4; no hace falta arrastrar
+  el conteo a la compactación diaria.
+- **El contrato del endpoint de lectura (`PuntoHistoricoTrafico`, §3) no cambia**: el
+  sparkline no usa el conteo. El análisis de sombra lee `data/trafico-historico.json`
+  directamente del repo, no vía HTTP.
+
+**DoD v4:**
+
+- [x] `porEstado` añadido a `SnapshotDistrito` (tipo `ConteoPorEstado`) y rellenado por
+      `agregarSnapshotPorDistrito` (`src/services/trafico-historico.ts`); test nuevo
+      cubriendo el conteo por estado, que suma exactamente `muestras`, y el distrito sin
+      tramos (conteo en cero, no `undefined`).
+- [x] `compactarSnapshotsAntiguos` y `construirHistoricoDistrito` verificados con fixtures
+      sin `porEstado` (test explícito "tolera snapshots legacy sin porEstado") — sin romper.
+- [x] `scripts/snapshot-trafico-historico.ts` produce el campo en una ejecución real
+      contra la fuente (`npm run snapshot:trafico-historico`, 2026-09-09: 19 distritos,
+      405 tramos con dato, 4 congestionado/cortado, `porEstado` presente en el snapshot
+      nuevo y ausente en los previos — coexisten en el fichero). Log del script ampliado
+      con el conteo de afectados.
+- [x] `npm run typecheck` / `test` (305/305, +2) / `build` en verde. Endpoint de lectura
+      (`src/server/trafico-historico.ts`, `PuntoHistoricoTrafico`) sin cambios ni regresión.
+
 ## 8. Historial
 
 | Versión | Fecha | Cambio |
@@ -120,3 +173,4 @@ No es una capa de mapa — panel con un mini-gráfico (sparkline SVG) de la cong
 | 1 | 2026-08-18 | Creación. Persistencia decidida explícitamente por el usuario: GitHub Actions cada 60 min + snapshots agregados versionados en el repo, con compactación a diario pasados 30 días. |
 | 2 | 2026-08-18 | DoD completo: funciones puras + tests (`src/services/trafico-historico.ts`), script de snapshot verificado contra la fuente real (`scripts/snapshot-trafico-historico.ts`), workflow de GitHub Actions (`.github/workflows/trafico-historico-cron.yml`), endpoint de lectura (`api/trafico/v1/historico.ts`), panel con sparkline en el mapa (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (105/105) y en navegador — se corrigió un recorte visual del sparkline detectado durante la verificación. Spec pasa a `Implemented`. |
 | 3 | 2026-09-08 | Resiliencia del cron: el `geoportal.valencia.es` tuvo un connect timeout puntual (run de las 14:55 UTC) que rompió el job y notificó, aunque el run siguiente se recuperó solo. El script ahora reintenta la lectura 3 veces con backoff (`conReintentos` en `scripts/snapshot-trafico-historico.ts`) antes de fallar; el workflow sigue fallando fuerte si se agotan los reintentos. De paso: `actions/setup-node` sube de Node 20 (deprecado en los runners) a Node 22. |
+| 4 | 2026-09-10 | `SnapshotDistrito.porEstado?` — conteo de tramos por estado en el snapshot horario, prerrequisito de la calibración en sombra de spec `010` v4 (§9). Campo opcional y retrocompatible; rollup diario y endpoint de lectura sin cambios. DoD completo: `src/services/trafico-historico.ts` (tipo `ConteoPorEstado`, `agregarSnapshotPorDistrito`), 2 tests nuevos (conteo por estado + tolerancia legacy), script verificado contra la fuente real. `npm run typecheck` / `test` (305/305) / `build` verdes. `Implemented`. |

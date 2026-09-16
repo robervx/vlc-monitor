@@ -80,6 +80,14 @@ function cargarFacebookSdk(): Promise<void> {
     script.defer = true;
     script.crossOrigin = 'anonymous';
     script.src = 'https://connect.facebook.net/es_ES/sdk.js#xfbml=0&version=v21.0';
+    // Bug real (reportado por el usuario, 2026-09-17): un bloqueador de
+    // anuncios/red/CSP puede impedir que este script cargue — sin `onerror`,
+    // `fbAsyncInit` nunca se dispara y esta promesa (compartida por todas las
+    // fichas de Facebook, no solo la que la pidió primero) se queda colgada
+    // para siempre. Con esto, el `await` de `montarWidgetFacebook` resuelve
+    // igualmente y cada ficha cae a su fallback de las 8s en vez de quedarse
+    // en blanco sin explicación (ver también el reordenado en esa función).
+    script.onerror = () => resolve();
     document.body.appendChild(script);
   });
   return fbSdkPromise;
@@ -97,6 +105,10 @@ function cargarXSdk(): Promise<VentanaConSdks['twttr']> {
     script.async = true;
     script.src = 'https://platform.twitter.com/widgets.js';
     script.onload = () => resolve((window as VentanaConSdks).twttr);
+    // Mismo motivo que en cargarFacebookSdk: `platform.twitter.com` es de lo
+    // más bloqueado por bloqueadores de anuncios — sin `onerror` la promesa
+    // (compartida por todas las fichas de X) se queda colgada para siempre.
+    script.onerror = () => resolve(undefined);
     document.body.appendChild(script);
   });
   return xSdkPromise;
@@ -122,6 +134,12 @@ function programarFallback(container: HTMLElement, nombre: string, url: string, 
 }
 
 async function montarWidgetFacebook(container: HTMLElement, pageUrl: string): Promise<void> {
+  // Bug real (2026-09-17): antes se programaba el fallback DESPUÉS de esperar
+  // al SDK — si ese `await` no resolvía nunca (ver `cargarFacebookSdk`), el
+  // fallback tampoco se llegaba a programar y la ficha se quedaba en blanco
+  // para siempre, sin aviso. Programarlo ya, antes de esperar nada, garantiza
+  // que a los 8s hay un fallback pase lo que pase con el SDK.
+  programarFallback(container, 'Facebook', pageUrl);
   await cargarFacebookSdk();
   const div = document.createElement('div');
   div.className = 'fb-page';
@@ -134,10 +152,11 @@ async function montarWidgetFacebook(container: HTMLElement, pageUrl: string): Pr
   div.dataset.showFacepile = 'false';
   container.appendChild(div);
   (window as VentanaConSdks).FB?.XFBML.parse(container);
-  programarFallback(container, 'Facebook', pageUrl);
 }
 
 async function montarWidgetX(container: HTMLElement, handle: string): Promise<void> {
+  // Mismo motivo que montarWidgetFacebook — ver ese comentario.
+  programarFallback(container, `@${handle}`, `https://x.com/${handle}`);
   const twttr = await cargarXSdk();
   const enlace = document.createElement('a');
   enlace.className = 'twitter-timeline';
@@ -147,7 +166,6 @@ async function montarWidgetX(container: HTMLElement, handle: string): Promise<vo
   enlace.textContent = `Tuits de @${handle}`;
   container.appendChild(enlace);
   twttr?.widgets?.load(container);
-  programarFallback(container, `@${handle}`, `https://x.com/${handle}`);
 }
 
 /**

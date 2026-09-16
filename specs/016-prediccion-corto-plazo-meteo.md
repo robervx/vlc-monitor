@@ -7,7 +7,7 @@ estado: Implemented
 tipo: capa
 depende_de: [001]
 propietario: ""
-version: 2
+version: 3
 ```
 
 ## 1. Problema / motivación
@@ -91,3 +91,4 @@ No es una capa de mapa (igual que `001`) — se renderiza como panel/tira horizo
 |---|---|---|
 | 1 | 2026-08-18 | Creación, fuente verificada (Open-Meteo `hourly`, ventana 4h). |
 | 2 | 2026-08-18 | DoD completo: servicio de normalización (`src/services/prediccion-corto-plazo.ts`), endpoint (`api/meteo/v1/prediccion-corto-plazo.ts`, reutiliza `api/_shared/cache.ts`), panel "Próximas 4h" junto al de meteo actual (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, tests (66/66 en el worktree) y en navegador. Spec pasa a `Implemented`. |
+| 3 | 2026-09-14 | **Refactor puro, sin cambio de comportamiento** — mismo movimiento que spec 001 v3 y spec 038 v6 (revisión de estructura "como World Monitor"). El panel "Próximas Nh" (`renderPrediccionPanel`/`fetchPrediccionCortoPlazoActual`) pasa de `src/main.ts` a `src/ui/meteo-panel.ts` (`montarPrediccionPanel()`), junto al panel de meteo actual (comparten `iconoWeatherCode`). Verificado en navegador: mismo dato real, misma cadencia de refresco. `npm run typecheck`/`test` (335/335)/`build` verdes. |

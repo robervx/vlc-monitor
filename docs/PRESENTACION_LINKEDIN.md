@@ -11,7 +11,7 @@ LinkedIn es el anzuelo que lleva a él.
 
 ## Post principal (español)
 
-> **Intelligent City Monitor — un mapa vivo de València con datos 100 % abiertos, operando a coste 0 €**
+> **Mirall — un mapa vivo de València con datos 100 % abiertos, operando a coste 0 €**
 >
 > Llevaba tiempo con una idea: ¿se puede montar un panel serio de "cómo está la ciudad ahora mismo" usando solo datos públicos y gratuitos, con estándar profesional de ingeniería? Este es el resultado.
 >
@@ -44,7 +44,7 @@ LinkedIn es el anzuelo que lleva a él.
 
 ## Versión corta (español)
 
-> He publicado **Intelligent City Monitor**: un mapa en tiempo real de València que reúne movilidad, meteorología, calidad del aire, eventos e incidencias en un solo panel, a partir de datos abiertos y gratuitos.
+> He publicado **Mirall**: un mapa en tiempo real de València que reúne movilidad, meteorología, calidad del aire, eventos e incidencias en un solo panel, a partir de datos abiertos y gratuitos.
 >
 > Desarrollo *spec-driven*, cada capa cita fuente y frescura, límite ético estricto (ningún dato de localización individual) y coste de operación 0 € gracias a un patrón de caché propio.
 >
@@ -60,7 +60,7 @@ LinkedIn es el anzuelo que lleva a él.
 
 ## Post (English)
 
-> **Intelligent City Monitor — a live open-data map of Valencia, running at ~0 €/month**
+> **Mirall — a live open-data map of Valencia, running at ~0 €/month**
 >
 > Can you build a serious "how is the city doing right now?" dashboard using only free, public data, at a professional engineering standard? This is my take.
 >

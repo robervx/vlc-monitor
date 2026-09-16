@@ -1276,7 +1276,10 @@
         padding: 10px 12px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         font-size: 14px;
-        min-width: 140px;
+        width: 280px;
+        max-height: 280px;
+        overflow-y: auto;
+        box-sizing: border-box;
       }
 
       /* spec 035 §5.2 (v2): las leyendas de capa arrancan colapsadas a su
@@ -1606,7 +1609,9 @@
       }
 
       #agenda-panel,
-      #actualidad-redes-panel {
+      #actualidad-redes-panel,
+      #apoyo-decision-panel,
+      #protocolos-panel {
         width: 320px;
         max-height: 70vh;
         display: flex;
@@ -1619,13 +1624,191 @@
       }
 
       #agenda-panel[hidden],
-      #actualidad-redes-panel[hidden] {
+      #actualidad-redes-panel[hidden],
+      #apoyo-decision-panel[hidden],
+      #protocolos-panel[hidden] {
         display: none;
+      }
+
+      /* Protocolos de actuación — spec 042 */
+      .protocolos-lista {
+        padding: 8px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .protocolo {
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+      }
+
+      .protocolo__titulo {
+        padding: 8px 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .protocolo__titulo::-webkit-details-marker {
+        display: none;
+      }
+
+      .protocolo__cuerpo {
+        padding: 0 10px 10px;
+      }
+
+      .protocolo__bloque {
+        margin-bottom: 8px;
+      }
+
+      .protocolo__bloque-titulo {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        margin-bottom: 3px;
+      }
+
+      .protocolo__cuerpo ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 12.5px;
+        color: #334155;
+      }
+
+      .protocolo__cuerpo li {
+        margin-bottom: 3px;
+      }
+
+      .protocolo__pie {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid #e2e8f0;
+        font-size: 11px;
+        color: #64748b;
+      }
+
+      .protocolo__fuente {
+        color: #2563eb;
+        text-decoration: none;
+      }
+
+      .protocolo__fuente--sin-citar {
+        color: #94a3b8;
+        font-style: italic;
       }
 
       #actualidad-redes-panel .actualidad-redes {
         padding: 8px 12px 10px;
         overflow-y: auto;
+      }
+
+      /* Apoyo a decisión operativa — spec 041 */
+      #apoyo-decision-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+        overflow-y: auto;
+      }
+
+      .sugerencia-operativa {
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #94a3b8;
+        border-radius: 4px;
+        padding: 8px 10px;
+      }
+
+      .sugerencia-operativa--prioritario {
+        border-left-color: #dc2626;
+        background: #fef2f2;
+      }
+
+      .sugerencia-operativa--seguimiento {
+        border-left-color: #d97706;
+        background: #fffbeb;
+      }
+
+      .sugerencia-operativa__cabecera {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 12.5px;
+        color: #1e293b;
+      }
+
+      .sugerencia-operativa__severidad {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        flex-shrink: 0;
+      }
+
+      .sugerencia-operativa__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin: 4px 0;
+      }
+
+      .sugerencia-operativa__chip {
+        font-size: 10px;
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 3px;
+        padding: 1px 5px;
+        color: #475569;
+      }
+
+      .sugerencia-operativa__resumen {
+        font-size: 12px;
+        color: #475569;
+        margin-bottom: 4px;
+      }
+
+      .sugerencia-operativa__texto {
+        font-size: 12.5px;
+        font-style: italic;
+        color: #1e293b;
+        margin-bottom: 6px;
+      }
+
+      .sugerencia-operativa__pie {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sugerencia-operativa__ver-mapa {
+        appearance: none;
+        border: 1px solid #94a3b8;
+        background: #fff;
+        border-radius: 4px;
+        padding: 3px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        color: #1e293b;
+      }
+
+      .sugerencia-operativa__ver-mapa:hover {
+        background: #f1f5f9;
+      }
+
+      .sugerencia-operativa__fuentes {
+        display: flex;
+        gap: 4px;
       }
 
       .camaras-grid {
@@ -2090,6 +2273,8 @@
       :root[data-layout='movil'] #info-panels > #camaras-panel,
       :root[data-layout='movil'] #info-panels > #agenda-panel,
       :root[data-layout='movil'] #info-panels > #actualidad-redes-panel,
+      :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
+      :root[data-layout='movil'] #info-panels > #protocolos-panel,
       :root[data-layout='movil'] #info-panels > .info-panel {
         position: static !important;
         inset: auto !important;
@@ -2103,14 +2288,18 @@
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
       :root[data-layout='movil'] #info-panels > #camaras-panel,
       :root[data-layout='movil'] #info-panels > #agenda-panel,
-      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel {
+      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel,
+      :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
+      :root[data-layout='movil'] #info-panels > #protocolos-panel {
         display: flex !important;
       }
       :root[data-layout='movil'] #info-panels > #media-panel[hidden],
       :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden],
       :root[data-layout='movil'] #info-panels > #camaras-panel[hidden],
       :root[data-layout='movil'] #info-panels > #agenda-panel[hidden],
-      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel[hidden] {
+      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #apoyo-decision-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #protocolos-panel[hidden] {
         display: none !important;
       }
 

@@ -53,6 +53,9 @@ import { montarCamarasPanel } from './ui/camaras-panel';
 import { montarMeteoActualPanel, montarPrediccionPanel } from './ui/meteo-panel';
 import { buildActualidadRedesContent } from './ui/actualidad-redes';
 import { initRouter } from './ui/router';
+import { montarApoyoDecisionPanel } from './ui/apoyo-decision-panel';
+import { buildProtocolosContent } from './ui/protocolos-panel';
+import { onPeticionCentrarMapa } from './ui/centrar-mapa';
 import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
 import { marcadoresSentido, type MarcadorSentido } from './services/flechas-sentido';
 import { puntosFlujoParaTramo } from './services/flujo-animado';
@@ -2338,6 +2341,18 @@ async function main(): Promise<void> {
   actualidadRedesPanel.appendChild(buildActualidadRedesContent());
   document.body.appendChild(actualidadRedesPanel);
 
+  // spec 041 — panel de apoyo a decisión, dentro de /inteligencia. "Ver en el
+  // mapa" pide centrar la única instancia de MapLibre (no crea una segunda) y
+  // cambia a /mapa — nunca dispara ninguna acción por sí mismo (§0).
+  montarApoyoDecisionPanel();
+  onPeticionCentrarMapa(({ coordenadas, zoom }) => {
+    map.flyTo({ center: coordenadas, zoom: zoom ?? map.getZoom() });
+  });
+
+  // spec 042 — contenido estático, sin red. ⚠️ Borrador pendiente de revisión
+  // explícita del usuario (ver src/config/protocolos-actuacion.ts).
+  document.body.appendChild(buildProtocolosContent());
+
   // Dispara una vez el 'change' de cada toggle "siempre activo" (ver
   // `toggleSiempreActivo`) para que cada panel cargue sus datos/polling desde
   // el arranque — su visibilidad real la decide solo la vista actual (ver
@@ -2449,7 +2464,15 @@ async function main(): Promise<void> {
     ['via-publica-leyenda', panel.viaPublicaToggle],
   ];
   const idsPaneleFijos = PANEL_PREFERENCES_REGISTRY.map((d) => d.key);
-  const idsInteligencia = ['media-panel', 'tendencia-panel', 'camaras-panel', 'agenda-panel', 'actualidad-redes-panel'];
+  const idsInteligencia = [
+    'media-panel',
+    'tendencia-panel',
+    'camaras-panel',
+    'agenda-panel',
+    'actualidad-redes-panel',
+    'apoyo-decision-panel',
+    'protocolos-panel',
+  ];
 
   initRouter((vista) => {
     const enMapa = vista === 'mapa';

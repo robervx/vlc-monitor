@@ -7,8 +7,18 @@ estado: Implemented
 tipo: fundacional
 depende_de: [019, 018]
 propietario: ""
-version: 3
+version: 4
 ```
+
+> **Estado:** v1-v4 `Implemented` y en producción. **v4 (2026-09-16)**: el producto pasa a
+> llamarse **Mirall**, documentado en `docs/decisiones/ADR-004-rebranding-mirall.md`. La
+> cabecera muestra el nombre + `MARCA.descriptor` ("Urban Intelligence Platform"); el
+> eslogan ES "La ciudad reflejada en tiempo real" (`MARCA.tagline`) es solo para
+> presentación externa (README, LinkedIn), no se muestra dentro de la app. Cambio de
+> nombre hacia adelante, no una reescritura del historial — las specs/ADRs ya cerradas que
+> mencionan "Intelligent City Monitor" se quedan como están. Sigue siendo proyecto abierto
+> MIT, sin empresa detrás, salvo las cámaras (spec `038`), que ya eran una fuente
+> "personal" no activa por defecto (ADR-003) — eso no cambia.
 
 ## 0. Contexto de la decisión
 
@@ -30,12 +40,17 @@ No hay dato de dominio. Constantes de marca (un único sitio, `src/config/marca.
 
 ```typescript
 export const MARCA = {
-  nombre: 'Intelligent City Monitor',
-  tagline: 'Datos abiertos de València',
+  nombre: 'Mirall',
+  descriptor: 'Urban Intelligence Platform', // se muestra en la cabecera junto al nombre
+  tagline: 'La ciudad reflejada en tiempo real', // solo presentación externa, no en la app
   // Pie visible siempre en la app (sustituye "Uso interno — no es un servicio público")
   pie: 'Proyecto de datos abiertos · sin relación con ningún organismo oficial',
 } as const;
 ```
+
+(v4, 2026-09-16: `nombre`/`descriptor` actualizados por el rebranding a Mirall, ver
+`docs/decisiones/ADR-004-rebranding-mirall.md`; campo `descriptor` nuevo en esa misma
+versión.)
 
 `src/ui/chasis.ts` y la pantalla de login (`api/_shared/pagina-login.ts`) consumen estas constantes en vez de literales.
 
@@ -51,7 +66,7 @@ No aplica. Cambios de configuración:
 
 No es una capa. Cambios de chasis (spec 019):
 
-- Cabecera: logo = placeholder neutro; nombre = `MARCA.nombre`; tagline = `MARCA.tagline`.
+- Cabecera: logo = placeholder neutro; nombre = `MARCA.nombre`; subtítulo = `MARCA.descriptor` (v4 — antes usaba `MARCA.tagline`, que desde v4 es solo para presentación externa).
 - Pie del sidebar: `MARCA.pie` (el bloque de sesión + "Cerrar sesión" de la spec 018 se mantiene, solo aparece si el gate está activo).
 - Iconos PWA (spec 028): regenerados desde el placeholder neutro.
 - `index.html` `<title>` y `apple-mobile-web-app-title`: coherentes con `MARCA.nombre`.
@@ -81,4 +96,5 @@ No es una capa. Cambios de chasis (spec 019):
 |---|---|---|
 | 1 | 2026-08-29 | Creación + implementación. Deriva de ADR-002. `scripts/generar-marca.ts` (marca radar en Node puro) + `public/assets/logo.png` + `public/icons/*`; `src/config/marca.ts`; `chasis.ts` y `pagina-login.ts` consumen la marca; `middleware.ts` fail-open; `LICENSE` MIT; README y `CLAUDE.md` §1 reescritos; specs `018`/`019` actualizadas. Logo anterior y `generar-iconos-pwa.ts` eliminados. `typecheck` + `test` + `build` verdes, verificado en navegador. Pasa a `Implemented`. |
 | 3 | 2026-09-04 | **Pieza de portfolio.** `README.md` reescrito como presentación pública (ES + resumen EN): demo en vivo enlazada (`vlc-monitor.vercel.app`), 4 capturas reales en `docs/capturas/`, diagrama del patrón `seed→caché→endpoint`, tabla de decisiones técnicas, el proceso spec-driven como argumento, y bloque de ética. Nuevo `docs/FUENTES_Y_LICENCIAS.md` — inventario completo por capa (fuente, spec, licencia CC BY 4.0 / ODbL / etc., atribución requerida), mapa base, infraestructura (coste 0 €) y licencias de las dependencias de software. Nuevo `docs/PRESENTACION_LINKEDIN.md` con los textos de publicación. Cierra el fast-follow anotado en §7 ("un pulido de la vista por defecto de la demo / que se vea potente"). Sin cambios de código ni de comportamiento de la app. |
+| 4 | 2026-09-16 | **Implemented** — rebranding a **Mirall** (`docs/decisiones/ADR-004-rebranding-mirall.md`). `src/config/marca.ts` gana el campo `descriptor` ("Urban Intelligence Platform", cabecera) y separa `tagline` (ES, solo presentación externa). Cabecera (`src/ui/chasis.ts`), `index.html` (`<title>`, `apple-mobile-web-app-title`), manifest de PWA (`vite.config.ts`, ahora lee de `MARCA` en vez de tener los textos duplicados a mano), `README.md`, agentes internos (`.claude/agents/*.md`) y `docs/PRESENTACION_LINKEDIN.md` actualizados. Wordmark de la cabecera con tipografía propia (Space Grotesk, cargada solo para `#app-header__name`). Cadena "VLC Monitor" (nombre de trabajo interno que aparecía en atribuciones de insights/histórico/tendencia) sustituida por `Mirall` en `src/main.ts`, `src/services/insights.ts` y `src/ui/glosario.ts`. No se reescriben specs/ADRs ya cerrados. `npm run typecheck`/`test` (335/335)/`build` verdes, verificado en navegador (cabecera, manifest generado). |
 | 2 | 2026-08-31 | **Primer despliegue real a Vercel** (repo hecho público). Tres límites de Hobby resueltos por el camino: (1) el grafo viario ~9 MB no cabe en función → estático del CDN (spec `020` v3); (2) ~18 funciones > límite de 12 → toda la API pasa a **una sola función**: handlers movidos a `src/server/<dominio>-<recurso>.ts`, router en `api/_router-src.ts` bundleado con esbuild a `api/router.js` (`scripts/bundle-api.mjs`, corre en `npm run build`), `vercel.json` reescribe `/api/*` → `/api/router`; (3) el runtime Node de Vercel ignora `export default` de estilo Web → el router exporta métodos HTTP con nombre (`export const GET/POST/... = dispatch`). Añadidos import attributes `with { type: 'json' }` a todos los imports de JSON (ESM estricto). Env vars `AUTH_SECRET`/`APP_USERS` retiradas del proyecto Vercel → demo abierta. 14 endpoints verificados 200 en producción + app en navegador. Arquitectura documentada en `CLAUDE.md` §6. |

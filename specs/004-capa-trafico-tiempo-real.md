@@ -7,8 +7,11 @@ estado: Implemented
 tipo: capa
 depende_de: [000]
 propietario: ""
-version: 3
+version: 4
 ```
+
+> **Estado:** v1-v4 `Implemented` y en producción. **v4 (2026-09-16)**: los estados no
+> fluidos ahora resaltan frente al verde — ver §8.
 
 ## 1. Problema / motivación
 
@@ -90,3 +93,4 @@ Color por `estado`: fluido verde, denso amarillo, congestionado naranja, cortado
 | 1 | 2026-08-18 | Creación con fuente verificada (Geoportal ArcGIS, capa Trafico/MapServer/192). |
 | 2 | 2026-08-18 | DoD completo: servicio de normalización con filtrado de filas vacías (`src/services/trafico.ts`), endpoint con resolución de distrito server-side (`api/trafico/v1/estado.ts`), nuevo valor `'linea'` en `LayerDefinition.agregacion`, capa registrada, toggle + leyenda + capa deck.gl en el mapa (`src/main.ts`). Extraído `distritosFromGeoJSON()` a `district-geometry.ts` para reutilizar la carga de distritos sin `fetch` relativo en endpoints edge. Verificado con `npm run typecheck`, `npm run test` y en navegador. Spec pasa a `Implemented`. |
 | 3 | 2026-08-26 | Efecto de flujo animado trasladado aquí desde spec 022 (a petición del usuario: más sentido en tráfico real que en el simulador de cortes) — `src/services/flujo-animado.ts` reutilizado, bucle de animación con throttling ligado al toggle de esta capa, excluye tramos `cortado`/`sin-datos`, ritmo lento (ciclo 4,5s) para no saturar con ~400 tramos. Verificado el pipeline de datos de forma directa contra la fuente real y con tests; verificación visual de movimiento no concluyente en esta sesión por `document.hidden=true` del navegador de pruebas (ver §6). `npm run typecheck` y `npm run test` (159/159) sin regresiones. |
+| 4 | 2026-09-16 | Estados no-fluidos resaltados: `ANCHO_ESTADO_TRAFICO` (3px fluido/sin-datos, 5px denso, 6px congestionado, 7px cortado) sustituye el `getLineWidth: 4` fijo; `ordenarTramosPorSeveridad()` reordena el array de features antes de construir el `FeatureCollection` para que lo problemático se pinte encima de lo fluido (deck.gl pinta un `GeoJsonLayer` en orden de array, sin z-order propio). Sin cambio de color. Verificado en navegador con datos reales: un tramo `cortado` se ve claramente más grueso que los tramos `fluido` alrededor. `npm run typecheck` verde (`test` con 5 fallos ajenos de auth por carga de CPU del entorno, ver spec 033 v3). |

@@ -7,13 +7,19 @@ estado: Implemented
 tipo: capa
 depende_de: [000, 023]
 propietario: ""
-version: 3
+version: 4
 ```
 
 > **Estado:** v3 (2026-09-16) `Implemented`. Ver §8 — incluye una limitación
 > honesta: el job de GitHub Actions no se ha podido ejecutar de verdad
 > todavía (Playwright no soporta macOS 12, el host de esta sesión, y el
 > workflow no se ha disparado aún en CI real).
+>
+> **v4 `Draft` (2026-09-17) — SIGUIENTE PASO, sin empezar.** Priorización de
+> eventos con impacto real en vía pública (fútbol, conciertos de aforo
+> grande, carreras) — ver §9. Decidido con el usuario como el primer punto
+> de la nueva tanda de trabajo post-V1 (ver `docs/03_PLAN_POST_V1.md`), antes
+> de cámaras externas, panel de emergencia meteorológica e IA.
 
 ## 1. Problema / motivación
 
@@ -122,6 +128,43 @@ Panel de lista (mismo patrón visual que contexto mediático, spec 009), agrupad
 - **Riesgo legal/ético (evaluado):** la spec se ciñe a lo que el `robots.txt` del sitio autoriza (§2), usa un user-agent identificable y una frecuencia baja. Es rastreo de contenido público institucional dentro de la política declarada del sitio.
 - **Fuera de alcance de esta versión:** geocodificación por dirección exacta de los eventos (solo se asocia a distrito por texto, vía spec 023, igual que el contexto mediático); notificaciones/alertas sobre eventos próximos (spec 014, si se retoma); cualquier filtro por categoría en la UI más allá de listar (fast-follow).
 
+## 9. v4 — priorización de eventos con impacto en vía pública (Draft, 2026-09-17)
+
+**Motivación (petición explícita del usuario):** de la agenda general de valencia.es (v3),
+lo que más importa para operar la ciudad es un subconjunto concreto: eventos que generan
+afluencia/tráfico/cortes reales, no cualquier exposición o visita guiada. El usuario pidió
+explícitamente:
+
+- Partidos del **Valencia CF** en Mestalla.
+- Partidos del **Levante UD** como local en el Estadi Ciutat de València.
+- Conciertos en el **Roig Arena** o cualquier otro concierto grande de la ciudad.
+- **Calendario de carreras** de la ciudad (populares, maratón, etc.).
+
+Esto son fuentes **nuevas y distintas** de valencia.es (v1-v3) — cada una con su propio
+calendario, no un único sitio. Due-diligence ligera ya hecha esta sesión (solo
+`robots.txt`, no estructura de página ni selectores — eso queda pendiente de verificar en
+profundidad antes de implementar, mismo criterio que v1/v2 de esta spec):
+
+| Fuente candidata | `robots.txt` | Nota |
+|---|---|---|
+| `valenciacf.com` (calendario/partidos) | **200, permisivo** — `User-agent: * ` sin `Disallow`, `Sitemap` publicado | Pendiente: localizar la página de calendario y verificar si el HTML se sirve sin JS (a diferencia de `valencia.es`, que exige navegador) |
+| `levanteud.com` (calendario/partidos) | **200, permisivo** — solo excluye `/api/`, `/preview/`, `/_next/`; `Allow: /` explícito para Googlebot/Bingbot/YahooSlurp | Sitio en Next.js — probable que el calendario también requiera JS/Playwright, a confirmar |
+| `roigarena.com` (conciertos/eventos) | **200, permisivo** — `Disallow:` vacío | Sitio en Nuxt — misma sospecha de requerir JS, a confirmar |
+| Calendario de carreras | **No identificada todavía** — candidatas a investigar: sección de deportes de `valencia.es`, Federació d'Atletisme de la Comunitat Valenciana, o agregadores de carreras populares (ej. Championchip CV) | Sin verificar en absoluto |
+
+**Diseño previsto (a confirmar al implementar):** cada fuente es de nuevo un scraper (muy
+probablemente Playwright, como v1-v3 de esta spec, dado que los tres sitios de clubes/recinto
+usan frameworks JS modernos) que alimenta el **mismo contrato `EventoAgenda`** (§3) con un
+campo nuevo para distinguir el origen y, si aplica, marcar el evento como de "alto impacto en
+vía pública" — a diseñar en el contrato de datos cuando se congele (posible campo
+`impactoViaPublica: boolean` o una `categoria` reservada, a decidir contra los datos reales
+de cada fuente, no de memoria). No se reemplaza la agenda general de v1-v3 — se añade como
+prioridad visual/filtro dentro del mismo panel, o como sección propia si el volumen lo pide.
+
+**Cómo retomar:** empezar verificando en navegador real (no solo `curl`) si cada sitio sirve
+el calendario sin JavaScript — eso decide si hace falta Playwright (como valencia.es) o si
+algún caso se puede resolver con `fetch` simple, mucho más barato de operar en Vercel.
+
 ## 8. Historial
 
 | Versión | Fecha | Cambio |
@@ -129,3 +172,4 @@ Panel de lista (mismo patrón visual que contexto mediático, spec 009), agrupad
 | 1 | 2026-08-26 | Creación (Draft) — verificación en vivo: la web requiere un cliente con JavaScript, `robots.txt` autoriza explícitamente las páginas de ficha. Arquitectura fijada en GitHub Actions + Playwright (no Vercel function), siguiendo el precedente de la spec 017. Pendiente de aprobación antes de implementar. |
 | 2 | 2026-09-10 | **Approved.** Re-verificación en navegador real: selectores de listado (`a.a-actualidad`, `p.label-title-agenda`, `p.label-fecha-actualidad`, `p.label-categoria-actualidad`), de ficha (`h2.agenda-titulo`, `p.bloque_texto.fecha`, `p.bloque_texto`), mecánica de paginación (portlet Liferay `CalendarAc`, click en número de página) y `robots.txt` (`Disallow: /-/` + `Allow: /-/content/`) confirmados y anotados en §2.1. Dos formatos de fecha (`DD/MM/YYYY` en listado, `DD mmm YYYY` en ficha). Contrato de datos (§3) sin cambios. Lista para implementar. |
 | 3 | 2026-09-16 | **DoD completo, pasa a `Implemented`.** `src/services/agenda-eventos.ts` (funciones puras: `parsearRangoFechaListado`/`parsearRangoFechaFicha`, `construirResumen`, `detectarEstructuraSospechosa`, `construirEventoAgenda` — reutiliza `findDistrictMentions` de spec 023), 15 tests. `scripts/scrape-agenda-eventos.ts` (Playwright, headless, user-agent identificable, mismo patrón de reintentos/snapshot que spec 017) + `.github/workflows/agenda-eventos-cron.yml` (cron cada 6h, `npx playwright install --with-deps chromium`, no comitea si `estructuraSospechosa`). Endpoint `GET /api/agenda/v1/eventos` (`src/server/agenda-eventos.ts`, registrado en `_router-src.ts`) lee el snapshot estático, mismo patrón que spec 017. Capa `agendaEventos` en `map-layer-definitions.ts` (`grupo: 'contexto'`, `agregacion: 'lista'`) + panel en `main.ts` (agrupado por distrito + "València (general)", aviso persistente de scraping, franja ámbar). **Re-verificación en vivo (2026-09-16) encontró un cambio real**: la paginación migró de portlet Liferay a la librería `paginationjs` — mismo patrón de interacción (clic en número, sin `href`), solo cambia el selector CSS del contenedor de página; el resto del contrato (§2.1) se confirmó idéntico. **Bootstrap real de `data/agenda-eventos.json`**: no fue posible ejecutar Playwright en este host (macOS 12, incompatible con los builds actuales de Chromium de Playwright) — se capturó el listado completo (68 eventos reales, 4 páginas) a mano vía navegador y se procesó con las mismas funciones puras ya testeadas (`construirEventoAgenda`), confirmando el pipeline completo con datos reales (incl. `distritosMencionados`: "XVI RUSSAFA ESCÈNICA" → l'Eixample, "Centre del Carme" → Ciutat Vella). El job de GitHub Actions en sí queda pendiente de su primera ejecución real en CI. 15 tests nuevos (348/348 en total), `npm run typecheck`/`build` verdes, verificado en navegador (panel real con 68 eventos, aviso de scraping visible, agrupación por distrito). |
+| 4 | 2026-09-17 | **Draft, sin empezar.** Alcance definido a petición del usuario: priorizar eventos con impacto en vía pública (Valencia CF en Mestalla, Levante UD en el Ciutat de València, conciertos del Roig Arena u otros grandes, calendario de carreras). Due-diligence ligera de `robots.txt` para `valenciacf.com`/`levanteud.com`/`roigarena.com` (los tres permisivos); fuente del calendario de carreras sin identificar todavía. Ver §9 para el detalle y cómo retomar. Primer punto de la tanda de trabajo post-V1, ver `docs/03_PLAN_POST_V1.md`. |

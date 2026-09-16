@@ -110,6 +110,144 @@ async function handler() {
   }
 }
 
+// src/services/avisos-meteo.ts
+var HEADERS = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
+var URL_FUENTE_AVISOS = "https://comunica.gva.es/es/emergencies-i-interior";
+var VENTANA_VIGENCIA_HORAS = 48;
+var ENTIDADES_HTML = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  oacute: "\xF3",
+  Oacute: "\xD3",
+  eacute: "\xE9",
+  Eacute: "\xC9",
+  aacute: "\xE1",
+  Aacute: "\xC1",
+  iacute: "\xED",
+  Iacute: "\xCD",
+  uacute: "\xFA",
+  Uacute: "\xDA",
+  ntilde: "\xF1",
+  Ntilde: "\xD1",
+  uuml: "\xFC"
+};
+function decodeEntities(texto) {
+  return texto.replace(/&#(\d+);/g, (_, dec2) => String.fromCharCode(Number(dec2))).replace(/&#x([0-9a-fA-F]+);/g, (_, hex2) => String.fromCharCode(parseInt(hex2, 16))).replace(/&([a-zA-Z]+);/g, (match, nombre) => ENTIDADES_HTML[nombre] ?? match);
+}
+function limpiarHtml(texto) {
+  return decodeEntities(texto.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ")).trim();
+}
+function trocearTarjetas(html) {
+  return html.split('<div class="card">').slice(1);
+}
+function extraerFecha(bloque) {
+  const m = /metadata-publish-date">\s*([\s\S]*?)\s*<\/span>/i.exec(bloque);
+  return m?.[1] ? m[1].trim() : null;
+}
+function extraerTituloYUrl(bloque) {
+  const m = /<a class="title" href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i.exec(bloque);
+  if (!m) return null;
+  const url = decodeEntities(m[1].trim());
+  const titulo = limpiarHtml(m[2]);
+  if (!url || !titulo) return null;
+  return { titulo, url };
+}
+function extraerResumen(bloque) {
+  const m = /<ul>([\s\S]*?)<\/ul>/i.exec(bloque);
+  if (!m) return null;
+  const items = [...m[1].matchAll(/<li>([\s\S]*?)<\/li>/gi)].map((mm) => limpiarHtml(mm[1])).filter((s) => s.length > 0);
+  return items.length > 0 ? items.join(" ") : null;
+}
+function parsearTarjetas(html) {
+  return trocearTarjetas(html).map((bloque) => {
+    const fechaTexto = extraerFecha(bloque);
+    const tituloYUrl = extraerTituloYUrl(bloque);
+    if (!fechaTexto || !tituloYUrl) return null;
+    return { ...tituloYUrl, fechaTexto, resumen: extraerResumen(bloque) };
+  }).filter((t) => t !== null);
+}
+function parsearFechaPublicacion(fechaTexto) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(fechaTexto);
+  if (!m) return null;
+  const fecha = /* @__PURE__ */ new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00.000Z`);
+  return Number.isNaN(fecha.getTime()) ? null : fecha.toISOString();
+}
+function esActivacionDeAviso(titulo) {
+  const t = titulo.toLowerCase();
+  return /\bactiva\b/.test(t) && /\b(alerta|aviso)\b/.test(t);
+}
+function detectarNivel(texto) {
+  const t = texto.toLowerCase();
+  if (/\brojo\b/.test(t) || /\broja\b/.test(t)) return "rojo";
+  if (/\bnaranja\b/.test(t)) return "naranja";
+  if (/\bamarill[oa]\b/.test(t)) return "amarillo";
+  return null;
+}
+function mencionaValencia(texto) {
+  return /valencia/i.test(texto);
+}
+function construirAviso(tarjeta, fetchedAt) {
+  if (!esActivacionDeAviso(tarjeta.titulo)) return null;
+  const textoCompleto = `${tarjeta.titulo} ${tarjeta.resumen ?? ""}`;
+  if (!mencionaValencia(textoCompleto)) return null;
+  const nivel = detectarNivel(textoCompleto);
+  if (!nivel) return null;
+  const publicadoEn = parsearFechaPublicacion(tarjeta.fechaTexto);
+  if (!publicadoEn) return null;
+  return {
+    id: tarjeta.url,
+    nivel,
+    titulo: tarjeta.titulo,
+    resumen: tarjeta.resumen,
+    url: tarjeta.url,
+    publicadoEn,
+    fetchedAt,
+    source: "gva-emergencias-scraping"
+  };
+}
+function esVigente(aviso, ahoraMs) {
+  const publicadoMs = new Date(aviso.publicadoEn).getTime();
+  const horas = (ahoraMs - publicadoMs) / (60 * 60 * 1e3);
+  return horas >= 0 && horas <= VENTANA_VIGENCIA_HORAS;
+}
+var ORDEN_NIVEL = { rojo: 3, naranja: 2, amarillo: 1 };
+async function fetchAvisosVigentes() {
+  const res = await fetch(URL_FUENTE_AVISOS, { headers: HEADERS });
+  if (!res.ok) {
+    throw new Error(`comunica.gva.es respondi\xF3 HTTP ${res.status}`);
+  }
+  const html = await res.text();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const ahoraMs = Date.now();
+  const avisos = parsearTarjetas(html).map((t) => construirAviso(t, fetchedAt)).filter((a) => a !== null).filter((a) => esVigente(a, ahoraMs)).sort((a, b) => ORDEN_NIVEL[b.nivel] - ORDEN_NIVEL[a.nivel] || b.publicadoEn.localeCompare(a.publicadoEn));
+  return { avisos, fetchedAt };
+}
+
+// src/server/avisos-meteo.ts
+var CACHE_KEY2 = "meteo:valencia-avisos:v1";
+var TTL_MS2 = 15 * 60 * 1e3;
+async function handler2() {
+  try {
+    const { value: snapshot, fresh } = await getOrFetch(CACHE_KEY2, TTL_MS2, fetchAvisosVigentes);
+    return new Response(JSON.stringify({ ...snapshot, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=60, stale-while-revalidate=900"
+      }
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
+      { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
+    );
+  }
+}
+
 // src/services/prediccion-corto-plazo.ts
 var VALENCIA_LAT2 = 39.4699;
 var VALENCIA_LON2 = -0.3763;
@@ -143,11 +281,11 @@ async function fetchPrediccionCortoPlazo() {
 }
 
 // src/server/meteo-prediccion.ts
-var CACHE_KEY2 = "meteo:valencia-prediccion-4h:v1";
-var TTL_MS2 = 15 * 60 * 1e3;
-async function handler2() {
+var CACHE_KEY3 = "meteo:valencia-prediccion-4h:v1";
+var TTL_MS3 = 15 * 60 * 1e3;
+async function handler3() {
   try {
-    const { value: prediccion, fresh } = await getOrFetch(CACHE_KEY2, TTL_MS2, fetchPrediccionCortoPlazo);
+    const { value: prediccion, fresh } = await getOrFetch(CACHE_KEY3, TTL_MS3, fetchPrediccionCortoPlazo);
     return new Response(JSON.stringify({ prediccion, fresh }), {
       status: 200,
       headers: {
@@ -202,11 +340,11 @@ async function fetchCalidadAire() {
 }
 
 // src/server/aire-actual.ts
-var CACHE_KEY3 = "aire:valencia-actual:v1";
-var TTL_MS3 = 60 * 60 * 1e3;
-async function handler3() {
+var CACHE_KEY4 = "aire:valencia-actual:v1";
+var TTL_MS4 = 60 * 60 * 1e3;
+async function handler4() {
   try {
-    const { value: calidad, fresh } = await getOrFetch(CACHE_KEY3, TTL_MS3, fetchCalidadAire);
+    const { value: calidad, fresh } = await getOrFetch(CACHE_KEY4, TTL_MS4, fetchCalidadAire);
     return new Response(JSON.stringify({ calidad, fresh }), {
       status: 200,
       headers: {
@@ -25261,14 +25399,14 @@ var distritos_valencia_default = {
 };
 
 // src/server/trafico-estado.ts
-var CACHE_KEY4 = "trafico:valencia-estado:v1";
-var TTL_MS4 = 3 * 60 * 1e3;
+var CACHE_KEY5 = "trafico:valencia-estado:v1";
+var TTL_MS5 = 3 * 60 * 1e3;
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-async function handler4() {
+async function handler5() {
   try {
     const { value: tramos, fresh } = await getOrFetch(
-      CACHE_KEY4,
-      TTL_MS4,
+      CACHE_KEY5,
+      TTL_MS5,
       () => fetchEstadoTrafico((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
     );
     return new Response(JSON.stringify({ tramos, fresh }), {
@@ -25284,91 +25422,6 @@ async function handler4() {
       { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
     );
   }
-}
-
-// src/services/pulso-distrito.ts
-var PESOS_PULSO = { trafico: 0.45, incidencias: 0.15, aire: 0.25, meteo: 0.15 };
-var AMPLIFICACION_TRAFICO_PULSO = 2.5;
-var UMBRALES_CATEGORIA_PULSO = { Moderado: 18, Tenso: 38, Cr\u00EDtico: 62 };
-function clamp01(x) {
-  return Math.min(1, Math.max(0, x));
-}
-var PESO_TRAFICO_POR_ESTADO = {
-  fluido: 0,
-  denso: 0.3,
-  congestionado: 0.6,
-  cortado: 1,
-  "sin-datos": 0
-};
-function componenteTrafico(tramosDistrito) {
-  const conDato = tramosDistrito.filter((t) => t.estado !== "sin-datos");
-  if (conDato.length === 0) return 0;
-  const suma = conDato.reduce((acc, t) => acc + PESO_TRAFICO_POR_ESTADO[t.estado], 0);
-  return clamp01(suma / conDato.length);
-}
-function componenteIncidencias(incidenciasDistrito) {
-  const peso = incidenciasDistrito.reduce((acc, i) => {
-    if (i.tipo === "obras") return acc + 0.06;
-    if (i.tipo === "festejos") return acc + 0.3;
-    return acc + 0.35;
-  }, 0);
-  return clamp01(peso / 22);
-}
-function componenteAire(aire) {
-  return clamp01((aire.indiceEuropeo - 15) / 65);
-}
-function componenteMeteo(meteo) {
-  const tCalor = Math.max(meteo.temperatura, meteo.sensacionTermica);
-  const calor = clamp01((tCalor - 28) / 12);
-  const frio = clamp01((6 - meteo.temperatura) / 8);
-  const viento = clamp01((meteo.vientoRachas - 40) / 45);
-  const lluvia = clamp01((meteo.precipitacion - 0.5) / 6);
-  return Math.max(calor, frio, viento, lluvia);
-}
-function categoriaPulso(indice) {
-  if (indice < UMBRALES_CATEGORIA_PULSO.Moderado) return "Tranquilo";
-  if (indice < UMBRALES_CATEGORIA_PULSO.Tenso) return "Moderado";
-  if (indice < UMBRALES_CATEGORIA_PULSO.Cr\u00EDtico) return "Tenso";
-  return "Cr\xEDtico";
-}
-function calcularPulsoDistrito(distritos2, meteo, aire, tramos, incidencias = []) {
-  const aireScore = componenteAire(aire);
-  const meteoScore = componenteMeteo(meteo);
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const observedAt = [meteo.observedAt, aire.observedAt, ...tramos.map((t) => t.observedAt)].sort()[0] ?? fetchedAt;
-  const tramosPorDistrito = /* @__PURE__ */ new Map();
-  for (const tramo of tramos) {
-    if (!tramo.distrito) continue;
-    const lista = tramosPorDistrito.get(tramo.distrito) ?? [];
-    lista.push(tramo);
-    tramosPorDistrito.set(tramo.distrito, lista);
-  }
-  const incidenciasPorDistrito = /* @__PURE__ */ new Map();
-  for (const inc of incidencias) {
-    if (!inc.distritoCodigo) continue;
-    const lista = incidenciasPorDistrito.get(inc.distritoCodigo) ?? [];
-    lista.push(inc);
-    incidenciasPorDistrito.set(inc.distritoCodigo, lista);
-  }
-  return distritos2.map((distrito) => {
-    const traficoScore = clamp01(
-      componenteTrafico(tramosPorDistrito.get(distrito.codigo) ?? []) * AMPLIFICACION_TRAFICO_PULSO
-    );
-    const incidenciasScore = componenteIncidencias(incidenciasPorDistrito.get(distrito.codigo) ?? []);
-    const indice = Math.round(
-      100 * (PESOS_PULSO.trafico * traficoScore + PESOS_PULSO.incidencias * incidenciasScore + PESOS_PULSO.aire * aireScore + PESOS_PULSO.meteo * meteoScore)
-    );
-    return {
-      distritoCodigo: distrito.codigo,
-      distritoNombre: distrito.nombre,
-      indice,
-      categoria: categoriaPulso(indice),
-      componentes: { trafico: traficoScore, incidencias: incidenciasScore, aire: aireScore, meteo: meteoScore },
-      observedAt,
-      fetchedAt,
-      source: "vlc-monitor-compuesto"
-    };
-  });
 }
 
 // src/services/trafico-historico.ts
@@ -50593,6 +50646,2906 @@ var trafico_historico_default = [
         muestras: 2
       }
     ]
+  },
+  {
+    timestamp: "2026-09-09T22:58:12.457Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T00:58:27.087Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T05:48:17.877Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0.006666666666666666,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T10:45:37.605Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T14:52:23.171Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T18:09:01.130Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0.012499999999999999,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T21:26:42.811Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-10T23:46:11.893Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T03:19:20.248Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T08:38:33.056Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T13:18:02.381Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0.010344827586206896,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.19615384615384615,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0.013333333333333332,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0.047368421052631574,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.1692307692307692,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0.03125,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0.03,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0.3,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T17:34:28.651Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0.01875,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0.3,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T20:33:24.406Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-11T23:00:56.440Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T03:24:35.336Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T08:24:24.963Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T12:39:09.352Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T16:01:01.560Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0.27586206896551724,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0.09523809523809523,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.16538461538461538,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T18:58:21.483Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T21:21:44.986Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-12T23:47:30.366Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T03:30:32.997Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T09:05:45.615Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T14:06:01.746Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T17:55:56.975Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0.0062499999999999995,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0.020689655172413793,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0.08571428571428572,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T20:27:54.592Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-13T22:55:21.426Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-14T00:47:06.525Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-14T05:51:24.573Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21
+      },
+      {
+        codigo: "03",
+        congestion: 0.15,
+        muestras: 26
+      },
+      {
+        codigo: "04",
+        congestion: 0.026666666666666665,
+        muestras: 45
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35
+      },
+      {
+        codigo: "07",
+        congestion: 0.047368421052631574,
+        muestras: 19
+      },
+      {
+        codigo: "08",
+        congestion: 0.1,
+        muestras: 13
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15
+      },
+      {
+        codigo: "14",
+        congestion: 0.08571428571428572,
+        muestras: 7
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2
+      }
+    ]
   }
 ];
 
@@ -50602,7 +53555,7 @@ var trafico_historico_diario_default = [];
 // src/server/trafico-historico.ts
 var DIAS_DEFECTO = 7;
 var DIAS_MAXIMO = 400;
-async function handler5(req) {
+async function handler6(req) {
   const url = new URL(req.url);
   const distritoParam = url.searchParams.get("distrito");
   const diasParam = Number(url.searchParams.get("dias"));
@@ -50665,14 +53618,14 @@ async function fetchEstacionesValenbisi(resolverDistrito2) {
 }
 
 // src/server/valenbisi-estaciones.ts
-var CACHE_KEY5 = "valenbisi:valencia-estaciones:v1";
-var TTL_MS5 = 2 * 60 * 1e3;
+var CACHE_KEY6 = "valenbisi:valencia-estaciones:v1";
+var TTL_MS6 = 2 * 60 * 1e3;
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-async function handler6() {
+async function handler7() {
   try {
     const { value: estaciones, fresh } = await getOrFetch(
-      CACHE_KEY5,
-      TTL_MS5,
+      CACHE_KEY6,
+      TTL_MS6,
       () => fetchEstacionesValenbisi((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
     );
     return new Response(JSON.stringify({ estaciones, fresh }), {
@@ -50725,14 +53678,14 @@ async function fetchAparcamientos(resolverDistrito2) {
 }
 
 // src/server/aparcamiento-estado.ts
-var CACHE_KEY6 = "aparcamiento:valencia-parkings:v1";
-var TTL_MS6 = 2 * 60 * 1e3;
+var CACHE_KEY7 = "aparcamiento:valencia-parkings:v1";
+var TTL_MS7 = 2 * 60 * 1e3;
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-async function handler7() {
+async function handler8() {
   try {
     const { value: aparcamientos, fresh } = await getOrFetch(
-      CACHE_KEY6,
-      TTL_MS6,
+      CACHE_KEY7,
+      TTL_MS7,
       () => fetchAparcamientos((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
     );
     return new Response(JSON.stringify({ aparcamientos, fresh }), {
@@ -50750,384 +53703,6 @@ async function handler7() {
   }
 }
 
-// src/services/via-publica.ts
-var TIPO_POR_VALOR_ORIGEN = {
-  OBRAS: "obras",
-  INCIDENCIAS: "incidencias",
-  FESTEJOS: "festejos"
-};
-var GEOPORTAL_VIA_PUBLICA_URL = "https://geoportal.valencia.es/server/rest/services/OPENDATA/Trafico/MapServer/209/query?where=1=1&outFields=*&f=geojson";
-async function fetchIncidenciasViaPublica(resolverDistrito2) {
-  const res = await fetch(GEOPORTAL_VIA_PUBLICA_URL, {
-    headers: { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" }
-  });
-  if (!res.ok) {
-    throw new Error(`Geoportal (v\xEDa p\xFAblica) respondi\xF3 HTTP ${res.status}`);
-  }
-  const body = await res.json();
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  return body.features.map((feature) => {
-    const p = feature.properties;
-    if (feature.geometry === null || p.id_incidencia === null || p.desc_incidencia === null || p.tipo_incidencia === null || p.desc_calle === null || p.tipo_afectacion === null || p.fecha_inicio === null || p.fecha_fin === null) {
-      return null;
-    }
-    const tipo = TIPO_POR_VALOR_ORIGEN[p.tipo_incidencia];
-    if (!tipo) return null;
-    const [lon, lat] = feature.geometry.coordinates;
-    return {
-      id: String(p.id_incidencia),
-      descripcion: p.desc_incidencia,
-      tipo,
-      calle: p.desc_calle,
-      afectacion: p.tipo_afectacion,
-      lat,
-      lon,
-      distritoCodigo: resolverDistrito2(lat, lon),
-      vigenciaDesde: new Date(p.fecha_inicio).toISOString(),
-      vigenciaHasta: new Date(p.fecha_fin).toISOString(),
-      fetchedAt,
-      source: "ajuntament-valencia-geoportal"
-    };
-  }).filter((item) => item !== null);
-}
-
-// src/server/pulso-distrito.ts
-setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-var distritosBasicos = distritosFromGeoJSON(distritos_valencia_default).map((d) => ({
-  codigo: d.codigo,
-  nombre: d.nombre
-}));
-async function handler8() {
-  try {
-    const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
-    const [meteoResult, aireResult, traficoResult] = await Promise.all([
-      getOrFetch("meteo:valencia-actual:v1", 15 * 60 * 1e3, fetchEstadoMeteo),
-      getOrFetch("aire:valencia-actual:v1", 60 * 60 * 1e3, fetchCalidadAire),
-      getOrFetch("trafico:valencia-estado:v1", 3 * 60 * 1e3, () => fetchEstadoTrafico(resolverDistrito2))
-    ]);
-    let incidencias = [];
-    try {
-      const r = await getOrFetch(
-        "via-publica:incidencias-valencia:v1",
-        60 * 60 * 1e3,
-        () => fetchIncidenciasViaPublica(resolverDistrito2)
-      );
-      const ahora = Date.now();
-      incidencias = r.value.filter((i) => new Date(i.vigenciaHasta).getTime() >= ahora);
-    } catch {
-    }
-    const distritos2 = calcularPulsoDistrito(
-      distritosBasicos,
-      meteoResult.value,
-      aireResult.value,
-      traficoResult.value,
-      incidencias
-    );
-    const fresh = meteoResult.fresh && aireResult.fresh && traficoResult.fresh;
-    return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
-      status: 200,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "public, max-age=60, stale-while-revalidate=180"
-      }
-    });
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
-      { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
-    );
-  }
-}
-
-// src/services/insights.ts
-var UMBRAL_CALOR_TEMPERATURA = 38;
-var UMBRAL_CALOR_SENSACION = 42;
-var UMBRAL_CALOR_AVISO_TEMPERATURA = 35;
-var UMBRAL_FRIO_TEMPERATURA = 0;
-var UMBRAL_LLUVIA_MM = 5;
-var UMBRAL_LLUVIA_PROB_PCT = 60;
-var UMBRAL_VIENTO_AVISO_KMH = 50;
-var UMBRAL_VIENTO_URGENTE_KMH = 70;
-function insightCalorExtremo(meteo, fetchedAt) {
-  const esExtremo = meteo.temperatura >= UMBRAL_CALOR_TEMPERATURA || meteo.sensacionTermica >= UMBRAL_CALOR_SENSACION;
-  const esAviso = meteo.temperatura >= UMBRAL_CALOR_AVISO_TEMPERATURA;
-  if (!esExtremo && !esAviso) return null;
-  const severidad = esExtremo ? "urgente" : "aviso";
-  const umbral = esExtremo ? `umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}\xB0C / ${UMBRAL_CALOR_SENSACION}\xB0C sensaci\xF3n)` : `umbral de aviso de calor (${UMBRAL_CALOR_AVISO_TEMPERATURA}\xB0C)`;
-  return {
-    id: "calor-extremo:ciudad",
-    tipo: "calor-extremo",
-    severidad,
-    titulo: `${esExtremo ? "Calor extremo" : "Aviso de calor"} \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
-    descripcion: `Temperatura ${meteo.temperatura}\xB0C, sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C \u2014 por encima del ${umbral}.`,
-    protocoloSugerido: {
-      asunto: `${esExtremo ? "Posible activaci\xF3n de protocolo de calor" : "Aviso de calor"} \u2014 Valencia`,
-      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C (sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C) en Valencia a las ${meteo.observedAt}. Se sugiere valorar ${esExtremo ? "la activaci\xF3n del protocolo de calor extremo" : "medidas preventivas de calor"}: hidrataci\xF3n y rotaci\xF3n de las unidades en calle, prioridad a zonas sin sombra. Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["001"],
-    detectedAt: meteo.observedAt,
-    fetchedAt
-  };
-}
-function insightFrioExtremo(meteo, fetchedAt) {
-  if (meteo.temperatura > UMBRAL_FRIO_TEMPERATURA) return null;
-  return {
-    id: "frio-extremo:ciudad",
-    tipo: "frio-extremo",
-    severidad: "aviso",
-    titulo: `Fr\xEDo extremo \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
-    descripcion: `Temperatura ${meteo.temperatura}\xB0C \u2014 igual o por debajo del umbral de fr\xEDo extremo (${UMBRAL_FRIO_TEMPERATURA}\xB0C).`,
-    protocoloSugerido: {
-      asunto: "Posible aviso de fr\xEDo extremo / riesgo de helada \u2014 Valencia",
-      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C en Valencia a las ${meteo.observedAt}. Se sugiere valorar aviso a las unidades sobre riesgo de helada en calzada y protocolo de fr\xEDo para personas sin techo. Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["001"],
-    detectedAt: meteo.observedAt,
-    fetchedAt
-  };
-}
-function insightVientoFuerte(meteo, fetchedAt) {
-  if (meteo.vientoRachas < UMBRAL_VIENTO_AVISO_KMH) return null;
-  const severidad = meteo.vientoRachas >= UMBRAL_VIENTO_URGENTE_KMH ? "urgente" : "aviso";
-  return {
-    id: "viento-fuerte:ciudad",
-    tipo: "viento-fuerte",
-    severidad,
-    titulo: `Viento fuerte \u2014 rachas de ${Math.round(meteo.vientoRachas)} km/h`,
-    descripcion: `Rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) \u2014 por encima del umbral de viento fuerte (${UMBRAL_VIENTO_AVISO_KMH} km/h).`,
-    protocoloSugerido: {
-      asunto: "Aviso de viento fuerte \u2014 Valencia",
-      cuerpo: `Se han detectado rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) en Valencia a las ${meteo.observedAt}. Se sugiere valorar aviso a unidades sobre riesgo de ca\xEDda de objetos/ramas, precauci\xF3n con estructuras temporales (casetas, carpas) y v\xEDa p\xFAblica. Dato de origen: Open-Meteo (VLC Monitor, spec 001). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["001"],
-    detectedAt: meteo.observedAt,
-    fetchedAt
-  };
-}
-function insightAireMalaCalidad(aire, fetchedAt) {
-  if (aire.categoria !== "Mala" && aire.categoria !== "Muy mala") return null;
-  const severidad = aire.categoria === "Muy mala" ? "urgente" : "aviso";
-  return {
-    id: "aire-mala-calidad:ciudad",
-    tipo: "aire-mala-calidad",
-    severidad,
-    titulo: `Calidad del aire ${aire.categoria.toLowerCase()} \u2014 \xEDndice ${aire.indiceEuropeo}`,
-    descripcion: `\xCDndice europeo de calidad del aire ${aire.indiceEuropeo} (${aire.categoria}), PM2.5 ${aire.pm25} \xB5g/m\xB3.`,
-    protocoloSugerido: {
-      asunto: `Aviso de calidad del aire ${aire.categoria.toLowerCase()} \u2014 Valencia`,
-      cuerpo: `El \xEDndice europeo de calidad del aire est\xE1 en ${aire.indiceEuropeo} (${aire.categoria}), PM2.5 ${aire.pm25} \xB5g/m\xB3, NO\u2082 ${aire.dioxidoNitrogeno} \xB5g/m\xB3 a las ${aire.observedAt}. Se sugiere valorar recomendaciones a la ciudadan\xEDa (grupos sensibles) y revisar si aplica alguna restricci\xF3n seg\xFAn el protocolo municipal de calidad del aire. Dato de origen: Open-Meteo Air Quality (VLC Monitor, spec 002). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["002"],
-    detectedAt: aire.observedAt,
-    fetchedAt
-  };
-}
-function insightsLluviaIntensa(prediccion, fetchedAt) {
-  return prediccion.predicciones.filter((tramo) => tramo.precipitacion >= UMBRAL_LLUVIA_MM).map((tramo) => ({
-    id: `lluvia-intensa-prevista:${tramo.horaObjetivo}`,
-    tipo: "lluvia-intensa-prevista",
-    severidad: "aviso",
-    titulo: `Lluvia intensa prevista \u2014 ${tramo.precipitacion}mm hacia las ${tramo.horaObjetivo}`,
-    descripcion: `Predicci\xF3n de ${tramo.precipitacion}mm de precipitaci\xF3n (${tramo.probabilidadPrecipitacion}% de probabilidad) para ${tramo.horaObjetivo}.`,
-    protocoloSugerido: {
-      asunto: "Aviso de lluvia intensa prevista \u2014 Valencia",
-      cuerpo: `Open-Meteo prev\xE9 ${tramo.precipitacion}mm de precipitaci\xF3n (${tramo.probabilidadPrecipitacion}% de probabilidad) para las ${tramo.horaObjetivo} en Valencia. Se sugiere valorar aviso preventivo a unidades sobre puntos de inundaci\xF3n habituales y refuerzo en pasos de peatones/zonas bajas. Dato de origen: Open-Meteo (VLC Monitor, spec 016). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["016"],
-    detectedAt: tramo.horaObjetivo,
-    fetchedAt
-  }));
-}
-function esCodigoLluvia(weatherCode) {
-  return weatherCode >= 51 && weatherCode <= 67 || weatherCode >= 80 && weatherCode <= 82 || weatherCode >= 95 && weatherCode <= 99;
-}
-function insightsLluviaPrevista(prediccion, fetchedAt) {
-  return prediccion.predicciones.filter((tramo) => tramo.precipitacion < UMBRAL_LLUVIA_MM).filter(
-    (tramo) => tramo.probabilidadPrecipitacion >= UMBRAL_LLUVIA_PROB_PCT || tramo.precipitacion > 0 && esCodigoLluvia(tramo.weatherCode)
-  ).map((tramo) => ({
-    id: `lluvia-prevista:${tramo.horaObjetivo}`,
-    tipo: "lluvia-prevista",
-    severidad: "aviso",
-    titulo: `Lluvia prevista hacia las ${tramo.horaObjetivo}`,
-    descripcion: `Predicci\xF3n: ${tramo.probabilidadPrecipitacion}% de probabilidad de precipitaci\xF3n (${tramo.precipitacion} mm) para ${tramo.horaObjetivo}.`,
-    protocoloSugerido: {
-      asunto: "Aviso de lluvia prevista \u2014 Valencia",
-      cuerpo: `Open-Meteo prev\xE9 lluvia hacia las ${tramo.horaObjetivo} en Valencia (${tramo.probabilidadPrecipitacion}% de probabilidad, ${tramo.precipitacion} mm estimados). Se sugiere aviso preventivo a unidades y atenci\xF3n a puntos de acumulaci\xF3n de agua habituales. Dato de origen: Open-Meteo (VLC Monitor, spec 016). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["016"],
-    detectedAt: tramo.horaObjetivo,
-    fetchedAt
-  }));
-}
-var NIVEL_TRAFICO = { fluido: 0, denso: 1, congestionado: 2, cortado: 3 };
-function insightsTraficoEmpeora(actual, previo, fetchedAt) {
-  if (!previo || previo.length === 0) return [];
-  const nivelPrevio = new Map(previo.map((t) => [t.id, NIVEL_TRAFICO[t.estado] ?? 0]));
-  const empeorados = [];
-  for (const t of actual) {
-    const nivelAhora = NIVEL_TRAFICO[t.estado];
-    if (nivelAhora === void 0) continue;
-    const antes = nivelPrevio.get(t.id);
-    if (antes === void 0) continue;
-    if (nivelAhora > antes) empeorados.push({ tramo: t, destino: nivelAhora });
-  }
-  if (empeorados.length === 0) return [];
-  const porDistrito = /* @__PURE__ */ new Map();
-  for (const e of empeorados) {
-    const clave = e.tramo.distrito ?? "__ciudad__";
-    const lista = porDistrito.get(clave);
-    if (lista) lista.push(e);
-    else porDistrito.set(clave, [e]);
-  }
-  return [...porDistrito.entries()].map(([clave, lista]) => {
-    const hayGrave = lista.some((e) => e.destino >= 2);
-    const nombreZona = clave === "__ciudad__" ? "Valencia" : lista[0].tramo.distrito;
-    return {
-      id: `trafico-empeora:${clave}`,
-      tipo: "trafico-empeora",
-      severidad: hayGrave ? "urgente" : "aviso",
-      titulo: `Tr\xE1fico a peor \u2014 ${lista.length} tramo${lista.length === 1 ? "" : "s"} en ${nombreZona}`,
-      descripcion: `${lista.length} tramo${lista.length === 1 ? " ha" : "s han"} subido de nivel de tr\xE1fico respecto a la lectura anterior (${lista.slice(0, 3).map((e) => `${e.tramo.nombre}: ${e.tramo.estado}`).join("; ")}${lista.length > 3 ? "\u2026" : ""}).`,
-      protocoloSugerido: {
-        asunto: `Empeoramiento de tr\xE1fico \u2014 ${nombreZona}`,
-        cuerpo: `Se ha detectado que ${lista.length} tramo${lista.length === 1 ? "" : "s"} de ${nombreZona} ha${lista.length === 1 ? "" : "n"} pasado a un estado de tr\xE1fico peor entre dos lecturas consecutivas. Se sugiere valorar si hace falta reforzar la regulaci\xF3n en la zona o avisar de rutas alternativas. Dato de origen: Ajuntament de Val\xE8ncia (VLC Monitor, spec 004). Revisar y decidir antes de actuar.`
-      },
-      distritoCodigo: clave === "__ciudad__" ? void 0 : clave,
-      fuenteSpec: ["004"],
-      detectedAt: fetchedAt,
-      fetchedAt
-    };
-  });
-}
-function insightsDistritoCritico(distritos2, fetchedAt) {
-  return distritos2.filter((d) => d.categoria === "Cr\xEDtico").map((d) => ({
-    id: `distrito-critico:${d.distritoCodigo}`,
-    tipo: "distrito-critico",
-    severidad: "urgente",
-    titulo: `Distrito cr\xEDtico \u2014 ${d.distritoNombre}`,
-    descripcion: `Pulso de Distrito ${d.indice}/100 (Cr\xEDtico) en ${d.distritoNombre} \u2014 tr\xE1fico ${(d.componentes.trafico * 100).toFixed(0)}%, aire ${(d.componentes.aire * 100).toFixed(0)}%, meteo ${(d.componentes.meteo * 100).toFixed(0)}%.`,
-    protocoloSugerido: {
-      asunto: `Distrito en estado cr\xEDtico \u2014 ${d.distritoNombre}`,
-      cuerpo: `El Pulso de Distrito de ${d.distritoNombre} est\xE1 en ${d.indice}/100 (Cr\xEDtico) a las ${d.observedAt}, combinando tr\xE1fico, calidad del aire y meteorolog\xEDa adversa. Se sugiere valorar revisar la situaci\xF3n sobre el terreno y priorizar unidades en la zona si procede. Dato de origen: VLC Monitor, \xEDndice compuesto (spec 010). Revisar y decidir antes de actuar.`
-    },
-    distritoCodigo: d.distritoCodigo,
-    fuenteSpec: ["010"],
-    detectedAt: d.observedAt,
-    fetchedAt
-  }));
-}
-var UMBRAL_TRAFICO_CONCENTRADO_AVISO = 3;
-var UMBRAL_TRAFICO_CONCENTRADO_URGENTE = 6;
-function nombreDistritoOCodigo(distritos2, codigo) {
-  return distritos2?.find((d) => d.distritoCodigo === codigo)?.distritoNombre ?? codigo;
-}
-function insightsTraficoConcentrado(tramos, distritos2, fetchedAt) {
-  const afectadosPorDistrito = /* @__PURE__ */ new Map();
-  const monitorizadosPorDistrito = /* @__PURE__ */ new Map();
-  for (const tramo of tramos) {
-    if (!tramo.distrito) continue;
-    monitorizadosPorDistrito.set(tramo.distrito, (monitorizadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
-    if (tramo.estado === "congestionado" || tramo.estado === "cortado") {
-      afectadosPorDistrito.set(tramo.distrito, (afectadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
-    }
-  }
-  const insights = [];
-  for (const [codigo, afectados] of afectadosPorDistrito) {
-    if (afectados < UMBRAL_TRAFICO_CONCENTRADO_AVISO) continue;
-    const nombre = nombreDistritoOCodigo(distritos2, codigo);
-    const monitorizados = monitorizadosPorDistrito.get(codigo) ?? afectados;
-    const severidad = afectados >= UMBRAL_TRAFICO_CONCENTRADO_URGENTE ? "urgente" : "aviso";
-    insights.push({
-      id: `trafico-concentrado-distrito:${codigo}`,
-      tipo: "trafico-concentrado-distrito",
-      severidad,
-      titulo: `Tr\xE1fico denso concentrado \u2014 ${nombre}`,
-      descripcion: `${afectados} de ${monitorizados} tramos monitorizados en ${nombre} est\xE1n congestionados o cortados ahora mismo.`,
-      protocoloSugerido: {
-        asunto: `Concentraci\xF3n de tr\xE1fico denso \u2014 ${nombre}`,
-        cuerpo: `Se han detectado ${afectados} tramos en estado congestionado o cortado (de ${monitorizados} monitorizados) en ${nombre}. Se sugiere valorar revisar la situaci\xF3n sobre el terreno. Dato de origen: Geoportal Ajuntament de Val\xE8ncia (VLC Monitor, spec 004). Revisar y decidir antes de actuar.`
-      },
-      distritoCodigo: codigo,
-      fuenteSpec: ["004"],
-      detectedAt: fetchedAt,
-      fetchedAt
-    });
-  }
-  return insights;
-}
-function insightsTraficoEnZonaFallas(tramos, fallas, distritos2, fetchedAt) {
-  const distritosConZonaFallas = new Set(
-    fallas.zonasMovilidadReducida.map((z) => z.distrito).filter((d) => d !== null)
-  );
-  if (distritosConZonaFallas.size === 0) return [];
-  const distritosConTraficoDenso = new Set(
-    tramos.filter((t) => t.distrito && (t.estado === "congestionado" || t.estado === "cortado")).map((t) => t.distrito)
-  );
-  const insights = [];
-  for (const codigo of distritosConZonaFallas) {
-    if (!distritosConTraficoDenso.has(codigo)) continue;
-    const nombre = nombreDistritoOCodigo(distritos2, codigo);
-    insights.push({
-      id: `trafico-en-zona-fallas:${codigo}`,
-      tipo: "trafico-en-zona-fallas",
-      severidad: "urgente",
-      titulo: `Tr\xE1fico denso en zona de Fallas activa \u2014 ${nombre}`,
-      descripcion: `${nombre} tiene tr\xE1fico congestionado o cortado y una zona de movilidad reducida de Fallas activa a la vez.`,
-      protocoloSugerido: {
-        asunto: `Concurrencia de tr\xE1fico denso y zona de Fallas \u2014 ${nombre}`,
-        cuerpo: `Se ha detectado tr\xE1fico congestionado o cortado coincidiendo con una zona de movilidad reducida de Fallas activa en ${nombre}. Se sugiere valorar reforzar la zona sobre el terreno. Datos de origen: Geoportal Ajuntament de Val\xE8ncia (VLC Monitor, specs 004 y 008). Revisar y decidir antes de actuar.`
-      },
-      distritoCodigo: codigo,
-      fuenteSpec: ["004", "008"],
-      detectedAt: fetchedAt,
-      fetchedAt
-    });
-  }
-  return insights;
-}
-function insightLluviaMasTrafico(insightsLluvia, tramos, distritos2, fetchedAt) {
-  if (insightsLluvia.length === 0) return null;
-  const distritosConTraficoDenso = Array.from(
-    new Set(
-      tramos.filter((t) => t.distrito && (t.estado === "congestionado" || t.estado === "cortado")).map((t) => t.distrito)
-    )
-  );
-  if (distritosConTraficoDenso.length === 0) return null;
-  const nombres = distritosConTraficoDenso.map((codigo) => nombreDistritoOCodigo(distritos2, codigo)).join(", ");
-  return {
-    id: "lluvia-mas-trafico-denso:ciudad",
-    tipo: "lluvia-mas-trafico-denso",
-    severidad: "urgente",
-    titulo: "Lluvia intensa prevista con tr\xE1fico ya denso",
-    descripcion: `Hay lluvia intensa prevista y tr\xE1fico ya congestionado o cortado en: ${nombres}.`,
-    protocoloSugerido: {
-      asunto: "Lluvia intensa prevista con tr\xE1fico ya denso \u2014 Valencia",
-      cuerpo: `Adem\xE1s de la lluvia intensa prevista, ya hay tr\xE1fico congestionado o cortado en: ${nombres}. Se sugiere valorar priorizar el refuerzo preventivo en esas zonas antes de que llegue la lluvia. Datos de origen: Open-Meteo y Geoportal Ajuntament de Val\xE8ncia (VLC Monitor, specs 016 y 004). Revisar y decidir antes de actuar.`
-    },
-    fuenteSpec: ["016", "004"],
-    detectedAt: fetchedAt,
-    fetchedAt
-  };
-}
-function calcularInsights(meteo, aire, distritos2, prediccion, tramosTrafico = null, datosFallas = null, tramosTraficoPrevios = null) {
-  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const insightsLluvia = prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : [];
-  const insights = [
-    insightCalorExtremo(meteo, fetchedAt),
-    insightFrioExtremo(meteo, fetchedAt),
-    insightVientoFuerte(meteo, fetchedAt),
-    insightAireMalaCalidad(aire, fetchedAt),
-    ...insightsLluvia,
-    ...prediccion ? insightsLluviaPrevista(prediccion, fetchedAt) : [],
-    ...distritos2 ? insightsDistritoCritico(distritos2, fetchedAt) : [],
-    ...tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos2, fetchedAt) : [],
-    ...tramosTrafico && datosFallas ? insightsTraficoEnZonaFallas(tramosTrafico, datosFallas, distritos2, fetchedAt) : [],
-    ...tramosTrafico ? insightsTraficoEmpeora(tramosTrafico, tramosTraficoPrevios, fetchedAt) : [],
-    ...tramosTrafico ? [insightLluviaMasTrafico(insightsLluvia, tramosTrafico, distritos2, fetchedAt)] : []
-  ].filter((insight) => insight !== null);
-  return { insights, fetchedAt, source: "vlc-monitor-insights" };
-}
-
 // src/services/fallas.ts
 function centroidePoligono(geometry) {
   const anillo = geometry.type === "Polygon" ? geometry.coordinates[0] : geometry.coordinates[0][0];
@@ -51140,10 +53715,10 @@ function centroidePoligono(geometry) {
   return [sumaLon / anillo.length, sumaLat / anillo.length];
 }
 var BASE_URL = "https://geoportal.valencia.es/server/rest/services/OPENDATA/Turismo/MapServer";
-var HEADERS = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
+var HEADERS2 = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
 async function fetchArcGis(layerId) {
   const res = await fetch(`${BASE_URL}/${layerId}/query?where=1=1&outFields=*&f=geojson`, {
-    headers: HEADERS
+    headers: HEADERS2
   });
   if (!res.ok) {
     throw new Error(`Geoportal (Fallas, capa ${layerId}) respondi\xF3 HTTP ${res.status}`);
@@ -51228,6 +53803,667 @@ async function fetchDatosFallas(resolverDistrito2) {
   return { monumentos, carpas, zonasMovilidadReducida };
 }
 
+// src/services/insights.ts
+var UMBRAL_CALOR_TEMPERATURA = 38;
+var UMBRAL_CALOR_SENSACION = 42;
+var UMBRAL_CALOR_AVISO_TEMPERATURA = 35;
+var UMBRAL_FRIO_TEMPERATURA = 0;
+var UMBRAL_LLUVIA_MM = 5;
+var UMBRAL_LLUVIA_PROB_PCT = 60;
+var UMBRAL_VIENTO_AVISO_KMH = 50;
+var UMBRAL_VIENTO_URGENTE_KMH = 70;
+function insightCalorExtremo(meteo, fetchedAt) {
+  const esExtremo = meteo.temperatura >= UMBRAL_CALOR_TEMPERATURA || meteo.sensacionTermica >= UMBRAL_CALOR_SENSACION;
+  const esAviso = meteo.temperatura >= UMBRAL_CALOR_AVISO_TEMPERATURA;
+  if (!esExtremo && !esAviso) return null;
+  const severidad = esExtremo ? "urgente" : "aviso";
+  const umbral = esExtremo ? `umbral de calor extremo (${UMBRAL_CALOR_TEMPERATURA}\xB0C / ${UMBRAL_CALOR_SENSACION}\xB0C sensaci\xF3n)` : `umbral de aviso de calor (${UMBRAL_CALOR_AVISO_TEMPERATURA}\xB0C)`;
+  return {
+    id: "calor-extremo:ciudad",
+    tipo: "calor-extremo",
+    severidad,
+    titulo: `${esExtremo ? "Calor extremo" : "Aviso de calor"} \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
+    descripcion: `Temperatura ${meteo.temperatura}\xB0C, sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C \u2014 por encima del ${umbral}.`,
+    protocoloSugerido: {
+      asunto: `${esExtremo ? "Posible activaci\xF3n de protocolo de calor" : "Aviso de calor"} \u2014 Valencia`,
+      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C (sensaci\xF3n t\xE9rmica ${meteo.sensacionTermica}\xB0C) en Valencia a las ${meteo.observedAt}. Se sugiere valorar ${esExtremo ? "la activaci\xF3n del protocolo de calor extremo" : "medidas preventivas de calor"}: hidrataci\xF3n y rotaci\xF3n de las unidades en calle, prioridad a zonas sin sombra. Dato de origen: Open-Meteo (Mirall, spec 001). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["001"],
+    detectedAt: meteo.observedAt,
+    fetchedAt
+  };
+}
+function insightFrioExtremo(meteo, fetchedAt) {
+  if (meteo.temperatura > UMBRAL_FRIO_TEMPERATURA) return null;
+  return {
+    id: "frio-extremo:ciudad",
+    tipo: "frio-extremo",
+    severidad: "aviso",
+    titulo: `Fr\xEDo extremo \u2014 ${Math.round(meteo.temperatura)}\xB0C en Valencia`,
+    descripcion: `Temperatura ${meteo.temperatura}\xB0C \u2014 igual o por debajo del umbral de fr\xEDo extremo (${UMBRAL_FRIO_TEMPERATURA}\xB0C).`,
+    protocoloSugerido: {
+      asunto: "Posible aviso de fr\xEDo extremo / riesgo de helada \u2014 Valencia",
+      cuerpo: `Se ha detectado una temperatura de ${meteo.temperatura}\xB0C en Valencia a las ${meteo.observedAt}. Se sugiere valorar aviso a las unidades sobre riesgo de helada en calzada y protocolo de fr\xEDo para personas sin techo. Dato de origen: Open-Meteo (Mirall, spec 001). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["001"],
+    detectedAt: meteo.observedAt,
+    fetchedAt
+  };
+}
+function insightVientoFuerte(meteo, fetchedAt) {
+  if (meteo.vientoRachas < UMBRAL_VIENTO_AVISO_KMH) return null;
+  const severidad = meteo.vientoRachas >= UMBRAL_VIENTO_URGENTE_KMH ? "urgente" : "aviso";
+  return {
+    id: "viento-fuerte:ciudad",
+    tipo: "viento-fuerte",
+    severidad,
+    titulo: `Viento fuerte \u2014 rachas de ${Math.round(meteo.vientoRachas)} km/h`,
+    descripcion: `Rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) \u2014 por encima del umbral de viento fuerte (${UMBRAL_VIENTO_AVISO_KMH} km/h).`,
+    protocoloSugerido: {
+      asunto: "Aviso de viento fuerte \u2014 Valencia",
+      cuerpo: `Se han detectado rachas de ${meteo.vientoRachas} km/h (velocidad sostenida ${meteo.vientoVelocidad} km/h) en Valencia a las ${meteo.observedAt}. Se sugiere valorar aviso a unidades sobre riesgo de ca\xEDda de objetos/ramas, precauci\xF3n con estructuras temporales (casetas, carpas) y v\xEDa p\xFAblica. Dato de origen: Open-Meteo (Mirall, spec 001). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["001"],
+    detectedAt: meteo.observedAt,
+    fetchedAt
+  };
+}
+function insightAireMalaCalidad(aire, fetchedAt) {
+  if (aire.categoria !== "Mala" && aire.categoria !== "Muy mala") return null;
+  const severidad = aire.categoria === "Muy mala" ? "urgente" : "aviso";
+  return {
+    id: "aire-mala-calidad:ciudad",
+    tipo: "aire-mala-calidad",
+    severidad,
+    titulo: `Calidad del aire ${aire.categoria.toLowerCase()} \u2014 \xEDndice ${aire.indiceEuropeo}`,
+    descripcion: `\xCDndice europeo de calidad del aire ${aire.indiceEuropeo} (${aire.categoria}), PM2.5 ${aire.pm25} \xB5g/m\xB3.`,
+    protocoloSugerido: {
+      asunto: `Aviso de calidad del aire ${aire.categoria.toLowerCase()} \u2014 Valencia`,
+      cuerpo: `El \xEDndice europeo de calidad del aire est\xE1 en ${aire.indiceEuropeo} (${aire.categoria}), PM2.5 ${aire.pm25} \xB5g/m\xB3, NO\u2082 ${aire.dioxidoNitrogeno} \xB5g/m\xB3 a las ${aire.observedAt}. Se sugiere valorar recomendaciones a la ciudadan\xEDa (grupos sensibles) y revisar si aplica alguna restricci\xF3n seg\xFAn el protocolo municipal de calidad del aire. Dato de origen: Open-Meteo Air Quality (Mirall, spec 002). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["002"],
+    detectedAt: aire.observedAt,
+    fetchedAt
+  };
+}
+function insightsLluviaIntensa(prediccion, fetchedAt) {
+  return prediccion.predicciones.filter((tramo) => tramo.precipitacion >= UMBRAL_LLUVIA_MM).map((tramo) => ({
+    id: `lluvia-intensa-prevista:${tramo.horaObjetivo}`,
+    tipo: "lluvia-intensa-prevista",
+    severidad: "aviso",
+    titulo: `Lluvia intensa prevista \u2014 ${tramo.precipitacion}mm hacia las ${tramo.horaObjetivo}`,
+    descripcion: `Predicci\xF3n de ${tramo.precipitacion}mm de precipitaci\xF3n (${tramo.probabilidadPrecipitacion}% de probabilidad) para ${tramo.horaObjetivo}.`,
+    protocoloSugerido: {
+      asunto: "Aviso de lluvia intensa prevista \u2014 Valencia",
+      cuerpo: `Open-Meteo prev\xE9 ${tramo.precipitacion}mm de precipitaci\xF3n (${tramo.probabilidadPrecipitacion}% de probabilidad) para las ${tramo.horaObjetivo} en Valencia. Se sugiere valorar aviso preventivo a unidades sobre puntos de inundaci\xF3n habituales y refuerzo en pasos de peatones/zonas bajas. Dato de origen: Open-Meteo (Mirall, spec 016). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["016"],
+    detectedAt: tramo.horaObjetivo,
+    fetchedAt
+  }));
+}
+function esCodigoLluvia(weatherCode) {
+  return weatherCode >= 51 && weatherCode <= 67 || weatherCode >= 80 && weatherCode <= 82 || weatherCode >= 95 && weatherCode <= 99;
+}
+function insightsLluviaPrevista(prediccion, fetchedAt) {
+  return prediccion.predicciones.filter((tramo) => tramo.precipitacion < UMBRAL_LLUVIA_MM).filter(
+    (tramo) => tramo.probabilidadPrecipitacion >= UMBRAL_LLUVIA_PROB_PCT || tramo.precipitacion > 0 && esCodigoLluvia(tramo.weatherCode)
+  ).map((tramo) => ({
+    id: `lluvia-prevista:${tramo.horaObjetivo}`,
+    tipo: "lluvia-prevista",
+    severidad: "aviso",
+    titulo: `Lluvia prevista hacia las ${tramo.horaObjetivo}`,
+    descripcion: `Predicci\xF3n: ${tramo.probabilidadPrecipitacion}% de probabilidad de precipitaci\xF3n (${tramo.precipitacion} mm) para ${tramo.horaObjetivo}.`,
+    protocoloSugerido: {
+      asunto: "Aviso de lluvia prevista \u2014 Valencia",
+      cuerpo: `Open-Meteo prev\xE9 lluvia hacia las ${tramo.horaObjetivo} en Valencia (${tramo.probabilidadPrecipitacion}% de probabilidad, ${tramo.precipitacion} mm estimados). Se sugiere aviso preventivo a unidades y atenci\xF3n a puntos de acumulaci\xF3n de agua habituales. Dato de origen: Open-Meteo (Mirall, spec 016). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["016"],
+    detectedAt: tramo.horaObjetivo,
+    fetchedAt
+  }));
+}
+var NIVEL_TRAFICO = { fluido: 0, denso: 1, congestionado: 2, cortado: 3 };
+function insightsTraficoEmpeora(actual, previo, fetchedAt) {
+  if (!previo || previo.length === 0) return [];
+  const nivelPrevio = new Map(previo.map((t) => [t.id, NIVEL_TRAFICO[t.estado] ?? 0]));
+  const empeorados = [];
+  for (const t of actual) {
+    const nivelAhora = NIVEL_TRAFICO[t.estado];
+    if (nivelAhora === void 0) continue;
+    const antes = nivelPrevio.get(t.id);
+    if (antes === void 0) continue;
+    if (nivelAhora > antes) empeorados.push({ tramo: t, destino: nivelAhora });
+  }
+  if (empeorados.length === 0) return [];
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const e of empeorados) {
+    const clave = e.tramo.distrito ?? "__ciudad__";
+    const lista = porDistrito.get(clave);
+    if (lista) lista.push(e);
+    else porDistrito.set(clave, [e]);
+  }
+  return [...porDistrito.entries()].map(([clave, lista]) => {
+    const hayGrave = lista.some((e) => e.destino >= 2);
+    const nombreZona = clave === "__ciudad__" ? "Valencia" : lista[0].tramo.distrito;
+    const masSevero = [...lista].sort((a, b) => b.destino - a.destino)[0];
+    const nombreCalle = masSevero.tramo.nombre || nombreZona;
+    const masEnStr = lista.length > 1 ? ` y ${lista.length - 1} m\xE1s` : "";
+    const titulo = `Tr\xE1fico a peor en ${nombreCalle}${masEnStr} (${nombreZona})`;
+    return {
+      id: `trafico-empeora:${clave}`,
+      tipo: "trafico-empeora",
+      severidad: hayGrave ? "urgente" : "aviso",
+      titulo,
+      descripcion: `${lista.length} tramo${lista.length === 1 ? " ha" : "s han"} subido de nivel de tr\xE1fico respecto a la lectura anterior (${lista.slice(0, 3).map((e) => `${e.tramo.nombre}: ${e.tramo.estado}`).join("; ")}${lista.length > 3 ? "\u2026" : ""}).`,
+      protocoloSugerido: {
+        asunto: `Empeoramiento de tr\xE1fico \u2014 ${nombreZona}`,
+        cuerpo: `Se ha detectado que ${lista.length} tramo${lista.length === 1 ? "" : "s"} de ${nombreZona} ha${lista.length === 1 ? "" : "n"} pasado a un estado de tr\xE1fico peor entre dos lecturas consecutivas. Se sugiere valorar si hace falta reforzar la regulaci\xF3n en la zona o avisar de rutas alternativas. Dato de origen: Ajuntament de Val\xE8ncia (Mirall, spec 004). Revisar y decidir antes de actuar.`
+      },
+      distritoCodigo: clave === "__ciudad__" ? void 0 : clave,
+      fuenteSpec: ["004"],
+      detectedAt: fetchedAt,
+      fetchedAt
+    };
+  });
+}
+var UMBRAL_TRAFICO_CONCENTRADO_AVISO = 3;
+var UMBRAL_TRAFICO_CONCENTRADO_URGENTE = 6;
+function nombreDistritoOCodigo(distritos2, codigo) {
+  return distritos2?.find((d) => d.distritoCodigo === codigo)?.distritoNombre ?? codigo;
+}
+function insightsTraficoConcentrado(tramos, distritos2, fetchedAt) {
+  const afectadosPorDistrito = /* @__PURE__ */ new Map();
+  const monitorizadosPorDistrito = /* @__PURE__ */ new Map();
+  for (const tramo of tramos) {
+    if (!tramo.distrito) continue;
+    monitorizadosPorDistrito.set(tramo.distrito, (monitorizadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
+    if (tramo.estado === "congestionado" || tramo.estado === "cortado") {
+      afectadosPorDistrito.set(tramo.distrito, (afectadosPorDistrito.get(tramo.distrito) ?? 0) + 1);
+    }
+  }
+  const insights = [];
+  for (const [codigo, afectados] of afectadosPorDistrito) {
+    if (afectados < UMBRAL_TRAFICO_CONCENTRADO_AVISO) continue;
+    const nombre = nombreDistritoOCodigo(distritos2, codigo);
+    const monitorizados = monitorizadosPorDistrito.get(codigo) ?? afectados;
+    const severidad = afectados >= UMBRAL_TRAFICO_CONCENTRADO_URGENTE ? "urgente" : "aviso";
+    insights.push({
+      id: `trafico-concentrado-distrito:${codigo}`,
+      tipo: "trafico-concentrado-distrito",
+      severidad,
+      titulo: `Tr\xE1fico denso concentrado \u2014 ${nombre}`,
+      descripcion: `${afectados} de ${monitorizados} tramos monitorizados en ${nombre} est\xE1n congestionados o cortados ahora mismo.`,
+      protocoloSugerido: {
+        asunto: `Concentraci\xF3n de tr\xE1fico denso \u2014 ${nombre}`,
+        cuerpo: `Se han detectado ${afectados} tramos en estado congestionado o cortado (de ${monitorizados} monitorizados) en ${nombre}. Se sugiere valorar revisar la situaci\xF3n sobre el terreno. Dato de origen: Geoportal Ajuntament de Val\xE8ncia (Mirall, spec 004). Revisar y decidir antes de actuar.`
+      },
+      distritoCodigo: codigo,
+      fuenteSpec: ["004"],
+      detectedAt: fetchedAt,
+      fetchedAt
+    });
+  }
+  return insights;
+}
+function insightsTraficoEnZonaFallas(tramos, fallas, distritos2, fetchedAt) {
+  const distritosConZonaFallas = new Set(
+    fallas.zonasMovilidadReducida.map((z) => z.distrito).filter((d) => d !== null)
+  );
+  if (distritosConZonaFallas.size === 0) return [];
+  const distritosConTraficoDenso = new Set(
+    tramos.filter((t) => t.distrito && (t.estado === "congestionado" || t.estado === "cortado")).map((t) => t.distrito)
+  );
+  const insights = [];
+  for (const codigo of distritosConZonaFallas) {
+    if (!distritosConTraficoDenso.has(codigo)) continue;
+    const nombre = nombreDistritoOCodigo(distritos2, codigo);
+    insights.push({
+      id: `trafico-en-zona-fallas:${codigo}`,
+      tipo: "trafico-en-zona-fallas",
+      severidad: "urgente",
+      titulo: `Tr\xE1fico denso en zona de Fallas activa \u2014 ${nombre}`,
+      descripcion: `${nombre} tiene tr\xE1fico congestionado o cortado y una zona de movilidad reducida de Fallas activa a la vez.`,
+      protocoloSugerido: {
+        asunto: `Concurrencia de tr\xE1fico denso y zona de Fallas \u2014 ${nombre}`,
+        cuerpo: `Se ha detectado tr\xE1fico congestionado o cortado coincidiendo con una zona de movilidad reducida de Fallas activa en ${nombre}. Se sugiere valorar reforzar la zona sobre el terreno. Datos de origen: Geoportal Ajuntament de Val\xE8ncia (Mirall, specs 004 y 008). Revisar y decidir antes de actuar.`
+      },
+      distritoCodigo: codigo,
+      fuenteSpec: ["004", "008"],
+      detectedAt: fetchedAt,
+      fetchedAt
+    });
+  }
+  return insights;
+}
+function insightLluviaMasTrafico(insightsLluvia, tramos, distritos2, fetchedAt) {
+  if (insightsLluvia.length === 0) return null;
+  const distritosConTraficoDenso = Array.from(
+    new Set(
+      tramos.filter((t) => t.distrito && (t.estado === "congestionado" || t.estado === "cortado")).map((t) => t.distrito)
+    )
+  );
+  if (distritosConTraficoDenso.length === 0) return null;
+  const nombres = distritosConTraficoDenso.map((codigo) => nombreDistritoOCodigo(distritos2, codigo)).join(", ");
+  return {
+    id: "lluvia-mas-trafico-denso:ciudad",
+    tipo: "lluvia-mas-trafico-denso",
+    severidad: "urgente",
+    titulo: "Lluvia intensa prevista con tr\xE1fico ya denso",
+    descripcion: `Hay lluvia intensa prevista y tr\xE1fico ya congestionado o cortado en: ${nombres}.`,
+    protocoloSugerido: {
+      asunto: "Lluvia intensa prevista con tr\xE1fico ya denso \u2014 Valencia",
+      cuerpo: `Adem\xE1s de la lluvia intensa prevista, ya hay tr\xE1fico congestionado o cortado en: ${nombres}. Se sugiere valorar priorizar el refuerzo preventivo en esas zonas antes de que llegue la lluvia. Datos de origen: Open-Meteo y Geoportal Ajuntament de Val\xE8ncia (Mirall, specs 016 y 004). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["016", "004"],
+    detectedAt: fetchedAt,
+    fetchedAt
+  };
+}
+var FUENTES_POR_ESCENARIO = {
+  "incidencia-sobre-trafico-denso": ["004", "026"],
+  "fallas-y-trafico": ["004", "008"],
+  "lluvia-inminente-sobre-trafico-denso": ["004", "016"]
+};
+function insightsPulsoDistrito(distritos2, fetchedAt) {
+  const insights = [];
+  for (const d of distritos2) {
+    const activos = d.escenariosActivos.filter((e) => e.modo === "vivo" && e.confirmado);
+    if (activos.length === 0) continue;
+    const fuentes = /* @__PURE__ */ new Set(["010"]);
+    for (const e of activos) for (const f of FUENTES_POR_ESCENARIO[e.id]) fuentes.add(f);
+    const severidad = activos.some((e) => e.nivel === "prioritario") ? "urgente" : "aviso";
+    const motivos = activos.map((e) => e.motivo).join(" ");
+    insights.push({
+      id: `pulso-distrito:${d.distritoCodigo}`,
+      tipo: "pulso-distrito",
+      severidad,
+      titulo: `Pulso \u2014 ${d.distritoNombre} (${activos.length} escenario${activos.length === 1 ? "" : "s"})`,
+      descripcion: motivos + (d.notaAire ? ` ${d.notaAire}` : ""),
+      protocoloSugerido: {
+        asunto: `Pulso de Distrito \u2014 ${d.distritoNombre}`,
+        cuerpo: `${motivos} Se sugiere valorar revisar la situaci\xF3n sobre el terreno o reforzar la regulaci\xF3n en la zona. Dato de origen: Mirall, escenarios de conjunci\xF3n (spec 010). Revisar y decidir antes de actuar.`
+      },
+      distritoCodigo: d.distritoCodigo,
+      fuenteSpec: [...fuentes],
+      detectedAt: d.observedAt,
+      fetchedAt
+    });
+  }
+  return insights;
+}
+var SEVERIDAD_POR_NIVEL_AVISO = {
+  amarillo: "aviso",
+  naranja: "urgente",
+  rojo: "urgente"
+};
+function insightsAvisoOficial(avisos, fetchedAt) {
+  return avisos.map((aviso) => ({
+    id: `aviso-oficial-meteo:${aviso.id}`,
+    tipo: "aviso-oficial-meteo",
+    severidad: SEVERIDAD_POR_NIVEL_AVISO[aviso.nivel],
+    titulo: `Aviso oficial ${aviso.nivel} \u2014 ${aviso.titulo}`,
+    descripcion: aviso.resumen ?? aviso.titulo,
+    protocoloSugerido: {
+      asunto: `Aviso oficial ${aviso.nivel} de fen\xF3menos adversos \u2014 Comunitat Valenciana`,
+      cuerpo: `Emergencias e Interior (Generalitat Valenciana) ha activado un aviso nivel ${aviso.nivel}: "${aviso.titulo}". ${aviso.resumen ?? ""} Fuente: ${aviso.url}. Dato de origen: sala de prensa de Emergencias e Interior, GVA (Mirall, spec 001). Revisar y decidir antes de actuar.`
+    },
+    fuenteSpec: ["001"],
+    detectedAt: aviso.publicadoEn,
+    fetchedAt
+  }));
+}
+function calcularInsights(meteo, aire, distritos2, prediccion, tramosTrafico = null, datosFallas = null, tramosTraficoPrevios = null, avisosOficiales = null) {
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const insightsLluvia = prediccion ? insightsLluviaIntensa(prediccion, fetchedAt) : [];
+  const insights = [
+    insightCalorExtremo(meteo, fetchedAt),
+    insightFrioExtremo(meteo, fetchedAt),
+    insightVientoFuerte(meteo, fetchedAt),
+    insightAireMalaCalidad(aire, fetchedAt),
+    ...insightsLluvia,
+    ...avisosOficiales ? insightsAvisoOficial(avisosOficiales, fetchedAt) : [],
+    ...prediccion ? insightsLluviaPrevista(prediccion, fetchedAt) : [],
+    ...distritos2 ? insightsPulsoDistrito(distritos2, fetchedAt) : [],
+    ...tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos2, fetchedAt) : [],
+    ...tramosTrafico && datosFallas ? insightsTraficoEnZonaFallas(tramosTrafico, datosFallas, distritos2, fetchedAt) : [],
+    ...tramosTrafico ? insightsTraficoEmpeora(tramosTrafico, tramosTraficoPrevios, fetchedAt) : [],
+    ...tramosTrafico ? [insightLluviaMasTrafico(insightsLluvia, tramosTrafico, distritos2, fetchedAt)] : []
+  ].filter((insight) => insight !== null);
+  return { insights, fetchedAt, source: "vlc-monitor-insights" };
+}
+
+// src/services/pulso-escenarios.ts
+var MIN_TRAMOS_MONITORIZACION = 3;
+var PERMANENCIA_TRAS_CONFIRMAR_MS = 20 * 60 * 1e3;
+var PCT_TRAFICO_CONCENTRADO = 0.25;
+var DIAS_INCIDENCIA_RECIENTE = 7;
+var HORIZONTE_LLUVIA_MIN = 120;
+var MAX_TRAMOS_AFECTADOS_MOSTRADOS = 5;
+var CENTRO_CIUDAD_FALLBACK = [-0.3763, 39.4699];
+var IDS_ESCENARIO = [
+  "incidencia-sobre-trafico-denso",
+  "fallas-y-trafico",
+  "lluvia-inminente-sobre-trafico-denso"
+];
+var MODO_POR_ESCENARIO = {
+  "incidencia-sobre-trafico-denso": "vivo",
+  "fallas-y-trafico": "vivo",
+  "lluvia-inminente-sobre-trafico-denso": "sombra"
+};
+var NIVEL_ESTADO = {
+  fluido: 0,
+  denso: 1,
+  congestionado: 2,
+  cortado: 3,
+  "sin-datos": -1
+};
+function claveHisteresis(distrito, escenarioId) {
+  return `${distrito}:${escenarioId}`;
+}
+function tramoAfectadoDe(t) {
+  return { id: t.id, nombre: t.nombre, estado: t.estado, puntoMedio: puntoMedio(t.geometry) };
+}
+function centroideMedio(puntos) {
+  if (puntos.length === 0) return CENTRO_CIUDAD_FALLBACK;
+  const lon = puntos.reduce((s, p) => s + p[0], 0) / puntos.length;
+  const lat = puntos.reduce((s, p) => s + p[1], 0) / puntos.length;
+  return [lon, lat];
+}
+function agregarPorDistrito(distritos2, tramos) {
+  const mapa = /* @__PURE__ */ new Map();
+  for (const d of distritos2) {
+    mapa.set(d.codigo, { codigo: d.codigo, nombre: d.nombre, tramos: [], monitorizados: 0, problematicos: [] });
+  }
+  for (const t of tramos) {
+    if (!t.distrito) continue;
+    const ag = mapa.get(t.distrito);
+    if (!ag) continue;
+    ag.tramos.push(t);
+    ag.monitorizados += 1;
+    if (t.estado === "congestionado" || t.estado === "cortado") ag.problematicos.push(t);
+  }
+  return mapa;
+}
+function trafficoConcentradoConPct(ag) {
+  if (ag.monitorizados === 0) return false;
+  return ag.problematicos.length >= UMBRAL_TRAFICO_CONCENTRADO_AVISO && ag.problematicos.length / ag.monitorizados >= PCT_TRAFICO_CONCENTRADO;
+}
+function trafficoConcentradoAbsoluto(ag, umbral) {
+  return ag.problematicos.length >= umbral;
+}
+function afectaCalzada(inc) {
+  return inc.afectacion.toLowerCase().includes("calzada");
+}
+function incidenciaElegible(inc, ahoraMs) {
+  const tipoOk = inc.tipo === "incidencias" || inc.tipo === "festejos" || inc.tipo === "obras" && afectaCalzada(inc);
+  if (!tipoOk) return false;
+  const dias = (ahoraMs - new Date(inc.vigenciaDesde).getTime()) / 864e5;
+  return dias >= 0 && dias <= DIAS_INCIDENCIA_RECIENTE;
+}
+function detectarIncidenciaSobreTraficoDenso(agregados, incidencias, ahoraMs) {
+  const detecciones = /* @__PURE__ */ new Map();
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const inc of incidencias) {
+    if (!inc.distritoCodigo || !incidenciaElegible(inc, ahoraMs)) continue;
+    const lista = porDistrito.get(inc.distritoCodigo) ?? [];
+    lista.push(inc);
+    porDistrito.set(inc.distritoCodigo, lista);
+  }
+  for (const [codigo, incs] of porDistrito) {
+    const ag = agregados.get(codigo);
+    if (!ag || !trafficoConcentradoConPct(ag)) continue;
+    const inc = incs[0];
+    detecciones.set(codigo, {
+      id: "incidencia-sobre-trafico-denso",
+      nivel: "prioritario",
+      anticipacionMin: null,
+      motivo: `Incidencia "${inc.descripcion}" en ${inc.calle} coincide con ${ag.problematicos.length} tramos de tr\xE1fico denso en ${ag.nombre}.`,
+      zonas: [],
+      centroideAfectado: [inc.lon, inc.lat],
+      tramosAfectados: ag.problematicos.slice(0, MAX_TRAMOS_AFECTADOS_MOSTRADOS).map(tramoAfectadoDe),
+      incidencia: { id: inc.id, descripcion: inc.descripcion, tipo: inc.tipo, lat: inc.lat, lon: inc.lon }
+    });
+  }
+  return detecciones;
+}
+function detectarFallasYTrafico(agregados, zonas) {
+  const detecciones = /* @__PURE__ */ new Map();
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const z of zonas) {
+    if (!z.distrito) continue;
+    const lista = porDistrito.get(z.distrito) ?? [];
+    lista.push(z);
+    porDistrito.set(z.distrito, lista);
+  }
+  for (const [codigo, zs] of porDistrito) {
+    const ag = agregados.get(codigo);
+    if (!ag || ag.problematicos.length === 0) continue;
+    const zona = zs[0];
+    const centroide = centroidePoligono(zona.geometry);
+    detecciones.set(codigo, {
+      id: "fallas-y-trafico",
+      nivel: "prioritario",
+      anticipacionMin: null,
+      motivo: `Zona de movilidad reducida de Fallas activa en ${ag.nombre}, coincidiendo con ${ag.problematicos.length} tramos de tr\xE1fico denso.`,
+      zonas: [],
+      centroideAfectado: centroide,
+      tramosAfectados: ag.problematicos.slice(0, MAX_TRAMOS_AFECTADOS_MOSTRADOS).map(tramoAfectadoDe),
+      zonaFallas: { nombre: zona.descripcion, centroide }
+    });
+  }
+  return detecciones;
+}
+function distritosConTraficoEmpeorado(tramos, previos) {
+  const distritos2 = /* @__PURE__ */ new Set();
+  if (!previos || previos.length === 0) return distritos2;
+  const nivelPrevio = new Map(previos.map((t) => [t.id, NIVEL_ESTADO[t.estado] ?? 0]));
+  for (const t of tramos) {
+    if (!t.distrito) continue;
+    const antes = nivelPrevio.get(t.id);
+    if (antes === void 0) continue;
+    const ahora = NIVEL_ESTADO[t.estado] ?? 0;
+    if (ahora > antes) distritos2.add(t.distrito);
+  }
+  return distritos2;
+}
+function lluviaInminente(prediccion, ahoraMs) {
+  if (!prediccion) return { activa: false, anticipacionMin: null };
+  for (const p of prediccion.predicciones) {
+    const minutos = (new Date(p.horaObjetivo).getTime() - ahoraMs) / 6e4;
+    if (minutos > HORIZONTE_LLUVIA_MIN) continue;
+    if (p.probabilidadPrecipitacion >= UMBRAL_LLUVIA_PROB_PCT || p.precipitacion >= 2) {
+      return { activa: true, anticipacionMin: Math.max(0, Math.round(minutos)) };
+    }
+  }
+  return { activa: false, anticipacionMin: null };
+}
+function detectarLluviaSobreTrafico(agregados, prediccion, tramosEmpeorados, ahoraMs) {
+  const detecciones = /* @__PURE__ */ new Map();
+  const { activa, anticipacionMin } = lluviaInminente(prediccion, ahoraMs);
+  if (!activa) return detecciones;
+  for (const [codigo, ag] of agregados) {
+    const traficoMalo = trafficoConcentradoAbsoluto(ag, UMBRAL_TRAFICO_CONCENTRADO_URGENTE) || tramosEmpeorados.has(codigo);
+    if (!traficoMalo) continue;
+    const tramosRef = ag.problematicos.length > 0 ? ag.problematicos : ag.tramos;
+    detecciones.set(codigo, {
+      id: "lluvia-inminente-sobre-trafico-denso",
+      nivel: "seguimiento",
+      anticipacionMin,
+      // Deliberado: nunca "va a llover en <distrito>" — el nowcast es de
+      // ciudad, la localización la pone el tráfico (spec 010 §3/§7).
+      motivo: `Riesgo de lluvia en la ciudad en los pr\xF3ximos ${anticipacionMin ?? "?"} min, coincidiendo con tr\xE1fico ya denso en ${ag.nombre}.`,
+      zonas: [],
+      centroideAfectado: centroideMedio(tramosRef.map((t) => puntoMedio(t.geometry))),
+      tramosAfectados: ag.problematicos.slice(0, MAX_TRAMOS_AFECTADOS_MOSTRADOS).map(tramoAfectadoDe)
+    });
+  }
+  return detecciones;
+}
+function calcularPulsoEscenarios(entrada, estadoPrevio) {
+  const ahoraIso = entrada.ahora ?? (/* @__PURE__ */ new Date()).toISOString();
+  const ahoraMs = new Date(ahoraIso).getTime();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const agregados = agregarPorDistrito(entrada.distritos, entrada.tramos);
+  const tramosEmpeorados = distritosConTraficoEmpeorado(entrada.tramos, entrada.tramosPrevios);
+  const detecciones = /* @__PURE__ */ new Map([
+    ["incidencia-sobre-trafico-denso", detectarIncidenciaSobreTraficoDenso(agregados, entrada.incidencias, ahoraMs)],
+    ["fallas-y-trafico", detectarFallasYTrafico(agregados, entrada.zonasFallas)],
+    [
+      "lluvia-inminente-sobre-trafico-denso",
+      detectarLluviaSobreTrafico(agregados, entrada.prediccion, tramosEmpeorados, ahoraMs)
+    ]
+  ]);
+  const estadoNuevo = {};
+  const escenariosPorDistrito = /* @__PURE__ */ new Map();
+  for (const d of entrada.distritos) escenariosPorDistrito.set(d.codigo, []);
+  for (const escenarioId of IDS_ESCENARIO) {
+    const porDistrito = detecciones.get(escenarioId);
+    for (const d of entrada.distritos) {
+      const clave = claveHisteresis(d.codigo, escenarioId);
+      const previo = estadoPrevio[clave];
+      const detectadoAhora = porDistrito.get(d.codigo);
+      if (detectadoAhora) {
+        const confirmadoFinal = previo !== void 0;
+        estadoNuevo[clave] = {
+          primeraDeteccion: previo?.primeraDeteccion ?? ahoraIso,
+          ultimaDeteccion: ahoraIso,
+          confirmado: confirmadoFinal,
+          ultimoEscenario: detectadoAhora
+        };
+        escenariosPorDistrito.get(d.codigo).push({ ...detectadoAhora, modo: MODO_POR_ESCENARIO[escenarioId], confirmado: confirmadoFinal });
+        continue;
+      }
+      if (previo?.confirmado && ahoraMs - new Date(previo.ultimaDeteccion).getTime() <= PERMANENCIA_TRAS_CONFIRMAR_MS) {
+        estadoNuevo[clave] = previo;
+        escenariosPorDistrito.get(d.codigo).push({ ...previo.ultimoEscenario, modo: MODO_POR_ESCENARIO[escenarioId], confirmado: true });
+      }
+    }
+  }
+  const distritosResultado = entrada.distritos.map((d) => {
+    const ag = agregados.get(d.codigo);
+    const monitorizados = ag?.monitorizados ?? 0;
+    const escenariosActivos = escenariosPorDistrito.get(d.codigo) ?? [];
+    const nivelesVivosConfirmados = escenariosActivos.filter((e) => e.modo === "vivo" && e.confirmado).map((e) => e.nivel);
+    const nivel = nivelesVivosConfirmados.includes("prioritario") ? "prioritario" : nivelesVivosConfirmados.includes("seguimiento") ? "seguimiento" : "sin-senal";
+    const notaAire = nivel !== "sin-senal" && entrada.aire && (entrada.aire.categoria === "Mala" || entrada.aire.categoria === "Muy mala") ? `Calidad del aire ${entrada.aire.categoria.toLowerCase()} en la ciudad ahora mismo.` : null;
+    return {
+      distritoCodigo: d.codigo,
+      distritoNombre: d.nombre,
+      nivel,
+      monitorizacion: monitorizados < MIN_TRAMOS_MONITORIZACION ? "insuficiente" : "suficiente",
+      tramosMonitorizados: monitorizados,
+      escenariosActivos,
+      notaAire,
+      observedAt: ahoraIso,
+      fetchedAt,
+      source: "vlc-monitor-pulso"
+    };
+  });
+  return { distritos: distritosResultado, estadoHisteresis: estadoNuevo };
+}
+
+// src/services/via-publica.ts
+var TIPO_POR_VALOR_ORIGEN = {
+  OBRAS: "obras",
+  INCIDENCIAS: "incidencias",
+  FESTEJOS: "festejos"
+};
+var GEOPORTAL_VIA_PUBLICA_URL = "https://geoportal.valencia.es/server/rest/services/OPENDATA/Trafico/MapServer/209/query?where=1=1&outFields=*&f=geojson";
+async function fetchIncidenciasViaPublica(resolverDistrito2) {
+  const res = await fetch(GEOPORTAL_VIA_PUBLICA_URL, {
+    headers: { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" }
+  });
+  if (!res.ok) {
+    throw new Error(`Geoportal (v\xEDa p\xFAblica) respondi\xF3 HTTP ${res.status}`);
+  }
+  const body = await res.json();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  return body.features.map((feature) => {
+    const p = feature.properties;
+    if (feature.geometry === null || p.id_incidencia === null || p.desc_incidencia === null || p.tipo_incidencia === null || p.desc_calle === null || p.tipo_afectacion === null || p.fecha_inicio === null || p.fecha_fin === null) {
+      return null;
+    }
+    const tipo = TIPO_POR_VALOR_ORIGEN[p.tipo_incidencia];
+    if (!tipo) return null;
+    const [lon, lat] = feature.geometry.coordinates;
+    return {
+      id: String(p.id_incidencia),
+      descripcion: p.desc_incidencia,
+      tipo,
+      calle: p.desc_calle,
+      afectacion: p.tipo_afectacion,
+      lat,
+      lon,
+      distritoCodigo: resolverDistrito2(lat, lon),
+      vigenciaDesde: new Date(p.fecha_inicio).toISOString(),
+      vigenciaHasta: new Date(p.fecha_fin).toISOString(),
+      fetchedAt,
+      source: "ajuntament-valencia-geoportal"
+    };
+  }).filter((item) => item !== null);
+}
+
+// src/server/pulso-distrito.ts
+setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
+var distritosBasicos = distritosFromGeoJSON(distritos_valencia_default).map((d) => ({
+  codigo: d.codigo,
+  nombre: d.nombre
+}));
+var CLAVE_HISTERESIS_PULSO = "pulso:escenarios-previos:v1";
+var CLAVE_TRAFICO_PREVIO = "insights:trafico:estado-previo";
+async function handler9() {
+  try {
+    const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
+    const [meteoResult, aireResult, traficoResult] = await Promise.all([
+      getOrFetch("meteo:valencia-actual:v1", 15 * 60 * 1e3, fetchEstadoMeteo),
+      getOrFetch("aire:valencia-actual:v1", 60 * 60 * 1e3, fetchCalidadAire),
+      getOrFetch("trafico:valencia-estado:v1", 3 * 60 * 1e3, () => fetchEstadoTrafico(resolverDistrito2))
+    ]);
+    const [incidenciasResult, fallasResult, prediccionResult] = await Promise.allSettled([
+      getOrFetch(
+        "via-publica:incidencias-valencia:v1",
+        60 * 60 * 1e3,
+        () => fetchIncidenciasViaPublica(resolverDistrito2)
+      ),
+      getOrFetch("fallas:valencia-actual:v1", 6 * 60 * 60 * 1e3, () => fetchDatosFallas(resolverDistrito2)),
+      getOrFetch("meteo:valencia-prediccion-4h:v1", 15 * 60 * 1e3, fetchPrediccionCortoPlazo)
+    ]);
+    const incidencias = incidenciasResult.status === "fulfilled" ? incidenciasResult.value.value.filter((i) => new Date(i.vigenciaHasta).getTime() >= Date.now()) : [];
+    const zonasFallas = fallasResult.status === "fulfilled" ? fallasResult.value.value.zonasMovilidadReducida : [];
+    const prediccion = prediccionResult.status === "fulfilled" ? prediccionResult.value.value : null;
+    const tramosTraficoPrevios = cachePeek(CLAVE_TRAFICO_PREVIO) ?? null;
+    const estadoHisteresisPrevio = cachePeek(CLAVE_HISTERESIS_PULSO) ?? {};
+    const { distritos: distritos2, estadoHisteresis } = calcularPulsoEscenarios(
+      {
+        distritos: distritosBasicos,
+        tramos: traficoResult.value,
+        incidencias,
+        zonasFallas,
+        prediccion,
+        aire: aireResult.value,
+        tramosPrevios: tramosTraficoPrevios
+      },
+      estadoHisteresisPrevio
+    );
+    cachePoke(CLAVE_HISTERESIS_PULSO, estadoHisteresis, 30 * 60 * 1e3);
+    cachePoke(CLAVE_TRAFICO_PREVIO, traficoResult.value, 15 * 60 * 1e3);
+    const fresh = meteoResult.fresh && aireResult.fresh && traficoResult.fresh;
+    return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=60, stale-while-revalidate=180"
+      }
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
+      { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
+    );
+  }
+}
+
 // src/server/insights-actual.ts
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
 var distritosBasicos2 = distritosFromGeoJSON(distritos_valencia_default).map((d) => ({
@@ -51235,23 +54471,40 @@ var distritosBasicos2 = distritosFromGeoJSON(distritos_valencia_default).map((d)
   nombre: d.nombre
 }));
 var resolverDistrito = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
-async function handler9() {
+var CLAVE_TRAFICO_PREVIO2 = "insights:trafico:estado-previo";
+var CLAVE_HISTERESIS_PULSO2 = "pulso:escenarios-previos:v1";
+async function handler10() {
   try {
     const [meteoResult, aireResult] = await Promise.all([
       getOrFetch("meteo:valencia-actual:v1", 15 * 60 * 1e3, fetchEstadoMeteo),
       getOrFetch("aire:valencia-actual:v1", 60 * 60 * 1e3, fetchCalidadAire)
     ]);
-    const [prediccionResult, traficoResult, fallasResult] = await Promise.allSettled([
+    const [prediccionResult, traficoResult, fallasResult, incidenciasResult, avisosResult] = await Promise.allSettled([
       getOrFetch("meteo:valencia-prediccion-4h:v1", 15 * 60 * 1e3, fetchPrediccionCortoPlazo),
       getOrFetch("trafico:valencia-estado:v1", 3 * 60 * 1e3, () => fetchEstadoTrafico(resolverDistrito)),
-      getOrFetch("fallas:valencia-actual:v1", 6 * 60 * 60 * 1e3, () => fetchDatosFallas(resolverDistrito))
+      getOrFetch("fallas:valencia-actual:v1", 6 * 60 * 60 * 1e3, () => fetchDatosFallas(resolverDistrito)),
+      getOrFetch("via-publica:incidencias-valencia:v1", 60 * 60 * 1e3, () => fetchIncidenciasViaPublica(resolverDistrito)),
+      getOrFetch("meteo:valencia-avisos:v1", 15 * 60 * 1e3, fetchAvisosVigentes)
     ]);
     const prediccion = prediccionResult.status === "fulfilled" ? prediccionResult.value.value : null;
     const tramosTrafico = traficoResult.status === "fulfilled" ? traficoResult.value.value : null;
     const datosFallas = fallasResult.status === "fulfilled" ? fallasResult.value.value : null;
-    const distritos2 = tramosTrafico ? calcularPulsoDistrito(distritosBasicos2, meteoResult.value, aireResult.value, tramosTrafico) : null;
-    const CLAVE_TRAFICO_PREVIO = "insights:trafico:estado-previo";
-    const tramosTraficoPrevios = cachePeek(CLAVE_TRAFICO_PREVIO) ?? null;
+    const incidencias = incidenciasResult.status === "fulfilled" ? incidenciasResult.value.value.filter((i) => new Date(i.vigenciaHasta).getTime() >= Date.now()) : [];
+    const avisosOficiales = avisosResult.status === "fulfilled" ? avisosResult.value.value.avisos : null;
+    const tramosTraficoPrevios = cachePeek(CLAVE_TRAFICO_PREVIO2) ?? null;
+    const estadoHisteresisPrevio = cachePeek(CLAVE_HISTERESIS_PULSO2) ?? {};
+    const { distritos: distritos2, estadoHisteresis } = calcularPulsoEscenarios(
+      {
+        distritos: distritosBasicos2,
+        tramos: tramosTrafico ?? [],
+        incidencias,
+        zonasFallas: datosFallas?.zonasMovilidadReducida ?? [],
+        prediccion,
+        aire: aireResult.value,
+        tramosPrevios: tramosTraficoPrevios
+      },
+      estadoHisteresisPrevio
+    );
     const panel = calcularInsights(
       meteoResult.value,
       aireResult.value,
@@ -51259,9 +54512,11 @@ async function handler9() {
       prediccion,
       tramosTrafico,
       datosFallas,
-      tramosTraficoPrevios
+      tramosTraficoPrevios,
+      avisosOficiales
     );
-    if (tramosTrafico) cachePoke(CLAVE_TRAFICO_PREVIO, tramosTrafico, 15 * 60 * 1e3);
+    if (tramosTrafico) cachePoke(CLAVE_TRAFICO_PREVIO2, tramosTrafico, 15 * 60 * 1e3);
+    cachePoke(CLAVE_HISTERESIS_PULSO2, estadoHisteresis, 30 * 60 * 1e3);
     const fresh = meteoResult.fresh && aireResult.fresh;
     return new Response(JSON.stringify({ panel, fresh }), {
       status: 200,
@@ -51279,14 +54534,14 @@ async function handler9() {
 }
 
 // src/server/fallas-actual.ts
-var CACHE_KEY7 = "fallas:valencia-actual:v1";
-var TTL_MS7 = 6 * 60 * 60 * 1e3;
+var CACHE_KEY8 = "fallas:valencia-actual:v1";
+var TTL_MS8 = 6 * 60 * 60 * 1e3;
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-async function handler10() {
+async function handler11() {
   try {
     const { value: datos, fresh } = await getOrFetch(
-      CACHE_KEY7,
-      TTL_MS7,
+      CACHE_KEY8,
+      TTL_MS8,
       () => fetchDatosFallas((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
     );
     return new Response(JSON.stringify({ ...datos, fresh }), {
@@ -51774,6 +55029,22 @@ var DESAMBIGUACION = preparar(lexico_ambito_ciudad_default.desambiguacion);
 var DEPORTE_CRONICA = preparar(lexico_ambito_ciudad_default.deporteCronica);
 var DEPORTE_LOGISTICO = preparar(lexico_ambito_ciudad_default.deporteLogistico);
 var PREPOSICIONES = preparar(lexico_ambito_ciudad_default.preposicionesLocativas);
+var MARCADORES_FUTBOL = preparar([
+  "valencia cf",
+  "valencia c f",
+  "levante ud",
+  "levante u d",
+  "mestalla",
+  "laliga",
+  "la liga",
+  "primera division",
+  "segunda division",
+  "champions league",
+  "liga de campeones",
+  "europa league",
+  "copa del rey",
+  "supercopa"
+]);
 var MUNICIPIOS = municipios_provincia_valencia_default.municipios.map((m) => ({
   etiqueta: m.nombre,
   patrones: preparar([m.nombre, ...m.alias ?? []]),
@@ -51806,7 +55077,7 @@ function municipioMencionado(textoNorm, textoPad) {
   }
   return null;
 }
-function mencionaValencia(textoPad) {
+function mencionaValencia2(textoPad) {
   return contiene(textoPad, "valencia") || contiene(textoPad, "valencia ciutat") || contiene(textoPad, "valencia capital");
 }
 function clasificarAmbitoCiudad(entrada) {
@@ -51815,8 +55086,12 @@ function clasificarAmbitoCiudad(entrada) {
   const hitLogistico = primeraCoincidencia(textoPad, DEPORTE_LOGISTICO);
   const hitCronica = primeraCoincidencia(textoPad, DEPORTE_CRONICA);
   const esDeporte = hitLogistico !== null || hitCronica !== null;
-  const soloCronica = hitCronica !== null && hitLogistico === null;
-  const categoria = esDeporte ? "deporte" : entrada.categoriaFuente === "ocio" ? "ocio" : "general";
+  const hitFutbol = primeraCoincidencia(textoPad, MARCADORES_FUTBOL);
+  const esFutbol = hitFutbol !== null;
+  const categoria = esDeporte ? "deporte" : "general";
+  if (esDeporte && !esFutbol) {
+    return { ambito: "excluido", categoria, motivo: `deporte no-f\xFAtbol: ${hitCronica ?? hitLogistico}` };
+  }
   if (entrada.distritosMencionados.length > 0) {
     const nombres = entrada.distritosMencionados.map((d) => d.distritoNombre).join(", ");
     return { ambito: "confirmado", categoria, motivo: `distrito/barrio: ${nombres}` };
@@ -51835,13 +55110,10 @@ function clasificarAmbitoCiudad(entrada) {
   if (municipio) return { ambito: "excluido", categoria, motivo: `municipio ajeno: ${municipio}` };
   const regional = primeraCoincidencia(textoPad, REGIONALES);
   if (regional) return { ambito: "excluido", categoria, motivo: `\xE1mbito regional: ${regional}` };
-  if (soloCronica) {
-    return { ambito: "excluido", categoria, motivo: `deporte (cr\xF3nica): ${hitCronica}` };
-  }
   if (entrada.fuenteCityOnly) {
     return { ambito: "confirmado", categoria, motivo: "fuente 100% ciudad" };
   }
-  if (mencionaValencia(textoPad)) {
+  if (mencionaValencia2(textoPad)) {
     return { ambito: "general", categoria, motivo: "menciona Val\xE8ncia, sin barrio ni hito" };
   }
   return { ambito: "excluido", categoria, motivo: "sin se\xF1al de Valencia ciudad" };
@@ -51861,8 +55133,7 @@ function clasificarYFiltrar(items, cfg) {
       titulo: item.titulo,
       resumen: item.resumen,
       distritosMencionados: item.distritosMencionados,
-      fuenteCityOnly: cfg.cityOnly,
-      categoriaFuente: cfg.categoriaFuente
+      fuenteCityOnly: cfg.cityOnly
     });
     if (clasificacion.ambito === "excluido") continue;
     salida.push({
@@ -51874,8 +55145,8 @@ function clasificarYFiltrar(items, cfg) {
   }
   return salida;
 }
-var HEADERS2 = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
-var ENTIDADES_HTML = {
+var HEADERS3 = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
+var ENTIDADES_HTML2 = {
   amp: "&",
   lt: "<",
   gt: ">",
@@ -51905,24 +55176,24 @@ var ENTIDADES_HTML = {
   rdquo: "\u201D",
   sup2: "\xB2"
 };
-function decodeEntities(texto) {
-  return texto.replace(/&#(\d+);/g, (_, dec2) => String.fromCharCode(Number(dec2))).replace(/&#x([0-9a-fA-F]+);/g, (_, hex2) => String.fromCharCode(parseInt(hex2, 16))).replace(/&([a-zA-Z]+);/g, (match, nombre) => ENTIDADES_HTML[nombre] ?? match);
+function decodeEntities2(texto) {
+  return texto.replace(/&#(\d+);/g, (_, dec2) => String.fromCharCode(Number(dec2))).replace(/&#x([0-9a-fA-F]+);/g, (_, hex2) => String.fromCharCode(parseInt(hex2, 16))).replace(/&([a-zA-Z]+);/g, (match, nombre) => ENTIDADES_HTML2[nombre] ?? match);
 }
 function extraerTag(bloque, tag) {
   const conCdata = new RegExp(
     `<${tag}[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tag}>`,
     "i"
   ).exec(bloque);
-  if (conCdata?.[1] !== void 0) return decodeEntities(conCdata[1].trim());
+  if (conCdata?.[1] !== void 0) return decodeEntities2(conCdata[1].trim());
   const plano = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i").exec(bloque);
-  if (plano?.[1] !== void 0) return decodeEntities(plano[1].trim());
+  if (plano?.[1] !== void 0) return decodeEntities2(plano[1].trim());
   return null;
 }
 function extraerImagenMedia(bloque) {
   const m = /<media:content[^>]*\burl="([^"]+)"/i.exec(bloque);
   return m?.[1] ?? null;
 }
-function limpiarHtml(texto) {
+function limpiarHtml2(texto) {
   if (texto === null) return null;
   const limpio = texto.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").replace(/\s*(?:The post .+? appeared first on|La entrada .+? se publicó primero en)[\s\S]*$/i, "").replace(/\s*(?:\[…\]|\[\.\.\.\]|Leer más|Seguir leyendo|Continue reading)\s*$/i, "").trim();
   return limpio.length > 0 ? limpio : null;
@@ -51939,7 +55210,7 @@ function parsearRss(xml, fuente, fetchedAt, fuenteTipo = "rss-nativo") {
     return {
       id: url,
       titulo,
-      resumen: limpiarHtml(extraerTag(bloque, "description")),
+      resumen: limpiarHtml2(extraerTag(bloque, "description")),
       url,
       fuente,
       fuenteTipo,
@@ -51984,7 +55255,7 @@ function parsearGoogleNews(xml, fetchedAt, etiqueta) {
   return enrichWithDistricts(items);
 }
 async function fetchRssFuente(url, fuente, cfg) {
-  const res = await fetch(url, { headers: HEADERS2 });
+  const res = await fetch(url, { headers: HEADERS3 });
   if (!res.ok) {
     throw new Error(`RSS ${fuente} respondi\xF3 HTTP ${res.status}`);
   }
@@ -51996,7 +55267,7 @@ function googleNewsUrl(query) {
   return `${GOOGLE_NEWS_BASE}?q=${encodeURIComponent(query)}&hl=es&gl=ES&ceid=ES:es`;
 }
 async function fetchGoogleNewsFuente(query, etiqueta, cfg) {
-  const res = await fetch(googleNewsUrl(query), { headers: HEADERS2 });
+  const res = await fetch(googleNewsUrl(query), { headers: HEADERS3 });
   if (!res.ok) {
     throw new Error(`Google News (${etiqueta}) respondi\xF3 HTTP ${res.status}`);
   }
@@ -52021,16 +55292,10 @@ function fetchVeinteMinutos() {
   );
 }
 function fetchValenciaSecreta() {
-  return fetchRssFuente("https://valenciasecreta.com/feed/", "Valencia Secreta", {
-    cityOnly: true,
-    categoriaFuente: "ocio"
-  });
+  return fetchRssFuente("https://valenciasecreta.com/feed/", "Valencia Secreta", { cityOnly: true });
 }
 function fetchValenciaBonita() {
-  return fetchRssFuente("https://www.valenciabonita.es/feed/", "Valencia Bonita", {
-    cityOnly: true,
-    categoriaFuente: "ocio"
-  });
+  return fetchRssFuente("https://www.valenciabonita.es/feed/", "Valencia Bonita", { cityOnly: true });
 }
 function fetchGoogleNewsLevante() {
   return fetchGoogleNewsFuente("Val\xE8ncia site:levante-emv.com when:2d", "Levante-EMV", {
@@ -52207,11 +55472,11 @@ function deduplicarNoticias(items) {
 }
 
 // src/server/mediatico-items.ts
-var TTL_MS8 = 15 * 60 * 1e3;
+var TTL_MS9 = 15 * 60 * 1e3;
 var MAX_ITEMS = 40;
-async function handler11() {
+async function handler12() {
   const resultados = await Promise.allSettled(
-    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS8, f.fetcher))
+    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS9, f.fetcher))
   );
   const items = [];
   const fuentesFallidas = [];
@@ -52445,12 +55710,12 @@ function calcularTendenciaTerminos(items, ventana, ahora = /* @__PURE__ */ new D
 }
 
 // src/server/mediatico-tendencia.ts
-var TTL_MS9 = 15 * 60 * 1e3;
-async function handler12(req) {
+var TTL_MS10 = 15 * 60 * 1e3;
+async function handler13(req) {
   const url = new URL(req.url);
   const ventana = url.searchParams.get("ventana") === "dia" ? "dia" : "hora";
   const resultados = await Promise.allSettled(
-    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS9, f.fetcher))
+    FUENTES_MEDIATICAS.map((f) => getOrFetch(f.cacheKey, TTL_MS10, f.fetcher))
   );
   const items = [];
   let fuentesOk = 0;
@@ -52481,14 +55746,14 @@ async function handler12(req) {
 }
 
 // src/server/via-publica-incidencias.ts
-var CACHE_KEY8 = "via-publica:incidencias-valencia:v1";
-var TTL_MS10 = 60 * 60 * 1e3;
+var CACHE_KEY9 = "via-publica:incidencias-valencia:v1";
+var TTL_MS11 = 60 * 60 * 1e3;
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-async function handler13() {
+async function handler14() {
   try {
     const { value: todas, fresh } = await getOrFetch(
-      CACHE_KEY8,
-      TTL_MS10,
+      CACHE_KEY9,
+      TTL_MS11,
       () => fetchIncidenciasViaPublica((lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null)
     );
     const ahora = Date.now();
@@ -52509,7 +55774,7 @@ async function handler13() {
 }
 
 // src/server/geo-distritos.ts
-async function handler14() {
+async function handler15() {
   const distritos2 = distritosFromGeoJSON(distritos_valencia_default);
   return new Response(JSON.stringify({ distritos: distritos2 }), {
     status: 200,
@@ -52606,7 +55871,7 @@ function horaActualSimulada() {
   const horas = (/* @__PURE__ */ new Date()).getUTCHours() + 2;
   return `${String(horas % 24).padStart(2, "0")}:00`;
 }
-async function handler15(req) {
+async function handler16(req) {
   const url = new URL(req.url);
   const hora = url.searchParams.get("hora") ?? horaActualSimulada();
   try {
@@ -52625,6 +55890,995 @@ async function handler15(req) {
       status: 400,
       headers: { "content-type": "application/json; charset=utf-8" }
     });
+  }
+}
+
+// data/agenda-eventos.json
+var agenda_eventos_default = {
+  eventos: [
+    {
+      id: "rutas-tematizadas-lengua-signos",
+      titulo: "Rutas tematizadas con int\xE9rprete de lengua de signos",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-09-23T00:00:00.000Z",
+      fechaFin: "2026-09-27T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/rutas-tematizadas-lengua-signos",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "semana-europea-de-la-movilidad-2026",
+      titulo: "SEMANA EUROPEA DE LA MOVILIDAD 2026",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-09-16T00:00:00.000Z",
+      fechaFin: "2026-09-22T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/semana-europea-de-la-movilidad-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "xvi-russafa-escenica",
+      titulo: "XVI RUSSAFA ESC\xC8NICA",
+      categoria: "FESTIVALES",
+      fechaInicio: "2026-09-16T00:00:00.000Z",
+      fechaFin: "2026-09-27T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/xvi-russafa-escenica",
+      distritosMencionados: [
+        {
+          distritoCodigo: "02",
+          distritoNombre: "l'Eixample",
+          coincidencia: "barrio",
+          textoCoincidente: "Russafa",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-aben-al-abbar-programacion",
+      titulo: "CC Aben Al-Abbar: programaci\xF3n semanal",
+      categoria: "CINE",
+      fechaInicio: "2026-09-14T00:00:00.000Z",
+      fechaFin: "2026-09-20T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-aben-al-abbar-programacion",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "valencia-design-fest-2026",
+      titulo: "VAL\xC8NCIA DESIGN FEST 2026",
+      categoria: "FESTIVALES",
+      fechaInicio: "2026-09-10T00:00:00.000Z",
+      fechaFin: "2026-10-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/valencia-design-fest-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicion-teresa-navarro",
+      titulo: "Expo Teresa Navarro 'La vida a trav\xE9s de la discapacidad'",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-09-09T00:00:00.000Z",
+      fechaFin: "2026-09-27T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-teresa-navarro",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "oficina-de-l-energia-actividades-gratuitas",
+      titulo: "Oficina de l'Energia: actividades gratuitas",
+      categoria: "TALLERES",
+      fechaInicio: "2026-09-08T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/oficina-de-l-energia-actividades-gratuitas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "centros-culturales-municipales",
+      titulo: "CENTROS CULTURALES MUNICIPALES",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/centros-culturales-municipales",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-escorxador-programacion-2025-26",
+      titulo: "CC Escorxador - Programaci\xF3n de septiembre",
+      categoria: "ENCUENTROS",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-09-30T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-escorxador-programacion-2025-26",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-reina-121-programacion",
+      titulo: "CC Reina 121 - Programaci\xF3n de septiembre",
+      categoria: "ENCUENTROS",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-09-30T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-reina-121-programacion",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-alqueria-albors",
+      titulo: "CC Alqueria d'Albors - Programaci\xF3n de septiembre",
+      categoria: "CINE",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-09-30T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-alqueria-albors",
+      distritosMencionados: [
+        {
+          distritoCodigo: "12",
+          distritoNombre: "Camins al Grau",
+          coincidencia: "barrio",
+          textoCoincidente: "Albors",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-nave-3-ribes-cas",
+      titulo: "CC Nave 3 Ribes - Programaci\xF3n de septiembre",
+      categoria: "CINE",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-09-30T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-nave-3-ribes-cas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "alqueria-dels-moros-visitas-gratuitas",
+      titulo: "Alqueria dels moros - Visitas gratuitas",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-09-01T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/alqueria-dels-moros-visitas-gratuitas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicion-macroarte-de-tony-tirado-el-paleontologic",
+      titulo: "Exposici\xF3n 'MacroArte' de Tony Tirado - El Paleontol\xF2gic",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-07-09T00:00:00.000Z",
+      fechaFin: "2026-11-15T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-macroarte-de-tony-tirado-el-paleontologic",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "pobles-del-sud-rutas-guiadas",
+      titulo: "Pobles del Sud - Rutas guiadas",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-06-27T00:00:00.000Z",
+      fechaFin: "2026-09-19T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pobles-del-sud-rutas-guiadas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicion-altres",
+      titulo: "Exposici\xF3n 'ALTRES' - Sala Municipal de Exposiciones",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-06-26T00:00:00.000Z",
+      fechaFin: "2026-11-29T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-altres",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "un-estiu-amb-molt-d-esport-2026",
+      titulo: "'UN ESTIU AMB MOLT D'ESPORT' 2026",
+      categoria: "DEPORTES",
+      fechaInicio: "2026-06-01T00:00:00.000Z",
+      fechaFin: "2026-09-30T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/un-estiu-amb-molt-d-esport-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exhibiciones-de-vela-latina-lago-de-la-albufera-2026",
+      titulo: "EXHIBICIONES DE VELA LATINA - L'ALBUFERA",
+      categoria: "OCIO ALTERNATIVO",
+      fechaInicio: "2026-05-30T00:00:00.000Z",
+      fechaFin: "2026-10-03T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exhibiciones-de-vela-latina-lago-de-la-albufera-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "ruta-santo-caliz-visitas-guiadas",
+      titulo: "Ruta Santo C\xE1liz: visitas guiadas gratuitas",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-05-09T00:00:00.000Z",
+      fechaFin: "2026-10-25T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-santo-caliz-visitas-guiadas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicion-la-valencia-de-blasco-ibanez",
+      titulo: "Exposici\xF3n 'La Val\xE8ncia de Blasco Ib\xE1\xF1ez'",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-02-12T00:00:00.000Z",
+      fechaFin: "2026-12-12T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-la-valencia-de-blasco-ibanez",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "bioparc-valencia",
+      titulo: "Bioparc - Agenda de actividades",
+      categoria: "OCIO ALTERNATIVO",
+      fechaInicio: "2026-01-03T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/bioparc-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "ruta-dones-de-ciencia",
+      titulo: "Murales 'Dones de Ci\xE8ncia'",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-03T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-dones-de-ciencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "ruta-cultural-anell-ciclista",
+      titulo: "RUTA CULTURAL 'ANILLO CICLISTA'",
+      categoria: "RUTAS CULTURALES",
+      fechaInicio: "2026-01-03T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-cultural-anell-ciclista",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "ruta-dels-arbres-monumentals-de-valencia",
+      titulo: "RUTAS DE LOS \xC1RBOLES MONUMENTALES DE VAL\xC8NCIA",
+      categoria: "",
+      fechaInicio: "2026-01-03T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-dels-arbres-monumentals-de-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-cultural-museu-de-les-ciencies",
+      titulo: "Museo de las Ciencias - Programaci\xF3n",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-museu-de-les-ciencies",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "loco-club-programaci%C3%B3",
+      titulo: "Loco Club \u2013 Programaci\xF3n",
+      categoria: "M\xDASICA",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/loco-club-programaci%C3%B3",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "la-mutant-espai-d-arts-vives",
+      titulo: "La Mutant - Espai d'Arts Vives. Actividades",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/la-mutant-espai-d-arts-vives",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-cultural-centre-del-carme",
+      titulo: "Centre del Carme - Programaci\xF3n cultural",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-centre-del-carme",
+      distritosMencionados: [
+        {
+          distritoCodigo: "01",
+          distritoNombre: "Ciutat Vella",
+          coincidencia: "barrio",
+          textoCoincidente: "El Carme",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "catedral-de-valencia",
+      titulo: "Catedral de Val\xE8ncia",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/catedral-de-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "ivac-filmoteca-programacio",
+      titulo: "IVAC Filmoteca - Programaci\xF3n",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ivac-filmoteca-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-cultural-caixaforum-valencia",
+      titulo: "CaixaForum Val\xE8ncia - Programaci\xF3n cultural",
+      categoria: "CONFERENCIAS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-caixaforum-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "museu-de-prehistoria-de-valencia",
+      titulo: "Museo de Prehistoria de Val\xE8ncia - Actividades",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-de-prehistoria-de-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "fundacion-canada-blanch-programacion-cultural",
+      titulo: "Fundaci\xF3n Ca\xF1ada Blanch \u2013 Programaci\xF3n cultural",
+      categoria: "CONFERENCIAS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/fundacion-canada-blanch-programacion-cultural",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "sala-russafa-programacio-cultural",
+      titulo: "Sala Russafa - Programaci\xF3n cultural",
+      categoria: "DANZA",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/sala-russafa-programacio-cultural",
+      distritosMencionados: [
+        {
+          distritoCodigo: "02",
+          distritoNombre: "l'Eixample",
+          coincidencia: "barrio",
+          textoCoincidente: "Russafa",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "el-centre-museistic-la-beneficencia",
+      titulo: "El Centro Muse\xEDstico 'La Beneficencia' - Actividades",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/el-centre-museistic-la-beneficencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-escalante-programacio",
+      titulo: "Escalante - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-escalante-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-principal-programacio",
+      titulo: "Teatro Principal - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-principal-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "collegi-major-rector-peset-programacio",
+      titulo: "Colegio Mayor Rector Peset - Programaci\xF3n cultural",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/collegi-major-rector-peset-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "museu-faller-de-valencia",
+      titulo: "Museo Fallero de Val\xE8ncia",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-faller-de-valencia",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-el-musical-programacio",
+      titulo: "Teatro El Musical \u2013 Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-el-musical-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-fins-a-final-d-any-teatre-flumen",
+      titulo: "Teatro Flumen - Programaci\xF3n",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-fins-a-final-d-any-teatre-flumen",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "museo-valencia-d-etnologia-actividades",
+      titulo: "L'ETNO, Museu Valenci\xE0 d'Etnologia- Programaci\xF3n",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museo-valencia-d-etnologia-actividades",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacion-cultural-teatro-circulo",
+      titulo: "Teatro C\xEDrculo - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacion-cultural-teatro-circulo",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "museu-de-la-setmana-santa-marinera",
+      titulo: "Museo de la Semana Santa Marinera",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-de-la-setmana-santa-marinera",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cafe-mercedes-jazz-programacio",
+      titulo: "Caf\xE9 Mercedes Jazz - Programaci\xF3n",
+      categoria: "M\xDASICA",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cafe-mercedes-jazz-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-teatro-la-estrella",
+      titulo: "Teatro La Estrella - Programaci\xF3n",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-teatro-la-estrella",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-muvim",
+      titulo: "MUVIM - Programaci\xF3n cultural",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-muvim",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-cultural-octubre-centre-de-cultura-contemporania",
+      titulo: "Octubre CCC - Programaci\xF3n cultural",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-octubre-centre-de-cultura-contemporania",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "sala-exposicions-edifici-del-rellotge",
+      titulo: "Sala de exposiciones 'Edificio del Reloj' - Programaci\xF3n",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/sala-exposicions-edifici-del-rellotge",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "fira-de-valencia-agenda",
+      titulo: "Feria de Val\xE8ncia - Agenda de eventos",
+      categoria: "FERIAS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/fira-de-valencia-agenda",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "bombas-gens-centre-d-arts-digitals-cas",
+      titulo: "Bombas Gens Centre d'Arts Digitals - Actividades",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/bombas-gens-centre-d-arts-digitals-cas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "museo-iluziona-cas",
+      titulo: "Museo Iluziona",
+      categoria: "OCIO ALTERNATIVO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museo-iluziona-cas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "casa-de-la-ciencia-del-csic-programacion",
+      titulo: "Casa de la Ci\xE8ncia del CSIC - Programaci\xF3n",
+      categoria: "CONFERENCIAS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/casa-de-la-ciencia-del-csic-programacion",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "institut-interuniversitari-lopez-pinero-programacio",
+      titulo: "Instituto Interuniversitario L\xF3pez Pi\xF1ero - Programaci\xF3n",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/institut-interuniversitari-lopez-pinero-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "jimmy-glass-jazz-programacio",
+      titulo: "Jimmy Glass Jazz - Programaci\xF3n",
+      categoria: "M\xDASICA",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/jimmy-glass-jazz-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "hemisferic-ciutat-arts-i-ciencies-programacio",
+      titulo: "Hemisf\xE8ric - Programaci\xF3n",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/hemisferic-ciutat-arts-i-ciencies-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicio-permanent-a-l-alqueria-de-felix",
+      titulo: "Exposici\xF3n permanente en La Alquer\xEDa de F\xE9lix",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicio-permanent-a-l-alqueria-de-felix",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "programacio-fins-a-final-d-any-carme-teatre",
+      titulo: "Carme Teatre - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-fins-a-final-d-any-carme-teatre",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-olympia-programaci%C3%B3",
+      titulo: "Teatro Olympia - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-olympia-programaci%C3%B3",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-talia-programacio",
+      titulo: "Teatro Talia - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-talia-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "drassanes-del-grau",
+      titulo: "Atarazanas del Grao",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/drassanes-del-grau",
+      distritosMencionados: [
+        {
+          distritoCodigo: "11",
+          distritoNombre: "Poblats Maritims",
+          coincidencia: "barrio",
+          textoCoincidente: "El Grao",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "centre-cultural-bancaixa",
+      titulo: "Centro Cultural Bancaja - Actividades",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/centre-cultural-bancaixa",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "pogramacio-cultural-jardi-botanic",
+      titulo: "Jard\xEDn Bot\xE1nico - Programaci\xF3n",
+      categoria: "CURSOS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pogramacio-cultural-jardi-botanic",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "black-note-club-programacio",
+      titulo: "Black Note Club - Programaci\xF3n",
+      categoria: "M\xDASICA",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/black-note-club-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "pogramacio-cultural-ateneo",
+      titulo: "Ateneo Mercantil - Programaci\xF3n cultural",
+      categoria: "CINE",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pogramacio-cultural-ateneo",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "palau-de-congressos-de-valencia-activitats",
+      titulo: "Palacio de Congresos de Val\xE8ncia - Actividades",
+      categoria: "CONGRESOS",
+      fechaInicio: "2026-01-02T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/palau-de-congressos-de-valencia-activitats",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "teatre-rialto-programacio",
+      titulo: "Teatro Rialto - Programaci\xF3n",
+      categoria: "TEATRO",
+      fechaInicio: "2026-01-01T00:00:00.000Z",
+      fechaFin: "2026-12-31T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-rialto-programacio",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "almudin-exposicion-iii-ano-jubilar-santo-caliz",
+      titulo: "Almud\xEDn - Exposici\xF3n por el III A\xF1o Jubilar del Santo C\xE1liz",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2025-10-30T00:00:00.000Z",
+      fechaFin: "2026-10-29T00:00:00.000Z",
+      resumen: null,
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/almudin-exposicion-iii-ano-jubilar-santo-caliz",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-16T08:55:15.992Z",
+      source: "ajuntament-valencia-scraping"
+    }
+  ],
+  fetchedAt: "2026-09-16T08:55:15.992Z",
+  estructuraSospechosa: false
+};
+
+// src/server/agenda-eventos.ts
+async function handler17() {
+  const datos = agenda_eventos_default;
+  return new Response(JSON.stringify(datos), {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "public, max-age=600, stale-while-revalidate=3600"
+    }
+  });
+}
+
+// src/services/apoyo-decision.ts
+var SE\u00D1ALES_POR_ESCENARIO = {
+  "incidencia-sobre-trafico-denso": ["incidencia-via-publica", "trafico-denso"],
+  "fallas-y-trafico": ["zona-fallas", "trafico-denso"],
+  "lluvia-inminente-sobre-trafico-denso": ["lluvia-inminente", "trafico-denso"]
+};
+var FUENTES_POR_ESCENARIO2 = {
+  "incidencia-sobre-trafico-denso": ["010", "004", "026"],
+  "fallas-y-trafico": ["010", "004", "008"],
+  "lluvia-inminente-sobre-trafico-denso": ["010", "004", "016"]
+};
+function calleDe(escenario) {
+  return escenario.tramosAfectados[0]?.nombre || void 0;
+}
+function sugerenciaTextoPara(escenario, distritoNombre) {
+  const calle = calleDe(escenario);
+  const dondeCalle = calle ? `${calle} (${distritoNombre})` : distritoNombre;
+  switch (escenario.id) {
+    case "incidencia-sobre-trafico-denso":
+      return `Podr\xEDa convenir valorar reforzar la regulaci\xF3n de tr\xE1fico en ${dondeCalle}, donde hay una incidencia coincidiendo con tr\xE1fico ya denso.`;
+    case "fallas-y-trafico":
+      return `Podr\xEDa convenir valorar reforzar la zona de Fallas en ${distritoNombre}, donde la zona de movilidad reducida coincide con tr\xE1fico ya denso.`;
+    case "lluvia-inminente-sobre-trafico-denso":
+      return `Podr\xEDa convenir valorar preposicionar unidades cerca de ${dondeCalle} ante la lluvia prevista, que coincide con tr\xE1fico ya denso en la zona.`;
+  }
+}
+function sugerenciaDeEscenario(distrito, escenario, generadaEn) {
+  return {
+    id: `${distrito.distritoCodigo}:${escenario.id}`,
+    distrito: distrito.distritoNombre,
+    calle: calleDe(escenario),
+    se\u00F1alesCombinadas: SE\u00D1ALES_POR_ESCENARIO[escenario.id],
+    resumen: escenario.motivo,
+    sugerenciaTexto: sugerenciaTextoPara(escenario, distrito.distritoNombre),
+    severidad: escenario.nivel,
+    generadaEn,
+    fuenteSpec: FUENTES_POR_ESCENARIO2[escenario.id],
+    centroide: escenario.centroideAfectado
+  };
+}
+function calcularSugerencias(distritos2, generadaEn) {
+  const sugerencias = [];
+  for (const distrito of distritos2) {
+    for (const escenario of distrito.escenariosActivos) {
+      if (escenario.modo !== "vivo" || !escenario.confirmado) continue;
+      sugerencias.push(sugerenciaDeEscenario(distrito, escenario, generadaEn));
+    }
+  }
+  return sugerencias.sort((a, b) => a.severidad === b.severidad ? 0 : a.severidad === "prioritario" ? -1 : 1);
+}
+
+// src/server/decision-sugerencias.ts
+setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
+var distritosBasicos3 = distritosFromGeoJSON(distritos_valencia_default).map((d) => ({
+  codigo: d.codigo,
+  nombre: d.nombre
+}));
+var CLAVE_HISTERESIS_PULSO3 = "pulso:escenarios-previos:v1";
+var CLAVE_TRAFICO_PREVIO3 = "insights:trafico:estado-previo";
+async function handler18() {
+  try {
+    const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
+    const [meteoResult, aireResult, traficoResult] = await Promise.all([
+      getOrFetch("meteo:valencia-actual:v1", 15 * 60 * 1e3, fetchEstadoMeteo),
+      getOrFetch("aire:valencia-actual:v1", 60 * 60 * 1e3, fetchCalidadAire),
+      getOrFetch("trafico:valencia-estado:v1", 3 * 60 * 1e3, () => fetchEstadoTrafico(resolverDistrito2))
+    ]);
+    const [incidenciasResult, fallasResult, prediccionResult] = await Promise.allSettled([
+      getOrFetch(
+        "via-publica:incidencias-valencia:v1",
+        60 * 60 * 1e3,
+        () => fetchIncidenciasViaPublica(resolverDistrito2)
+      ),
+      getOrFetch("fallas:valencia-actual:v1", 6 * 60 * 60 * 1e3, () => fetchDatosFallas(resolverDistrito2)),
+      getOrFetch("meteo:valencia-prediccion-4h:v1", 15 * 60 * 1e3, fetchPrediccionCortoPlazo)
+    ]);
+    const incidencias = incidenciasResult.status === "fulfilled" ? incidenciasResult.value.value.filter((i) => new Date(i.vigenciaHasta).getTime() >= Date.now()) : [];
+    const zonasFallas = fallasResult.status === "fulfilled" ? fallasResult.value.value.zonasMovilidadReducida : [];
+    const prediccion = prediccionResult.status === "fulfilled" ? prediccionResult.value.value : null;
+    const tramosTraficoPrevios = cachePeek(CLAVE_TRAFICO_PREVIO3) ?? null;
+    const estadoHisteresisPrevio = cachePeek(CLAVE_HISTERESIS_PULSO3) ?? {};
+    const { distritos: distritos2, estadoHisteresis } = calcularPulsoEscenarios(
+      {
+        distritos: distritosBasicos3,
+        tramos: traficoResult.value,
+        incidencias,
+        zonasFallas,
+        prediccion,
+        aire: aireResult.value,
+        tramosPrevios: tramosTraficoPrevios
+      },
+      estadoHisteresisPrevio
+    );
+    cachePoke(CLAVE_HISTERESIS_PULSO3, estadoHisteresis, 30 * 60 * 1e3);
+    cachePoke(CLAVE_TRAFICO_PREVIO3, traficoResult.value, 15 * 60 * 1e3);
+    const generadaEn = (/* @__PURE__ */ new Date()).toISOString();
+    const sugerencias = calcularSugerencias(distritos2, generadaEn);
+    const fresh = meteoResult.fresh && aireResult.fresh && traficoResult.fresh;
+    return new Response(JSON.stringify({ sugerencias, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=60, stale-while-revalidate=180"
+      }
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
+      { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
+    );
   }
 }
 
@@ -52773,7 +57027,7 @@ function json(obj, status, extraHeaders) {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extraHeaders }
   });
 }
-async function handler16(req) {
+async function handler19(req) {
   if (req.method !== "POST") return json({ ok: false }, 405);
   const secret = process.env.AUTH_SECRET;
   let users;
@@ -52815,7 +57069,7 @@ async function handler16(req) {
 }
 
 // src/server/auth-logout.ts
-async function handler17(req) {
+async function handler20(req) {
   const status = req.method === "POST" ? 200 : 405;
   return new Response(JSON.stringify({ ok: status === 200 }), {
     status,
@@ -52828,7 +57082,7 @@ async function handler17(req) {
 }
 
 // src/server/auth-estado.ts
-async function handler18(req) {
+async function handler21(req) {
   const secret = process.env.AUTH_SECRET;
   const sesion = secret ? await verificarSesion(leerCookie(req.headers.get("cookie"), COOKIE_NOMBRE), secret) : null;
   return new Response(
@@ -52840,23 +57094,26 @@ async function handler18(req) {
 // api/_router-src.ts
 var RUTAS = {
   "meteo/v1/actual": handler,
-  "meteo/v1/prediccion-corto-plazo": handler2,
-  "aire/v1/actual": handler3,
-  "trafico/v1/estado": handler4,
-  "trafico/v1/historico": handler5,
-  "valenbisi/v1/estaciones": handler6,
-  "aparcamiento/v1/estado": handler7,
-  "pulso/v1/distrito": handler8,
-  "insights/v1/actual": handler9,
-  "fallas/v1/actual": handler10,
-  "mediatico/v1/items": handler11,
-  "mediatico/v1/tendencia": handler12,
-  "via-publica/v1/incidencias": handler13,
-  "geo/v1/distritos": handler14,
-  "mock/v1/densidad-personas": handler15,
-  "auth/v1/login": handler16,
-  "auth/v1/logout": handler17,
-  "auth/v1/estado": handler18
+  "meteo/v1/avisos": handler2,
+  "meteo/v1/prediccion-corto-plazo": handler3,
+  "aire/v1/actual": handler4,
+  "trafico/v1/estado": handler5,
+  "trafico/v1/historico": handler6,
+  "valenbisi/v1/estaciones": handler7,
+  "aparcamiento/v1/estado": handler8,
+  "pulso/v1/distrito": handler9,
+  "insights/v1/actual": handler10,
+  "fallas/v1/actual": handler11,
+  "mediatico/v1/items": handler12,
+  "mediatico/v1/tendencia": handler13,
+  "via-publica/v1/incidencias": handler14,
+  "geo/v1/distritos": handler15,
+  "mock/v1/densidad-personas": handler16,
+  "agenda/v1/eventos": handler17,
+  "decision/v1/sugerencias": handler18,
+  "auth/v1/login": handler19,
+  "auth/v1/logout": handler20,
+  "auth/v1/estado": handler21
 };
 var BASE = "http://d.invalid";
 async function dispatch(req) {

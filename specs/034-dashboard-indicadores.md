@@ -7,8 +7,13 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [004, 001, 002, 010, 013]
 propietario: ""
-version: 2
+version: 4
 ```
+
+> **Estado:** v1-v4 `Implemented` y en producción. **v3 (2026-09-16)**: quitado el chip de
+> temperatura del KPI. **v4 (2026-09-16)**: el chip "Pulso" pasa a leer el `nivel`
+> ordinal de spec 010 v4 (escenarios de conjunción) en vez del `indice` 0-100 retirado
+> — ver §8.
 
 ## 1. Problema / motivación
 
@@ -97,3 +102,5 @@ pequeña + valor + color de tono):
 |---|---|---|
 | 1 | 2026-09-04 | Creación (Draft). Diseñada con endpoint servidor `GET /api/dashboard/v1/indicadores`. |
 | 2 | 2026-09-09 | Replanteada a **agregación en cliente** sobre datos que los paneles ya fetchean (`dashboard-kpis.ts`, patrón de `estado-frescura.ts`). Se descarta el endpoint. 5 KPIs (temperatura, aire, tráfico, pulso, alertas), chip clicable → activa la capa. Implementado y verificado. Pasa a `Implemented`. |
+| 3 | 2026-09-16 | Quitado el KPI de temperatura (duplicaba el panel de meteo, que tiene icono/descripción/viento además del número): retirado el `registrarKpi(...)` de `src/ui/meteo-panel.ts` y `'temperatura'` de `ClaveKpi`/`ORDEN` en `src/ui/dashboard-kpis.ts`. La tira de KPIs pasa de 5 a 4 chips (Aire, Tráfico, Pulso, Alertas). Verificado en navegador y `npm run typecheck`/`test` (335/335, salvo 5 tests de auth ajenos por carga de CPU del entorno). |
+| 4 | 2026-09-16 | Consumidor de spec 010 v4: el chip "Pulso" (`renderPulsoLeyenda` en `src/main.ts`) pasa de contar distritos por `categoria` (Tranquilo/Moderado/Tenso/Crítico) a contar por `nivel` (`prioritario`/`seguimiento`/`sin-senal`); tono urgente si hay algún distrito prioritario, aviso si hay seguimiento, ok si no. Sin cambios en el mecanismo de `dashboard-kpis.ts` en sí. Verificado en navegador (chip "PULSO · sin señal" en tono ok). |

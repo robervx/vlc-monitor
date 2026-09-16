@@ -342,7 +342,7 @@ function descargarResumenSimulacion(e: EstadoModoSimulacion): void {
   const fecha = new Date().toLocaleString('es-ES');
   const r = e.resultado;
   const lineas = [
-    'Simulación de cortes de calle — Intelligent City Monitor',
+    `Simulación de cortes de calle — ${MARCA.nombre}`,
     `Generado: ${fecha}`,
     '',
     `CALLES CORTADAS (${e.tramosCortados.length}):`,
@@ -591,7 +591,7 @@ function buildHeader(): HTMLElement {
 
   const tagline = document.createElement('span');
   tagline.id = 'app-header__tagline';
-  tagline.textContent = MARCA.tagline;
+  tagline.textContent = MARCA.descriptor;
 
   brand.append(name, tagline);
 
@@ -860,17 +860,28 @@ function buildSidebar(): void {
     { passive: true },
   );
 
-  // Al cambiar de layout con la hoja abierta, normaliza el estado.
+  // Al cambiar de layout con la hoja abierta, normaliza el estado. Bug real
+  // (spec 019 v6): esta función reconciliaba el listener de `pointerdown`
+  // (clic fuera en escritorio) pero no el de `keydown` (Esc + trampa de foco,
+  // pensado solo para la hoja móvil) — si la hoja se abría en escritorio y
+  // luego el layout pasaba a móvil sin volver a llamar a `setExpandido`, Esc
+  // dejaba de cerrarla porque el listener nunca se había añadido.
+  const expandidaAhora = (): boolean => sidebar.classList.contains('is-expanded');
   onCambioLayout((layout) => {
     if (layout === 'escritorio') {
       backdrop.hidden = true;
       document.removeEventListener('keydown', onKeydown);
-      if (sidebar.classList.contains('is-expanded')) {
+      if (expandidaAhora()) {
         document.addEventListener('pointerdown', onClicFueraEscritorio, true);
       }
     } else {
       document.removeEventListener('pointerdown', onClicFueraEscritorio, true);
-      if (sidebar.classList.contains('is-expanded')) backdrop.hidden = false;
+      if (expandidaAhora()) {
+        backdrop.hidden = false;
+        document.addEventListener('keydown', onKeydown);
+      } else {
+        document.removeEventListener('keydown', onKeydown);
+      }
     }
   });
 

@@ -6,17 +6,18 @@ Este fichero es la memoria de proyecto para cualquier sesión de Claude Code que
 
 Mapa en tiempo real de la ciudad de València que agrega, en un único panel, señales públicas y gratuitas: movilidad, meteorología, calidad del aire, eventos e incidencias. El planteamiento arquitectónico sigue el de [World Monitor](https://github.com/koala73/worldmonitor) (ver `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md`), reducido a escala de ciudad: sin globo 3D, sin app de escritorio, sin multi-tenant.
 
-Nombre de producto: **"Intelligent City Monitor"**. Proyecto abierto bajo licencia MIT, sin audiencia institucional declarada ni marca de ningún organismo. Cualquiera puede desplegarlo o partir de él.
+Nombre de producto: **"Mirall"** — descriptor visible en la cabecera de la app: "Urban Intelligence Platform". El eslogan "La ciudad reflejada en tiempo real" es de presentación externa (README, LinkedIn), no se muestra dentro de la app (`src/config/marca.ts`: `nombre`/`descriptor`/`tagline`). Renombrado desde "Intelligent City Monitor" por decisión del usuario, ver `docs/decisiones/ADR-004-rebranding-mirall.md` (el historial de specs anteriores a esa fecha sigue citando el nombre antiguo, no se reescribe). Proyecto abierto bajo licencia MIT, sin audiencia institucional declarada ni marca de ningún organismo, sin empresa detrás. Cualquiera puede desplegarlo o partir de él.
 
 El repo incluye, además de las capas de datos, un conjunto de herramientas de apoyo a la gestión municipal construidas sobre datos abiertos: grafo viario de la ciudad (`020`), propuesta de perímetro por incidente (`021`), simulador de cortes de calle con propagación dirigida (`022`, `031`) y motor de insights (`013`, `024`). Son herramientas genéricas —obras, eventos, emergencias— y están sujetas al límite ético/legal de §4, que aplica con más razón en un proyecto público. Cualquier despliegue que quiera una orientación operativa específica la añade por su cuenta, fuera de este repo, con su propia autorización y cumplimiento.
 
 Documentos de referencia, en orden de lectura recomendado:
 
 1. `docs/01_VIABILIDAD_VISION_Y_PROCESO.md` — viabilidad económica, visión de producto, roadmap, proceso spec-driven.
-2. `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md` — de dónde salen los patrones técnicos.
-3. `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` — catálogo de fuentes de "actividad humana" y el límite ético/legal aplicado.
-4. `ROADMAP.md` — fuente única de verdad de fases y qué spec pertenece a cada una.
-5. `specs/INDEX.md` — estado de cada spec. **Empieza siempre aquí para saber en qué trabajar.**
+2. `docs/02_DEFINITION_OF_DONE_V1.md` — qué tiene que estar `Implemented` para dar la V1 por completa, y qué distingue el despliegue interno del público.
+3. `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md` — de dónde salen los patrones técnicos.
+4. `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` — catálogo de fuentes de "actividad humana" y el límite ético/legal aplicado.
+5. `ROADMAP.md` — fuente única de verdad de fases y qué spec pertenece a cada una.
+6. `specs/INDEX.md` — estado de cada spec. **Empieza siempre aquí para saber en qué trabajar.**
 
 ## 2. Regla no negociable: Spec-Driven Development
 

@@ -16,7 +16,7 @@ import lexico from '../../data/lexico-ambito-ciudad.json' with { type: 'json' };
 import municipiosData from '../../data/municipios-provincia-valencia.json' with { type: 'json' };
 
 export type AmbitoCiudad = 'confirmado' | 'general' | 'excluido';
-export type CategoriaMediatica = 'general' | 'ocio' | 'deporte';
+export type CategoriaMediatica = 'general' | 'deporte';
 
 export interface ClasificacionAmbito {
   ambito: AmbitoCiudad;
@@ -32,8 +32,6 @@ export interface EntradaClasificacion {
   distritosMencionados: ReadonlyArray<{ distritoNombre: string; coincidencia?: string }>;
   /** true si la fuente cubre exclusivamente la ciudad (ej. Valencia Plaza). */
   fuenteCityOnly: boolean;
-  /** 'ocio' si la fuente es un medio temático de ocio/cultura de la ciudad. */
-  categoriaFuente?: 'ocio';
 }
 
 function normalizar(texto: string): string {
@@ -63,6 +61,30 @@ const DESAMBIGUACION = preparar(lexico.desambiguacion);
 const DEPORTE_CRONICA = preparar(lexico.deporteCronica);
 const DEPORTE_LOGISTICO = preparar(lexico.deporteLogistico);
 const PREPOSICIONES = preparar(lexico.preposicionesLocativas);
+
+// v6 (DoD de V1, 2026-09-16): el usuario pidió que "ocio y deporte" deje de
+// ser un bucket aparte — solo interesa el deporte cuando es sobre fútbol
+// (marcadores inequívocos: club/competición/estadio). El resto de deporte
+// (baloncesto, tenis, motor, ciclismo, crónica genérica...) se descarta.
+// Deliberadamente NO se usa vocabulario genérico de crónica compartido entre
+// deportes (p. ej. "fichaje", "lesión", "vestuario" — el Valencia Basket
+// también los usa) para no dar falsos positivos de fútbol.
+const MARCADORES_FUTBOL = preparar([
+  'valencia cf',
+  'valencia c f',
+  'levante ud',
+  'levante u d',
+  'mestalla',
+  'laliga',
+  'la liga',
+  'primera division',
+  'segunda division',
+  'champions league',
+  'liga de campeones',
+  'europa league',
+  'copa del rey',
+  'supercopa',
+]);
 
 interface MunicipioNorm {
   etiqueta: string;
@@ -117,11 +139,13 @@ function mencionaValencia(textoPad: string): boolean {
 }
 
 /**
- * spec 009 §3.1 — orden de evaluación:
- *   señal positiva fuerte  -> confirmado (gana sobre cualquier negativa)
+ * spec 009 §3.1 (v6) — orden de evaluación:
+ *   deporte que no sea fútbol (marcador de club/competición/estadio) -> excluido,
+ *     gana incluso sobre una señal positiva (distrito/hito) — decisión explícita
+ *     del usuario: "solo interesa cuando hay partido de fútbol"
+ *   señal positiva fuerte  -> confirmado (gana sobre cualquier otra negativa)
  *   desambiguación / fuera de la ciudad (nacional/internacional) / municipio
  *     ajeno / marcador regional -> excluido
- *   deporte solo-crónica (sin componente logístico) -> excluido
  *   fuente 100% ciudad -> confirmado
  *   menciona València -> general (bucket visible)
  *   nada -> excluido
@@ -133,13 +157,17 @@ export function clasificarAmbitoCiudad(entrada: EntradaClasificacion): Clasifica
   const hitLogistico = primeraCoincidencia(textoPad, DEPORTE_LOGISTICO);
   const hitCronica = primeraCoincidencia(textoPad, DEPORTE_CRONICA);
   const esDeporte = hitLogistico !== null || hitCronica !== null;
-  const soloCronica = hitCronica !== null && hitLogistico === null;
+  const hitFutbol = primeraCoincidencia(textoPad, MARCADORES_FUTBOL);
+  const esFutbol = hitFutbol !== null;
 
-  const categoria: CategoriaMediatica = esDeporte
-    ? 'deporte'
-    : entrada.categoriaFuente === 'ocio'
-      ? 'ocio'
-      : 'general';
+  // "ocio" deja de ser una categoría propia (v6) — las fuentes temáticas de
+  // ocio/cultura se tratan como cualquier otra fuente de ciudad.
+  const categoria: CategoriaMediatica = esDeporte ? 'deporte' : 'general';
+
+  // 0. Deporte que no es fútbol — fuera, sin excepción por señal positiva.
+  if (esDeporte && !esFutbol) {
+    return { ambito: 'excluido', categoria, motivo: `deporte no-fútbol: ${hitCronica ?? hitLogistico}` };
+  }
 
   // 1. Señales positivas fuertes.
   if (entrada.distritosMencionados.length > 0) {
@@ -162,11 +190,6 @@ export function clasificarAmbitoCiudad(entrada: EntradaClasificacion): Clasifica
   if (municipio) return { ambito: 'excluido', categoria, motivo: `municipio ajeno: ${municipio}` };
   const regional = primeraCoincidencia(textoPad, REGIONALES);
   if (regional) return { ambito: 'excluido', categoria, motivo: `ámbito regional: ${regional}` };
-
-  // 3. Deporte de pura crónica (sin componente logístico de ciudad).
-  if (soloCronica) {
-    return { ambito: 'excluido', categoria, motivo: `deporte (crónica): ${hitCronica}` };
-  }
 
   // 4. Fuente que solo cubre la ciudad.
   if (entrada.fuenteCityOnly) {

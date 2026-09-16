@@ -7,8 +7,12 @@ estado: Implemented
 tipo: capa
 depende_de: [000]
 propietario: ""
-version: 2
+version: 3
 ```
+
+> **Estado:** v1-v3 `Implemented` y en producción. **v3 (2026-09-16)**: la densidad
+> sintética se concentra en los monumentos falleros reales (spec 008) además del tinte
+> plano por distrito — ver §8.
 
 ## 1. Problema / motivación
 
@@ -88,3 +92,4 @@ La UI **debe** mostrar de forma visible (no en letra pequeña) que la capa usa d
 |---|---|---|
 | 1 | 2026-08-17 | Creación — versión mock, sin fuente real |
 | 2 | 2026-08-18 | DoD completo: ponderación por población real del Padrón 2024 (verificada, ver §2), generador determinista (`src/services/densidad-personas-mock.ts` + tests), endpoint (`api/mock/v1/densidad-personas.ts`), capa registrada con badge (`src/config/map-layer-definitions.ts`), UI con toggle + selector de hora + badge/banner MOCK persistentes (`src/main.ts`). Verificado con `npm run typecheck`, `npm run test`, `npm run build` y en navegador. Spec pasa a `Implemented`. |
+| 3 | 2026-09-16 | Nueva función pura `generarHotspotsDensidadMock(horaSimulada, hotspots)` (`src/services/densidad-personas-mock.ts`) — misma base determinista (hash + PRNG) que `generarDensidadMock`, pero por punto en vez de por distrito, con una base más alta y menos dispersa (concentración real, no solo ambiente de fondo). Sigue sin I/O: quien la llama (`src/main.ts`) le pasa los `hotspots` ya cargados. Se usan los monumentos falleros reales de spec `008` (`datosFallas.monumentos`, lat/lon directos) como puntos calientes — se cargan la primera vez que se activa la capa de densidad, aunque la capa "Fallas" en sí no esté encendida (`fallasHotspotsCargados`). Renderizado con un `ScatterplotLayer` nuevo (`movimiento-personas-mock-hotspots`) encima del choropleth por distrito existente, radio y color por intensidad (mismo `colorIntensidad` de spec 003 original). Sigue marcado `MOCK` de forma visible y persistente (banner + badge ya existentes, sin cambios — `CLAUDE.md` §4). 4 tests nuevos (342 en total, incluyendo los de spec 009 v6), verificado en navegador contra datos reales: puntos naranja/rojo concentrados sobre los 689 monumentos reales, visibles en Ciutat Vella y el resto de la ciudad, sin errores de consola. |

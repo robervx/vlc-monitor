@@ -3,8 +3,10 @@
 // En móvil (`<html data-layout="movil">`, ver deteccion-dispositivo.ts):
 //   - `#info-panels` pasa a ser un bottom sheet arrastrable de 3 estados;
 //   - `#controls` (capas), `#media-panel`, `#tendencia-panel`, `#camaras-panel`,
-//     `#agenda-panel` y `#actualidad-redes-panel` (spec 040) se reparentan
-//     dentro del sheet para que todo quede en un único sitio con scroll —
+//     `#agenda-panel`, `#actualidad-redes-panel` (spec 040),
+//     `#apoyo-decision-panel` (spec 041) y `#protocolos-panel` (spec 042) se
+//     reparentan dentro del sheet para que todo quede en un único sitio con
+//     scroll —
 //     la vista activa (`:root[data-vista]`, ver `router.ts`) decide cuáles de
 //     ellos son visibles, independientemente de dónde vivan en el DOM;
 //   - al volver a escritorio se deshace todo (los paneles vuelven a <body>).
@@ -29,6 +31,8 @@ const IDS_REPARENTABLES = [
   'camaras-panel',
   'agenda-panel',
   'actualidad-redes-panel',
+  'apoyo-decision-panel',
+  'protocolos-panel',
 ] as const;
 
 let sheet: HTMLElement | null = null;
