@@ -5,16 +5,19 @@ id: 039
 titulo: "Actualidad institucional en redes (widgets oficiales de Facebook y X, sin filtrado cruzado)"
 estado: Implemented
 tipo: panel
-depende_de: [019]
+depende_de: [019, 040]
 propietario: ""
-version: 3
+version: 4
 ```
 
-> **Estado:** v3 `Implemented` (2026-09-16) — cierra el DoD de V1: las 13 entidades
-> verificadas visualmente en navegador (iframes reales con el handle/URL correctos, no
-> placeholders), fallback probado con una cuenta que de verdad no existe (no solo por
-> inspección del código), y nuevo selector "Elegir qué cuentas leer" con preferencia
-> persistida en `localStorage` (§5/§6).
+> **Estado:** v4 `Implemented` (2026-09-16) — reubicación: sale del sidebar (`SIDEBAR_REGISTRY`)
+> a un panel propio (`#actualidad-redes-panel`) dentro de la vista `/inteligencia` de spec
+> `040`. Mismo `buildActualidadRedesContent()` de v3, sin cambios — la spec `040` es la que
+> decide dónde vive, no esta. **v3 `Implemented` (2026-09-16)** — cierra el DoD de V1: las
+> 13 entidades verificadas visualmente en navegador (iframes reales con el handle/URL
+> correctos, no placeholders), fallback probado con una cuenta que de verdad no existe (no
+> solo por inspección del código), y nuevo selector "Elegir qué cuentas leer" con
+> preferencia persistida en `localStorage` (§5/§6).
 
 ## 1. Problema / motivación
 
@@ -89,7 +92,12 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 }
 ```
 
-**Ubicación decidida por el usuario:** sección nueva en el **sidebar izquierdo** (chasís de spec `019`, `SIDEBAR_REGISTRY`), junto a "Cerca de mí" / "Glosario" — no un panel flotante nuevo. Al hacer clic en la sección se despliega la lista de las 13 entidades como acordeones (`<details>`); dentro, cada entidad es **otro acordeón**: hasta que no se abre la ficha de una entidad concreta no se pide ningún widget suyo (spec §4). Sigue el mismo patrón que las demás secciones del sidebar (`cerca-de-mi`, `glosario`) — no tienen checkbox de mostrar/ocultar en Configuración, se abren/cierran desde el propio sidebar.
+**Ubicación (v1-v3):** sección nueva en el **sidebar izquierdo** (chasís de spec `019`, `SIDEBAR_REGISTRY`), junto a "Cerca de mí" / "Glosario" — no un panel flotante nuevo. Al hacer clic en la sección se despliega la lista de las 13 entidades como acordeones (`<details>`); dentro, cada entidad es **otro acordeón**: hasta que no se abre la ficha de una entidad concreta no se pide ningún widget suyo (spec §4).
+
+**Ubicación (v4):** sale del sidebar — spec `040` la mueve a un panel propio
+(`#actualidad-redes-panel`) dentro de la vista `/inteligencia`, junto a cámaras/contexto
+mediático/tendencia/agenda. El contenido interno (`buildActualidadRedesContent()`, las
+fichas en acordeón, el selector "Elegir qué cuentas leer") no cambia — solo dónde se monta.
 
 **v3 — "Elegir qué cuentas leer" (DoD de V1):** a diferencia de Configuración (spec 019 v3, que gobierna los 5 paneles fijos del panel principal — ver `panel-preferences.ts`), el filtro de entidades vive **dentro de esta misma sección**, no en Configuración: son 13 filas específicas de esta spec, no paneles genéricos. Mismo patrón de `localStorage` que `panel-preferences.ts` pero invertido (se guarda el conjunto de ids *ocultos*, no *visibles*, para que una entidad nueva en el registro aparezca visible por defecto sin migrar la preferencia de nadie): `src/ui/actualidad-redes.ts` — `isEntidadVisible(id)`/`setEntidadVisible(id, visible)`, clave `imc:entidades-redes-ocultas`. Un acordeón "Elegir qué cuentas leer" con un checkbox por entidad, antes de la lista de fichas; desmarcar una entidad oculta su ficha (`hidden`) sin desmontar sus widgets si ya estaban cargados.
 
@@ -122,3 +130,4 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 | 1 | 2026-09-14 | Creación. Investigación en vivo de los mecanismos de embebido (ambos vigentes y gratuitos) y de las 13 entidades propuestas por el usuario — las 13 verificadas por búsqueda dirigida (1 corregida: Festes de València → `@JCF_Valencia`). Ubicación en el sidebar decidida. Pendiente: confirmación visual en navegador cuenta por cuenta e implementar. |
 | 2 | 2026-09-14 | Implementada: `src/config/entidades-redes.ts` (con tests), `src/ui/actualidad-redes.ts` (fichas en acordeón, carga diferida por entidad, fallback a los 8s), sección nueva en `SIDEBAR_REGISTRY`. Verificado en navegador contra una cuenta real (Centre de Gestió de Trànsit): ambos widgets (Facebook y X) cargan con datos reales, sin scripts de terceros hasta abrir la ficha. `npm run typecheck`/`test` (334/334)/`build` verdes. DoD abierto: confirmar visualmente las 12 entidades restantes y probar el fallback con un fallo real. |
 | 3 | 2026-09-16 | **Cierre de DoD de V1.** Las 13 entidades verificadas en navegador (iframes reales con handle/URL exactos, ver §6); fallback probado con una cuenta inexistente real, no simulada por inspección de código. Nuevo selector "Elegir qué cuentas leer" (`buildSelectorEntidades` en `src/ui/actualidad-redes.ts`) — 13 checkboxes, preferencia persistida en `localStorage` (`imc:entidades-redes-ocultas`, mismo espíritu invertido que `panel-preferences.ts` de spec 019), CSS nuevo en `index.html` (`.red-entidad-selector*`). Sin test unitario para la persistencia (el proyecto no usa `jsdom`/`localStorage` en tests — mismo criterio que `panel-preferences.ts`, que tampoco lo tiene; verificado en navegador real en su lugar). `npm run typecheck`/`test` (357/357)/`build` verdes. Spec pasa a `Implemented`. |
+| 4 | 2026-09-16 | Reubicación por spec `040`: sale de `SIDEBAR_REGISTRY` (`src/ui/chasis.ts`) a un panel propio (`#actualidad-redes-panel`) dentro de `/inteligencia`, montado desde `src/main.ts` con la misma `buildActualidadRedesContent()`. Sin cambios de lógica ni de contrato — depende ahora también de `040`. |

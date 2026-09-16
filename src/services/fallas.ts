@@ -47,8 +47,8 @@ export interface ZonaMovilidadReducida {
 
 export type ResolverDistrito = (lat: number, lon: number) => string | null;
 
-/** Centroide simple (media de vértices del anillo exterior) — mismo nivel de precisión que puntoMedio() en trafico.ts, suficiente para resolver distrito, no para cálculo geométrico exacto. */
-function centroidePoligono(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): [number, number] {
+/** Centroide simple (media de vértices del anillo exterior) — mismo nivel de precisión que puntoMedio() en trafico.ts, suficiente para resolver distrito, no para cálculo geométrico exacto. Exportado — spec 010 v4 (`pulso-escenarios.ts`) lo reutiliza para el marcador del escenario `fallas-y-trafico`. */
+export function centroidePoligono(geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon): [number, number] {
   const anillo = geometry.type === 'Polygon' ? geometry.coordinates[0]! : geometry.coordinates[0]![0]!;
   let sumaLon = 0;
   let sumaLat = 0;

@@ -3,16 +3,12 @@ import distritosGeoJSON from '../../data/distritos-valencia.json' with { type: '
 import { setLoadedDistricts, type Distrito } from './district-geometry';
 import { resetTablaPatronesGeolocalizacion } from './geolocalizacion-texto';
 import {
-  parseFechaListado,
-  parseFechaFicha,
-  parseRangoFechas,
-  slugDeUrlFicha,
-  recortarResumen,
-  normalizarEvento,
-  construirSnapshot,
-  SNAPSHOT_AGENDA_VACIO,
-  type EventoAgendaCrudo,
-  type SnapshotAgenda,
+  parsearRangoFechaListado,
+  parsearRangoFechaFicha,
+  construirResumen,
+  detectarEstructuraSospechosa,
+  construirEventoAgenda,
+  type EventoAgenda,
 } from './agenda-eventos';
 
 interface DistritoFeature {
@@ -22,186 +18,136 @@ interface DistritoFeature {
 }
 
 beforeAll(() => {
-  const distritos: Distrito[] = (distritosGeoJSON.features as unknown as DistritoFeature[]).map(
-    (feature) => ({ ...feature.properties, geometry: feature.geometry }),
-  );
+  const distritos: Distrito[] = (distritosGeoJSON.features as unknown as DistritoFeature[]).map((feature) => ({
+    ...feature.properties,
+    geometry: feature.geometry,
+  }));
   setLoadedDistricts(distritos);
   resetTablaPatronesGeolocalizacion();
 });
 
-const FETCHED = '2026-09-10T04:00:00.000Z';
-
-describe('parseFechaListado (DD/MM/YYYY)', () => {
-  it('parsea una fecha del listado', () => {
-    expect(parseFechaListado('23/09/2026')).toBe('2026-09-23');
-    expect(parseFechaListado(' 01/12/2026 ')).toBe('2026-12-01');
+describe('parsearRangoFechaListado', () => {
+  it('parsea "DD/MM/YYYY - DD/MM/YYYY" a ISO 8601', () => {
+    const r = parsearRangoFechaListado('23/09/2026 - 27/09/2026');
+    expect(r).toEqual({ inicio: '2026-09-23T00:00:00.000Z', fin: '2026-09-27T00:00:00.000Z' });
   });
-  it('rechaza texto sin fecha o fecha imposible', () => {
-    expect(parseFechaListado('próximamente')).toBeNull();
-    expect(parseFechaListado('32/01/2026')).toBeNull();
-    expect(parseFechaListado('29/02/2027')).toBeNull(); // no bisiesto
+
+  it('null si el texto no tiene el formato esperado', () => {
+    expect(parsearRangoFechaListado('sin fecha')).toBeNull();
+    expect(parsearRangoFechaListado('')).toBeNull();
   });
 });
 
-describe('parseFechaFicha (DD mmm YYYY)', () => {
-  it('parsea mes abreviado y completo en español', () => {
-    expect(parseFechaFicha('16 sep 2026')).toBe('2026-09-16');
-    expect(parseFechaFicha('16 sept 2026')).toBe('2026-09-16');
-    expect(parseFechaFicha('1 enero 2027')).toBe('2027-01-01');
-    expect(parseFechaFicha('3 DIC 2026')).toBe('2026-12-03');
+describe('parsearRangoFechaFicha', () => {
+  it('parsea "FECHA: DD mmm YYYY - DD mmm YYYY" (mes abreviado ES) a ISO 8601', () => {
+    const r = parsearRangoFechaFicha('FECHA: \n\n 23 sep 2026 \n - \n 27 sep 2026');
+    expect(r).toEqual({ inicio: '2026-09-23T00:00:00.000Z', fin: '2026-09-27T00:00:00.000Z' });
   });
-  it('rechaza mes desconocido', () => {
-    expect(parseFechaFicha('16 xxx 2026')).toBeNull();
+
+  it('funciona con día de un solo dígito', () => {
+    const r = parsearRangoFechaFicha('FECHA: 3 ene 2027 - 5 ene 2027');
+    expect(r).toEqual({ inicio: '2027-01-03T00:00:00.000Z', fin: '2027-01-05T00:00:00.000Z' });
+  });
+
+  it('null si el mes no se reconoce (indicio de estructura cambiada)', () => {
+    expect(parsearRangoFechaFicha('FECHA: 23 xyz 2026 - 27 xyz 2026')).toBeNull();
   });
 });
 
-describe('parseRangoFechas', () => {
-  it('separa "X - Y"', () => {
-    expect(parseRangoFechas('23/09/2026 - 27/09/2026', parseFechaListado)).toEqual({
-      inicio: '2026-09-23',
-      fin: '2026-09-27',
-    });
-  });
-  it('quita el prefijo "FECHA:" de la ficha y admite guion largo', () => {
-    expect(parseRangoFechas('FECHA: 16 sep 2026 – 27 sep 2026', parseFechaFicha)).toEqual({
-      inicio: '2026-09-16',
-      fin: '2026-09-27',
-    });
-  });
-  it('tolera el texto real de la ficha (saltos de línea, tabs y coletilla HORARIO/PRECIO)', () => {
-    const real =
-      'FECHA: \n\n\n                \t09 sep 2026\n                 - \n\n\n                \t27 sep 2026\n\n\n' +
-      '                    HORARIO: De martes a sábado de 10:00 a 14:00 horas.\n                    PRECIO: Gratuito';
-    expect(parseRangoFechas(real, parseFechaFicha)).toEqual({ inicio: '2026-09-09', fin: '2026-09-27' });
+describe('construirResumen', () => {
+  it('une párrafos no vacíos con un espacio', () => {
+    expect(construirResumen(['Primera frase.', '', 'Segunda frase.'])).toBe('Primera frase. Segunda frase.');
   });
 
-  it('una sola fecha → inicio y fin iguales', () => {
-    expect(parseRangoFechas('05/10/2026', parseFechaListado)).toEqual({
-      inicio: '2026-10-05',
-      fin: '2026-10-05',
-    });
+  it('null si no hay texto', () => {
+    expect(construirResumen([])).toBeNull();
+    expect(construirResumen(['', '  '])).toBeNull();
   });
-  it('vacío → nulls', () => {
-    expect(parseRangoFechas(null, parseFechaListado)).toEqual({ inicio: null, fin: null });
+
+  it('recorta a ~300 caracteres con puntos suspensivos', () => {
+    const largo = 'x'.repeat(400);
+    const resumen = construirResumen([largo]);
+    expect(resumen!.length).toBeLessThanOrEqual(301);
+    expect(resumen!.endsWith('…')).toBe(true);
+  });
+
+  it('no recorta si ya cabe en el límite', () => {
+    const corto = 'Un resumen corto.';
+    expect(construirResumen([corto])).toBe(corto);
   });
 });
 
-describe('slugDeUrlFicha', () => {
-  it('coge el último segmento', () => {
-    expect(slugDeUrlFicha('https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/xvi-russafa-escenica')).toBe(
-      'xvi-russafa-escenica',
+function evento(id: string): EventoAgenda {
+  return {
+    id,
+    titulo: 'test',
+    categoria: 'EXPOSICIONES',
+    fechaInicio: '2026-09-16T00:00:00.000Z',
+    fechaFin: '2026-09-17T00:00:00.000Z',
+    resumen: null,
+    url: `https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/${id}`,
+    distritosMencionados: [],
+    fetchedAt: '2026-09-16T10:00:00.000Z',
+    source: 'ajuntament-valencia-scraping',
+  };
+}
+
+describe('detectarEstructuraSospechosa', () => {
+  it('true si 0 eventos nuevos pero había eventos antes', () => {
+    expect(detectarEstructuraSospechosa([], [evento('a')])).toBe(true);
+  });
+
+  it('false si 0 eventos nuevos y tampoco había antes (agenda genuinamente vacía)', () => {
+    expect(detectarEstructuraSospechosa([], [])).toBe(false);
+  });
+
+  it('false si hay eventos nuevos', () => {
+    expect(detectarEstructuraSospechosa([evento('a')], [evento('b')])).toBe(false);
+  });
+});
+
+describe('construirEventoAgenda', () => {
+  it('ensambla el contrato final a partir del listado + la ficha', () => {
+    const r = construirEventoAgenda(
+      {
+        id: 'rutas-tematizadas-lengua-signos',
+        titulo: 'Rutas tematizadas con intérprete de lengua de signos',
+        categoria: 'VISITAS GUIADAS',
+        rangoFechaTexto: '23/09/2026 - 27/09/2026',
+        url: 'https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/rutas-tematizadas-lengua-signos',
+      },
+      { parrafos: ['', 'Ruta por el centro histórico de Ciutat Vella.'] },
+      '2026-09-16T10:00:00.000Z',
     );
-    expect(slugDeUrlFicha('/cas/agenda-de-la-ciudad/-/content/mi-evento?foo=1#x')).toBe('mi-evento');
-  });
-});
-
-describe('recortarResumen', () => {
-  it('colapsa espacios y deja el texto corto tal cual', () => {
-    expect(recortarResumen('  hola   mundo \n ')).toBe('hola mundo');
-  });
-  it('recorta en límite de palabra con elipsis', () => {
-    const largo = 'palabra '.repeat(60);
-    const r = recortarResumen(largo, 50)!;
-    expect(r.length).toBeLessThanOrEqual(51);
-    expect(r.endsWith('…')).toBe(true);
-    expect(r).not.toMatch(/palabr…$/); // no corta a mitad de palabra
-  });
-  it('null/vacío → null', () => {
-    expect(recortarResumen(null)).toBeNull();
-    expect(recortarResumen('   ')).toBeNull();
-  });
-});
-
-describe('normalizarEvento', () => {
-  const base: EventoAgendaCrudo = {
-    url: 'https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/concierto-en-benimaclet',
-    titulo: 'Concierto gratuito en Benimaclet',
-    categoria: 'música',
-    fechasListado: '16/09/2026 - 16/09/2026',
-    descripcion: 'Un concierto al aire libre en la plaza del pueblo de Benimaclet.',
-  };
-
-  it('normaliza al contrato de §3 y geolocaliza por texto (spec 023)', () => {
-    const e = normalizarEvento(base, FETCHED)!;
-    expect(e).toMatchObject({
-      id: 'concierto-en-benimaclet',
-      titulo: 'Concierto gratuito en Benimaclet',
-      categoria: 'MÚSICA',
-      fechaInicio: '2026-09-16',
-      fechaFin: '2026-09-16',
-      source: 'ajuntament-valencia-scraping',
-      fetchedAt: FETCHED,
+    expect(r).toMatchObject({
+      id: 'rutas-tematizadas-lengua-signos',
+      fechaInicio: '2026-09-23T00:00:00.000Z',
+      resumen: 'Ruta por el centro histórico de Ciutat Vella.',
     });
-    expect(e.distritosMencionados.length).toBeGreaterThan(0);
-    expect(e.distritosMencionados[0]).toMatchObject({ coincidencia: 'barrio' });
+    expect(r!.distritosMencionados.length).toBeGreaterThan(0);
   });
 
-  it('prefiere las fechas de la ficha si las hay', () => {
-    const e = normalizarEvento({ ...base, fechasFicha: 'FECHA: 20 oct 2026 - 25 oct 2026' }, FETCHED)!;
-    expect(e.fechaInicio).toBe('2026-10-20');
-    expect(e.fechaFin).toBe('2026-10-25');
+  it('null si el rango de fechas no se puede parsear (estructura cambiada)', () => {
+    const r = construirEventoAgenda(
+      { id: 'x', titulo: 'x', categoria: 'x', rangoFechaTexto: 'fecha rara', url: 'https://x' },
+      null,
+      '2026-09-16T10:00:00.000Z',
+    );
+    expect(r).toBeNull();
   });
 
-  it('devuelve null si falta título o fecha', () => {
-    expect(normalizarEvento({ ...base, titulo: '' }, FETCHED)).toBeNull();
-    expect(normalizarEvento({ ...base, fechasListado: null, fechasFicha: null }, FETCHED)).toBeNull();
-  });
-
-  it('tolera categoría/fechas no parseables sin descartar el evento', () => {
-    const e = normalizarEvento({ ...base, categoria: null, fechasListado: 'sin definir', fechasFicha: null }, FETCHED)!;
-    expect(e.categoria).toBe('');
-    expect(e.fechaInicio).toBeNull();
-  });
-});
-
-describe('construirSnapshot — resiliencia (spec 027 §4)', () => {
-  const opts = { generadoEn: FETCHED, paginasLeidas: 4 };
-  const crudo = (slug: string): EventoAgendaCrudo => ({
-    url: `https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/${slug}`,
-    titulo: `Evento ${slug}`,
-    categoria: 'TEATRO',
-    fechasListado: '10/09/2026 - 12/09/2026',
-  });
-  const previoConEventos: SnapshotAgenda = {
-    eventos: [normalizarEvento(crudo('viejo-1'), '2026-09-09T04:00:00.000Z')!],
-    generadoEn: '2026-09-09T04:00:00.000Z',
-    paginasLeidas: 4,
-    estructuraSospechosa: false,
-  };
-
-  it('caso normal: snapshot nuevo con los eventos ordenados por fecha', () => {
-    const snap = construirSnapshot([crudo('b'), crudo('a')], SNAPSHOT_AGENDA_VACIO, opts);
-    expect(snap.estructuraSospechosa).toBe(false);
-    expect(snap.eventos.map((e) => e.id)).toEqual(['a', 'b']);
-    expect(snap.generadoEn).toBe(FETCHED);
-  });
-
-  it('0 crudos con snapshot previo no vacío → conserva los viejos y marca sospechoso', () => {
-    const snap = construirSnapshot([], previoConEventos, opts);
-    expect(snap.estructuraSospechosa).toBe(true);
-    expect(snap.eventos).toEqual(previoConEventos.eventos);
-    expect(snap.generadoEn).toBe(FETCHED); // pero el sello se actualiza
-  });
-
-  it('0 crudos sin snapshot previo → snapshot vacío no sospechoso (primera ejecución)', () => {
-    const snap = construirSnapshot([], SNAPSHOT_AGENDA_VACIO, opts);
-    expect(snap).toMatchObject({ eventos: [], estructuraSospechosa: false });
-  });
-
-  it('demasiados crudos sin título/fecha → sospechoso, conserva el previo', () => {
-    const rotos: EventoAgendaCrudo[] = [
-      crudo('ok-1'),
-      { url: 'https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/roto-1' },
-      { url: 'https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/roto-2' },
-      { url: 'https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/roto-3' },
-    ];
-    const snap = construirSnapshot(rotos, previoConEventos, opts);
-    expect(snap.estructuraSospechosa).toBe(true);
-    expect(snap.eventos).toEqual(previoConEventos.eventos);
-  });
-
-  it('deduplica slugs repetidos entre páginas', () => {
-    const snap = construirSnapshot([crudo('x'), crudo('x'), crudo('y')], SNAPSHOT_AGENDA_VACIO, opts);
-    expect(snap.eventos.map((e) => e.id)).toEqual(['x', 'y']);
+  it('resumen null si no hay ficha', () => {
+    const r = construirEventoAgenda(
+      {
+        id: 'x',
+        titulo: 'x',
+        categoria: 'x',
+        rangoFechaTexto: '23/09/2026 - 27/09/2026',
+        url: 'https://x',
+      },
+      null,
+      '2026-09-16T10:00:00.000Z',
+    );
+    expect(r!.resumen).toBeNull();
   });
 });

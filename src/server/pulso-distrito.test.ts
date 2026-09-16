@@ -81,18 +81,26 @@ describe('GET /api/pulso/v1/distrito', () => {
     expect(res.status).toBe(502);
   });
 
-  it('devuelve el índice para los 19 distritos combinando las tres fuentes', async () => {
+  it('devuelve los 19 distritos con su nivel de escenario (spec 010 v4), combinando las fuentes', async () => {
     mockFetchPorUrl();
 
     const res = await handler();
     const body = (await res.json()) as {
-      distritos: Array<{ distritoCodigo: string; indice: number; source: string }>;
+      distritos: Array<{
+        distritoCodigo: string;
+        nivel: string;
+        monitorizacion: string;
+        escenariosActivos: unknown[];
+        source: string;
+      }>;
       fresh: boolean;
     };
 
     expect(res.status).toBe(200);
     expect(body.fresh).toBe(true);
     expect(body.distritos).toHaveLength(19);
-    expect(body.distritos.every((d) => d.source === 'vlc-monitor-compuesto')).toBe(true);
+    expect(body.distritos.every((d) => d.source === 'vlc-monitor-pulso')).toBe(true);
+    expect(body.distritos.every((d) => ['sin-senal', 'seguimiento', 'prioritario'].includes(d.nivel))).toBe(true);
+    expect(body.distritos.every((d) => Array.isArray(d.escenariosActivos))).toBe(true);
   });
 });

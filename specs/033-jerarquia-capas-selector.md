@@ -7,8 +7,19 @@ estado: Implemented
 tipo: capa
 depende_de: [019]
 propietario: ""
-version: 2
+version: 4
 ```
+
+> **Estado:** v1-v4 `Implemented` y en producción. **v4 (2026-09-16, spec `040`)**: cámaras,
+> contexto mediático y términos en tendencia dejan de ser filas del selector — se mudan a
+> la vista `/inteligencia` como contenido fijo, no capas que se encienden/apagan (spec `040`
+> §2). "Prioritarias" vuelve al criterio operativo de v2 (tráfico/Pulso de Distrito/
+> incidencias de vía pública); "Contexto e informativas" queda en 4 filas (densidad mock/
+> Valenbisi/aparcamiento/Fallas). **v3 (2026-09-16)**: reordenado el selector por petición
+> explícita del usuario — ver §8. Esto redefine el criterio de "Prioritarias" de v2 (antes
+> "situación en tiempo real": tráfico/Pulso/incidencias) a "las capas que más información
+> aportan" (tráfico/contexto mediático/cámaras/incidencias); Pulso de Distrito pasa al
+> grupo "Contexto e informativas", como último elemento.
 
 ## 1. Problema / motivación
 
@@ -135,3 +146,5 @@ Sin cambios en `LayerToggle`, en `#info-panels` ni en el contrato del estado en 
 |---|---|---|
 | 1 | 2026-09-04 | Creación (Draft). Framing neutro de los grupos (no por audiencia, por ADR-002). |
 | 2 | 2026-09-09 | Draft ampliada tras revisión con el usuario: grupos "Prioritarias" / "Contexto e informativas", **peso visual** en el grupo primario, **preset "Vista operativa"**. Alcance acotado: se agrupan los nodos HTML actuales, no se reescribe el selector como bucle sobre el registro. **Implementado y verificado el mismo día**: `grupo` en `map-layer-definitions.ts`, `buildControlPanel()` reestructurado (`#controls__head`, grupos, `<details>` con contador y persistencia), CSS en `index.html`, preset + contador en `main()`. Pasa a `Implemented`. |
+| 3 | 2026-09-16 | Reordenado el HTML de `buildControlPanel()` (`src/main.ts`): grupo "Prioritarias" pasa a Tráfico → Contexto mediático → Cámaras en vivo → Incidencias de vía pública; "Contexto e informativas" pasa a Densidad de personas → Valenbisi → Aparcamiento → Fallas → Términos en tendencia → **Pulso de Distrito** (última, 6 elementos en vez de 7). `togglesContexto` (contador del `<details>`) actualizado a la nueva membresía. Registrada por primera vez la entrada `camaras` en `map-layer-definitions.ts` (antes cableada a mano, fuera del registro) con `grupo: 'primaria'`; `contextoMediatico` pasa de `'contexto'` a `'primaria'`, `pulsoDistrito` de `'primaria'` a `'contexto'`. Añadida su entrada en `META_CAPAS` (`src/ui/glosario.ts`) para no romper el guardarraíl `capasSinMetadato()`. El preset "Vista operativa" sigue encendiendo las mismas 3 capas operativas (tráfico/Pulso/incidencias) independientemente de en qué grupo HTML estén. Verificado en navegador (orden exacto confirmado vía `get_page_text`) y `npm run typecheck`/`test` (335/335, salvo 5 tests de auth con timeout por carga extrema de CPU del entorno, no relacionados — pasan con más margen de tiempo). |
+| 4 | 2026-09-16 | Consumidor de spec `040`: cámaras/contexto mediático/tendencia salen del selector (pasan a ser contenido fijo de `/inteligencia`, no capas). "Prioritarias" vuelve a Tráfico → Pulso de Distrito → Incidencias de vía pública; "Contexto e informativas" queda en 4 filas (Densidad mock/Valenbisi/Aparcamiento/Fallas). `togglesContexto` actualizado. `LAYER_REGISTRY`/`META_CAPAS` (glosario) no se tocan en esta versión — sigue pendiente como ajuste cosmético menor que sus entradas de `camaras`/`contextoMediatico`/`tendenciaTerminos`/`agendaEventos` ya no describen filas reales del selector (fuera de alcance de esta versión, ver spec `040` §7). |

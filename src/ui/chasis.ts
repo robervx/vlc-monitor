@@ -7,6 +7,7 @@ import { limpiarCacheDatos } from '../pwa';
 import { onCambioFrescura } from './estado-frescura';
 import { MARCA } from '../config/marca';
 import { esMovil, getLayoutForzado, setLayoutForzado, onCambioLayout } from './deteccion-dispositivo';
+import { irAVista, vistaActual, type Vista } from './router';
 import { calcularCercania, formatoDistancia, type ResultadoCercania } from '../services/proximidad';
 import { getCapasActivas } from '../services/capas-activas-store';
 import {
@@ -32,7 +33,6 @@ import {
   type EstadoModoSimulacion,
 } from './modo-simulacion-cortes';
 import { buildGlosarioContent } from './glosario';
-import { buildActualidadRedesContent } from './actualidad-redes';
 
 export interface SidebarSectionDefinition {
   key: string;
@@ -551,14 +551,6 @@ export const SIDEBAR_REGISTRY: SidebarSectionDefinition[] = [
     render: buildGemeloDigitalContent,
   },
   {
-    key: 'actualidad-redes',
-    label: 'Actualidad institucional',
-    icono: '📣',
-    estado: 'disponible',
-    specId: '039',
-    render: buildActualidadRedesContent,
-  },
-  {
     key: 'glosario',
     label: 'Glosario',
     icono: '📖',
@@ -602,6 +594,30 @@ function buildHeader(): HTMLElement {
   tagline.textContent = MARCA.tagline;
 
   brand.append(name, tagline);
+
+  // spec 040 — nav de dos vistas (mapa operativo / hub de inteligencia),
+  // routing por hash. `data-vista` en <html> (aplicado por initRouter) pinta
+  // el enlace activo por CSS — este nav solo dispara la navegación.
+  const nav = document.createElement('nav');
+  nav.id = 'app-header__nav';
+  const enlaceVista = (vista: Vista, label: string): HTMLButtonElement => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'app-header__nav-link';
+    btn.dataset.vista = vista;
+    btn.textContent = label;
+    btn.setAttribute('aria-current', vistaActual() === vista ? 'page' : 'false');
+    btn.addEventListener('click', () => irAVista(vista));
+    return btn;
+  };
+  const linkMapa = enlaceVista('mapa', 'Mapa');
+  const linkInteligencia = enlaceVista('inteligencia', 'Inteligencia');
+  nav.append(linkMapa, linkInteligencia);
+  window.addEventListener('hashchange', () => {
+    const actual = vistaActual();
+    linkMapa.setAttribute('aria-current', actual === 'mapa' ? 'page' : 'false');
+    linkInteligencia.setAttribute('aria-current', actual === 'inteligencia' ? 'page' : 'false');
+  });
 
   const status = document.createElement('div');
   status.id = 'app-header__status';
@@ -652,7 +668,7 @@ function buildHeader(): HTMLElement {
   datetime.append(clock, date);
 
   status.append(live, divider, datetime);
-  header.append(logo, brand, status);
+  header.append(logo, brand, nav, status);
 
   const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 

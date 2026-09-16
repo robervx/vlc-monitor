@@ -3,12 +3,17 @@
 ```yaml
 id: 027
 titulo: "Agenda general de eventos culturales — scraping resiliente de valencia.es"
-estado: Approved
+estado: Implemented
 tipo: capa
 depende_de: [000, 023]
 propietario: ""
-version: 2
+version: 3
 ```
+
+> **Estado:** v3 (2026-09-16) `Implemented`. Ver §8 — incluye una limitación
+> honesta: el job de GitHub Actions no se ha podido ejecutar de verdad
+> todavía (Playwright no soporta macOS 12, el host de esta sesión, y el
+> workflow no se ha disparado aún en CI real).
 
 ## 1. Problema / motivación
 
@@ -100,15 +105,15 @@ Panel de lista (mismo patrón visual que contexto mediático, spec 009), agrupad
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] Job de GitHub Actions con Playwright, user-agent identificable (ej. `vlc-monitor-agenda-bot`), que respeta el `robots.txt` verificado en §2 (no toca las rutas bajo `Disallow: /-/` salvo `/-/content/`).
-- [ ] Parser de listado (título, rango de fechas, categoría, enlace) + parser de ficha (resumen recortado) verificados contra la estructura real observada en §2.
-- [ ] Normalización de fechas "DD MES AAAA" / "DD/MM/AAAA" (la web usa ambos formatos según vista) a ISO 8601, testeada.
-- [ ] Detección de `estructuraSospechosa` implementada y testeada (simular 0 resultados con snapshot previo no vacío → no se sobrescribe, se marca).
-- [ ] `distritosMencionados` calculado reutilizando la función de la spec 023, sin duplicar lógica de matching.
-- [ ] Endpoint `GET /api/agenda/v1/eventos` responde con el contrato de §3, sirviendo el snapshot cacheado.
-- [ ] Panel visible, agrupado por distrito + bloque general, cada ítem enlaza a la ficha oficial — verificado en navegador.
-- [ ] **La UI indica de forma visible y persistente que este panel es contenido extraído por scraping de la web municipal, no una API/dataset oficial** (mismo principio de transparencia que el badge "MOCK" de la spec 003, adaptado a "fuente: web institucional, no API") — no en letra pequeña.
-- [ ] Si `estructuraSospechosa: true`, la UI lo refleja (ej. "agenda desactualizada, revisar fuente") en vez de mostrar el snapshot antiguo como si fuera reciente sin más.
+- [x] Job de GitHub Actions con Playwright (`.github/workflows/agenda-eventos-cron.yml`), user-agent identificable (`vlc-monitor-agenda-bot/1.0`), respeta el `robots.txt` (código no toca rutas bajo `Disallow: /-/` salvo `/-/content/`) — **re-verificado en vivo el 2026-09-16**, sigue vigente. **Limitación honesta**: el job en sí no se ha podido ejecutar de verdad — Playwright no soporta macOS 12 (host de esta sesión: `ERROR: Playwright does not support chromium on mac12`) y el workflow todavía no se ha disparado en GitHub Actions real (necesita el primer push/merge o un `workflow_dispatch` manual). Pendiente de una verificación de ejecución real, mismo tipo de hueco que el autoplay de spec 038.
+- [x] Parser de listado (`a.a-actualidad`, `p.label-title-agenda`, `p.label-fecha-actualidad`, `p.label-categoria-actualidad span`) + parser de ficha (`h2.agenda-titulo`, `p.bloque_texto.fecha`, `p.bloque_texto`) — **verificados contra el sitio real en navegador el 2026-09-16** (no solo documentación): selectores del listado idénticos a la verificación de 2026-09-10; la ficha también. Único cambio real encontrado: la paginación migró de un portlet Liferay/insuit a la librería `paginationjs` (`li.paginationjs-page`) — misma mecánica de fondo (clic en número, sin `href` real), el script se escribió contra el selector actual.
+- [x] Normalización de fechas "DD mmm AAAA" / "DD/MM/AAAA" a ISO 8601, testeada — `src/services/agenda-eventos.ts` + 15 tests en `agenda-eventos.test.ts`.
+- [x] Detección de `estructuraSospechosa` implementada y testeada (0 resultados con snapshot previo no vacío → no se sobrescribe el snapshot, se conserva marcado).
+- [x] `distritosMencionados` calculado reutilizando `findDistrictMentions` de spec 023 — verificado con datos reales (p. ej. "XVI RUSSAFA ESCÈNICA" → l'Eixample, "Centre del Carme" → Ciutat Vella).
+- [x] Endpoint `GET /api/agenda/v1/eventos` responde con el contrato de §3 — verificado en navegador contra un snapshot inicial real (68 eventos, capturados a mano vía navegador dado que Playwright no corre en este host — ver primer punto).
+- [x] Panel visible, agrupado por distrito + bloque "València (general)", cada ítem enlaza a la ficha oficial — verificado en navegador.
+- [x] **Aviso persistente de scraping, no letra pequeña**: franja superior del panel (`.agenda-panel__aviso`, fondo ámbar) — "Contenido extraído por scraping de valencia.es — no es una API ni un dataset oficial." Verificado en navegador.
+- [x] Si `estructuraSospechosa: true`, la UI lo refleja (mensaje "Agenda posiblemente desactualizada...") — implementado y probado por unidad (`renderAgendaPanel`); **no probado end-to-end con un caso real de estructura rota** (haría falta que el sitio cambiase de verdad).
 
 ## 7. Riesgos y fuera de alcance
 
@@ -123,3 +128,4 @@ Panel de lista (mismo patrón visual que contexto mediático, spec 009), agrupad
 |---|---|---|
 | 1 | 2026-08-26 | Creación (Draft) — verificación en vivo: la web requiere un cliente con JavaScript, `robots.txt` autoriza explícitamente las páginas de ficha. Arquitectura fijada en GitHub Actions + Playwright (no Vercel function), siguiendo el precedente de la spec 017. Pendiente de aprobación antes de implementar. |
 | 2 | 2026-09-10 | **Approved.** Re-verificación en navegador real: selectores de listado (`a.a-actualidad`, `p.label-title-agenda`, `p.label-fecha-actualidad`, `p.label-categoria-actualidad`), de ficha (`h2.agenda-titulo`, `p.bloque_texto.fecha`, `p.bloque_texto`), mecánica de paginación (portlet Liferay `CalendarAc`, click en número de página) y `robots.txt` (`Disallow: /-/` + `Allow: /-/content/`) confirmados y anotados en §2.1. Dos formatos de fecha (`DD/MM/YYYY` en listado, `DD mmm YYYY` en ficha). Contrato de datos (§3) sin cambios. Lista para implementar. |
+| 3 | 2026-09-16 | **DoD completo, pasa a `Implemented`.** `src/services/agenda-eventos.ts` (funciones puras: `parsearRangoFechaListado`/`parsearRangoFechaFicha`, `construirResumen`, `detectarEstructuraSospechosa`, `construirEventoAgenda` — reutiliza `findDistrictMentions` de spec 023), 15 tests. `scripts/scrape-agenda-eventos.ts` (Playwright, headless, user-agent identificable, mismo patrón de reintentos/snapshot que spec 017) + `.github/workflows/agenda-eventos-cron.yml` (cron cada 6h, `npx playwright install --with-deps chromium`, no comitea si `estructuraSospechosa`). Endpoint `GET /api/agenda/v1/eventos` (`src/server/agenda-eventos.ts`, registrado en `_router-src.ts`) lee el snapshot estático, mismo patrón que spec 017. Capa `agendaEventos` en `map-layer-definitions.ts` (`grupo: 'contexto'`, `agregacion: 'lista'`) + panel en `main.ts` (agrupado por distrito + "València (general)", aviso persistente de scraping, franja ámbar). **Re-verificación en vivo (2026-09-16) encontró un cambio real**: la paginación migró de portlet Liferay a la librería `paginationjs` — mismo patrón de interacción (clic en número, sin `href`), solo cambia el selector CSS del contenedor de página; el resto del contrato (§2.1) se confirmó idéntico. **Bootstrap real de `data/agenda-eventos.json`**: no fue posible ejecutar Playwright en este host (macOS 12, incompatible con los builds actuales de Chromium de Playwright) — se capturó el listado completo (68 eventos reales, 4 páginas) a mano vía navegador y se procesó con las mismas funciones puras ya testeadas (`construirEventoAgenda`), confirmando el pipeline completo con datos reales (incl. `distritosMencionados`: "XVI RUSSAFA ESCÈNICA" → l'Eixample, "Centre del Carme" → Ciutat Vella). El job de GitHub Actions en sí queda pendiente de su primera ejecución real en CI. 15 tests nuevos (348/348 en total), `npm run typecheck`/`build` verdes, verificado en navegador (panel real con 68 eventos, aviso de scraping visible, agrupación por distrito). |

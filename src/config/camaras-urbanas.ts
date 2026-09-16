@@ -25,6 +25,20 @@
  *    así ("la animada zona portuaria desde la playa de Las Arenas en
  *    València"). El nombre anterior prometía algo que la cámara no enseña —
  *    corregido para que la etiqueta coincida con lo que de verdad se ve.
+ *
+ * v5 — a petición del usuario ("centralizar cámaras... otras que puedan haber
+ * similares"), dos candidatas nuevas investigadas:
+ *  - `meteo365.es` (Puerto de Valencia): **descartada**, no añadida — su imagen
+ *    en directo tiene protección de hotlinking activa (403 salvo `Referer`
+ *    exacto `meteo365.es`, comprobado con `curl`) y su aviso legal prohíbe
+ *    expresamente "reproducción, distribución o modificación sin autorización
+ *    expresa". Es un bloqueo técnico activo, no una zona gris como Turisme CV.
+ *  - Misma red Turisme CV: se encontraron **2 cámaras más** de Valencia-ciudad
+ *    que no estaban en el registro (`sitemap.xml`, filtro por municipio
+ *    "València" no daba resultado por la UI — se confirmó por sitemap):
+ *    Jardín del Turia y El Saler. Mismo mecanismo (DASH, CORS abierto) y misma
+ *    categoría "personal" ya resuelta — no cambia la clasificación de
+ *    `ADR-003`, solo añade puntos a la misma fuente ya aprobada.
  */
 
 export type ProveedorCamara = 'youtube-canal' | 'turisme-cv-dash';
@@ -66,6 +80,26 @@ export const CAMARAS_URBANAS: CamaraUrbana[] = [
     manifestUrl: 'https://streaming.comunitatvalenciana.com/webcam/ValenciaLasArenas/manifest.mpd',
     atribucion: 'Xarxa de Webcams — Turisme Comunitat Valenciana',
     fuenteUrl: 'https://www.comunitatvalenciana.com/en/valencia/valencia/webcams/valencia-las-arenas',
+  },
+  {
+    id: 'turisme-cv-jardin-del-turia',
+    nombre: 'Jardín del Turia',
+    proveedor: 'turisme-cv-dash',
+    categoria: 'personal',
+    envFlag: 'VITE_PERSONAL_CAMARA_TURISME_CV',
+    manifestUrl: 'https://streaming.comunitatvalenciana.com/webcam/ValenciaJardinDelTuria/manifest.mpd',
+    atribucion: 'Xarxa de Webcams — Turisme Comunitat Valenciana',
+    fuenteUrl: 'https://www.comunitatvalenciana.com/es/valencia/valencia/webcams/valencia-jardin-del-turia',
+  },
+  {
+    id: 'turisme-cv-el-saler',
+    nombre: 'El Saler',
+    proveedor: 'turisme-cv-dash',
+    categoria: 'personal',
+    envFlag: 'VITE_PERSONAL_CAMARA_TURISME_CV',
+    manifestUrl: 'https://streaming.comunitatvalenciana.com/webcam/ElSaler/manifest.mpd',
+    atribucion: 'Xarxa de Webcams — Turisme Comunitat Valenciana',
+    fuenteUrl: 'https://www.comunitatvalenciana.com/es/valencia/valencia/webcams/valencia-el-saler',
   },
 ];
 

@@ -55,7 +55,6 @@ export interface ItemMediatico extends ItemMediaticoConDistrito {
 interface FiltroFuenteConfig {
   /** true si la fuente cubre exclusivamente la ciudad (ej. Valencia Plaza). */
   cityOnly: boolean;
-  categoriaFuente?: 'ocio';
 }
 
 /** Spec 023 §4: menciones de distrito/barrio, antes de cachear. */
@@ -78,7 +77,6 @@ function clasificarYFiltrar(
       resumen: item.resumen,
       distritosMencionados: item.distritosMencionados,
       fuenteCityOnly: cfg.cityOnly,
-      categoriaFuente: cfg.categoriaFuente,
     });
     if (clasificacion.ambito === 'excluido') continue;
     salida.push({
@@ -313,17 +311,11 @@ export function fetchVeinteMinutos(): Promise<ItemMediatico[]> {
 }
 
 export function fetchValenciaSecreta(): Promise<ItemMediatico[]> {
-  return fetchRssFuente('https://valenciasecreta.com/feed/', 'Valencia Secreta', {
-    cityOnly: true,
-    categoriaFuente: 'ocio',
-  });
+  return fetchRssFuente('https://valenciasecreta.com/feed/', 'Valencia Secreta', { cityOnly: true });
 }
 
 export function fetchValenciaBonita(): Promise<ItemMediatico[]> {
-  return fetchRssFuente('https://www.valenciabonita.es/feed/', 'Valencia Bonita', {
-    cityOnly: true,
-    categoriaFuente: 'ocio',
-  });
+  return fetchRssFuente('https://www.valenciabonita.es/feed/', 'Valencia Bonita', { cityOnly: true });
 }
 
 export function fetchGoogleNewsLevante(): Promise<ItemMediatico[]> {

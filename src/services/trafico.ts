@@ -35,7 +35,8 @@ export function normalizarEstado(codigo: number | null): { estado: EstadoTramo; 
   return { estado: base, esPasoInferior };
 }
 
-function puntoMedio(geometry: GeoJSON.LineString | GeoJSON.MultiLineString): [number, number] {
+/** Exportado para spec 010 v4 (`pulso-escenarios.ts`) — punto para marcadores/resaltado de tramo. */
+export function puntoMedio(geometry: GeoJSON.LineString | GeoJSON.MultiLineString): [number, number] {
   const linea = geometry.type === 'LineString' ? geometry.coordinates : geometry.coordinates[0]!;
   const punto = linea[Math.floor(linea.length / 2)]!;
   return [punto[0]!, punto[1]!];

@@ -7,8 +7,15 @@ estado: Implemented
 tipo: capa
 depende_de: [019, 010]
 propietario: ""
-version: 2
+version: 3
 ```
+
+> **Estado:** v1-v3 `Implemented` y en producción. **v3 (2026-09-16)**: entradas "Pulso de
+> Distrito" y "Alertas e insights" actualizadas para spec 010 v4 (escenarios de
+> conjunción) y spec 013 v5/v6 (modal, `pulso-distrito`) — ver §8. El cordón (021) y el
+> filtro de contexto mediático (009) no tienen entrada propia entre los 8 temas actuales,
+> no necesitaron cambio de texto. Las páginas nuevas (`040`/`041`/`042`) tendrán su
+> entrada cuando se implementen, en una v4 futura.
 
 ## 1. Problema / motivación
 
@@ -99,3 +106,4 @@ glosario lo refleja sin editar texto.
 | 1 | 2026-09-09 | Creación (Draft). Sale de la petición del usuario de una página de glosario en el lateral, junto con la recalibración del Pulso (spec `010` v3). |
 | 2 | 2026-09-09 | **Implemented.** `src/ui/glosario.ts` (contenido puro `construirEntradasGlosario()` + `buildGlosarioContent()` acordeón), entrada en `SIDEBAR_REGISTRY`, CSS `.glosario-*` en `index.html`. Las 8 entradas de §3; Pulso y alertas leen sus números de `pulso-distrito.ts` / `insights.ts`; lista de capas derivada de `LAYER_REGISTRY` + `META_CAPAS` (con guardarraíl de cobertura). 9 tests en `src/ui/glosario.test.ts`. typecheck/test (302)/build verdes, verificado en navegador (acordeón, valores en vivo). |
 | 2.1 | 2026-09-10 | Revisión de contenido de las 8 entradas contra el código (`acda93e`). Pulso: se explica la amplificación ×2,5 del tráfico (`AMPLIFICACION_TRAFICO_PULSO` exportado). Correcciones: densidad MOCK y Pulso no se calculan "en cliente"; colores de "en vivo" = los reales de la cabecera (`#22c55e`/`#fbbf24`/`#94a3b8`) + "stale-on-error"; alertas cada pocos minutos, aire "Mala/Muy mala", distrito crítico = categoría Crítico; foco se quita con el ✕ del chip; "Fuentes y licencias" ahora sí lista licencias (CC BY 4.0 / ODbL / © AEMET / Google News / MIT); nota de que meteo y aire no están en el selector. +1 test (10 en total). test (303)/typecheck/build verdes. Verificada la hoja móvil (375×812): las 8 entradas presentes, sin desbordamiento horizontal, `#app-sidebar__sections` scrollea, cuerpo/títulos a 12px legibles, acordeón táctil OK. |
+| 3 | 2026-09-16 | `cuerpoPulso()` reescrita para spec 010 v4: describe los 3 escenarios de conjunción citando `UMBRAL_TRAFICO_CONCENTRADO_AVISO`/`UMBRAL_TRAFICO_CONCENTRADO_URGENTE` de `insights.ts` (ya no lee `PESOS_PULSO`/`UMBRALES_CATEGORIA_PULSO`/`AMPLIFICACION_TRAFICO_PULSO`, eliminadas). `cuerpoAlertas()`: quita la mención a "distrito crítico" (regla retirada), añade "Pulso de Distrito" a la lista de tipos, corrige "toast arriba a la derecha" → "modal que hay que cerrar" (spec 013 v5). Entrada "Foco de distrito": "antepone el índice" → "antepone el nivel y los escenarios". `META_CAPAS.pulsoDistrito` actualizado. Test file actualizado (cita `UMBRAL_TRAFICO_CONCENTRADO_*` en vez de los pesos retirados). Verificado en navegador. |

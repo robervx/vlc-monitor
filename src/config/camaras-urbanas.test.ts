@@ -19,6 +19,8 @@ describe('camarasVisibles', () => {
     const ids = visibles.map((c) => c.id);
     expect(ids).toContain('turisme-cv-plaza-ayuntamiento');
     expect(ids).toContain('turisme-cv-las-arenas');
+    expect(ids).toContain('turisme-cv-jardin-del-turia');
+    expect(ids).toContain('turisme-cv-el-saler');
     expect(new Set(visibles.map((c) => c.nombre)).size).toBe(visibles.length);
   });
 

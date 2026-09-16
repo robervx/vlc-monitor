@@ -55,6 +55,41 @@ function parseHoraSimulada(hora: string): number {
   return horas;
 }
 
+export interface PuntoDensidadMock {
+  lat: number;
+  lon: number;
+  intensidad: number; // 0-1, normalizado
+  esSintetico: true;
+}
+
+/**
+ * v3 (DoD de V1, 2026-09-16): la densidad por distrito (`generarDensidadMock`)
+ * es plana dentro de cada distrito — no distingue "toda la plaza del
+ * Ayuntamiento" de "una calle lateral tranquila". El usuario pidió que se
+ * concentre en puntos calientes reales (monumentos falleros) en vez de teñir
+ * el distrito entero por igual. Sigue siendo una función **pura, sin I/O**
+ * (mismo guardarraíl de spec 003 §2): los puntos calientes (`hotspots`) los
+ * pasa quien la llama — hoy `src/main.ts`, a partir de los monumentos de
+ * spec 008 que ya tiene en memoria — esta función no llama a ninguna fuente
+ * por su cuenta.
+ */
+export function generarHotspotsDensidadMock(
+  horaSimulada: string,
+  hotspots: ReadonlyArray<{ id: string; lat: number; lon: number }>,
+): PuntoDensidadMock[] {
+  const horas = parseHoraSimulada(horaSimulada);
+  const factor = factorHorario(horas);
+
+  return hotspots.map((h) => {
+    // Base alta y poco dispersa — un monumento fallero concentra mucho más
+    // que la media del distrito en las horas de actividad. El ruido
+    // determinista evita que todos los puntos se vean idénticos.
+    const ruido = (seededRandom(hashString(`hotspot-${h.id}-${horaSimulada}`)) - 0.5) * 0.15;
+    const intensidad = Math.min(1, Math.max(0.15, 0.75 * factor + ruido));
+    return { lat: h.lat, lon: h.lon, intensidad, esSintetico: true as const };
+  });
+}
+
 export function generarDensidadMock(horaSimulada: string): DensidadDistritoMock[] {
   const horas = parseHoraSimulada(horaSimulada);
   const generatedAt = new Date().toISOString();

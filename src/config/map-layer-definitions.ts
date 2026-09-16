@@ -21,7 +21,7 @@ export interface LayerDefinition {
   specId: string; // id de la spec en specs/ que define esta capa — trazabilidad obligatoria
   renderers: RendererKind[];
   zoomMinimo: number;
-  agregacion: 'punto' | 'choropleth-distrito' | 'cluster' | 'linea' | 'lista'; // 'linea' (spec 004), 'lista' (spec 009, panel no geoespacial)
+  agregacion: 'punto' | 'choropleth-distrito' | 'cluster' | 'linea' | 'lista' | 'mixta'; // 'linea' (spec 004), 'lista' (spec 009, panel no geoespacial), 'mixta' (spec 010 v4: marcador + tramos resaltados como primario, choropleth como contexto)
   /** Grupo del selector — spec 033. `distritos` (capa base, no está en el selector) es el único sin grupo. */
   grupo?: GrupoCapa;
   /** Debe ser `true` mientras la fuente sea sintética — ver spec 003. */
@@ -89,10 +89,16 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
   pulsoDistrito: {
     key: 'pulsoDistrito',
     specId: '010',
-    grupo: 'primaria',
+    // v3 (DoD de V1, 2026-09-16): pasa de 'primaria' a 'contexto' — el
+    // usuario pidió expresamente que sea la última capa del selector, tráfico
+    // + contexto mediático + cámaras + incidencias pasan por delante.
+    grupo: 'contexto',
     renderers: ['deck'],
     zoomMinimo: 0,
-    agregacion: 'choropleth-distrito',
+    // v4 (spec 010 §5, 2026-09-16): ya no es un choropleth plano — marcador +
+    // tramos resaltados por escenario activo (primario), choropleth de
+    // 3 estados por distrito (contexto).
+    agregacion: 'mixta',
   },
   fallas: {
     key: 'fallas',
@@ -105,7 +111,9 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
   contextoMediatico: {
     key: 'contextoMediatico',
     specId: '009',
-    grupo: 'contexto',
+    // v3 (DoD de V1, 2026-09-16): pasa de 'contexto' a 'primaria' — el
+    // usuario la señaló como una de las capas que más información aportan.
+    grupo: 'primaria',
     renderers: ['panel'],
     zoomMinimo: 0,
     agregacion: 'lista',
@@ -125,6 +133,26 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
     renderers: ['deck'],
     zoomMinimo: 12, // solo a nivel calle — 499 puntos activos, satura el mapa a zoom de ciudad (spec 026 §5/§7)
     agregacion: 'punto',
+  },
+  camaras: {
+    key: 'camaras',
+    specId: '038',
+    // Nueva en v3 (DoD de V1, 2026-09-16) — antes no tenía entrada en este
+    // registro, se cableaba a mano en main.ts (`panel.camarasToggle`).
+    // 'primaria' porque el usuario la señaló como una de las capas más
+    // informativas, junto con tráfico y contexto mediático.
+    grupo: 'primaria',
+    renderers: ['panel'],
+    zoomMinimo: 0,
+    agregacion: 'lista',
+  },
+  agendaEventos: {
+    key: 'agendaEventos',
+    specId: '027',
+    grupo: 'contexto',
+    renderers: ['panel'],
+    zoomMinimo: 0,
+    agregacion: 'lista',
   },
   //
   // No añadas entradas aquí sin que exista antes la spec correspondiente

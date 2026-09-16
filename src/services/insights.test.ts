@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { calcularInsights } from './insights';
 import type { EstadoMeteo } from './estado-meteo';
 import type { CalidadAire } from './calidad-aire';
-import type { PulsoDistrito } from './pulso-distrito';
+import type { PulsoDistrito, EscenarioActivo } from './pulso-escenarios';
 import type { PrediccionCortoPlazo } from './prediccion-corto-plazo';
 import type { TramoTrafico } from './trafico';
 import type { DatosFallas } from './fallas';
@@ -66,13 +66,30 @@ const PREDICCION_SIN_LLUVIA: PrediccionCortoPlazo = {
 const DISTRITO_TRANQUILO: PulsoDistrito = {
   distritoCodigo: '01',
   distritoNombre: 'Ciutat Vella',
-  indice: 10,
-  categoria: 'Tranquilo',
-  componentes: { trafico: 0, incidencias: 0, aire: 0.1, meteo: 0 },
+  nivel: 'sin-senal',
+  monitorizacion: 'suficiente',
+  tramosMonitorizados: 10,
+  escenariosActivos: [],
+  notaAire: null,
   observedAt: '2026-08-18T10:00:00.000Z',
   fetchedAt: '2026-08-18T10:01:00.000Z',
-  source: 'vlc-monitor-compuesto',
+  source: 'vlc-monitor-pulso',
 };
+
+function escenarioActivo(over: Partial<EscenarioActivo> = {}): EscenarioActivo {
+  return {
+    id: 'incidencia-sobre-trafico-denso',
+    nivel: 'prioritario',
+    modo: 'vivo',
+    confirmado: true,
+    anticipacionMin: null,
+    motivo: 'Incidencia en Extramurs con tráfico denso.',
+    zonas: [],
+    centroideAfectado: [-0.38, 39.47],
+    tramosAfectados: [],
+    ...over,
+  };
+}
 
 function tramo(id: string, distrito: string | null, estado: TramoTrafico['estado']): TramoTrafico {
   return {
@@ -173,15 +190,42 @@ describe('calcularInsights', () => {
     expect(lluvia[0]?.detectedAt).toBe('2026-08-18T11:00:00.000Z');
   });
 
-  it('genera distrito-critico solo para distritos en categoría Crítico', () => {
+  it('genera pulso-distrito solo para distritos con un escenario vivo+confirmado (spec 010 v4)', () => {
     const distritos: PulsoDistrito[] = [
       DISTRITO_TRANQUILO,
-      { ...DISTRITO_TRANQUILO, distritoCodigo: '05', distritoNombre: 'Extramurs', indice: 80, categoria: 'Crítico' },
+      {
+        ...DISTRITO_TRANQUILO,
+        distritoCodigo: '05',
+        distritoNombre: 'Extramurs',
+        nivel: 'prioritario',
+        escenariosActivos: [escenarioActivo()],
+      },
     ];
     const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, distritos, null);
     expect(resultado.insights).toHaveLength(1);
+    expect(resultado.insights[0]?.tipo).toBe('pulso-distrito');
     expect(resultado.insights[0]?.distritoCodigo).toBe('05');
     expect(resultado.insights[0]?.severidad).toBe('urgente');
+  });
+
+  it('no genera pulso-distrito para un escenario detectado pero no confirmado (cold start)', () => {
+    const distritos: PulsoDistrito[] = [
+      { ...DISTRITO_TRANQUILO, distritoCodigo: '05', escenariosActivos: [escenarioActivo({ confirmado: false })] },
+    ];
+    const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, distritos, null);
+    expect(resultado.insights.filter((i) => i.tipo === 'pulso-distrito')).toHaveLength(0);
+  });
+
+  it('no genera pulso-distrito para un escenario en modo sombra, aunque esté confirmado', () => {
+    const distritos: PulsoDistrito[] = [
+      {
+        ...DISTRITO_TRANQUILO,
+        distritoCodigo: '05',
+        escenariosActivos: [escenarioActivo({ id: 'lluvia-inminente-sobre-trafico-denso', modo: 'sombra' })],
+      },
+    ];
+    const resultado = calcularInsights(METEO_NEUTRA, AIRE_BUENA, distritos, null);
+    expect(resultado.insights.filter((i) => i.tipo === 'pulso-distrito')).toHaveLength(0);
   });
 
   it('genera viento-fuerte con severidad aviso a partir de 50 km/h de racha', () => {
@@ -210,7 +254,7 @@ describe('calcularInsights', () => {
     const resultado = calcularInsights(
       { ...METEO_NEUTRA, temperatura: 38, sensacionTermica: 39 },
       { ...AIRE_BUENA, categoria: 'Muy mala', indiceEuropeo: 95 },
-      [{ ...DISTRITO_TRANQUILO, distritoCodigo: '05', categoria: 'Crítico', indice: 80 }],
+      [{ ...DISTRITO_TRANQUILO, distritoCodigo: '05', nivel: 'prioritario', escenariosActivos: [escenarioActivo()] }],
       { ...PREDICCION_SIN_LLUVIA, predicciones: [{ ...PREDICCION_SIN_LLUVIA.predicciones[0]!, precipitacion: 6 }] },
     );
     expect(resultado.insights.length).toBeGreaterThan(0);
@@ -358,6 +402,17 @@ describe('calcularInsights', () => {
       expect(e?.severidad).toBe('urgente');
       expect(e?.distritoCodigo).toBe('05');
       expect(e?.fuenteSpec).toEqual(['004']);
+      // v5: el título nombra la calle, no solo el distrito.
+      expect(e?.titulo).toContain('Calle 1');
+    });
+
+    it('trafico-empeora: con varios tramos, el título nombra el más severo y cuenta el resto', () => {
+      const previo = [tramo('1', '05', 'fluido'), tramo('2', '05', 'fluido'), tramo('3', '05', 'fluido')];
+      const actual = [tramo('1', '05', 'denso'), tramo('2', '05', 'cortado'), tramo('3', '05', 'denso')];
+      const r = calcularInsights(METEO_NEUTRA, AIRE_BUENA, null, null, actual, FALLAS_SIN_ZONAS, previo);
+      const e = r.insights.find((i) => i.tipo === 'trafico-empeora');
+      expect(e?.titulo).toContain('Calle 2'); // el que llega a "cortado", el más severo
+      expect(e?.titulo).toContain('2 más');
     });
 
     it('trafico-empeora: fluido → denso es solo aviso; una mejora no dispara', () => {

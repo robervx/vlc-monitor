@@ -1,0 +1,49 @@
+name: Agenda de eventos (scraping)
+
+# Spec 027 (specs/027-agenda-eventos-scraping.md §4). Cadencia de 6h — la
+# agenda cultural cambia lento y reduce la carga sobre valencia.es (mismo
+# criterio de frecuencia que spec 008/Fallas). Job propio, distinto del cron
+# horario de spec 017, porque necesita Playwright (navegador headless) en vez
+# de un simple fetch — instalar Chromium en cada run tarda más que el resto
+# de scripts de este repo.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agenda-eventos-cron
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      # user-agent identificable, respeta robots.txt (Disallow: /-/, Allow:
+      # /-/content/ — ver spec 027 §2). Si la estructura del sitio cambia
+      # (0 eventos con snapshot previo no vacío), el script no sobrescribe el
+      # snapshot bueno y termina con código de error — este paso rompe el job
+      # a propósito para que se note, sin comitear un snapshot vacío/falso.
+      - run: npm run scrape:agenda-eventos
+
+      - name: Comitear el snapshot si hay cambios
+        run: |
+          git config user.name "vlc-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/agenda-eventos.json
+          git diff --cached --quiet || git commit -m "chore: snapshot de agenda de eventos $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push

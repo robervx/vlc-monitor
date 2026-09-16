@@ -15,7 +15,10 @@
     "marca": "tsx scripts/generar-marca.ts",
     "seed:distritos": "node scripts/seed-distritos.mjs",
     "seed:red-viaria": "tsx scripts/seed-red-viaria.ts",
-    "snapshot:trafico-historico": "tsx scripts/snapshot-trafico-historico.ts"
+    "snapshot:trafico-historico": "tsx scripts/snapshot-trafico-historico.ts",
+    "snapshot:pulso-sombra": "tsx scripts/snapshot-pulso-sombra.ts",
+    "verificar:reconciliacion-trafico-grafo": "tsx scripts/verificar-reconciliacion-trafico-grafo.ts",
+    "scrape:agenda-eventos": "tsx scripts/scrape-agenda-eventos.ts"
   },
   "dependencies": {
     "@deck.gl/core": "^9.0.0",
@@ -31,6 +34,7 @@
     "@types/node": "^22.7.0",
     "@types/rbush": "^4.0.0",
     "esbuild": "^0.21.5",
+    "playwright": "^1.63.0",
     "tsx": "^4.23.12",
     "typescript": "^5.6.0",
     "vercel": "^59.10.0",

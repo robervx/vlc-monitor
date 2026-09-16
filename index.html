@@ -3,15 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Intelligent City Monitor</title>
+    <title>Mirall</title>
 
     <!-- PWA — spec 028. El <link rel="manifest"> lo inyecta vite-plugin-pwa. -->
     <meta name="theme-color" content="#0b1f33" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="IC Monitor" />
+    <meta name="apple-mobile-web-app-title" content="Mirall" />
     <link rel="icon" type="image/png" href="/icons/favicon-32.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- Tipografía del wordmark de marca — solo para #app-header__name, ver ADR-004 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
 
     <!-- Layout escritorio/móvil — spec 029. Se fija antes del primer pintado
          para que no haya parpadeo; deteccion-dispositivo.ts lo mantiene en
@@ -98,9 +103,10 @@
       }
 
       #app-header__name {
-        font-size: 16px;
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 20px;
         font-weight: 700;
-        letter-spacing: 0.02em;
+        letter-spacing: -0.01em;
       }
 
       #app-header__tagline {
@@ -108,6 +114,35 @@
         color: #b9c6d6;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+      }
+
+      /* Nav de dos vistas — spec 040. */
+      #app-header__nav {
+        display: flex;
+        gap: 4px;
+        margin-left: 20px;
+      }
+
+      .app-header__nav-link {
+        appearance: none;
+        border: none;
+        background: transparent;
+        color: #b9c6d6;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .app-header__nav-link:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      .app-header__nav-link[aria-current='page'] {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
       }
 
       #app-header__status {
@@ -917,90 +952,117 @@
         top: calc(var(--header-h) + 8px + env(safe-area-inset-top));
       }
 
-      /* spec 013 v4 — el "popup": alertas nuevas saltan arriba a la derecha
-         y se van solas; el panel de #info-panels sigue siendo la lista fija. */
-      #alert-toasts {
+      /* spec 013 v5 — modal bloqueante: una alerta nueva exige cierre
+         explícito antes de seguir, en vez del toast de esquina que se
+         autocerraba solo (v4). Cola: si llega más de una, se ven una a una. */
+      #alert-modal-backdrop {
         position: fixed;
-        top: calc(var(--header-h) + 12px);
-        right: 12px;
-        z-index: 900;
+        inset: 0;
+        z-index: 1100;
+        background: rgba(15, 23, 42, 0.55);
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: min(320px, calc(100vw - 24px));
-        pointer-events: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        animation: alert-modal-fade-in 0.12s ease;
       }
 
-      .alert-toast {
-        pointer-events: auto;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 10px 10px 10px 12px;
-        border-radius: 8px;
-        background: #fff;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
-        border-left: 4px solid #94a3b8;
-        animation: alert-toast-in 0.16s ease;
+      #alert-modal-backdrop[hidden] {
+        display: none;
       }
 
-      @keyframes alert-toast-in {
+      @keyframes alert-modal-fade-in {
         from {
           opacity: 0;
-          transform: translateX(12px);
         }
       }
 
-      .alert-toast--aviso {
-        border-left-color: #f2c744;
+      #alert-modal {
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        border-top: 5px solid #94a3b8;
+        overflow: hidden;
       }
 
-      .alert-toast--urgente {
-        border-left-color: #d64545;
+      #alert-modal.alert-modal--aviso {
+        border-top-color: #f2c744;
       }
 
-      .alert-toast--resumen {
-        justify-content: center;
+      #alert-modal.alert-modal--urgente {
+        border-top-color: #d64545;
+      }
+
+      .alert-modal__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .alert-modal__contador {
         font-size: 12px;
         color: #64748b;
-        border-left-color: transparent;
       }
 
-      .alert-toast__cuerpo {
-        flex: 1;
+      .alert-modal__cerrar {
+        background: transparent;
+        border: 0;
+        color: #64748b;
+        font-size: 16px;
         cursor: pointer;
-        min-width: 0;
+        padding: 2px 6px;
+        line-height: 1.4;
       }
 
-      .alert-toast__titulo {
-        font-size: 13px;
-        font-weight: 600;
+      .alert-modal__cuerpo {
+        padding: 14px 16px;
+      }
+
+      .alert-modal__titulo {
+        font-size: 15px;
+        font-weight: 700;
         color: #1e293b;
       }
 
-      .alert-toast__desc {
-        font-size: 12px;
+      .alert-modal__desc {
+        font-size: 13px;
         color: #475569;
-        margin-top: 2px;
+        margin-top: 6px;
+        line-height: 1.4;
       }
 
-      .alert-toast__cerrar {
-        background: transparent;
-        border: 0;
-        color: #94a3b8;
+      .alert-modal__footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 10px 16px 14px;
+      }
+
+      .alert-modal__footer button {
         font-size: 13px;
+        padding: 7px 12px;
+        border-radius: 6px;
         cursor: pointer;
-        padding: 0 4px;
-        line-height: 1.4;
+      }
+
+      .alert-modal__ver {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+      }
+
+      .alert-modal__siguiente {
+        background: var(--imc-navy, #0b1f33);
+        border: 1px solid var(--imc-navy, #0b1f33);
+        color: #fff;
       }
 
       .info-panel--resaltado {
         box-shadow: 0 0 0 2px #f2c744;
         transition: box-shadow 0.2s ease;
-      }
-
-      :root[data-layout='movil'] #alert-toasts {
-        top: calc(var(--header-h) + 8px + env(safe-area-inset-top));
       }
 
       #pwa-toast {
@@ -1217,8 +1279,12 @@
         min-width: 140px;
       }
 
-      /* spec 035 §5.2 — las leyendas de capa arrancan colapsadas a su título;
-         al pasar el ratón (o hacer foco / tocar) se expande la leyenda entera. */
+      /* spec 035 §5.2 (v2): las leyendas de capa arrancan colapsadas a su
+         título y se expanden solo con clic/tap (`buildInfoPanel` en
+         panel-utils.ts ya tenía el toggle de clic para táctil; v2 lo
+         generaliza a todos los dispositivos). Antes se expandían también al
+         pasar el ratón por encima — en escritorio se veían "en blanco" un
+         instante y molestaban para lectura/capturas, así que se retiró. */
       .info-panel--colapsable {
         cursor: pointer;
       }
@@ -1239,15 +1305,11 @@
         font-size: 11px;
       }
 
-      .info-panel--colapsable:hover > *,
-      .info-panel--colapsable:focus-within > *,
       .info-panel--colapsable.is-expandida > * {
         max-height: 320px;
         opacity: 1;
       }
 
-      .info-panel--colapsable:hover > :first-child::after,
-      .info-panel--colapsable:focus-within > :first-child::after,
       .info-panel--colapsable.is-expandida > :first-child::after {
         content: ' ▴';
       }
@@ -1516,6 +1578,56 @@
         display: none;
       }
 
+      /* Vista /inteligencia — spec 040. En vez de flotar ancladas al mapa
+         (posición absoluta de arriba), cámaras/prensa/tendencia pasan a fluir
+         como tarjetas normales dentro de la página; agenda y actualidad
+         institucional ya eran bloques normales, solo ganan aquí el mismo
+         aspecto de tarjeta. El body entero se vuelve un contenedor flex que
+         envuelve — el resto de hijos de <body> (mapa, selector, sidebar,
+         cabecera) están todos en `position:fixed/absolute` u ocultos por
+         `hidden`, así que no participan del flujo y no se ven afectados. */
+      :root[data-vista='inteligencia']:not([data-layout='movil']) body {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 16px;
+        padding: calc(var(--header-h) + 16px) 16px 16px calc(var(--sidebar-w-collapsed) + 16px);
+        box-sizing: border-box;
+        min-height: 100vh;
+      }
+
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-panel,
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel,
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #tendencia-panel {
+        position: static;
+        top: auto;
+        right: auto;
+        width: 320px;
+      }
+
+      #agenda-panel,
+      #actualidad-redes-panel {
+        width: 320px;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.97);
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
+        overflow: hidden auto;
+      }
+
+      #agenda-panel[hidden],
+      #actualidad-redes-panel[hidden] {
+        display: none;
+      }
+
+      #actualidad-redes-panel .actualidad-redes {
+        padding: 8px 12px 10px;
+        overflow-y: auto;
+      }
+
       .camaras-grid {
         display: flex;
         flex-direction: column;
@@ -1629,19 +1741,21 @@
         gap: 8px;
       }
 
-      .media-panel__filtro {
-        font-weight: 400;
-        font-size: 11px;
-        color: #555;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-      }
-
       .media-panel__list {
         overflow-y: auto;
         flex: 1;
+      }
+
+      /* spec 027 — aviso persistente de que la agenda es scraping, no una
+         API/dataset oficial (mismo principio de transparencia que el badge
+         MOCK de spec 003, adaptado: aquí no en letra pequeña tampoco). */
+      .agenda-panel__aviso {
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #7a4a00;
+        background: #fff3cd;
+        border-bottom: 1px solid #ffe69c;
       }
 
       .media-panel__item {
@@ -1666,6 +1780,17 @@
         font-size: 11px;
         color: #888;
         margin-top: 3px;
+      }
+
+      /* spec 009 v6 — titular con más de 24h desde su publicación: sigue
+         visible (es contexto igualmente válido) pero visualmente atenuado. */
+      .media-panel__item--caducado {
+        opacity: 0.6;
+      }
+
+      .media-panel__caducado {
+        color: #b45309;
+        font-weight: 600;
       }
 
       .media-panel__grupo-titulo {
@@ -1963,6 +2088,8 @@
       :root[data-layout='movil'] #info-panels > #media-panel,
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
       :root[data-layout='movil'] #info-panels > #camaras-panel,
+      :root[data-layout='movil'] #info-panels > #agenda-panel,
+      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel,
       :root[data-layout='movil'] #info-panels > .info-panel {
         position: static !important;
         inset: auto !important;
@@ -1974,12 +2101,16 @@
       }
       :root[data-layout='movil'] #info-panels > #media-panel,
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
-      :root[data-layout='movil'] #info-panels > #camaras-panel {
+      :root[data-layout='movil'] #info-panels > #camaras-panel,
+      :root[data-layout='movil'] #info-panels > #agenda-panel,
+      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel {
         display: flex !important;
       }
       :root[data-layout='movil'] #info-panels > #media-panel[hidden],
       :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden],
-      :root[data-layout='movil'] #info-panels > #camaras-panel[hidden] {
+      :root[data-layout='movil'] #info-panels > #camaras-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #agenda-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #actualidad-redes-panel[hidden] {
         display: none !important;
       }
 

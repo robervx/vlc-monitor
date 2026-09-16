@@ -4,32 +4,26 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
-import { GeoJsonLayer, ScatterplotLayer, IconLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, ScatterplotLayer, IconLayer, TextLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
 import { preloadDistrictGeometry, getDistrictCentroid, getLoadedDistricts } from './services/district-geometry';
 import type { DensidadDistritoMock } from './services/densidad-personas-mock';
-import type { EstadoMeteo } from './services/estado-meteo';
-import type { PrediccionCortoPlazo } from './services/prediccion-corto-plazo';
+import { generarHotspotsDensidadMock } from './services/densidad-personas-mock';
 import type { Insight, PanelInsights } from './services/insights';
-import {
-  UMBRAL_VIENTO_AVISO_KMH,
-  UMBRAL_VIENTO_URGENTE_KMH,
-  UMBRAL_CALOR_TEMPERATURA,
-  UMBRAL_CALOR_SENSACION,
-} from './services/insights';
 import type { CalidadAire } from './services/calidad-aire';
 import type { TramoTrafico, EstadoTramo } from './services/trafico';
 import type { HistoricoTrafico } from './services/trafico-historico';
 import { sparklinePath } from './services/trafico-historico';
 import type { EstacionValenbisi } from './services/valenbisi';
 import type { Aparcamiento } from './services/aparcamiento';
-import type { PulsoDistrito, CategoriaPulso } from './services/pulso-distrito';
+import type { PulsoDistrito, NivelPulso, EscenarioActivo } from './services/pulso-escenarios';
 import type { DatosFallas, MonumentoFalla } from './services/fallas';
 import type { ItemMediatico } from './services/mediatico';
 import type { VentanaTendencia } from './services/tendencia-terminos';
+import type { EventoAgenda, SnapshotAgenda } from './services/agenda-eventos';
 import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
 import { mountChasis } from './ui/chasis';
-import { applyPanelVisibility } from './ui/panel-preferences';
+import { applyPanelVisibility, PANEL_PREFERENCES_REGISTRY } from './ui/panel-preferences';
 import { registrarFrescura } from './ui/estado-frescura';
 import { montarDashboardKpis, registrarKpi } from './ui/dashboard-kpis';
 import { setFocoDistrito, getFocoDistrito, onCambioFoco, montarChipFoco } from './ui/foco-distrito';
@@ -55,7 +49,11 @@ import {
   getEstadoModoSimulacion,
 } from './ui/modo-simulacion-cortes';
 import { cargarGrafoViario } from './services/grafo-viario-cliente';
-import { camarasVisibles, type CamaraUrbana } from './config/camaras-urbanas';
+import { montarCamarasPanel } from './ui/camaras-panel';
+import { montarMeteoActualPanel, montarPrediccionPanel } from './ui/meteo-panel';
+import { buildActualidadRedesContent } from './ui/actualidad-redes';
+import { initRouter } from './ui/router';
+import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
 import { marcadoresSentido, type MarcadorSentido } from './services/flechas-sentido';
 import { puntosFlujoParaTramo } from './services/flujo-animado';
 import type { Coordenada } from './services/proximidad';
@@ -107,7 +105,9 @@ function writeStateToUrl(state: MapUrlState): void {
   params.set('view', `${state.center[0].toFixed(5)},${state.center[1].toFixed(5)}`);
   params.set('zoom', state.zoom.toFixed(2));
   if (state.distrito) params.set('distrito', state.distrito);
-  const newUrl = `${window.location.pathname}?${params.toString()}`;
+  // spec 040 — no pisar el hash de vista (#/inteligencia): replaceState
+  // sustituye la URL entera, así que hay que conservarlo explícitamente.
+  const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
   window.history.replaceState(null, '', newUrl);
 }
 
@@ -163,250 +163,145 @@ function marcadoresSentidoParaIds(
   return marcadoresSentido(tramos);
 }
 
-// Icono por rango de código WMO — ver src/services/estado-meteo.ts para la
-// tabla completa de descripciones.
-function iconoWeatherCode(codigo: number): string {
-  if (codigo === 0) return '☀️';
-  if (codigo <= 2) return '🌤️';
-  if (codigo === 3) return '☁️';
-  if (codigo <= 48) return '🌫️';
-  if (codigo <= 57) return '🌦️';
-  if (codigo <= 67) return '🌧️';
-  if (codigo <= 77) return '🌨️';
-  if (codigo <= 82) return '🌧️';
-  if (codigo <= 86) return '🌨️';
-  return '⛈️';
-}
-
-// Escapado defensivo — títulos/URLs de spec 009 vienen de feeds RSS externos,
-// nunca se insertan en el DOM sin pasar por aquí (riesgo de XSS si un feed
-// llega corrupto o comprometido).
-function escapeHtml(texto: string): string {
-  return texto
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function formatoFrescura(fetchedAt: string): string {
-  const minutos = Math.round((Date.now() - new Date(fetchedAt).getTime()) / 60000);
-  if (minutos < 1) return 'hace instantes';
-  if (minutos === 1) return 'hace 1 min';
-  return `hace ${minutos} min`;
-}
-
-function metaFrescura(fuente: string, fetchedAt: string, fresh: boolean): string {
-  const aviso = fresh
-    ? ''
-    : '<span class="info-panel__stale" title="No se pudo refrescar, mostrando el último dato bueno">⚠ no actualizado</span>';
-  return `${fuente} · actualizado ${formatoFrescura(fetchedAt)} ${aviso}`;
-}
-
-function buildInfoPanel(id: string, opciones?: { colapsable?: boolean }): HTMLDivElement {
-  let container = document.getElementById('info-panels') as HTMLDivElement | null;
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'info-panels';
-    document.body.appendChild(container);
-  }
-  const root = document.createElement('div');
-  root.id = id;
-  root.className = 'info-panel';
-  // spec 035 §5.2 — las leyendas de capa arrancan colapsadas a su título y se
-  // expanden al hover/foco/tap. Los paneles de datos fijos no se colapsan.
-  if (opciones?.colapsable) {
-    root.classList.add('info-panel--colapsable');
-    root.tabIndex = 0;
-    root.addEventListener('click', (ev) => {
-      // en táctil no hay hover: un toque en el cuerpo (no en un botón/enlace) alterna.
-      if ((ev.target as HTMLElement).closest('button, a')) return;
-      root.classList.toggle('is-expandida');
-    });
-  }
-  root.textContent = 'Cargando…';
-  container.appendChild(root);
-  return root;
-}
-
-// Semáforo de viento — mismos umbrales que la regla 'viento-fuerte' de
-// insights.ts (spec 013), para que el color de aquí y el aviso coincidan.
-function colorSemaforoViento(rachas: number): string {
-  if (rachas >= UMBRAL_VIENTO_URGENTE_KMH) return '#dc2626'; // rojo
-  if (rachas >= UMBRAL_VIENTO_AVISO_KMH) return '#f59e0b'; // ámbar
-  return '#16a34a'; // verde
-}
-
-function renderMeteoPanel(root: HTMLDivElement, estado: EstadoMeteo, fresh: boolean): void {
-  root.innerHTML = `
-    <div class="info-panel__main">
-      <span class="info-panel__icon">${iconoWeatherCode(estado.weatherCode)}</span>
-      <span class="info-panel__value">${Math.round(estado.temperatura)}°C</span>
-    </div>
-    <div class="info-panel__desc">${estado.descripcion}</div>
-    <div class="info-panel__viento">
-      <span class="info-panel__viento-dot" style="background:${colorSemaforoViento(estado.vientoRachas)}"></span>
-      Viento ${Math.round(estado.vientoVelocidad)} km/h · rachas ${Math.round(estado.vientoRachas)} km/h
-    </div>
-    <div class="info-panel__meta">${metaFrescura('Open-Meteo', estado.fetchedAt, fresh)}</div>
-  `;
-
-  const t = estado.temperatura;
-  registrarKpi({
-    clave: 'temperatura',
-    etiqueta: 'Temp.',
-    valor: `${Math.round(t)}°C`,
-    tono:
-      t >= UMBRAL_CALOR_TEMPERATURA || estado.sensacionTermica >= UMBRAL_CALOR_SENSACION
-        ? 'urgente'
-        : t >= 35
-          ? 'aviso'
-          : 'neutro',
-  });
-}
-
-async function fetchEstadoMeteoActual(): Promise<{ estado: EstadoMeteo; fresh: boolean }> {
-  const res = await fetch('/api/meteo/v1/actual');
-  if (!res.ok) throw new Error(`GET /api/meteo/v1/actual -> HTTP ${res.status}`);
-  return (await res.json()) as { estado: EstadoMeteo; fresh: boolean };
-}
-
-function formatoHora(iso: string): string {
-  return new Date(iso).toLocaleTimeString('es-ES', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Madrid',
-  });
-}
-
-// Spec 016 — panel de "próximas horas" junto al de meteo actual.
-function renderPrediccionPanel(root: HTMLDivElement, prediccion: PrediccionCortoPlazo, fresh: boolean): void {
-  const tramos = prediccion.predicciones
-    .map(
-      (tramo) => `
-        <div class="prediccion-panel__tramo">
-          <div class="prediccion-panel__hora">${formatoHora(tramo.horaObjetivo)}</div>
-          <div class="prediccion-panel__icon">${iconoWeatherCode(tramo.weatherCode)}</div>
-          <div class="prediccion-panel__temp">${Math.round(tramo.temperatura)}°</div>
-          <div class="prediccion-panel__lluvia">💧${Math.round(tramo.probabilidadPrecipitacion)}%</div>
-        </div>`,
-    )
-    .join('');
-  root.innerHTML = `
-    <div class="info-panel__desc">Próximas ${prediccion.ventanaHoras}h</div>
-    <div class="prediccion-panel__tramos">${tramos}</div>
-    <div class="info-panel__meta">${metaFrescura('Open-Meteo', prediccion.fetchedAt, fresh)}</div>
-  `;
-}
-
-async function fetchPrediccionCortoPlazoActual(): Promise<{ prediccion: PrediccionCortoPlazo; fresh: boolean }> {
-  const res = await fetch('/api/meteo/v1/prediccion-corto-plazo');
-  if (!res.ok) throw new Error(`GET /api/meteo/v1/prediccion-corto-plazo -> HTTP ${res.status}`);
-  return (await res.json()) as { prediccion: PrediccionCortoPlazo; fresh: boolean };
-}
-
 // Spec 013 — "avisa, no actúa" (CLAUDE.md §4): cada tarjeta ofrece un
 // borrador para copiar, nunca un envío automático ni una lista de
 // destinatarios. Guardamos el último panel para que el listener de clic
 // (delegado, ver más abajo) pueda leer el texto exacto a copiar.
 let ultimoPanelInsights: PanelInsights | null = null;
 
-// Spec 013 v4 — el "popup": cuando aparece un insight con un id que no estaba
-// en la evaluación anterior, salta un toast arriba a la derecha. `null` =
-// todavía no ha habido primera carga → esa primera se puebla en silencio.
+// Spec 013 v4/v5 — cuando aparece un insight con un id que no estaba en la
+// evaluación anterior, salta una alerta. `null` = todavía no ha habido
+// primera carga → esa primera se puebla en silencio (no es "nueva").
 let idsInsightsPrevios: Set<string> | null = null;
 
-function contenedorToasts(): HTMLDivElement {
-  let cont = document.getElementById('alert-toasts') as HTMLDivElement | null;
-  if (!cont) {
-    cont = document.createElement('div');
-    cont.id = 'alert-toasts';
-    document.body.appendChild(cont);
+// v5 (DoD de V1, 2026-09-16): el toast de esquina que se autocerraba solo a
+// los 10s pasa a un modal bloqueante — exige cierre explícito. Si llegan
+// varias alertas nuevas a la vez, se ven una a una (cola), nunca varios
+// modales superpuestos. No existía ningún <dialog>/modal en el repo antes de
+// esto — reutiliza el patrón de backdrop/focus-trap/Esc del sidebar móvil
+// (`src/ui/chasis.ts`), adaptado aquí porque vive en un módulo distinto.
+let colaAlertasModal: Insight[] = [];
+let focoPrevioAlertaModal: HTMLElement | null = null;
+
+function elementosModalAlerta(): { backdrop: HTMLDivElement; modal: HTMLDivElement } {
+  let backdrop = document.getElementById('alert-modal-backdrop') as HTMLDivElement | null;
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'alert-modal-backdrop';
+    backdrop.hidden = true;
+    const modal = document.createElement('div');
+    modal.id = 'alert-modal';
+    modal.setAttribute('role', 'alertdialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'alert-modal-titulo');
+    modal.tabIndex = -1;
+    backdrop.appendChild(modal);
+    backdrop.addEventListener('click', (ev) => {
+      if (ev.target === backdrop) cerrarAlertaModalActual();
+    });
+    document.body.appendChild(backdrop);
   }
-  return cont;
+  return { backdrop, modal: document.getElementById('alert-modal') as HTMLDivElement };
 }
 
-function mostrarToastAlerta(insight: Insight): void {
-  const cont = contenedorToasts();
-  // máx. 3 visibles; el resto se resume en "y N más".
-  const visibles = cont.querySelectorAll('.alert-toast:not(.alert-toast--resumen)');
-  if (visibles.length >= 3) {
-    let resumen = cont.querySelector<HTMLDivElement>('.alert-toast--resumen');
-    const n = Number(resumen?.dataset.n ?? '0') + 1;
-    if (!resumen) {
-      resumen = document.createElement('div');
-      resumen.className = 'alert-toast alert-toast--resumen';
-      cont.appendChild(resumen);
+function onKeydownAlertaModal(ev: KeyboardEvent): void {
+  if (ev.key === 'Escape') {
+    cerrarAlertaModalActual();
+    return;
+  }
+  if (ev.key === 'Tab') {
+    const { modal } = elementosModalAlerta();
+    const focusables = modal.querySelectorAll<HTMLElement>('button');
+    if (focusables.length === 0) return;
+    const primero = focusables[0]!;
+    const ultimo = focusables[focusables.length - 1]!;
+    if (ev.shiftKey && document.activeElement === primero) {
+      ev.preventDefault();
+      ultimo.focus();
+    } else if (!ev.shiftKey && document.activeElement === ultimo) {
+      ev.preventDefault();
+      primero.focus();
     }
-    resumen.dataset.n = String(n);
-    resumen.textContent = `y ${n} alerta${n === 1 ? '' : 's'} más`;
+  }
+}
+
+function renderAlertaModalActual(): void {
+  const { backdrop, modal } = elementosModalAlerta();
+  const insight = colaAlertasModal[0];
+
+  if (!insight) {
+    backdrop.hidden = true;
+    document.removeEventListener('keydown', onKeydownAlertaModal);
+    if (focoPrevioAlertaModal) {
+      focoPrevioAlertaModal.focus?.();
+      focoPrevioAlertaModal = null;
+    }
     return;
   }
 
-  const el = document.createElement('div');
-  el.className = `alert-toast alert-toast--${insight.severidad}`;
-  el.setAttribute('role', 'status');
+  modal.className = `alert-modal--${insight.severidad}`;
+  modal.innerHTML = `
+    <div class="alert-modal__header">
+      <span class="alert-modal__contador">${colaAlertasModal.length > 1 ? `1 de ${colaAlertasModal.length}` : ''}</span>
+      <button type="button" class="alert-modal__cerrar" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="alert-modal__cuerpo">
+      <div class="alert-modal__titulo" id="alert-modal-titulo">${escapeHtml(insight.titulo)}</div>
+      <div class="alert-modal__desc">${escapeHtml(insight.descripcion)}</div>
+    </div>
+    <div class="alert-modal__footer">
+      <button type="button" class="alert-modal__ver">Ver en el panel</button>
+    </div>
+  `;
 
-  const cuerpo = document.createElement('div');
-  cuerpo.className = 'alert-toast__cuerpo';
-  const titulo = document.createElement('div');
-  titulo.className = 'alert-toast__titulo';
-  titulo.textContent = insight.titulo;
-  const desc = document.createElement('div');
-  desc.className = 'alert-toast__desc';
-  desc.textContent = insight.descripcion;
-  cuerpo.append(titulo, desc);
-
-  const cerrar = document.createElement('button');
-  cerrar.className = 'alert-toast__cerrar';
-  cerrar.type = 'button';
-  cerrar.setAttribute('aria-label', 'Descartar aviso');
-  cerrar.textContent = '✕';
-
-  el.append(cuerpo, cerrar);
-  cont.appendChild(el);
-
-  const quitar = (): void => {
-    el.remove();
-    if (!cont.querySelector('.alert-toast:not(.alert-toast--resumen)')) {
-      cont.querySelector('.alert-toast--resumen')?.remove();
-    }
-  };
-  const timer = window.setTimeout(quitar, 10_000);
-  cerrar.addEventListener('click', () => {
-    window.clearTimeout(timer);
-    quitar();
-  });
-  cuerpo.addEventListener('click', () => {
+  modal.querySelector('.alert-modal__cerrar')!.addEventListener('click', cerrarAlertaModalActual);
+  modal.querySelector('.alert-modal__ver')!.addEventListener('click', () => {
     const panel = document.getElementById('insights-panel');
     panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     panel?.classList.add('info-panel--resaltado');
     window.setTimeout(() => panel?.classList.remove('info-panel--resaltado'), 1500);
+    cerrarAlertaModalActual();
   });
+
+  if (backdrop.hidden) {
+    focoPrevioAlertaModal = document.activeElement as HTMLElement | null;
+    backdrop.hidden = false;
+    document.addEventListener('keydown', onKeydownAlertaModal);
+  }
+  modal.querySelector<HTMLButtonElement>('.alert-modal__cerrar')!.focus();
+}
+
+function cerrarAlertaModalActual(): void {
+  colaAlertasModal.shift();
+  renderAlertaModalActual();
+}
+
+function mostrarModalAlerta(insight: Insight): void {
+  colaAlertasModal.push(insight);
+  renderAlertaModalActual();
 }
 
 function procesarNuevasAlertas(panel: PanelInsights): void {
   const idsAhora = new Set(panel.insights.map((i) => i.id));
   if (idsInsightsPrevios !== null) {
     for (const insight of panel.insights) {
-      if (!idsInsightsPrevios.has(insight.id)) mostrarToastAlerta(insight);
+      if (!idsInsightsPrevios.has(insight.id)) mostrarModalAlerta(insight);
     }
   }
   idsInsightsPrevios = idsAhora;
 }
 
 if (import.meta.env.DEV) {
-  // Ayuda de verificación en dev: dispara un toast de alerta de prueba.
+  // Ayuda de verificación en dev: dispara una alerta de prueba en el modal.
   (window as unknown as { __toastAlertaDemo?: (sev?: 'aviso' | 'urgente') => void }).__toastAlertaDemo = (
     sev = 'urgente',
   ) =>
-    mostrarToastAlerta({
+    mostrarModalAlerta({
       id: `demo:${Date.now()}`,
       tipo: 'calor-extremo',
       severidad: sev,
       titulo: sev === 'urgente' ? 'Calor extremo — 39°C en Valencia' : 'Aviso de calor — 35°C',
-      descripcion: 'Alerta de prueba para verificar el toast (spec 013 v4).',
+      descripcion: 'Alerta de prueba para verificar el modal (spec 013 v5).',
       protocoloSugerido: { asunto: '', cuerpo: '' },
       fuenteSpec: ['001'],
       detectedAt: new Date().toISOString(),
@@ -429,7 +324,7 @@ function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: 
   if (panel.insights.length === 0) {
     root.innerHTML = `
       <div class="info-panel__desc">✓ Sin alertas activas</div>
-      <div class="info-panel__meta">${metaFrescura('VLC Monitor (insights)', panel.fetchedAt, fresh)}</div>
+      <div class="info-panel__meta">${metaFrescura('Mirall (insights)', panel.fetchedAt, fresh)}</div>
     `;
     return;
   }
@@ -452,7 +347,7 @@ function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: 
   root.innerHTML = `
     <div class="info-panel__desc">⚠ ${panel.insights.length} alerta${panel.insights.length === 1 ? '' : 's'}</div>
     <div class="insight-panel__tarjetas">${tarjetas}</div>
-    <div class="info-panel__meta">${metaFrescura('VLC Monitor (insights)', panel.fetchedAt, fresh)}</div>
+    <div class="info-panel__meta">${metaFrescura('Mirall (insights)', panel.fetchedAt, fresh)}</div>
   `;
 }
 
@@ -511,13 +406,6 @@ async function fetchCalidadAireActual(): Promise<{ calidad: CalidadAire; fresh: 
   return (await res.json()) as { calidad: CalidadAire; fresh: boolean };
 }
 
-function startPolling(refresh: () => Promise<void>, intervalMs: number): void {
-  refresh().catch((err: unknown) => console.error('Fallo al refrescar panel:', err));
-  setInterval(() => {
-    refresh().catch((err: unknown) => console.error('Fallo al refrescar panel:', err));
-  }, intervalMs);
-}
-
 const COLOR_ESTADO_TRAFICO: Record<EstadoTramo, Color> = {
   fluido: [76, 175, 80, 200],
   denso: [255, 193, 7, 200],
@@ -525,6 +413,32 @@ const COLOR_ESTADO_TRAFICO: Record<EstadoTramo, Color> = {
   cortado: [211, 47, 47, 220],
   'sin-datos': [158, 158, 158, 130],
 };
+
+// v4 (DoD de V1, 2026-09-16): los estados no-fluidos no resaltaban frente al
+// verde, que domina por ser mayoría de los ~400 tramos. Dos ajustes, sin
+// tocar el color en sí: ancho creciente por severidad, y orden de dibujo
+// (`ordenarTramosPorSeveridad`) para que lo problemático se pinte encima de
+// lo fluido — deck.gl pinta un `GeoJsonLayer` en el orden del array de
+// features, no hay una prop de z-order propia.
+const ANCHO_ESTADO_TRAFICO: Record<EstadoTramo, number> = {
+  'sin-datos': 3,
+  fluido: 3,
+  denso: 5,
+  congestionado: 6,
+  cortado: 7,
+};
+
+const SEVERIDAD_ESTADO_TRAFICO: Record<EstadoTramo, number> = {
+  'sin-datos': 0,
+  fluido: 1,
+  denso: 2,
+  congestionado: 3,
+  cortado: 4,
+};
+
+function ordenarTramosPorSeveridad(tramos: TramoTrafico[]): TramoTrafico[] {
+  return [...tramos].sort((a, b) => SEVERIDAD_ESTADO_TRAFICO[a.estado] - SEVERIDAD_ESTADO_TRAFICO[b.estado]);
+}
 
 const ETIQUETA_ESTADO_TRAFICO: Record<EstadoTramo, string> = {
   fluido: 'Fluido',
@@ -598,7 +512,7 @@ function renderTraficoHistoricoPanel(root: HTMLDivElement, historico: HistoricoT
       <polyline points="${puntosSvg}" fill="none" stroke="#b45309" stroke-width="2" />
     </svg>
     <div class="info-panel__value info-panel__value--small">${ultimo}% ahora</div>
-    <div class="info-panel__meta">${metaFrescura('VLC Monitor (histórico)', historico.fetchedAt, fresh)}</div>
+    <div class="info-panel__meta">${metaFrescura('Mirall (histórico)', historico.fetchedAt, fresh)}</div>
   `;
 }
 
@@ -660,49 +574,75 @@ async function fetchAparcamientosActual(): Promise<{ aparcamientos: Aparcamiento
   return (await res.json()) as { aparcamientos: Aparcamiento[]; fresh: boolean };
 }
 
-// Verde -> amarillo -> naranja -> rojo, según categoría — ver src/services/pulso-distrito.ts.
-const COLOR_CATEGORIA_PULSO: Record<CategoriaPulso, Color> = {
-  Tranquilo: [76, 175, 80, 140],
-  Moderado: [255, 235, 59, 150],
-  Tenso: [255, 152, 0, 160],
-  Crítico: [211, 47, 47, 180],
+// v4 (spec 010 §5/§10) — el índice 0-100 se retira; el nivel es ordinal de
+// 2 escalones (seguimiento/prioritario) + un tercer estado visual de reposo
+// ('sin-senal') con dos tonos de gris según si el distrito tiene tramos de
+// tráfico suficientes para evaluar o no ("gris tramado" de la spec — deck.gl
+// no soporta patrones de relleno sin shaders propios, se aproxima con menor
+// opacidad, documentado aquí en vez de fingir un tramado real).
+const COLOR_NIVEL_PULSO: Record<'seguimiento' | 'prioritario', Color> = {
+  seguimiento: [255, 193, 7, 200],
+  prioritario: [211, 47, 47, 210],
 };
+const COLOR_PULSO_SIN_SENAL: Color = [158, 158, 158, 90];
+const COLOR_PULSO_MONITORIZACION_INSUFICIENTE: Color = [158, 158, 158, 35];
+
+function colorChoroplethPulso(d: PulsoDistrito | undefined): Color {
+  if (!d) return COLOR_PULSO_SIN_SENAL;
+  if (d.nivel === 'prioritario') return COLOR_NIVEL_PULSO.prioritario;
+  if (d.nivel === 'seguimiento') return COLOR_NIVEL_PULSO.seguimiento;
+  return d.monitorizacion === 'insuficiente' ? COLOR_PULSO_MONITORIZACION_INSUFICIENTE : COLOR_PULSO_SIN_SENAL;
+}
+
+/** Escenarios que la UI pinta (marcador + choropleth): vivo + confirmado — los 'sombra' y los no confirmados quedan solo para trazabilidad (spec 010 §4). */
+function escenariosVivosConfirmados(
+  distritos: PulsoDistrito[],
+): Array<{ distritoCodigo: string; distritoNombre: string; escenario: EscenarioActivo }> {
+  return distritos.flatMap((d) =>
+    d.escenariosActivos
+      .filter((e) => e.modo === 'vivo' && e.confirmado)
+      .map((escenario) => ({ distritoCodigo: d.distritoCodigo, distritoNombre: d.distritoNombre, escenario })),
+  );
+}
 
 function renderPulsoLeyenda(root: HTMLDivElement, distritos: PulsoDistrito[], fresh: boolean): void {
-  const masTenso = [...distritos].sort((a, b) => b.indice - a.indice)[0];
-  const filas = (Object.keys(COLOR_CATEGORIA_PULSO) as CategoriaPulso[])
-    .map((categoria) => {
-      const [r, g, b] = COLOR_CATEGORIA_PULSO[categoria];
-      const n = distritos.filter((d) => d.categoria === categoria).length;
+  const prioritarios = distritos.filter((d) => d.nivel === 'prioritario');
+  const seguimiento = distritos.filter((d) => d.nivel === 'seguimiento');
+  const insuficientes = distritos.filter((d) => d.nivel === 'sin-senal' && d.monitorizacion === 'insuficiente');
+  const activos = escenariosVivosConfirmados(distritos);
+
+  registrarKpi({
+    clave: 'pulso',
+    etiqueta: 'Pulso',
+    valor:
+      prioritarios.length + seguimiento.length === 0
+        ? 'sin señal'
+        : `${prioritarios.length} prioritario${prioritarios.length === 1 ? '' : 's'} · ${seguimiento.length} seguimiento`,
+    tono: prioritarios.length > 0 ? 'urgente' : seguimiento.length > 0 ? 'aviso' : 'ok',
+    capaRelacionada: 'toggle-pulso',
+  });
+
+  // spec 036 — si hay un distrito en foco, se antepone su nivel.
+  const foco = getFocoDistrito();
+  const enFoco = foco ? distritos.find((d) => d.distritoCodigo === foco.codigo) : undefined;
+
+  const filasEscenarios = activos
+    .map(({ distritoNombre, escenario }) => {
+      const [r, g, b] = COLOR_NIVEL_PULSO[escenario.nivel];
       return `<div class="trafico-leyenda__row">
         <span class="trafico-leyenda__dot" style="background:rgb(${r},${g},${b})"></span>
-        ${categoria} (${n})
+        ${escapeHtml(distritoNombre)}: ${escapeHtml(escenario.motivo)}
       </div>`;
     })
     .join('');
 
-  const criticos = distritos.filter((d) => d.categoria === 'Crítico').length;
-  const tensos = distritos.filter((d) => d.categoria === 'Tenso').length;
-  const moderados = distritos.filter((d) => d.categoria === 'Moderado').length;
-  const noTranquilos = criticos + tensos + moderados;
-  registrarKpi({
-    clave: 'pulso',
-    etiqueta: 'Pulso',
-    valor: noTranquilos === 0 ? 'tranquilo' : `${noTranquilos} distrito${noTranquilos === 1 ? '' : 's'}`,
-    tono: criticos > 0 ? 'urgente' : tensos > 0 ? 'aviso' : moderados > 0 ? 'neutro' : 'ok',
-    capaRelacionada: 'toggle-pulso',
-  });
-
-  // spec 036 — si hay un distrito en foco, se antepone su índice.
-  const foco = getFocoDistrito();
-  const enFoco = foco ? distritos.find((d) => d.distritoCodigo === foco.codigo) : undefined;
-
   root.innerHTML = `
-    <div class="info-panel__desc">Pulso de Distrito${masTenso ? ` — ${masTenso.distritoNombre} (${masTenso.indice})` : ''}</div>
-    ${enFoco ? `<div class="pulso-leyenda__foco">${enFoco.distritoNombre}: <strong>${enFoco.indice}</strong> · ${enFoco.categoria}</div>` : ''}
-    ${filas}
-    ${masTenso ? `<div class="info-panel__meta">Más tenso: ${masTenso.distritoNombre} · índice ${masTenso.indice}</div>` : ''}
-    <div class="info-panel__meta">${metaFrescura('VLC Monitor (compuesto)', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+    <div class="info-panel__desc">Pulso de Distrito${activos.length > 0 ? ` — ${activos.length} escenario${activos.length === 1 ? '' : 's'} activo${activos.length === 1 ? '' : 's'}` : ' — sin escenarios activos'}</div>
+    ${enFoco ? `<div class="pulso-leyenda__foco">${escapeHtml(enFoco.distritoNombre)}: <strong>${enFoco.nivel === 'sin-senal' ? 'sin señal' : enFoco.nivel}</strong></div>` : ''}
+    ${filasEscenarios || '<div class="trafico-leyenda__row">Sin escenarios activos ahora mismo.</div>'}
+    <div class="info-panel__meta">${prioritarios.length} prioritario · ${seguimiento.length} seguimiento · ${insuficientes.length} con monitorización insuficiente</div>
+    <div class="info-panel__meta">Heurística documentada, no validada contra ground truth (spec 010 §7).</div>
+    <div class="info-panel__meta">${metaFrescura('Mirall (escenarios)', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
   `;
 }
 
@@ -815,28 +755,9 @@ function formatoTiempoRelativo(fechaIso: string): string {
   return `hace ${Math.round(horas / 24)} d`;
 }
 
-const PREF_OCIO_DEPORTE = 'imc:media-ocio-deporte';
-
-function leerPrefOcioDeporte(): boolean {
-  try {
-    return localStorage.getItem(PREF_OCIO_DEPORTE) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function guardarPrefOcioDeporte(valor: boolean): void {
-  try {
-    localStorage.setItem(PREF_OCIO_DEPORTE, valor ? '1' : '0');
-  } catch {
-    /* almacenamiento no disponible — no bloquea el panel */
-  }
-}
-
 interface MediaPanel {
   root: HTMLDivElement;
   list: HTMLDivElement;
-  ocioDeporteToggle: HTMLInputElement;
 }
 
 function buildMediaPanel(): MediaPanel {
@@ -844,21 +765,18 @@ function buildMediaPanel(): MediaPanel {
   root.id = 'media-panel';
   root.hidden = true;
   root.innerHTML = `
-    <div class="media-panel__header">
-      Contexto mediático
-      <label class="media-panel__filtro">
-        <input type="checkbox" id="media-ocio-deporte-toggle" />
-        Ocio y deporte
-      </label>
-    </div>
+    <div class="media-panel__header">Contexto mediático</div>
     <div class="media-panel__list" id="media-panel-list"></div>
     <div class="info-panel__meta" id="media-panel-meta"></div>
   `;
   document.body.appendChild(root);
-  const ocioDeporteToggle = root.querySelector<HTMLInputElement>('#media-ocio-deporte-toggle')!;
-  ocioDeporteToggle.checked = leerPrefOcioDeporte();
-  return { root, list: root.querySelector('#media-panel-list')!, ocioDeporteToggle };
+  return { root, list: root.querySelector('#media-panel-list')! };
 }
+
+// v6 (DoD de V1, 2026-09-16): "es una herramienta para alertas" — un titular
+// que lleva demasiado tiempo sin renovarse deja de ser señal de "ahora mismo"
+// y se marca como caducado, sin ocultarlo (sigue siendo contexto válido).
+const UMBRAL_CADUCADO_MS = 24 * 60 * 60 * 1000; // 24h
 
 // Spec 023 §5: cada ítem enlaza a la noticia; si menciona distrito(s), se muestra
 // como chip(s) — atenuado si el match solo pasó por la guarda de contexto de un
@@ -872,10 +790,15 @@ function renderItemMediatico(item: ItemMediatico): string {
     .join('');
 
   const viaGoogle = item.fuenteTipo === 'google-news' ? ' · vía Google News' : '';
+  const caducado = Date.now() - new Date(item.publicadoEn).getTime() > UMBRAL_CADUCADO_MS;
+  const claseItem = caducado ? 'media-panel__item media-panel__item--caducado' : 'media-panel__item';
+  const avisoCaducado = caducado
+    ? ' · <span class="media-panel__caducado" title="Más de 24h desde su publicación">caducado</span>'
+    : '';
   return `
-    <a class="media-panel__item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+    <a class="${claseItem}" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
       <div class="media-panel__item-titulo">${escapeHtml(item.titulo)}</div>
-      <div class="media-panel__item-meta">${escapeHtml(item.fuente)} · ${formatoTiempoRelativo(item.publicadoEn)}${viaGoogle}</div>
+      <div class="media-panel__item-meta">${escapeHtml(item.fuente)} · ${formatoTiempoRelativo(item.publicadoEn)}${viaGoogle}${avisoCaducado}</div>
       ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
     </a>
   `;
@@ -889,6 +812,11 @@ function renderGrupoMediatico(titulo: string, items: ItemMediatico[]): string {
   `;
 }
 
+// Mismo TTL que la caché del endpoint (`api/mediatico/v1/items`, spec 009 §4)
+// — no se importa desde ahí para no arrastrar código de servidor al bundle
+// de cliente (ver comentario equivalente en el polling de más abajo).
+const TTL_MEDIATICO_MS = 15 * 60 * 1000;
+
 function renderMediaticoPanel(
   panel: MediaPanel,
   items: ItemMediatico[],
@@ -896,20 +824,20 @@ function renderMediaticoPanel(
   fuentesFallidas: string[],
 ): void {
   const validos = items.filter((item) => /^https?:\/\//i.test(item.url)); // nunca renderizar javascript:/data: aunque venga en el feed
-  const mostrarOcioDeporte = panel.ocioDeporteToggle.checked;
 
-  const informativos = validos.filter((i) => i.categoria === 'general');
-  const ocio = validos.filter((i) => i.categoria === 'ocio');
-  const deporte = validos.filter((i) => i.categoria === 'deporte');
+  // v6: ya no hay bucket "ocio y deporte" que ocultar tras un toggle — el
+  // filtro (spec 009 §3.1 v6) ya descarta el deporte que no es fútbol antes
+  // de llegar aquí, así que lo que sobrevive se trata como cualquier otro
+  // titular de ciudad.
 
-  // Spec 023 §5: agrupar los informativos por distrito mencionado; un ítem con
-  // dos distritos aparece en los dos grupos. Sin mención -> bucket de ciudad
-  // (confirmado por hito/institución) o "general, sin confirmar" (spec 009 §3.1).
+  // Spec 023 §5: agrupar por distrito mencionado; un ítem con dos distritos
+  // aparece en los dos grupos. Sin mención -> bucket de ciudad (confirmado
+  // por hito/institución) o "general, sin confirmar" (spec 009 §3.1).
   const porDistrito = new Map<string, { nombre: string; items: ItemMediatico[] }>();
   const ciudadSinDistrito: ItemMediatico[] = [];
   const generales: ItemMediatico[] = [];
 
-  for (const item of informativos) {
+  for (const item of validos) {
     if (item.distritosMencionados.length === 0) {
       (item.ambitoCiudad === 'confirmado' ? ciudadSinDistrito : generales).push(item);
       continue;
@@ -937,10 +865,6 @@ function renderMediaticoPanel(
     renderGrupoMediatico('València (ciudad)', ciudadSinDistrito),
     renderGrupoMediatico('València (general, sin confirmar)', generales),
   ];
-  if (mostrarOcioDeporte) {
-    partes.push(renderGrupoMediatico('Ocio y cultura', ocio));
-    partes.push(renderGrupoMediatico('Deporte', deporte));
-  }
 
   const vacio = foco
     ? `<div class="tendencia-panel__insuficiente">Sin titulares que mencionen ${foco.nombre} ahora mismo.</div>`
@@ -948,15 +872,11 @@ function renderMediaticoPanel(
   panel.list.innerHTML = (foco ? `<div class="media-panel__foco">Foco: ${foco.nombre}</div>` : '') + (partes.join('') || vacio);
 
   const meta = panel.root.querySelector('#media-panel-meta')!;
-  const ocultos =
-    !mostrarOcioDeporte && ocio.length + deporte.length > 0
-      ? ` · ${ocio.length + deporte.length} de ocio/deporte ocultos`
-      : '';
+  const fetchedAt = items[0]?.fetchedAt ?? new Date().toISOString();
+  const minutosParaProxima = Math.round((TTL_MEDIATICO_MS - (Date.now() - new Date(fetchedAt).getTime())) / 60000);
+  const proxima = fresh && minutosParaProxima > 0 ? ` · próxima actualización en ~${minutosParaProxima} min` : '';
   const avisoFallidas = fuentesFallidas.length > 0 ? ` · sin ${fuentesFallidas.join(', ')}` : '';
-  meta.innerHTML =
-    metaFrescura('Prensa local', items[0]?.fetchedAt ?? new Date().toISOString(), fresh) +
-    ocultos +
-    avisoFallidas;
+  meta.innerHTML = metaFrescura('Prensa local', fetchedAt, fresh) + proxima + avisoFallidas;
 }
 
 async function fetchItemsMediaticosActual(): Promise<{
@@ -1024,124 +944,106 @@ function renderTendenciaPanel(
   }
 
   const meta = panel.root.querySelector('#tendencia-panel-meta')!;
-  meta.innerHTML = `${metaFrescura('VLC Monitor (tendencia)', ventana.fetchedAt, fresh)} · ${ventana.totalItems} ítems considerados`;
+  meta.innerHTML = `${metaFrescura('Mirall (tendencia)', ventana.fetchedAt, fresh)} · ${ventana.totalItems} ítems considerados`;
+}
+
+// spec 027 — agenda general de eventos culturales, vía scraping resiliente de
+// valencia.es (no una API oficial, ver spec 027 §2). Mismo patrón visual que
+// el contexto mediático (spec 009): panel de lista agrupado por distrito
+// mencionado + bloque "València (general)".
+interface AgendaPanel {
+  root: HTMLDivElement;
+  list: HTMLDivElement;
+}
+
+function buildAgendaPanel(): AgendaPanel {
+  const root = document.createElement('div');
+  root.id = 'agenda-panel';
+  root.hidden = true;
+  root.innerHTML = `
+    <div class="media-panel__header">Agenda de eventos</div>
+    <div class="agenda-panel__aviso">Contenido extraído por scraping de valencia.es — no es una API ni un dataset oficial.</div>
+    <div class="media-panel__list" id="agenda-panel-list"></div>
+    <div class="info-panel__meta" id="agenda-panel-meta"></div>
+  `;
+  document.body.appendChild(root);
+  return { root, list: root.querySelector('#agenda-panel-list')! };
+}
+
+function formatoFechaEvento(fechaInicio: string, fechaFin: string): string {
+  const inicio = new Date(fechaInicio);
+  const fin = new Date(fechaFin);
+  const fmtFin = fin.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (inicio.getTime() === fin.getTime()) return fmtFin;
+  const fmtInicio = inicio.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return `${fmtInicio} – ${fmtFin}`;
+}
+
+function renderItemAgenda(evento: EventoAgenda): string {
+  const chips = evento.distritosMencionados
+    .map((m) => `<span class="media-panel__chip">${escapeHtml(m.distritoNombre)}</span>`)
+    .join('');
+  return `
+    <a class="media-panel__item" href="${escapeHtml(evento.url)}" target="_blank" rel="noopener noreferrer">
+      <div class="media-panel__item-titulo">${escapeHtml(evento.titulo)}</div>
+      <div class="media-panel__item-meta">${escapeHtml(evento.categoria || 'Sin categoría')} · ${formatoFechaEvento(evento.fechaInicio, evento.fechaFin)}</div>
+      ${chips ? `<div class="media-panel__chips">${chips}</div>` : ''}
+    </a>
+  `;
+}
+
+function renderGrupoAgenda(titulo: string, eventos: EventoAgenda[]): string {
+  if (eventos.length === 0) return '';
+  return `
+    <div class="media-panel__grupo-titulo">${escapeHtml(titulo)}</div>
+    ${eventos.map(renderItemAgenda).join('')}
+  `;
+}
+
+function renderAgendaPanel(panel: AgendaPanel, snapshot: SnapshotAgenda): void {
+  const avisoSospechoso = snapshot.estructuraSospechosa
+    ? '<div class="tendencia-panel__insuficiente">⚠ Agenda posiblemente desactualizada — la fuente parece haber cambiado de estructura, revisar el scraper. Mostrando el último dato bueno conocido.</div>'
+    : '';
+
+  const porDistrito = new Map<string, { nombre: string; eventos: EventoAgenda[] }>();
+  const generales: EventoAgenda[] = [];
+  for (const ev of snapshot.eventos) {
+    if (ev.distritosMencionados.length === 0) {
+      generales.push(ev);
+      continue;
+    }
+    for (const m of ev.distritosMencionados) {
+      const grupo = porDistrito.get(m.distritoCodigo) ?? { nombre: m.distritoNombre, eventos: [] };
+      grupo.eventos.push(ev);
+      porDistrito.set(m.distritoCodigo, grupo);
+    }
+  }
+
+  const gruposDistrito = [...porDistrito.entries()]
+    .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre))
+    .map(([, grupo]) => renderGrupoAgenda(grupo.nombre, grupo.eventos))
+    .join('');
+
+  const listaHtml = [gruposDistrito, renderGrupoAgenda('València (general)', generales)].join('');
+  const vacio = '<div class="tendencia-panel__insuficiente">Sin eventos en la agenda ahora mismo.</div>';
+  panel.list.innerHTML = avisoSospechoso + (listaHtml || (avisoSospechoso ? '' : vacio));
+
+  const meta = panel.root.querySelector('#agenda-panel-meta')!;
+  meta.innerHTML =
+    metaFrescura('valencia.es (scraping)', snapshot.fetchedAt, !snapshot.estructuraSospechosa) +
+    ` · ${snapshot.eventos.length} eventos`;
+}
+
+async function fetchAgendaEventosActual(): Promise<SnapshotAgenda> {
+  const res = await fetch('/api/agenda/v1/eventos');
+  if (!res.ok) throw new Error(`GET /api/agenda/v1/eventos -> HTTP ${res.status}`);
+  return (await res.json()) as SnapshotAgenda;
 }
 
 async function fetchTendenciaActual(ventana: 'hora' | 'dia'): Promise<{ panel: VentanaTendencia; fresh: boolean }> {
   const res = await fetch(`/api/mediatico/v1/tendencia?ventana=${ventana}`);
   if (!res.ok) throw new Error(`GET /api/mediatico/v1/tendencia -> HTTP ${res.status}`);
   return (await res.json()) as { panel: VentanaTendencia; fresh: boolean };
-}
-
-// Spec 038 v3 — sin endpoint propio: son embeds de terceros reproducidos
-// directo en el navegador de quien mira, nunca grabados ni rehosteados por
-// nosotros. Diseño en tarjetas "clic para reproducir" (como el panel de
-// referencia de World Monitor): nada de vídeo se carga hasta que se pulsa su
-// tarjeta — así ninguna tarjeta se queda a medio cargar mostrando el título y
-// la interfaz de YouTube por encima en vez de la imagen.
-function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement } {
-  const root = document.createElement('div');
-  root.id = 'camaras-panel';
-  root.hidden = true;
-  root.innerHTML = `
-    <div class="media-panel__header">Cámaras en vivo</div>
-    <div class="camaras-grid" id="camaras-panel-grid"></div>
-  `;
-  document.body.appendChild(root);
-  return { root, grid: root.querySelector('#camaras-panel-grid')! };
-}
-
-/** Parámetros que minimizan la interfaz propia de YouTube (título, sugerencias, marca). */
-function iframeYoutubeCanal(channelId: string, nombre: string): HTMLIFrameElement {
-  const src =
-    `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(channelId)}` +
-    '&autoplay=1&mute=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1';
-  const iframe = document.createElement('iframe');
-  iframe.className = 'camara-tile__player';
-  iframe.src = src;
-  iframe.title = nombre;
-  iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-  iframe.allowFullscreen = true;
-  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-  return iframe;
-}
-
-/** Reproductor DASH (spec 038 §7, cámara "personal" — solo llega aquí si su envFlag está activo). */
-async function reproducirDash(stage: HTMLElement, manifestUrl: string): Promise<void> {
-  const video = document.createElement('video');
-  video.className = 'camara-tile__player camara-tile__player--video';
-  video.muted = true;
-  video.autoplay = true;
-  video.playsInline = true;
-  video.controls = true;
-  stage.appendChild(video);
-  try {
-    const { MediaPlayer } = await import('dashjs');
-    const player = MediaPlayer().create();
-    // El "live catchup" (acelerar/recortar buffer para pegarse al directo) de
-    // dashjs entraba en un bucle play/pause en este stream — se desactiva y se
-    // deja un colchón de buffer algo mayor antes del borde en directo.
-    player.updateSettings({
-      streaming: { liveCatchup: { enabled: false }, delay: { liveDelayFragmentCount: 4 } },
-    });
-    player.initialize(video, manifestUrl, true);
-    // Chrome pausa por ahorro de energía el vídeo-solo-sin-audio que queda en
-    // una pestaña en segundo plano ("video-only background media was paused
-    // to save power") — se reintenta al volver a primer plano. Con controles
-    // nativos visibles (arriba), la persona siempre puede darle a play a mano.
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && video.paused && video.isConnected) {
-        void video.play().catch(() => {});
-      }
-    });
-  } catch (err) {
-    console.error('Fallo al iniciar el reproductor DASH:', err);
-    stage.innerHTML = '<div class="camara-tile__error">No disponible ahora mismo</div>';
-  }
-}
-
-function reproducirCamara(stage: HTMLElement, camara: CamaraUrbana): void {
-  stage.innerHTML = '';
-  if (camara.proveedor === 'youtube-canal' && camara.youtubeChannelId) {
-    stage.appendChild(iframeYoutubeCanal(camara.youtubeChannelId, camara.nombre));
-  } else if (camara.proveedor === 'turisme-cv-dash' && camara.manifestUrl) {
-    void reproducirDash(stage, camara.manifestUrl);
-  } else {
-    stage.innerHTML = '<div class="camara-tile__error">No disponible</div>';
-  }
-}
-
-function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrbana[]): void {
-  // El nombre vive fuera del "stage" (a diferencia de v3) para que se siga
-  // viendo una vez reproduciendo — antes se borraba junto al placeholder.
-  panel.grid.innerHTML = camaras
-    .map(
-      (_, i) => `
-        <div class="camara-tile">
-          <div class="camara-tile__nombre"></div>
-          <div class="camara-tile__stage" data-camara-index="${i}">
-            <button type="button" class="camara-tile__play">▶</button>
-          </div>
-          <a class="camara-tile__atribucion" target="_blank" rel="noopener noreferrer"></a>
-        </div>
-      `,
-    )
-    .join('');
-
-  panel.grid.querySelectorAll<HTMLDivElement>('.camara-tile').forEach((tile, i) => {
-    const camara = camaras[i];
-    if (!camara) return;
-    const stage = tile.querySelector<HTMLDivElement>('.camara-tile__stage')!;
-    tile.querySelector('.camara-tile__nombre')!.textContent = camara.nombre;
-    const atribucion = tile.querySelector<HTMLAnchorElement>('.camara-tile__atribucion')!;
-    atribucion.href = camara.fuenteUrl;
-    atribucion.textContent = `${camara.atribucion} ↗`;
-    stage.querySelector('.camara-tile__play')!.addEventListener(
-      'click',
-      () => reproducirCamara(stage, camara),
-      { once: true },
-    );
-  });
 }
 
 interface ControlPanel {
@@ -1157,6 +1059,7 @@ interface ControlPanel {
   fallasToggle: HTMLInputElement;
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
+  agendaToggle: HTMLInputElement;
   viaPublicaToggle: HTMLInputElement;
   camarasToggle: HTMLInputElement;
   /** spec 033: grupo plegable "Contexto e informativas" y sus adornos. */
@@ -1166,6 +1069,14 @@ interface ControlPanel {
 }
 
 const SELECTOR_CONTEXTO_ABIERTO_KEY = 'imc:selector-contexto-abierto';
+
+/** Checkbox desconectado del DOM, marcado — ver nota en `buildControlPanel`. */
+function toggleSiempreActivo(): HTMLInputElement {
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = true;
+  return input;
+}
 
 function buildControlPanel(): ControlPanel {
   const panel = document.createElement('div');
@@ -1224,27 +1135,9 @@ function buildControlPanel(): ControlPanel {
         <input type="checkbox" id="toggle-fallas" />
         Fallas
       </label>
-      <label class="controls__row">
-        <input type="checkbox" id="toggle-media" />
-        Contexto mediático
-      </label>
-      <label class="controls__row">
-        <input type="checkbox" id="toggle-tendencia" />
-        Términos en tendencia
-      </label>
-      <label class="controls__row" id="toggle-camaras-row">
-        <input type="checkbox" id="toggle-camaras" />
-        Cámaras en vivo
-      </label>
     </details>
   `;
   document.body.appendChild(panel);
-
-  // spec 038 v7 (DoD de V1) — sin la env var de la fuente "personal" (ADR-003)
-  // la entrada se oculta del todo, no se deja un panel vacío al activarla.
-  if (camarasVisibles().length === 0) {
-    panel.querySelector<HTMLLabelElement>('#toggle-camaras-row')!.hidden = true;
-  }
 
   const contextoDetails = panel.querySelector<HTMLDetailsElement>('#controls-contexto')!;
   contextoDetails.addEventListener('toggle', () => {
@@ -1272,10 +1165,19 @@ function buildControlPanel(): ControlPanel {
     aparcamientoToggle: panel.querySelector('#toggle-aparcamiento')!,
     pulsoToggle: panel.querySelector('#toggle-pulso')!,
     fallasToggle: panel.querySelector('#toggle-fallas')!,
-    mediaToggle: panel.querySelector('#toggle-media')!,
-    tendenciaToggle: panel.querySelector('#toggle-tendencia')!,
+    // spec 040 — cámaras/contexto mediático/tendencia/agenda dejan de ser filas
+    // del selector (se mudan a la vista /inteligencia, siempre visibles ahí, no
+    // capas de mapa que se enciendan/apaguen). Se crean como checkboxes
+    // "toggle" desconectados del DOM, siempre marcados, solo para que el
+    // cableado interno de cada panel (`panel.mediaToggle.addEventListener(...)`,
+    // `montarCamarasPanel(toggle)`) siga funcionando sin tocar su lógica
+    // (`docs/02_DEFINITION_OF_DONE_V1.md`, spec 040 §2: "reubicación, no
+    // reimplementación") — `main()` dispara su `change` una vez tras cablear.
+    mediaToggle: toggleSiempreActivo(),
+    tendenciaToggle: toggleSiempreActivo(),
+    agendaToggle: toggleSiempreActivo(),
+    camarasToggle: toggleSiempreActivo(),
     viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
-    camarasToggle: panel.querySelector('#toggle-camaras')!,
     contextoDetails,
     contextoContador: panel.querySelector('#contexto-contador')!,
     presetOperativaBtn: panel.querySelector('#preset-operativa')!,
@@ -1306,7 +1208,6 @@ async function main(): Promise<void> {
   window.addEventListener('resize', () => map.resize());
 
   let selectedDistrito: string | null = initialState.distrito;
-  let hoveredDistrito: string | null = null;
   let mockVisible = false;
   let horaSimulada = `${String(new Date().getHours()).padStart(2, '0')}:00`;
   let densidadMock: DensidadDistritoMock[] = [];
@@ -1320,6 +1221,10 @@ async function main(): Promise<void> {
   let pulsoDistritos: PulsoDistrito[] = [];
   let fallasVisible = false;
   let datosFallas: DatosFallas = { monumentos: [], carpas: [], zonasMovilidadReducida: [] };
+  // v3 (DoD de V1, 2026-09-16) — los puntos calientes del mock de densidad
+  // (más abajo) necesitan los monumentos falleros aunque la capa "Fallas" en
+  // sí no esté activada; se cargan una vez, la primera vez que hagan falta.
+  let fallasHotspotsCargados = false;
   let viaPublicaVisible = false;
   let incidenciasViaPublica: IncidenciaViaPublica[] = [];
   const viaPublicaTooltip = buildViaPublicaTooltip();
@@ -1471,9 +1376,26 @@ async function main(): Promise<void> {
 
     const intensidadPorDistrito = new Map(densidadMock.map((d) => [d.distritoCodigo, d.intensidad]));
     const pulsoPorDistrito = new Map(pulsoDistritos.map((p) => [p.distritoCodigo, p]));
+    // v4 (spec 010 §5) — escenarios vivo+confirmado, base de los marcadores y
+    // de los puntos de tramo resaltados (primario); el choropleth de abajo es
+    // el contexto.
+    const pulsoEscenariosActivos = pulsoVisible ? escenariosVivosConfirmados(pulsoDistritos) : [];
+    const pulsoTramosAfectados = pulsoEscenariosActivos.flatMap(({ escenario }) => escenario.tramosAfectados);
+    // v3 (DoD de V1, 2026-09-16) — puntos calientes de densidad mock sobre los
+    // monumentos falleros reales (spec 008, ya en memoria vía `datosFallas`),
+    // en vez de solo un tinte plano por distrito. Cálculo en cliente porque es
+    // una función pura y determinista, sin I/O (mismo guardarraíl de spec 003
+    // §2) — no hace falta un endpoint nuevo para componer dos cachés.
+    const puntosCalientesMock =
+      mockVisible && datosFallas.monumentos.length > 0
+        ? generarHotspotsDensidadMock(
+            horaSimulada,
+            datosFallas.monumentos.map((m) => ({ id: m.id, lat: m.lat, lon: m.lon })),
+          )
+        : [];
     const traficoFeatureCollection: GeoJSON.FeatureCollection<GeoJSON.Geometry, { estado: EstadoTramo }> = {
       type: 'FeatureCollection',
-      features: tramosTrafico.map((t) => ({
+      features: ordenarTramosPorSeveridad(tramosTrafico).map((t) => ({
         type: 'Feature',
         geometry: t.geometry,
         properties: { estado: t.estado },
@@ -1491,6 +1413,18 @@ async function main(): Promise<void> {
           getFillColor: (f) => colorIntensidad(intensidadPorDistrito.get(f.properties.codigo) ?? 0),
           updateTriggers: { getFillColor: [densidadMock] },
         }),
+        puntosCalientesMock.length > 0 &&
+          new ScatterplotLayer<(typeof puntosCalientesMock)[number]>({
+            id: 'movimiento-personas-mock-hotspots',
+            data: puntosCalientesMock,
+            pickable: false,
+            getPosition: (p) => [p.lon, p.lat],
+            getFillColor: (p) => colorIntensidad(p.intensidad),
+            getRadius: (p) => 25 + p.intensidad * 55,
+            radiusMinPixels: 4,
+            radiusMaxPixels: 40,
+            updateTriggers: { getPosition: [puntosCalientesMock], getFillColor: [puntosCalientesMock] },
+          }),
         traficoVisible &&
           new GeoJsonLayer<{ estado: EstadoTramo }>({
             id: 'trafico',
@@ -1499,9 +1433,9 @@ async function main(): Promise<void> {
             filled: false,
             pickable: false,
             getLineColor: (f) => COLOR_ESTADO_TRAFICO[f.properties.estado],
-            getLineWidth: 4,
+            getLineWidth: (f) => ANCHO_ESTADO_TRAFICO[f.properties.estado],
             lineWidthMinPixels: 2,
-            updateTriggers: { getLineColor: [tramosTrafico] },
+            updateTriggers: { getLineColor: [tramosTrafico], getLineWidth: [tramosTrafico] },
           }),
         puntosFlujoTrafico.length > 0 &&
           new ScatterplotLayer<Coordenada>({
@@ -1542,6 +1476,9 @@ async function main(): Promise<void> {
             radiusMinPixels: 4,
             updateTriggers: { getFillColor: [aparcamientos] },
           }),
+        // v4 (spec 010 §5) — de contexto a primario: 1) choropleth del
+        // distrito (contexto), 2) puntos de tramo afectado resaltados,
+        // 3) marcador + etiqueta por escenario activo (lo más primario).
         pulsoVisible &&
           new GeoJsonLayer<DistritoProperties>({
             id: 'pulso-distrito',
@@ -1549,9 +1486,57 @@ async function main(): Promise<void> {
             stroked: false,
             filled: true,
             pickable: false,
-            getFillColor: (f) =>
-              COLOR_CATEGORIA_PULSO[pulsoPorDistrito.get(f.properties.codigo)?.categoria ?? 'Tranquilo'],
+            getFillColor: (f) => colorChoroplethPulso(pulsoPorDistrito.get(f.properties.codigo)),
             updateTriggers: { getFillColor: [pulsoDistritos] },
+          }),
+        pulsoTramosAfectados.length > 0 &&
+          new ScatterplotLayer<(typeof pulsoTramosAfectados)[number]>({
+            id: 'pulso-tramos-afectados',
+            data: pulsoTramosAfectados,
+            pickable: false,
+            getPosition: (t) => t.puntoMedio,
+            getFillColor: [15, 31, 51, 230],
+            stroked: true,
+            getLineColor: [255, 255, 255, 230],
+            lineWidthMinPixels: 1,
+            getRadius: 6,
+            radiusMinPixels: 3,
+            radiusMaxPixels: 6,
+          }),
+        pulsoEscenariosActivos.length > 0 &&
+          new ScatterplotLayer<(typeof pulsoEscenariosActivos)[number]>({
+            id: 'pulso-marcadores',
+            data: pulsoEscenariosActivos,
+            pickable: true,
+            getPosition: (e) => e.escenario.centroideAfectado,
+            getFillColor: (e) => COLOR_NIVEL_PULSO[e.escenario.nivel],
+            stroked: true,
+            getLineColor: [255, 255, 255, 255],
+            lineWidthMinPixels: 2,
+            getRadius: 14,
+            radiusMinPixels: 8,
+            radiusMaxPixels: 16,
+            onClick: () => {
+              pulsoLeyendaRoot.classList.add('is-expandida');
+              pulsoLeyendaRoot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              pulsoLeyendaRoot.classList.add('info-panel--resaltado');
+              window.setTimeout(() => pulsoLeyendaRoot.classList.remove('info-panel--resaltado'), 1500);
+            },
+          }),
+        pulsoEscenariosActivos.length > 0 &&
+          new TextLayer<(typeof pulsoEscenariosActivos)[number]>({
+            id: 'pulso-etiquetas',
+            data: pulsoEscenariosActivos,
+            pickable: false,
+            getPosition: (e) => e.escenario.centroideAfectado,
+            getText: (e) =>
+              e.escenario.anticipacionMin ? `${e.distritoNombre} · ~${e.escenario.anticipacionMin} min` : e.distritoNombre,
+            getSize: 12,
+            getColor: [15, 31, 51, 255],
+            getPixelOffset: [0, -18],
+            background: true,
+            getBackgroundColor: [255, 255, 255, 220],
+            backgroundPadding: [4, 2],
           }),
         fallasVisible &&
           new GeoJsonLayer<Record<string, never>>({
@@ -1849,29 +1834,16 @@ async function main(): Promise<void> {
           // distrito entero encima.
           pickable: !algunModoActivo,
           autoHighlight: false,
-          getFillColor: (f) => {
-            const codigo = f.properties.codigo;
-            if (codigo === selectedDistrito) return [255, 140, 0, 130];
-            if (codigo === hoveredDistrito) return [30, 144, 255, 90];
-            return [30, 144, 255, 25];
-          },
+          // Sin resaltado visual por hover ni por selección (spec 000 v4): el
+          // usuario lo pidió explícitamente porque "iluminar" el distrito le
+          // quitaba claridad al leer el mapa y al hacer capturas. El foco de
+          // distrito (spec 036) sigue funcionando igual — el clic dispara
+          // `setFocoDistrito` y el único indicador visual pasa a ser el chip
+          // "Foco: X", no un cambio de color del polígono.
+          getFillColor: [30, 144, 255, 25],
           getLineColor: [30, 60, 110, 220],
           getLineWidth: 2,
           lineWidthMinPixels: 1,
-          updateTriggers: {
-            getFillColor: [selectedDistrito, hoveredDistrito, mockVisible],
-          },
-          onHover: (info: PickingInfo<GeoJSON.Feature<GeoJSON.Geometry, DistritoProperties>>) => {
-            // Guard explícito, no solo `pickable` — comprobar el estado en
-            // vivo aquí evita depender de que el re-render con pickable:false
-            // ya se haya aplicado antes de que llegue este evento (spec 021/022).
-            if (getEstadoModoCordon().fase !== 'inactivo' || getEstadoModoSimulacion().fase !== 'inactivo') return;
-            const nuevoHover = info.object?.properties.codigo ?? null;
-            if (nuevoHover !== hoveredDistrito) {
-              hoveredDistrito = nuevoHover;
-              renderLayers();
-            }
-          },
           onClick: (info: PickingInfo<GeoJSON.Feature<GeoJSON.Geometry, DistritoProperties>>) => {
             if (getEstadoModoCordon().fase !== 'inactivo' || getEstadoModoSimulacion().fase !== 'inactivo') return;
             const props = info.object?.properties ?? null;
@@ -2025,15 +1997,7 @@ async function main(): Promise<void> {
 
   // spec 033 — grupo "Contexto e informativas": contador de capas activas + se
   // abre solo si hay alguna encendida (p. ej. al llegar por una URL compartida).
-  const togglesContexto = [
-    panel.mockToggle,
-    panel.valenbisiToggle,
-    panel.aparcamientoToggle,
-    panel.fallasToggle,
-    panel.mediaToggle,
-    panel.tendenciaToggle,
-    panel.camarasToggle,
-  ];
+  const togglesContexto = [panel.mockToggle, panel.valenbisiToggle, panel.aparcamientoToggle, panel.fallasToggle];
   function actualizarContextoSelector(): void {
     const activas = togglesContexto.filter((t) => t.checked).length;
     panel.contextoContador.textContent = `${activas} / ${togglesContexto.length}`;
@@ -2042,9 +2006,14 @@ async function main(): Promise<void> {
   }
   togglesContexto.forEach((t) => t.addEventListener('change', actualizarContextoSelector));
 
-  // spec 033 — preset "Vista operativa": enciende las 3 capas prioritarias que
-  // estén apagadas (dispara su `change` real, que ya persiste), sin tocar las de
-  // contexto, y pliega el grupo de contexto.
+  // spec 033 — preset "Vista operativa": enciende las 3 capas operativas en
+  // tiempo real (tráfico, Pulso, incidencias de vía pública) que estén
+  // apagadas (dispara su `change` real, que ya persiste) y pliega el grupo de
+  // contexto. Desde v3, Pulso vive dentro de "Contexto e informativas" en el
+  // HTML (reordenado a petición del usuario) pero sigue siendo una de las 3
+  // capas que enciende este preset — si queda plegada tras esto, su casilla
+  // sigue marcada, solo no visible hasta reabrir el grupo (mismo comportamiento
+  // que ya tenía cualquier otra casilla de contexto activa al usar el preset).
   panel.presetOperativaBtn.addEventListener('click', () => {
     for (const t of [panel.traficoToggle, panel.pulsoToggle, panel.viaPublicaToggle]) {
       if (!t.checked) {
@@ -2072,6 +2041,16 @@ async function main(): Promise<void> {
 
   async function refreshMockLayer(): Promise<void> {
     densidadMock = await fetchDensidadMock(horaSimulada);
+    if (!fallasHotspotsCargados) {
+      fallasHotspotsCargados = true;
+      try {
+        const { fresh, ...datos } = await fetchDatosFallasActual();
+        void fresh; // no hace falta aquí — la frescura la gestiona el toggle "Fallas" si se activa
+        datosFallas = datos;
+      } catch (err) {
+        console.error('Fallo al cargar monumentos falleros para los puntos calientes de densidad mock:', err);
+      }
+    }
     renderLayers();
   }
 
@@ -2278,18 +2257,6 @@ async function main(): Promise<void> {
     }
   }
 
-  mediaPanel.ocioDeporteToggle.addEventListener('change', () => {
-    guardarPrefOcioDeporte(mediaPanel.ocioDeporteToggle.checked);
-    if (ultimoMediatico) {
-      renderMediaticoPanel(
-        mediaPanel,
-        ultimoMediatico.items,
-        ultimoMediatico.fresh,
-        ultimoMediatico.fuentesFallidas,
-      );
-    }
-  });
-
   panel.mediaToggle.addEventListener('change', () => {
     mediaPanel.root.hidden = !panel.mediaToggle.checked;
     if (panel.mediaToggle.checked && !mediaPollingIniciado) {
@@ -2340,23 +2307,44 @@ async function main(): Promise<void> {
     }
   });
 
-  // spec 038 v3 — sin backend ni polling: las tarjetas se construyen la primera
-  // vez que se activa el panel, pero ningún vídeo se reproduce hasta que se
-  // pulsa "Reproducir" en su tarjeta (ver renderCamarasPanel).
-  const camarasPanel = buildCamarasPanel();
-  let camarasCargadas = false;
-  panel.camarasToggle.addEventListener('change', () => {
-    camarasPanel.root.hidden = !panel.camarasToggle.checked;
-    if (panel.camarasToggle.checked && !camarasCargadas) {
-      camarasCargadas = true;
-      const camaras = camarasVisibles();
-      if (camaras.length > 0) {
-        renderCamarasPanel(camarasPanel, camaras);
-      } else {
-        camarasPanel.grid.textContent = 'No hay cámaras disponibles en esta build.';
-      }
+  const agendaPanel = buildAgendaPanel();
+  let agendaPollingIniciado = false;
+  async function refreshAgenda(): Promise<void> {
+    try {
+      const snapshot = await fetchAgendaEventosActual();
+      renderAgendaPanel(agendaPanel, snapshot);
+    } catch (err) {
+      agendaPanel.list.textContent = 'Agenda de eventos no disponible';
+      console.error('Fallo al cargar la agenda de eventos:', err);
+    }
+  }
+
+  panel.agendaToggle.addEventListener('change', () => {
+    agendaPanel.root.hidden = !panel.agendaToggle.checked;
+    if (panel.agendaToggle.checked && !agendaPollingIniciado) {
+      agendaPollingIniciado = true;
+      startPolling(refreshAgenda, 6 * 60 * 60 * 1000); // igual TTL que la caché del endpoint, spec 027 §4
     }
   });
+
+  montarCamarasPanel(panel.camarasToggle);
+
+  // spec 040 — "Actualidad institucional" (039) se muda del sidebar a un panel
+  // propio de /inteligencia; `buildActualidadRedesContent()` es exactamente el
+  // mismo contenido que ya usaba el sidebar (sin reescribir su lógica interna).
+  const actualidadRedesPanel = document.createElement('div');
+  actualidadRedesPanel.id = 'actualidad-redes-panel';
+  actualidadRedesPanel.innerHTML = '<div class="media-panel__header">Actualidad institucional</div>';
+  actualidadRedesPanel.appendChild(buildActualidadRedesContent());
+  document.body.appendChild(actualidadRedesPanel);
+
+  // Dispara una vez el 'change' de cada toggle "siempre activo" (ver
+  // `toggleSiempreActivo`) para que cada panel cargue sus datos/polling desde
+  // el arranque — su visibilidad real la decide solo la vista actual (ver
+  // `initRouter` al final de esta función), no este checkbox.
+  for (const t of [panel.mediaToggle, panel.tendenciaToggle, panel.agendaToggle, panel.camarasToggle]) {
+    t.dispatchEvent(new Event('change'));
+  }
 
   map.on('load', () => {
     renderLayers();
@@ -2372,33 +2360,8 @@ async function main(): Promise<void> {
   // fija, no cambian al hacer pan.
   if (DEBUG_GRAFO) map.on('moveend', () => renderLayers());
 
-  const meteoPanelRoot = buildInfoPanel('meteo-panel');
-  async function refreshMeteoPanel(): Promise<void> {
-    try {
-      const { estado, fresh } = await fetchEstadoMeteoActual();
-      renderMeteoPanel(meteoPanelRoot, estado, fresh);
-      registrarFrescura('meteo', { ok: true, fresh, fetchedAt: estado.fetchedAt });
-    } catch (err) {
-      meteoPanelRoot.textContent = 'Meteo no disponible';
-      registrarFrescura('meteo', { ok: false, fresh: false });
-      console.error('Fallo al cargar meteo:', err);
-    }
-  }
-  startPolling(refreshMeteoPanel, 5 * 60 * 1000);
-
-  const prediccionPanelRoot = buildInfoPanel('meteo-prediccion-panel');
-  async function refreshPrediccionPanel(): Promise<void> {
-    try {
-      const { prediccion, fresh } = await fetchPrediccionCortoPlazoActual();
-      renderPrediccionPanel(prediccionPanelRoot, prediccion, fresh);
-      registrarFrescura('prediccion', { ok: true, fresh, fetchedAt: prediccion.fetchedAt });
-    } catch (err) {
-      prediccionPanelRoot.textContent = 'Predicción no disponible';
-      registrarFrescura('prediccion', { ok: false, fresh: false });
-      console.error('Fallo al cargar predicción a corto plazo:', err);
-    }
-  }
-  startPolling(refreshPrediccionPanel, 5 * 60 * 1000);
+  montarMeteoActualPanel();
+  montarPrediccionPanel();
 
   const airePanelRoot = buildInfoPanel('aire-panel');
   async function refreshAirePanel(): Promise<void> {
@@ -2469,8 +2432,64 @@ async function main(): Promise<void> {
   // Spec 029 — con los paneles ya montados, activa el layout móvil (bottom
   // sheet + reparentado) si el dispositivo lo pide.
   initLayoutMovil();
+
+  // spec 040 — dos vistas por hash. `/inteligencia` esconde todo lo de "mapa
+  // operativo" (mapa, selector de capas, KPIs, leyendas, los 5 paneles fijos)
+  // y muestra los paneles de lectura (cámaras/prensa/redes/tendencia/agenda).
+  // Al volver a "mapa" nunca se fuerza `hidden = false` a ciegas en lo que
+  // tiene preferencia propia (los 5 paneles fijos, las leyendas de capa) —
+  // se reaplica su estado real (`applyPanelVisibility()`, `toggle.checked`)
+  // para no pisar lo que el usuario tenía elegido antes de cambiar de vista.
+  const leyendasPorToggle: [string, HTMLInputElement][] = [
+    ['trafico-leyenda', panel.traficoToggle],
+    ['valenbisi-leyenda', panel.valenbisiToggle],
+    ['aparcamiento-leyenda', panel.aparcamientoToggle],
+    ['pulso-leyenda', panel.pulsoToggle],
+    ['fallas-leyenda', panel.fallasToggle],
+    ['via-publica-leyenda', panel.viaPublicaToggle],
+  ];
+  const idsPaneleFijos = PANEL_PREFERENCES_REGISTRY.map((d) => d.key);
+  const idsInteligencia = ['media-panel', 'tendencia-panel', 'camaras-panel', 'agenda-panel', 'actualidad-redes-panel'];
+
+  initRouter((vista) => {
+    const enMapa = vista === 'mapa';
+    const movil = document.documentElement.dataset.layout === 'movil';
+
+    // En móvil el mapa se deja igual que hoy con cualquier panel abierto (de
+    // fondo, detrás de la hoja) — no hace falta ocultarlo ni tiene coste; en
+    // escritorio, en cambio, /inteligencia es una página propia sin mapa.
+    if (!movil) document.getElementById('map')!.hidden = !enMapa;
+    document.getElementById('controls')!.hidden = !enMapa;
+    document.getElementById('dashboard-kpis')!.hidden = !enMapa;
+    panel.banner.hidden = !(enMapa && panel.mockToggle.checked);
+
+    // `#info-panels` es un contenedor compartido en móvil (spec 029, bottom
+    // sheet, también aloja los paneles de /inteligencia) — solo tiene sentido
+    // ocultarlo entero en escritorio; en móvil se ocultan sus hijos "de mapa"
+    // uno a uno más abajo, sin tocar el contenedor.
+    if (!movil) document.getElementById('info-panels')!.hidden = !enMapa;
+
+    if (enMapa) {
+      applyPanelVisibility();
+      for (const [id, toggle] of leyendasPorToggle) {
+        const el = document.getElementById(id);
+        if (el) el.hidden = !toggle.checked;
+      }
+      map.resize();
+    } else {
+      for (const id of [...idsPaneleFijos, ...leyendasPorToggle.map(([id]) => id)]) {
+        const el = document.getElementById(id);
+        if (el) el.hidden = true;
+      }
+    }
+
+    for (const id of idsInteligencia) {
+      const el = document.getElementById(id);
+      if (el) el.hidden = enMapa;
+    }
+  });
 }
 
 main().catch((err: unknown) => {
-  console.error('Fallo al iniciar VLC Monitor:', err);
+  console.error('Fallo al iniciar Mirall:', err);
 });

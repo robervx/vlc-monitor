@@ -9,13 +9,14 @@
 // alguien recalibra un peso el glosario lo refleja sin tocar este fichero.
 
 import { LAYER_REGISTRY } from '../config/map-layer-definitions';
-import { PESOS_PULSO, UMBRALES_CATEGORIA_PULSO, AMPLIFICACION_TRAFICO_PULSO } from '../services/pulso-distrito';
 import {
   UMBRAL_CALOR_TEMPERATURA,
   UMBRAL_CALOR_SENSACION,
   UMBRAL_CALOR_AVISO_TEMPERATURA,
   UMBRAL_VIENTO_AVISO_KMH,
   UMBRAL_VIENTO_URGENTE_KMH,
+  UMBRAL_TRAFICO_CONCENTRADO_AVISO,
+  UMBRAL_TRAFICO_CONCENTRADO_URGENTE,
 } from '../services/insights';
 
 const REPO_URL = 'https://github.com/robervx/vlc-monitor';
@@ -26,8 +27,6 @@ export interface EntradaGlosario {
   /** HTML simple (párrafos, listas), contenido estático de confianza — sin scripts ni datos de usuario. */
   cuerpo: string;
 }
-
-const pct = (n: number): string => `${Math.round(n * 100)} %`;
 
 /**
  * Metadatos legibles de cada capa. La *lista* de capas se deriva de
@@ -87,9 +86,9 @@ const META_CAPAS: Record<string, MetaCapa> = {
   },
   pulsoDistrito: {
     nombre: 'Pulso de Distrito',
-    mide: 'Índice compuesto de tensión del distrito (ver "Pulso de Distrito" arriba)',
-    frecuencia: 'Se recalcula a partir de sus fuentes (tráfico, incidencias, aire, meteo)',
-    fuente: 'Compuesto — VLC Monitor, sin fuente externa propia',
+    mide: 'Escenarios de conjunción activos por distrito (ver "Pulso de Distrito" arriba)',
+    frecuencia: 'Se recalcula a partir de sus fuentes (tráfico, incidencias, Fallas, lluvia)',
+    fuente: 'Compuesto — Mirall, sin fuente externa propia',
   },
   fallas: {
     nombre: 'Fallas',
@@ -115,6 +114,18 @@ const META_CAPAS: Record<string, MetaCapa> = {
     frecuencia: 'Caché refrescada cada ~60 min',
     fuente: 'Geoportal del Ajuntament de València',
   },
+  camaras: {
+    nombre: 'Cámaras en vivo',
+    mide: 'Vídeo en directo de cámaras urbanas — embeds de terceros, sin captura ni almacenamiento propio',
+    frecuencia: 'Directo (según disponibilidad del proveedor)',
+    fuente: 'Xarxa de Webcams de Turisme CV (fuente "personal", no activa por defecto — ver ADR-003)',
+  },
+  agendaEventos: {
+    nombre: 'Agenda de eventos',
+    mide: 'Agenda general de eventos culturales de la ciudad — conciertos, exposiciones, rutas guiadas, festivales',
+    frecuencia: 'Caché refrescada cada ~6 h',
+    fuente: 'Scraping de valencia.es (no es una API/dataset oficial, se avisa en el propio panel)',
+  },
 };
 
 /** Claves de `LAYER_REGISTRY` sin entrada en `META_CAPAS` — debe ser [] siempre. */
@@ -134,31 +145,32 @@ function listaCapasHtml(): string {
 }
 
 function cuerpoPulso(): string {
-  const { trafico, incidencias, aire, meteo } = PESOS_PULSO;
-  const { Moderado, Tenso, Crítico } = UMBRALES_CATEGORIA_PULSO;
   return `
-    <p>El <strong>Pulso de Distrito</strong> resume en un número de 0 a 100 lo tensa
-    que está la situación de un distrito ahora mismo. Combina cuatro señales que la
-    app ya tiene:</p>
+    <p>El <strong>Pulso de Distrito</strong> ya no es un número de 0 a 100 (v4,
+    2026-09-16) — es un catálogo de <strong>escenarios de conjunción</strong>: cuando
+    dos señales que por separado son rutinarias coinciden en el mismo distrito, la app
+    lo saca a primer plano nombrando el motivo, la zona y las calles afectadas.</p>
     <ul class="glosario-lista">
-      <li>Tráfico — peso <strong>${pct(trafico)}</strong></li>
-      <li>Incidencias de vía pública — peso <strong>${pct(incidencias)}</strong></li>
-      <li>Calidad del aire — peso <strong>${pct(aire)}</strong></li>
-      <li>Meteorología adversa — peso <strong>${pct(meteo)}</strong></li>
+      <li><strong>Incidencia + tráfico denso.</strong> Una incidencia oficial de vía
+      pública (obra, corte, festejo reciente) coincide con al menos
+      ${UMBRAL_TRAFICO_CONCENTRADO_AVISO} tramos congestionados/cortados (≥25 % de los
+      monitorizados) en el mismo distrito.</li>
+      <li><strong>Fallas + tráfico denso.</strong> Una zona de movilidad reducida de
+      Fallas activa coincide con tráfico ya denso en el mismo distrito.</li>
+      <li><strong>Lluvia inminente + tráfico denso</strong> (en pruebas, no se pinta
+      todavía). Riesgo de lluvia en la ciudad en las próximas 2 h coincidiendo con
+      ${UMBRAL_TRAFICO_CONCENTRADO_URGENTE} o más tramos densos, o con tráfico que
+      acaba de empeorar, en el mismo distrito.</li>
     </ul>
-    <p>Fórmula: <code>índice = 100 × (${trafico}·tráfico + ${incidencias}·incidencias
-    + ${aire}·aire + ${meteo}·meteo)</code>, donde cada componente va de 0 a 1. En la
-    meteo domina el factor más adverso (calor, frío, viento o lluvia), no la media.
-    El componente de tráfico se amplifica ×${AMPLIFICACION_TRAFICO_PULSO} (con tope en 1)
-    antes de entrar en la fórmula, para que unos pocos tramos cortados o congestionados
-    entre cientos de tramos fluidos muevan el índice.</p>
-    <p>Categorías por umbral: <strong>Tranquilo</strong> si el índice &lt; ${Moderado},
-    <strong>Moderado</strong> de ${Moderado} a ${Tenso - 1},
-    <strong>Tenso</strong> de ${Tenso} a ${Crítico - 1},
-    <strong>Crítico</strong> a partir de ${Crítico}.</p>
-    <p class="glosario-nota">Aire y meteo son de ciudad (una sola medición): entre
-    distritos solo varían de verdad el tráfico y las incidencias. El índice mejora
-    cuando existan fuentes de aire/meteo por distrito.</p>
+    <p>Cada distrito tiene un nivel — <strong>seguimiento</strong> (mirar) o
+    <strong>prioritario</strong> (adelantarse ya) — el más alto entre sus escenarios
+    confirmados. Un escenario solo cuenta tras verse en dos evaluaciones seguidas
+    (evita parpadeos) y sigue pintado 20 min tras dejar de detectarse.</p>
+    <p class="glosario-nota">Sin tramos de tráfico suficientes en un distrito, el mapa
+    lo pinta gris muy claro ("monitorización insuficiente") en vez de "tranquilo" — no
+    es lo mismo no tener dato que no tener problema. Heurística documentada, no
+    validada contra ningún registro histórico de incidentes reales (ver "Fuentes y
+    licencias").</p>
   `;
 }
 
@@ -174,13 +186,15 @@ function cuerpoAlertas(): string {
       <strong>lluvia probable</strong> (señal blanda).</li>
       <li><strong>Viento fuerte</strong> — aviso con rachas ≥ ${UMBRAL_VIENTO_AVISO_KMH} km/h,
       urgente ≥ ${UMBRAL_VIENTO_URGENTE_KMH} km/h.</li>
-      <li><strong>Calidad del aire mala</strong> (categoría "Mala" o "Muy mala") y
-      <strong>distrito crítico</strong> (el Pulso de un distrito entra en "Crítico").</li>
+      <li><strong>Calidad del aire mala</strong> (categoría "Mala" o "Muy mala").</li>
       <li><strong>Tráfico</strong> — concentración de tramos afectados en un distrito,
       tráfico en zona de Fallas, empeoramiento respecto al ciclo anterior y lluvia + tráfico denso.</li>
+      <li><strong>Pulso de Distrito</strong> — un escenario de conjunción confirmado
+      (ver "Pulso de Distrito" arriba) genera una tarjeta agrupada por distrito.</li>
     </ul>
-    <p>Al aparecer una alerta nueva salta un aviso arriba a la derecha (nunca en la
-    primera carga). El panel ofrece un borrador de texto para copiar.</p>
+    <p>Al aparecer una alerta nueva se abre un aviso que hay que cerrar de forma
+    explícita antes de seguir (nunca en la primera carga). El panel ofrece un borrador
+    de texto para copiar.</p>
     <p class="glosario-nota"><strong>Avisa, no actúa.</strong> La app genera una alerta
     visible para que la revise una persona: nunca decide ni ejecuta una acción sobre
     nadie, ni envía nada automáticamente. Cualquier intervención real sigue el cauce
@@ -250,7 +264,7 @@ export function construirEntradasGlosario(): EntradaGlosario[] {
         <ul class="glosario-lista">
           <li>El contexto mediático se filtra a las noticias de ese distrito (más los
           buckets de ciudad).</li>
-          <li>El Pulso antepone el índice de ese distrito.</li>
+          <li>El Pulso antepone el nivel y los escenarios de ese distrito.</li>
         </ul>
         <p>Para quitar el foco: clic de nuevo en el mismo distrito, o el <strong>✕</strong>
         del chip. No se guarda entre sesiones.</p>`,

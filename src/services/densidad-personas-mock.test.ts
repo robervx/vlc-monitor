@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generarDensidadMock } from './densidad-personas-mock';
+import { generarDensidadMock, generarHotspotsDensidadMock } from './densidad-personas-mock';
 
 describe('generarDensidadMock', () => {
   it('devuelve los 19 distritos, todos marcados como sintéticos', () => {
@@ -33,5 +33,36 @@ describe('generarDensidadMock', () => {
   it('rechaza una hora inválida', () => {
     expect(() => generarDensidadMock('25:00')).toThrow();
     expect(() => generarDensidadMock('no-es-una-hora')).toThrow();
+  });
+});
+
+describe('generarHotspotsDensidadMock (v3)', () => {
+  const hotspots = [
+    { id: 'ajuntament', lat: 39.4699, lon: -0.3763 },
+    { id: 'otro', lat: 39.48, lon: -0.38 },
+  ];
+
+  it('devuelve un punto por hotspot, con la misma posición y sintético', () => {
+    const resultado = generarHotspotsDensidadMock('20:00', hotspots);
+    expect(resultado).toHaveLength(2);
+    expect(resultado[0]).toMatchObject({ lat: 39.4699, lon: -0.3763, esSintetico: true });
+    expect(resultado.every((p) => p.intensidad >= 0 && p.intensidad <= 1)).toBe(true);
+  });
+
+  it('es determinista: mismo hotspot + hora produce la misma intensidad', () => {
+    const a = generarHotspotsDensidadMock('20:00', hotspots);
+    const b = generarHotspotsDensidadMock('20:00', hotspots);
+    expect(a.map((p) => p.intensidad)).toEqual(b.map((p) => p.intensidad));
+  });
+
+  it('concentra más que la media de los distritos en horas de actividad', () => {
+    const [punto] = generarHotspotsDensidadMock('20:00', [hotspots[0]!]);
+    const distritos = generarDensidadMock('20:00');
+    const mediaDistritos = distritos.reduce((s, d) => s + d.intensidad, 0) / distritos.length;
+    expect(punto!.intensidad).toBeGreaterThan(mediaDistritos);
+  });
+
+  it('sin hotspots, devuelve un array vacío', () => {
+    expect(generarHotspotsDensidadMock('12:00', [])).toEqual([]);
   });
 });
