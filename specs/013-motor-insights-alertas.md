@@ -7,12 +7,19 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [001, 002, 010, 016]
 propietario: ""
-version: 4
+version: 7
 ```
 
-> **Estado:** v1–v3 `Implemented` y en producción. **v4 está en `Draft`** (ver §10 y
-> el historial) — añade disparadores nuevos y el patrón de alerta emergente. No se
-> implementa hasta que v4 pase a `Approved`.
+> **Estado:** v1-v7 `Implemented` y en producción. **v7 (2026-09-16)**: consumidor de
+> spec 001 v4 — nueva regla `aviso-oficial-meteo` (avisos oficiales de fenómenos
+> adversos por scraping de GVA Emergencias e Interior), un `Insight` por aviso vigente,
+> severidad por nivel (amarillo→aviso, naranja/rojo→urgente). Sin UI nueva: el panel y el
+> modal ya son genéricos por `titulo`/`descripcion` — ver spec 001 §4. **v6 (2026-09-16)**: consumidor de
+> spec 010 v4 — la regla `distrito-critico` se retira (dependía del índice 0-100
+> eliminado) y se sustituye por `pulso-distrito`, un `Insight` agrupado por distrito a
+> partir de los escenarios de conjunción vivo+confirmado. **v5 (2026-09-16)**: las
+> alertas pasan de toast de esquina a un modal bloqueante, y el insight `trafico-empeora` nombra la
+> calle en el título — ver §10.
 
 ## 0. Decisión de diseño (resuelve la tensión documentada en el backlog)
 
@@ -221,4 +228,7 @@ Se retoma si el volumen de alertas lo justifica.
 | 1 | 2026-08-18 | Creación. Diseño "alerta + borrador, envío manual" decidido explícitamente por el usuario tras la tensión documentada en el backlog (§0). Dependencias (001, 002, 010, 016) ya `Implemented`. |
 | 2 | 2026-08-18 | DoD completo: función pura + tests (`src/services/insights.ts`), endpoint que combina las cachés existentes con degradación si tráfico/predicción fallan (`api/insights/v1/actual.ts`), panel con tarjetas por severidad y botón "Copiar borrador" sin destinatarios (`src/main.ts`, `index.html`). Verificado con `npm run typecheck`, `npm run test` (92/92) y en navegador. Spec pasa a `Implemented`. |
 | 3 | 2026-08-19 | Nueva regla `viento-fuerte` (umbral por rachas, heurística documentada igual criterio que el resto de reglas de esta spec — ver §8) — `insightVientoFuerte()` en `insights.ts`, 3 tests nuevos. Los umbrales (`UMBRAL_VIENTO_AVISO_KMH`/`UMBRAL_VIENTO_URGENTE_KMH`) se exportan para que el panel de meteo (spec 001, `main.ts`) pinte el mismo semáforo de color sin duplicar el número en dos sitios. |
-| 4 | 2026-09-04 | Alcance v4 (§9). **v4a `Implemented` 2026-09-09**: el "popup" — toast arriba a la derecha cuando aparece un insight con `id` nuevo (nunca en la primera carga), apilado máx. 3, auto-cierre, clic → resalta el panel de insights. `#alert-toasts` + `procesarNuevasAlertas()` en `main.ts`, CSS en `index.html`, sin tocar el endpoint. **v4b pendiente**: disparadores nuevos (`trafico-empeora` con estado en caché, calor a 35 °C, `lluvia-prevista`). El rail lateral dedicado se descarta como desproporcionado (§9.3). El dashboard de KPIs es la spec `034`. |
+| 4 | 2026-09-04 | Alcance v4 (§9). **v4a `Implemented` 2026-09-09**: el "popup" — toast arriba a la derecha cuando aparece un insight con `id` nuevo (nunca en la primera carga), apilado máx. 3, auto-cierre, clic → resalta el panel de insights. `#alert-toasts` + `procesarNuevasAlertas()` en `main.ts`, CSS en `index.html`, sin tocar el endpoint. **v4b `Implemented` 2026-09-09**: disparadores nuevos (`trafico-empeora` con estado en caché, calor a 35 °C, `lluvia-prevista`). El rail lateral dedicado se descarta como desproporcionado (§9.3). El dashboard de KPIs es la spec `034`. |
+| 5 | 2026-09-16 | **Modal bloqueante** (`#alert-modal-backdrop`/`#alert-modal` en `src/main.ts`) sustituye el toast de esquina — no existía ningún `<dialog>`/modal en el repo, se construyó reutilizando el patrón de backdrop/focus-trap/Esc del sidebar móvil (`chasis.ts`), adaptado localmente. Cola (`colaAlertasModal`): si llegan varias alertas nuevas a la vez, se ven una a una con contador "1 de N"; se cierra con ✕, Esc, clic en el backdrop o "Ver en el panel" (que además hace scroll y resalta el panel de insights, como antes). Sin autocierre por temporizador. **`trafico-empeora`** (`src/services/insights.ts`): el título pasa de nombrar solo el distrito a nombrar la calle del tramo más severo (`"Tráfico a peor en <calle> y N más (<distrito>)"`), ordenando por nivel de destino. 2 tests nuevos de insights + verificado en navegador con el hook de demo (`window.__toastAlertaDemo`): modal centrado, contador "1 de 3" con 3 alertas encoladas, Esc avanza una a una, clic en el backdrop cierra. 343/343 tests, `npm run typecheck` verde. |
+| 6 | 2026-09-16 | Consumidor de spec 010 v4: `insightsDistritoCritico` (dependía de `categoria`/`indice`/`componentes`, eliminados) se retira; `'distrito-critico'` sale de `TipoInsight`. Nueva `insightsPulsoDistrito()` — un `Insight` agrupado por distrito a partir de `d.escenariosActivos.filter(e => e.modo==='vivo' && e.confirmado)`, severidad urgente si algún escenario es `prioritario`, chips de `fuenteSpec` por escenario contribuyente (`FUENTES_POR_ESCENARIO`). `FuenteInsight` gana `'026'` (incidencias de vía pública, ahora fuente real del motor). 3 tests nuevos en `insights.test.ts`. `npm run typecheck`/`test` (346/346)/`build` verdes. |
+| 7 | 2026-09-16 | Consumidor de spec 001 v4: `TipoInsight` gana `'aviso-oficial-meteo'`. Nueva `insightsAvisoOficial()` en `insights.ts` — un `Insight` por `AvisoMeteo` vigente que llega de `fetchAvisosVigentes()` (spec 001), severidad por `SEVERIDAD_POR_NIVEL_AVISO` (amarillo→aviso, naranja/rojo→urgente). `calcularInsights()` gana un octavo parámetro opcional `avisosOficiales`; `insights-actual.ts` lo obtiene con `Promise.allSettled` igual que el resto de fuentes "opcionales" (si el scraping falla, el resto de reglas se sirve igual). No se toca `FuenteInsight` (ya incluía `'001'`). Verificado contra el dev server real: la alerta naranja real del 15/09/2026 aparece en el panel sin ningún cambio de UI. `npm run typecheck`/`test` (357/357)/`build` verdes. |

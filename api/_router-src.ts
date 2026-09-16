@@ -15,6 +15,7 @@
 // El límite de body de 4,5 MB no aplica aquí (ninguna respuesta se acerca).
 
 import meteoActual from '../src/server/meteo-actual';
+import meteoAvisos from '../src/server/avisos-meteo';
 import meteoPrediccion from '../src/server/meteo-prediccion';
 import aireActual from '../src/server/aire-actual';
 import traficoEstado from '../src/server/trafico-estado';
@@ -37,6 +38,7 @@ type Handler = (req: Request) => Promise<Response>;
 
 const RUTAS: Record<string, Handler> = {
   'meteo/v1/actual': meteoActual,
+  'meteo/v1/avisos': meteoAvisos,
   'meteo/v1/prediccion-corto-plazo': meteoPrediccion,
   'aire/v1/actual': aireActual,
   'trafico/v1/estado': traficoEstado,

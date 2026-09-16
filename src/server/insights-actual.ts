@@ -13,6 +13,7 @@ import { fetchCalidadAire } from '../services/calidad-aire';
 import { fetchEstadoTrafico } from '../services/trafico';
 import { fetchDatosFallas } from '../services/fallas';
 import { fetchPrediccionCortoPlazo } from '../services/prediccion-corto-plazo';
+import { fetchAvisosVigentes } from '../services/avisos-meteo';
 import { calcularPulsoDistrito } from '../services/pulso-distrito';
 import {
   distritosFromGeoJSON,
@@ -40,15 +41,17 @@ export default async function handler(): Promise<Response> {
     // Fuentes "opcionales": si fallan, se degrada sirviendo los insights que
     // sí se pudieron calcular en vez de romper todo el panel (spec 013 §4,
     // extendido por spec 024 §4 a tráfico/Fallas).
-    const [prediccionResult, traficoResult, fallasResult] = await Promise.allSettled([
+    const [prediccionResult, traficoResult, fallasResult, avisosResult] = await Promise.allSettled([
       getOrFetch('meteo:valencia-prediccion-4h:v1', 15 * 60 * 1000, fetchPrediccionCortoPlazo),
       getOrFetch('trafico:valencia-estado:v1', 3 * 60 * 1000, () => fetchEstadoTrafico(resolverDistrito)),
       getOrFetch('fallas:valencia-actual:v1', 6 * 60 * 60 * 1000, () => fetchDatosFallas(resolverDistrito)),
+      getOrFetch('meteo:valencia-avisos:v1', 15 * 60 * 1000, fetchAvisosVigentes),
     ]);
 
     const prediccion = prediccionResult.status === 'fulfilled' ? prediccionResult.value.value : null;
     const tramosTrafico = traficoResult.status === 'fulfilled' ? traficoResult.value.value : null;
     const datosFallas = fallasResult.status === 'fulfilled' ? fallasResult.value.value : null;
+    const avisosOficiales = avisosResult.status === 'fulfilled' ? avisosResult.value.value.avisos : null;
     const distritos = tramosTrafico
       ? calcularPulsoDistrito(distritosBasicos, meteoResult.value, aireResult.value, tramosTrafico)
       : null;
@@ -67,6 +70,7 @@ export default async function handler(): Promise<Response> {
       tramosTrafico,
       datosFallas,
       tramosTraficoPrevios,
+      avisosOficiales,
     );
 
     if (tramosTrafico) cachePoke(CLAVE_TRAFICO_PREVIO, tramosTrafico, 15 * 60 * 1000);

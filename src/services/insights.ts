@@ -17,6 +17,7 @@ import type { PulsoDistrito } from './pulso-distrito';
 import type { PrediccionCortoPlazo } from './prediccion-corto-plazo';
 import type { TramoTrafico } from './trafico';
 import type { DatosFallas } from './fallas';
+import type { AvisoMeteo } from './avisos-meteo';
 
 export type SeveridadInsight = 'aviso' | 'urgente';
 
@@ -31,7 +32,8 @@ export type TipoInsight =
   | 'trafico-concentrado-distrito'
   | 'trafico-en-zona-fallas'
   | 'trafico-empeora'
-  | 'lluvia-mas-trafico-denso';
+  | 'lluvia-mas-trafico-denso'
+  | 'aviso-oficial-meteo';
 
 export interface ProtocoloSugerido {
   asunto: string;
@@ -468,6 +470,39 @@ function insightLluviaMasTrafico(
   };
 }
 
+const SEVERIDAD_POR_NIVEL_AVISO: Record<AvisoMeteo['nivel'], SeveridadInsight> = {
+  amarillo: 'aviso',
+  naranja: 'urgente',
+  rojo: 'urgente',
+};
+
+/**
+ * spec 001 v4 §2 — avisos oficiales de fenómenos adversos (GVA Emergencias e
+ * Interior, scraping), uno por aviso vigente. Reutiliza el modal bloqueante
+ * ya existente de spec 013 en vez de una UI nueva: es exactamente el "avisa,
+ * no actúa" que pide CLAUDE.md §4 para una alerta decretada por un organismo
+ * oficial, sin depender de ninguna API key.
+ */
+function insightsAvisoOficial(avisos: AvisoMeteo[], fetchedAt: string): Insight[] {
+  return avisos.map((aviso) => ({
+    id: `aviso-oficial-meteo:${aviso.id}`,
+    tipo: 'aviso-oficial-meteo' as const,
+    severidad: SEVERIDAD_POR_NIVEL_AVISO[aviso.nivel],
+    titulo: `Aviso oficial ${aviso.nivel} — ${aviso.titulo}`,
+    descripcion: aviso.resumen ?? aviso.titulo,
+    protocoloSugerido: {
+      asunto: `Aviso oficial ${aviso.nivel} de fenómenos adversos — Comunitat Valenciana`,
+      cuerpo:
+        `Emergencias e Interior (Generalitat Valenciana) ha activado un aviso nivel ${aviso.nivel}: "${aviso.titulo}". ` +
+        `${aviso.resumen ?? ''} Fuente: ${aviso.url}. ` +
+        'Dato de origen: sala de prensa de Emergencias e Interior, GVA (Mirall, spec 001). Revisar y decidir antes de actuar.',
+    },
+    fuenteSpec: ['001'],
+    detectedAt: aviso.publicadoEn,
+    fetchedAt,
+  }));
+}
+
 export function calcularInsights(
   meteo: EstadoMeteo,
   aire: CalidadAire,
@@ -476,6 +511,7 @@ export function calcularInsights(
   tramosTrafico: TramoTrafico[] | null = null,
   datosFallas: DatosFallas | null = null,
   tramosTraficoPrevios: TramoTrafico[] | null = null,
+  avisosOficiales: AvisoMeteo[] | null = null,
 ): PanelInsights {
   const fetchedAt = new Date().toISOString();
 
@@ -487,6 +523,7 @@ export function calcularInsights(
     insightVientoFuerte(meteo, fetchedAt),
     insightAireMalaCalidad(aire, fetchedAt),
     ...insightsLluvia,
+    ...(avisosOficiales ? insightsAvisoOficial(avisosOficiales, fetchedAt) : []),
     ...(prediccion ? insightsLluviaPrevista(prediccion, fetchedAt) : []),
     ...(distritos ? insightsDistritoCritico(distritos, fetchedAt) : []),
     ...(tramosTrafico ? insightsTraficoConcentrado(tramosTrafico, distritos, fetchedAt) : []),
