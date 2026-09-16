@@ -3,12 +3,18 @@
 ```yaml
 id: 039
 titulo: "Actualidad institucional en redes (widgets oficiales de Facebook y X, sin filtrado cruzado)"
-estado: Draft
+estado: Implemented
 tipo: panel
 depende_de: [019]
 propietario: ""
-version: 2
+version: 3
 ```
+
+> **Estado:** v3 `Implemented` (2026-09-16) — cierra el DoD de V1: las 13 entidades
+> verificadas visualmente en navegador (iframes reales con el handle/URL correctos, no
+> placeholders), fallback probado con una cuenta que de verdad no existe (no solo por
+> inspección del código), y nuevo selector "Elegir qué cuentas leer" con preferencia
+> persistida en `localStorage` (§5/§6).
 
 ## 1. Problema / motivación
 
@@ -85,6 +91,8 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 
 **Ubicación decidida por el usuario:** sección nueva en el **sidebar izquierdo** (chasís de spec `019`, `SIDEBAR_REGISTRY`), junto a "Cerca de mí" / "Glosario" — no un panel flotante nuevo. Al hacer clic en la sección se despliega la lista de las 13 entidades como acordeones (`<details>`); dentro, cada entidad es **otro acordeón**: hasta que no se abre la ficha de una entidad concreta no se pide ningún widget suyo (spec §4). Sigue el mismo patrón que las demás secciones del sidebar (`cerca-de-mi`, `glosario`) — no tienen checkbox de mostrar/ocultar en Configuración, se abren/cierran desde el propio sidebar.
 
+**v3 — "Elegir qué cuentas leer" (DoD de V1):** a diferencia de Configuración (spec 019 v3, que gobierna los 5 paneles fijos del panel principal — ver `panel-preferences.ts`), el filtro de entidades vive **dentro de esta misma sección**, no en Configuración: son 13 filas específicas de esta spec, no paneles genéricos. Mismo patrón de `localStorage` que `panel-preferences.ts` pero invertido (se guarda el conjunto de ids *ocultos*, no *visibles*, para que una entidad nueva en el registro aparezca visible por defecto sin migrar la preferencia de nadie): `src/ui/actualidad-redes.ts` — `isEntidadVisible(id)`/`setEntidadVisible(id, visible)`, clave `imc:entidades-redes-ocultas`. Un acordeón "Elegir qué cuentas leer" con un checkbox por entidad, antes de la lista de fichas; desmarcar una entidad oculta su ficha (`hidden`) sin desmontar sus widgets si ya estaban cargados.
+
 ## 6. Criterios de aceptación (Definition of Done)
 
 - [x] Mecanismos de embebido confirmados vigentes hoy (Page Plugin no deprecado; `publish.x.com` gratuito sin key) — no supuesto de memoria, investigado en esta sesión.
@@ -95,9 +103,10 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 - [x] Widget real verificado en navegador contra una cuenta de verdad (Centre de Gestió de Trànsit): el iframe de Facebook carga `facebook.com/.../plugins/page.php` con la página real, y el de X carga `syndication.twitter.com/.../screen-name/TransitValencia` con el handle correcto — no un placeholder.
 - [x] Fallback a tarjeta simple (`construirTarjetaFallback`) programado a los 8s si no aparece un iframe — mecanismo implementado, no forzado el caso de fallo real en esta verificación (el caso real probado sí cargó a tiempo).
 - [x] Aviso breve y visible de que abrir una ficha carga scripts de Meta/X con sus propias cookies.
-- [ ] Confirmación visual cuenta por cuenta de las 12 entidades restantes (solo se verificó en vivo la primera) — pendiente antes de dar la spec por completa.
-- [ ] Probar el caso de fallo real (una cuenta que de verdad no cargue) para confirmar el fallback en producción, no solo por inspección del código.
-- [x] `npm run typecheck` + `npm run test` (334/334) + `npm run build` verdes.
+- [x] **Confirmación visual de las 13 entidades (v3)**: abiertas las 13 fichas en el dev server real y comprobado, por JS, el `src` de cada iframe resultante — los 8 widgets de Facebook cargan `facebook.com/v21.0/plugins/page.php?...&href=<page-url-exacta>` y los 13 de X cargan `syndication.twitter.com/.../screen-name/<handle-exacto>`, coincidiendo uno a uno con `entidades-redes.ts`. Ninguna cayó a fallback (las 13 cargaron a tiempo).
+- [x] **Caso de fallo real probado (v3)**: entidad temporal con `xHandle` inexistente (`esta_cuenta_no_existe_de_verdad_zzz999`) añadida, abierta y verificada en el dev server real — a los 8s, sin ningún iframe creado (el SDK de X no lo generó para una cuenta que no existe), `programarFallback` sustituyó el contenedor por la tarjeta "@esta_cuenta_no_existe_de_verdad_zzz999 — ver publicaciones ↗" enlazando a `x.com/esta_cuenta_no_existe_de_verdad_zzz999`. Entidad de prueba retirada tras la verificación, no queda en el registro.
+- [x] **"Elegir qué cuentas leer" (v3)**: selector con 13 checkboxes, preferencia persistida en `localStorage` (`imc:entidades-redes-ocultas`) — verificado en navegador: desmarcar una entidad oculta su ficha al momento y sigue oculta tras recargar la página; volver a marcarla la muestra.
+- [x] `npm run typecheck` + `npm run test` (357/357) + `npm run build` verdes.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -112,3 +121,4 @@ No aplica — sin backend. Registro estático `src/config/entidades-redes.ts`.
 |---|---|---|
 | 1 | 2026-09-14 | Creación. Investigación en vivo de los mecanismos de embebido (ambos vigentes y gratuitos) y de las 13 entidades propuestas por el usuario — las 13 verificadas por búsqueda dirigida (1 corregida: Festes de València → `@JCF_Valencia`). Ubicación en el sidebar decidida. Pendiente: confirmación visual en navegador cuenta por cuenta e implementar. |
 | 2 | 2026-09-14 | Implementada: `src/config/entidades-redes.ts` (con tests), `src/ui/actualidad-redes.ts` (fichas en acordeón, carga diferida por entidad, fallback a los 8s), sección nueva en `SIDEBAR_REGISTRY`. Verificado en navegador contra una cuenta real (Centre de Gestió de Trànsit): ambos widgets (Facebook y X) cargan con datos reales, sin scripts de terceros hasta abrir la ficha. `npm run typecheck`/`test` (334/334)/`build` verdes. DoD abierto: confirmar visualmente las 12 entidades restantes y probar el fallback con un fallo real. |
+| 3 | 2026-09-16 | **Cierre de DoD de V1.** Las 13 entidades verificadas en navegador (iframes reales con handle/URL exactos, ver §6); fallback probado con una cuenta inexistente real, no simulada por inspección de código. Nuevo selector "Elegir qué cuentas leer" (`buildSelectorEntidades` en `src/ui/actualidad-redes.ts`) — 13 checkboxes, preferencia persistida en `localStorage` (`imc:entidades-redes-ocultas`, mismo espíritu invertido que `panel-preferences.ts` de spec 019), CSS nuevo en `index.html` (`.red-entidad-selector*`). Sin test unitario para la persistencia (el proyecto no usa `jsdom`/`localStorage` en tests — mismo criterio que `panel-preferences.ts`, que tampoco lo tiene; verificado en navegador real en su lugar). `npm run typecheck`/`test` (357/357)/`build` verdes. Spec pasa a `Implemented`. |

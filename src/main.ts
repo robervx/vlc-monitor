@@ -1232,13 +1232,19 @@ function buildControlPanel(): ControlPanel {
         <input type="checkbox" id="toggle-tendencia" />
         Términos en tendencia
       </label>
-      <label class="controls__row">
+      <label class="controls__row" id="toggle-camaras-row">
         <input type="checkbox" id="toggle-camaras" />
         Cámaras en vivo
       </label>
     </details>
   `;
   document.body.appendChild(panel);
+
+  // spec 038 v7 (DoD de V1) — sin la env var de la fuente "personal" (ADR-003)
+  // la entrada se oculta del todo, no se deja un panel vacío al activarla.
+  if (camarasVisibles().length === 0) {
+    panel.querySelector<HTMLLabelElement>('#toggle-camaras-row')!.hidden = true;
+  }
 
   const contextoDetails = panel.querySelector<HTMLDetailsElement>('#controls-contexto')!;
   contextoDetails.addEventListener('toggle', () => {

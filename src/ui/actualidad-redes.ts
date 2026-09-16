@@ -14,6 +14,41 @@ import { ENTIDADES_REDES, type EntidadRed } from '../config/entidades-redes';
 
 const TIEMPO_FALLBACK_MS = 8000;
 
+// v3 (DoD de V1) — "elegir qué cuentas leer": mismo patrón de localStorage
+// que `panel-preferences.ts` (un set de ids *ocultos*, no de visibles, para
+// que una entidad nueva en el registro aparezca visible por defecto sin
+// tener que tocar la preferencia guardada de nadie).
+const ENTIDADES_OCULTAS_KEY = 'imc:entidades-redes-ocultas';
+
+function leerOcultas(): Set<string> {
+  try {
+    const raw = localStorage.getItem(ENTIDADES_OCULTAS_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+function guardarOcultas(ocultas: Set<string>): void {
+  try {
+    localStorage.setItem(ENTIDADES_OCULTAS_KEY, JSON.stringify([...ocultas]));
+  } catch {
+    /* no-op — localStorage no disponible (privado/bloqueado), se pierde la preferencia, no la funcionalidad */
+  }
+}
+
+export function isEntidadVisible(id: string): boolean {
+  return !leerOcultas().has(id);
+}
+
+export function setEntidadVisible(id: string, visible: boolean): void {
+  const ocultas = leerOcultas();
+  if (visible) ocultas.delete(id);
+  else ocultas.add(id);
+  guardarOcultas(ocultas);
+}
+
 interface VentanaConSdks extends Window {
   FB?: { init: (opts: Record<string, unknown>) => void; XFBML: { parse: (el?: HTMLElement) => void } };
   fbAsyncInit?: () => void;
@@ -155,6 +190,39 @@ export function construirFichaEntidad(entidad: EntidadRed): HTMLDetailsElement {
   return det;
 }
 
+/** "Elegir qué cuentas leer" — un checkbox por entidad, preferencia persistida (spec 039 v3). */
+function buildSelectorEntidades(fichas: Map<string, HTMLDetailsElement>): HTMLDetailsElement {
+  const selector = document.createElement('details');
+  selector.className = 'red-entidad-selector';
+
+  const sum = document.createElement('summary');
+  sum.className = 'red-entidad-selector__titulo';
+  sum.textContent = 'Elegir qué cuentas leer';
+  selector.appendChild(sum);
+
+  for (const entidad of ENTIDADES_REDES) {
+    const row = document.createElement('label');
+    row.className = 'sidebar-panel-checkbox';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = isEntidadVisible(entidad.id);
+    checkbox.addEventListener('change', () => {
+      setEntidadVisible(entidad.id, checkbox.checked);
+      const ficha = fichas.get(entidad.id);
+      if (ficha) ficha.hidden = !checkbox.checked;
+    });
+
+    const text = document.createElement('span');
+    text.textContent = entidad.nombre;
+
+    row.append(checkbox, text);
+    selector.appendChild(row);
+  }
+
+  return selector;
+}
+
 export function buildActualidadRedesContent(): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'sidebar-panel-content actualidad-redes';
@@ -170,9 +238,15 @@ export function buildActualidadRedesContent(): HTMLElement {
   aviso.textContent = 'Al abrir una ficha se cargan los scripts oficiales de Meta y/o X, que pueden fijar sus propias cookies.';
   wrap.appendChild(aviso);
 
+  const fichas = new Map<string, HTMLDetailsElement>();
   for (const entidad of ENTIDADES_REDES) {
-    wrap.appendChild(construirFichaEntidad(entidad));
+    const ficha = construirFichaEntidad(entidad);
+    ficha.hidden = !isEntidadVisible(entidad.id);
+    fichas.set(entidad.id, ficha);
   }
+
+  wrap.appendChild(buildSelectorEntidades(fichas));
+  for (const ficha of fichas.values()) wrap.appendChild(ficha);
 
   return wrap;
 }

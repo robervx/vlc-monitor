@@ -362,6 +362,40 @@
       }
 
       /* Actualidad institucional en redes — spec 039 */
+      .red-entidad-selector {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 4px;
+      }
+
+      .red-entidad-selector__titulo {
+        font-size: 12px;
+        font-weight: 600;
+        color: #dbe6f0;
+        padding: 8px 0;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .red-entidad-selector__titulo::-webkit-details-marker {
+        display: none;
+      }
+
+      .red-entidad-selector__titulo::before {
+        content: '▸';
+        display: inline-block;
+        width: 1em;
+        color: #7d90a6;
+      }
+
+      .red-entidad-selector[open] .red-entidad-selector__titulo::before {
+        content: '▾';
+      }
+
+      .red-entidad-selector .sidebar-panel-checkbox {
+        padding-left: 1em;
+        padding-bottom: 8px;
+      }
+
       .red-entidad {
         border-top: 1px solid rgba(255, 255, 255, 0.08);
       }
