@@ -207,7 +207,10 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
   usuario (`ADR-006`), igual que ya pasó con Upstash (sin aprovisionar todavía) y con la
   clave de Gemini de `045`. Sin esa pieza, la correlación en caliente (§3-§4 sin la
   escritura histórica) sigue siendo implementable y útil por sí sola — no bloquea todo lo
-  demás.
+  demás. El esquema de la tabla histórica (§3 de aquí, `senales_historico`) queda
+  superado por el modelo de dominio completo de `docs/04_MODELO_DE_DATOS.md`
+  (`senal`/`fuente`/`asociacion`/`recomendacion`/`evento_programado`) — cuando se
+  implemente la escritura, usar ese esquema, no el borrador de §3.
 - **Crecimiento de la tabla histórica**: sin política de retención, `senales_historico`
   crece sin límite. Mitigación prevista (igual que ya hace `trafico-historico` con
   rollups diarios): agregar/podar registros más allá de N días a un rollup por

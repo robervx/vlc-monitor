@@ -4,9 +4,12 @@
 
 ### La ciudad reflejada en tiempo real
 
-**Un mapa vivo de la ciudad de València: movilidad, meteorología, calidad del aire,
-eventos e incidencias, agregados en un solo panel a partir de datos abiertos y
-gratuitos.**
+**Mirall transforma información pública dispersa en una representación coherente de la
+ciudad que permite comprender qué está ocurriendo y tomar decisiones.**
+
+Hoy, en la práctica: un mapa vivo de la ciudad de València — movilidad, meteorología,
+calidad del aire, eventos e incidencias, agregados en un solo panel a partir de datos
+abiertos y gratuitos.
 
 [**▶ Demo en vivo**](https://vlc-monitor.vercel.app) &nbsp;·&nbsp;
 [Fuentes y licencias](docs/FUENTES_Y_LICENCIAS.md) &nbsp;·&nbsp;

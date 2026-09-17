@@ -4,7 +4,19 @@ Este fichero es la memoria de proyecto para cualquier sesión de Claude Code que
 
 ## 1. Qué es este proyecto
 
-Mapa en tiempo real de la ciudad de València que agrega, en un único panel, señales públicas y gratuitas: movilidad, meteorología, calidad del aire, eventos e incidencias. El planteamiento arquitectónico sigue el de [World Monitor](https://github.com/koala73/worldmonitor) (ver `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md`), reducido a escala de ciudad: sin globo 3D, sin app de escritorio, sin multi-tenant.
+**Mirall transforma información pública dispersa en una representación coherente de la
+ciudad que permite comprender qué está ocurriendo y tomar decisiones.** (Declaración de
+misión del usuario, 2026-09-17 — es la vara de medir para cualquier decisión de producto o
+de modelo de datos: si una pieza no ayuda a "comprender qué está ocurriendo" o a "tomar
+decisiones", no encaja aquí sin más justificación.)
+
+En la práctica, hoy eso es un mapa en tiempo real de la ciudad de València que agrega, en un
+único panel, señales públicas y gratuitas: movilidad, meteorología, calidad del aire,
+eventos e incidencias. El planteamiento arquitectónico sigue el de [World Monitor](https://github.com/koala73/worldmonitor) (ver `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md`), reducido a escala de ciudad: sin globo 3D, sin app de escritorio, sin multi-tenant.
+
+El modelo de datos de dominio (qué entidades conoce Mirall, cómo se identifican y
+relacionan, de dónde vienen) está documentado en `docs/04_MODELO_DE_DATOS.md` — léelo antes
+de tocar cualquier esquema de base de datos o de añadir una entidad nueva al dominio.
 
 Nombre de producto: **"Mirall"** — descriptor visible en la cabecera de la app: "Urban Intelligence Platform". El eslogan "La ciudad reflejada en tiempo real" es de presentación externa (README, LinkedIn), no se muestra dentro de la app (`src/config/marca.ts`: `nombre`/`descriptor`/`tagline`). Renombrado desde "Intelligent City Monitor" por decisión del usuario, ver `docs/decisiones/ADR-004-rebranding-mirall.md` (el historial de specs anteriores a esa fecha sigue citando el nombre antiguo, no se reescribe). Proyecto abierto bajo licencia MIT, sin audiencia institucional declarada ni marca de ningún organismo, sin empresa detrás. Cualquiera puede desplegarlo o partir de él.
 
@@ -14,10 +26,11 @@ Documentos de referencia, en orden de lectura recomendado:
 
 1. `docs/01_VIABILIDAD_VISION_Y_PROCESO.md` — viabilidad económica, visión de producto, roadmap, proceso spec-driven.
 2. `docs/02_DEFINITION_OF_DONE_V1.md` — qué tiene que estar `Implemented` para dar la V1 por completa, y qué distingue el despliegue interno del público.
-3. `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md` — de dónde salen los patrones técnicos.
-4. `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` — catálogo de fuentes de "actividad humana" y el límite ético/legal aplicado.
-5. `ROADMAP.md` — fuente única de verdad de fases y qué spec pertenece a cada una.
-6. `specs/INDEX.md` — estado de cada spec. **Empieza siempre aquí para saber en qué trabajar.**
+3. `docs/04_MODELO_DE_DATOS.md` — modelo conceptual de dominio (entidades, relaciones, identificadores, procedencia) — léelo antes de tocar el esquema de base de datos o de proponer una entidad nueva.
+4. `docs/investigacion/WORLDMONITOR_TEARDOWN_VLC_PROPUESTA.md` — de dónde salen los patrones técnicos.
+5. `docs/investigacion/PULSO_HUMANO_FUENTES_OSINT.md` — catálogo de fuentes de "actividad humana" y el límite ético/legal aplicado.
+6. `ROADMAP.md` — fuente única de verdad de fases y qué spec pertenece a cada una.
+7. `specs/INDEX.md` — estado de cada spec. **Empieza siempre aquí para saber en qué trabajar.**
 
 ## 2. Regla no negociable: Spec-Driven Development
 

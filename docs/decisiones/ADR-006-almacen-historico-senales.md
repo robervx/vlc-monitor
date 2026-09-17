@@ -69,6 +69,12 @@ acceso a Postgres vive detrás de un endpoint interno más, igual que cualquier 
   antes de escribir el esquema real de la tabla — esta ADR fija la elección de motor, no
   el esquema.
 
+**Actualización (2026-09-17)**: el esquema (entidades, relaciones, identificadores,
+dimensión espacial/temporal, procedencia) quedó modelado — desde el dominio, no desde las
+tablas existentes — en `docs/04_MODELO_DE_DATOS.md`. Es el "architecture gate" pedido
+explícitamente por el usuario antes de escribir la migración SQL real: se revisa/ajusta
+antes de tocar la base de datos, no después.
+
 ## Consecuencia
 
 - `047` puede diseñar su contrato de datos asumiendo Postgres como destino del histórico,
