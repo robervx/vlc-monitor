@@ -11,6 +11,7 @@
 import type { ResumenAltimetriaDistrito } from '../services/altimetria';
 import type { LluviaVientoDistrito } from '../services/meteo-zona';
 import type { PluviometroSaih } from '../services/pluviometros-saih';
+import type { EstacionAvamet } from '../services/avamet-estaciones';
 import { escapeHtml, metaFrescura, startPolling } from './panel-utils';
 
 async function fetchAltimetria(): Promise<ResumenAltimetriaDistrito[]> {
@@ -30,6 +31,12 @@ async function fetchPluviometros(): Promise<{ estaciones: PluviometroSaih[]; fre
   const res = await fetch('/api/emergencia/v1/pluviometros');
   if (!res.ok) throw new Error(`GET /api/emergencia/v1/pluviometros -> HTTP ${res.status}`);
   return (await res.json()) as { estaciones: PluviometroSaih[]; fresh: boolean };
+}
+
+async function fetchAvamet(): Promise<{ estaciones: EstacionAvamet[]; fresh: boolean }> {
+  const res = await fetch('/api/emergencia/v1/avamet');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/avamet -> HTTP ${res.status}`);
+  return (await res.json()) as { estaciones: EstacionAvamet[]; fresh: boolean };
 }
 
 function renderAltimetria(distritos: ResumenAltimetriaDistrito[]): string {
@@ -59,6 +66,23 @@ function renderMeteoZona(distritos: LluviaVientoDistrito[]): string {
           <span class="meteo-zona-fila__nombre">${escapeHtml(d.distritoNombre)}</span>
           <span class="meteo-zona-fila__dato">🌧 ${d.precipitacionMm.toFixed(1)} mm</span>
           <span class="meteo-zona-fila__dato">💨 ${d.vientoKmh.toFixed(0)} km/h (ráfaga ${d.rachaKmh.toFixed(0)})</span>
+        </div>
+      `,
+    )
+    .join('');
+}
+
+function renderAvamet(estaciones: EstacionAvamet[]): string {
+  if (estaciones.length === 0) return '<div class="info-panel__desc">Sin estaciones AVAMET disponibles ahora mismo.</div>';
+  const ordenado = [...estaciones].sort((a, b) => b.temperaturaC - a.temperaturaC);
+  return ordenado
+    .map(
+      (e) => `
+        <div class="avamet-fila">
+          <span class="avamet-fila__nombre">${escapeHtml(e.nombre)}</span>
+          <span class="avamet-fila__dato">🌡 ${e.temperaturaC.toFixed(1)}°C</span>
+          <span class="avamet-fila__dato">💨 ${e.vientoKmh.toFixed(0)} km/h (${escapeHtml(e.vientoDireccion)})</span>
+          <span class="avamet-fila__dato">🌧 ${e.precipitacionDiaMm.toFixed(1)} mm/día</span>
         </div>
       `,
     )
@@ -115,7 +139,7 @@ export function montarMeteoZonaPanel(): void {
   root.hidden = true;
   root.innerHTML = `
     <div class="media-panel__header">Lluvia y viento por distrito</div>
-    <p class="cordon-intro">Por distrito es un modelo (Open-Meteo), no una estación real; los pluviómetros de abajo sí son dato medido (SAIH Júcar). Sin dato de "capacidad de absorción del terreno" — no existe una fuente oficial para eso, no se inventa una estimación (spec 044 §7).</p>
+    <p class="cordon-intro">Por distrito es un modelo (Open-Meteo), no una estación real; los pluviómetros SAIH y las estaciones AVAMET de abajo sí son dato medido. Sin dato de "capacidad de absorción del terreno" — no existe una fuente oficial para eso, no se inventa una estimación (spec 044 §7).</p>
     <div class="emergencia-meteo__bloque">
       <div class="emergencia-meteo__subtitulo">Por distrito (modelo)</div>
       <div id="emergencia-meteo-zona-list"></div>
@@ -126,11 +150,17 @@ export function montarMeteoZonaPanel(): void {
       <div id="emergencia-pluviometros-list"></div>
       <div class="info-panel__meta" id="emergencia-pluviometros-meta"></div>
     </div>
+    <div class="emergencia-meteo__bloque">
+      <div class="emergencia-meteo__subtitulo">Temperatura y lluvia por zona — estaciones reales (AVAMET)</div>
+      <div id="emergencia-avamet-list"></div>
+      <div class="info-panel__meta" id="emergencia-avamet-meta"></div>
+    </div>
   `;
   document.body.appendChild(root);
 
   const meteoZonaList = root.querySelector('#emergencia-meteo-zona-list')!;
   const pluviometrosList = root.querySelector('#emergencia-pluviometros-list')!;
+  const avametList = root.querySelector('#emergencia-avamet-list')!;
 
   async function refrescarMeteoZona(): Promise<void> {
     try {
@@ -154,6 +184,18 @@ export function montarMeteoZonaPanel(): void {
     }
   }
 
+  async function refrescarAvamet(): Promise<void> {
+    try {
+      const { estaciones, fresh } = await fetchAvamet();
+      avametList.innerHTML = renderAvamet(estaciones);
+      root.querySelector('#emergencia-avamet-meta')!.innerHTML = metaFrescura('AVAMET (medido)', new Date().toISOString(), fresh);
+    } catch (err) {
+      avametList.textContent = 'Estaciones AVAMET no disponibles';
+      console.error('Fallo al cargar estaciones AVAMET:', err);
+    }
+  }
+
   startPolling(refrescarMeteoZona, 15 * 60 * 1000);
   startPolling(refrescarPluviometros, 15 * 60 * 1000);
+  startPolling(refrescarAvamet, 15 * 60 * 1000);
 }

@@ -4,9 +4,10 @@
 completo (12/12 pasos) el mismo día. Este documento recoge la siguiente tanda de trabajo,
 definida con el usuario para continuar en otra sesión. **Actualización (2026-09-17, misma
 tanda): las 4 piezas (`027` v4, `043`, `044`, `045`) quedaron `Implemented`** — incluida
-`045`, tras que el usuario resolviera explícitamente el bloqueante de decisión de
-producto/ADR (`docs/decisiones/ADR-005-panel-sintesis-ia.md`). No es una fase nueva
-confirmada en `ROADMAP.md` todavía.
+`045`, cuyo proveedor de IA cambió dos veces tras la aprobación inicial (ver historial más
+abajo) hasta confirmarse en vivo con una cuenta 100% gratuita. `044` recibió además una v4
+con temperatura por zona real (AVAMET), a partir de una petición explícita del usuario ya
+en esta misma tanda. No es una fase nueva confirmada en `ROADMAP.md` todavía.
 
 ## Orden de prioridad (decidido explícitamente por el usuario)
 
@@ -20,17 +21,27 @@ confirmada en `ROADMAP.md` todavía.
    imágenes JPEG oficiales, licencia Creative Commons Attribution) — **pública por
    defecto**, mejor resultado que la hipótesis "personal" de partida. 84 cámaras.
 3. ~~**[`044`](../specs/044-panel-emergencia-meteorologica.md)**~~ — **Implementado
-   (2026-09-17).** Panel de emergencia meteorológica: altimetría por distrito (IGN, seed
+   (2026-09-17, v4).** Panel de emergencia meteorológica: altimetría por distrito (IGN, seed
    único), lluvia/viento por distrito (Open-Meteo multi-coordenada), pluviómetros reales
    (SAIH Júcar) — no hizo falta dividir en specs separadas. "Capacidad de absorción"
-   descartada, sin fuente oficial.
-4. ~~**[`045`](../specs/045-panel-sintesis-ia.md)**~~ — **Implementado (2026-09-17).**
-   Panel de síntesis con IA. El usuario resolvió el bloqueante de producto/ADR aprobando
-   Vercel AI Gateway + modelo barato (`anthropic/claude-haiku-4.5`) + caché de 20 min —
-   ver `docs/decisiones/ADR-005-panel-sintesis-ia.md`. Guardrails por esquema (`zod`):
-   `fuenteSpec` no vacío forzado, aviso "generado por IA" siempre visible. Sin
-   credenciales de proveedor en este entorno de desarrollo — la llamada real al modelo
-   queda pendiente del primer despliegue con `AI_GATEWAY_API_KEY`/`VERCEL_OIDC_TOKEN`.
+   descartada, sin fuente oficial. **v4 (misma tanda):** a partir de unas capturas que
+   compartió el usuario de AVAMET, se añadió temperatura/humedad/viento/lluvia real por
+   estación dentro de la ciudad (`mxo-mxo.php?territori=c15` embebe un array JSON con
+   lat/lon por estación — resuelve el bloqueante de geocodificación que quedó abierto en
+   v2). Esa misma conversación abrió una investigación más amplia sobre escorrentía urbana
+   e hidrología, ver el punto "Qué sigue" más abajo.
+4. ~~**[`045`](../specs/045-panel-sintesis-ia.md)**~~ — **Implementado (2026-09-17, v5).**
+   Panel de síntesis con IA. El usuario aprobó primero Vercel AI Gateway + Claude Haiku
+   (`docs/decisiones/ADR-005-panel-sintesis-ia.md`), luego reconsideró por un proveedor
+   **gratuito de verdad** atado a su cuenta personal (Google Gemini, API directa) y
+   finalmente compartió su propia clave de AI Studio para verificar en vivo. Esa
+   verificación encontró y corrigió 2 bugs reales (modelo poco fiable, truncado por
+   razonamiento interno) y confirmó que la cuota gratuita de `gemini-3.6-flash` es muy
+   ajustada (~20 peticiones/día) — al pedir explorar alternativas, `gemini-3-flash-preview`
+   resultó tener cuota separada y bastante más generosa, y con él se confirmó el camino
+   feliz completo (HTTP 200 con datos reales de la ciudad). Guardrails por esquema (`zod`)
+   sin cambios: `fuenteSpec` no vacío forzado, aviso "generado por IA" siempre visible. Sin
+   huecos pendientes — ver "Revisión v4" en el ADR.
 
 ## Cómo retomar cada una
 
@@ -40,9 +51,25 @@ paso real de cada una es la misma investigación en profundidad que ya se ha hec
 cada spec `Implemented` de este repo (`CLAUDE.md` §8.2), no asumir que lo apuntado aquí ya
 vale como verificación.
 
-- Las 4 piezas de esta tanda (**`027` v4**, **`043`**, **`044`**, **`045`**) están
-  `Implemented` (2026-09-17). No queda trabajo pendiente de esta tanda salvo verificar la
-  llamada real al modelo de IA de `045` en el primer despliegue con credenciales.
+- Las 4 piezas de esta tanda (**`027` v4**, **`043`**, **`044` v4**, **`045` v5**) están
+  `Implemented` (2026-09-17), con el camino feliz de `045` ya confirmado en vivo. No queda
+  trabajo pendiente de esta tanda.
+
+## Qué sigue — investigación abierta sin implementar (2026-09-17)
+
+A raíz de la integración de AVAMET en `044` v4, el usuario compartió una investigación
+extensa sobre escorrentía urbana e hidrología en Valencia (SIRA, coeficientes de
+escorrentía, pluviómetros municipales adicionales, LiDAR, PATRICOVA/SNCZI, método HAND).
+Queda documentada en
+[`docs/investigacion/ESCORRENTIA_HIDROLOGIA_URBANA_VLC.md`](investigacion/ESCORRENTIA_HIDROLOGIA_URBANA_VLC.md)
+y reservada como spec **[`046`](../specs/INDEX.md)** en estado `Planned` — es
+sustancialmente más grande que cualquier spec de esta tanda (cruza topografía, red de
+saneamiento y normativa), por lo que sigue el flujo normal de `CLAUDE.md` §2: due-diligence
+de spec propia antes de escribir código, no una extensión de `044`.
+
+También quedan explícitamente aparcados por el usuario, sin fecha ("iremos viendo"):
+revisar "actualidad institucional" (sobre todo el bloque de Twitter/X) y cómo sacarle más
+valor a la agenda de eventos (`027`).
 
 ## Qué NO es esta tanda
 

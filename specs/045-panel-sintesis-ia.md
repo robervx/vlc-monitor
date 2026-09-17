@@ -7,25 +7,23 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [013, 041, 040]
 propietario: ""
-version: 4
+version: 5
 ```
 
-> **Estado:** `Implemented` (v4, 2026-09-17) — el usuario resolvió el bloqueante de §0 en
-> tres pasos el mismo día: aprobó Vercel AI Gateway + modelo barato (v2), reconsideró por
-> un proveedor **gratuito de verdad** — Google Gemini con clave personal de Google AI
-> Studio (v3, ver ADR-005 "Revisión v2") — y finalmente **compartió su propia clave real**
-> para verificar en vivo (v4, ver ADR-005 "Revisión v3"). Esa verificación encontró y
-> corrigió un bug real (el modelo agotaba `maxOutputTokens` en razonamiento interno antes
-> de escribir el JSON — `thinkingConfig.thinkingBudget: 0` lo desactiva) y confirmó que la
-> cuota gratuita real es más ajustada de lo esperado (~20 peticiones antes de HTTP 429,
-> ventana no especificada por Google) — el TTL de caché sube de 20 a 90 min en
-> consecuencia. **Limitación honesta que queda pendiente**: la cuota se agotó durante el
-> diagnóstico antes de poder confirmar el camino feliz completo (una respuesta real a
-> través del propio endpoint, con los 5 handlers agregados) una última vez ya con el
-> arreglo aplicado — sí se confirmó por separado que la clave autentica, que el modelo
-> responde con datos reales, y que el arreglo del "pensamiento" está bien diagnosticado
-> (el desglose de `usage` de Google lo confirma sin ambigüedad). Pendiente: repetir esa
-> última confirmación cuando la cuota se recupere.
+> **Estado:** `Implemented` (v5, 2026-09-17) — **totalmente verificado en vivo, sin huecos
+> pendientes.** El usuario resolvió el bloqueante de §0 en varios pasos el mismo día:
+> aprobó Vercel AI Gateway + modelo barato (v2), reconsideró por un proveedor **gratuito
+> de verdad** (v3, Google Gemini) y compartió su propia clave real para verificar en vivo
+> (v4). Esa verificación encontró y corrigió 2 bugs reales — el modelo agotaba
+> `maxOutputTokens` en razonamiento interno antes de escribir el JSON
+> (`thinkingConfig.thinkingBudget: 0` lo arregla) y `gemini-3.6-flash` tenía una cuota
+> gratuita real de solo ~20 peticiones/día — y al pedírsele explícitamente investigar
+> alternativas (v5), se encontró que **`gemini-3-flash-preview`** tiene cuota
+> notablemente más generosa dentro de la misma cuenta gratuita. Con ese modelo se
+> confirmó el **camino feliz completo a través del propio endpoint en ejecución**
+> (`HTTP 200`, datos reales de la ciudad, guardrails cumplidos) y en el panel real del
+> navegador. Ver `docs/decisiones/ADR-005-panel-sintesis-ia.md` ("Revisión v4") para el
+> detalle completo.
 
 ## 0. Por qué esta spec es distinta de las demás — decisión pendiente, no solo técnica
 
@@ -95,7 +93,7 @@ un `fetch` a una URL relativa no resolvería en producción; llamar la función 
 evita ese problema y de paso reutiliza la caché propia de cada handler sin coste extra.
 
 La fuente nueva es el **modelo de IA en sí**: Google Generative AI directo (paquete
-`@ai-sdk/google`, no Vercel AI Gateway), modelo `gemini-3.6-flash`, con la clave
+`@ai-sdk/google`, no Vercel AI Gateway), modelo `gemini-3-flash-preview`, con la clave
 gratuita personal del usuario (decisión de producto,
 `docs/decisiones/ADR-005-panel-sintesis-ia.md`, "Revisión v2").
 
@@ -156,18 +154,18 @@ No aplica — panel de texto (`src/ui/sintesis-ia-panel.ts`) dentro de `/intelig
       mapa" pero tampoco ninguna acción ejecutable).
 - [x] Comportamiento definido y probado ante una respuesta del modelo mal formada o vacía
       — `SintesisIASchema.safeParse` rechaza severidad fuera de enum y `fuenteSpec` vacío
-      (2 tests). Verificado además con **3 escenarios reales** usando la clave del usuario
-      (v4): sin clave (502, "API key is missing"), con clave pero cuota agotada (502 con
-      el mensaje real de Google), y con clave + cuota disponible pero salida truncada por
-      razonamiento interno (`NoObjectGeneratedError`, diagnóstico exacto vía `usage` de la
-      respuesta) — los tres casos degradan sin romper el panel ni inventar contenido.
-      **Pendiente**: confirmar el camino feliz completo (200 con síntesis real) ya con el
-      arreglo de `thinkingBudget: 0` aplicado — la cuota se agotó durante el diagnóstico
-      antes de poder repetirlo una última vez; el diagnóstico del bug en sí no es
-      ambiguo (ver ADR-005 "Revisión v3").
-- [x] Diseño visual verificado en navegador con una respuesta simulada de la forma real del
-      contrato — advertencia siempre visible, insights con severidad y chips de fuente,
-      recomendaciones con chips de fuente.
+      (2 tests). Verificado además con **4 escenarios reales** usando la clave del
+      usuario: sin clave (502, "API key is missing"), con clave pero cuota agotada (502
+      con el mensaje real de Google), con clave + cuota disponible pero salida truncada
+      por razonamiento interno (`NoObjectGeneratedError`, diagnóstico exacto vía `usage`
+      de la respuesta — v4) y, tras cambiar de modelo, **camino feliz completo real**:
+      `HTTP 200` a través del propio endpoint en ejecución, con datos reales de la
+      ciudad y los 4 guardrails cumplidos (v5, ver ADR-005 "Revisión v4"). Los cuatro
+      casos degradan o responden correctamente sin romper el panel ni inventar contenido.
+- [x] Diseño visual verificado en navegador **con una respuesta real** (no solo simulada)
+      de `gemini-3-flash-preview` a través del endpoint en ejecución — advertencia
+      siempre visible, insights con severidad y chips de fuente, recomendaciones con
+      chips de fuente, todo con contenido real generado sobre datos reales de la ciudad.
 - [x] 7 tests nuevos (`sintesis-ia.test.ts`) — esquema, guardrail de trazabilidad,
       ensamblado de metadatos, construcción de prompt.
 - [x] `npm run typecheck` / `npm run test` (401/401) / `npm run build` verdes. El bundle de
@@ -198,3 +196,4 @@ No aplica — panel de texto (`src/ui/sintesis-ia-panel.ts`) dentro de `/intelig
 | 2 | 2026-09-17 | **Implemented.** Usuario aprobó explícitamente la opción de §0.1 → `docs/decisiones/ADR-005-panel-sintesis-ia.md` (Vercel AI Gateway, `anthropic/claude-haiku-4.5`, TTL 20 min, guardrails por esquema). `src/services/sintesis-ia.ts` (esquema zod, prompt, guardrail de trazabilidad, 7 tests), `src/server/sintesis-ia.ts` (`GET /api/sintesis/v1/actual`, invoca los handlers existentes como funciones en el mismo proceso — evita el problema del origen ficticio del router), `src/ui/sintesis-ia-panel.ts`. Sin credenciales de proveedor en este entorno — verificado el camino de error controlado (502, panel degrada sin romperse) y el diseño visual con una respuesta simulada; la llamada real al modelo queda pendiente del primer despliegue con credenciales. 401/401 tests, `typecheck`/`build` verdes (bundle de `api/router.js`: 1,2 MB → 2,4 MB). |
 | 3 | 2026-09-17 | **Cambio de proveedor**, misma sesión: el usuario reconsideró tras ver v2 — quiere un proveedor gratuito de verdad, no facturación por token vía Vercel AI Gateway. Pivote a **Google Generative AI directo** (`@ai-sdk/google`, `gemini-3.8-flash`, `GOOGLE_GENERATIVE_AI_API_KEY` — clave personal gratuita de Google AI Studio), ver ADR-005 "Revisión v2". Añadidos los "parámetros de actuación" pedidos explícitamente: `temperature: 0.3` (síntesis factual, no creativa) y `maxOutputTokens: 1024`. Sin cambio en guardrails, contrato ni UI. Verificado el mismo camino de error controlado, ahora con el mensaje real de Google ("API key is missing"). 401/401 tests, `typecheck`/`build` verdes (bundle de `api/router.js`: 2,4 MB → 2,7 MB). |
 | 4 | 2026-09-17 | **Verificación en vivo con la clave real del usuario** (compartida explícitamente para probar). Encontrados y corregidos 2 problemas reales (ver ADR-005 "Revisión v3"): (1) `gemini-3.8-flash` no respondía con fiabilidad (503 "alta demanda") — modelo corregido a `gemini-3.6-flash`, confirmado con `curl` real. (2) El modelo agotaba `maxOutputTokens` en tokens de "pensamiento" interno antes de escribir el JSON de salida (`reasoningTokens: 979` de `1009` totales, `finishReason: 'length'`, objeto truncado) — corregido con `thinkingConfig: { thinkingBudget: 0 }`. Confirmada también la cuota gratuita real: ~20 peticiones antes de HTTP 429 — TTL de caché sube de 20 a 90 min y `maxRetries` baja de 3 (por defecto) a 1 para no triplicar el consumo de cuota por petición. La clave se guardó solo en `.env.local` (gitignored, nunca commiteada) y en el allowlist de `vite.config.ts` para que el dev server la propague a `process.env`. **Limitación que queda pendiente**: la cuota se agotó durante el propio diagnóstico antes de poder confirmar el camino feliz completo una última vez ya con el arreglo aplicado — el diagnóstico en sí no es ambiguo (`usage` de la respuesta real de Google lo desglosa), pero falta esa confirmación final. 401/401 tests, `typecheck`/`build` verdes. |
+| 5 | 2026-09-17 | **Cierra el último hueco pendiente.** A petición explícita del usuario ("investiga y plantea posibles alternativas" mientras la cuota de `gemini-3.6-flash` seguía agotada), se probaron modelos alternativos dentro de la misma cuenta gratuita: `gemini-flash-latest`/`gemini-flash-lite-latest`/`gemini-3.5-flash`/`gemini-3.5-flash-lite` no son ids válidos contra la API REST directa (404); **`gemini-3-flash-preview` sí, con cuota claramente más generosa** (respondió con normalidad mientras `3.6-flash` seguía en 429 — confirma que las cuotas free-tier son específicas por modelo, no compartidas). Modelo cambiado a `gemini-3-flash-preview`. **Camino feliz confirmado en vivo por primera vez**: `GET /api/sintesis/v1/actual` real devolvió `HTTP 200` con una síntesis real sobre datos reales del momento (tráfico en Extramurs, incidencias del temporal, aviso del Hospital Clínico), los 4 guardrails cumplidos, y verificado también en el panel del navegador. Ver ADR-005 "Revisión v4". 401/401 tests, `typecheck`/`build` verdes. |

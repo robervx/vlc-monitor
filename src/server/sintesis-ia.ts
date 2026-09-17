@@ -39,7 +39,14 @@ const CACHE_KEY = 'sintesis-ia:actual:v1';
 // al día, con margen. Si se agota igualmente, el endpoint degrada solo
 // (stale-on-error / 502 controlado), nunca rompe el panel.
 const TTL_MS = 90 * 60 * 1000;
-const MODELO = 'gemini-3.6-flash'; // verificado en vivo el 2026-09-17 (curl real); gemini-3.8-flash devolvió 503 "high demand" y Google recomienda 3.6 al pedir el 2.5 ya retirado
+// verificado en vivo el 2026-09-17: `gemini-3.6-flash` (el que Google recomienda al pedir
+// el 2.5 ya retirado) agota su cuota gratuita a las ~20 peticiones/día — demasiado poco
+// para un panel con caché de 90 min. `gemini-3-flash-preview` resolvió el mismo prompt
+// real de esta spec sin truncar (con thinkingBudget:0) y, con la cuota de 3.6-flash ya
+// agotada, siguió respondiendo con normalidad — cuota separada y notablemente más
+// generosa. Es "preview" (Google podría cambiarlo sin aviso) pero es la opción viable
+// ahora mismo dentro de una cuenta 100% gratuita — ver ADR-005 "Revisión v4".
+const MODELO = 'gemini-3-flash-preview';
 
 async function leerJson(handler: () => Promise<Response>): Promise<unknown> {
   try {

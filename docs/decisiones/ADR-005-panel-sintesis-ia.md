@@ -25,11 +25,12 @@ usuario aprobó esa opción tal cual se le presentó.
    `GOOGLE_GENERATIVE_AI_API_KEY`, que el usuario provisiona con su propia cuenta gratuita
    de Google AI Studio (`ai.google.dev`) — el gasto cae dentro de la cuota diaria gratuita
    de esa cuenta personal, no genera factura.
-2. **Modelo: `gemini-3.6-flash`** (familia "Flash" de Google, pensada para uso de alto
-   volumen dentro de la cuota gratuita) — la tarea es resumir 5-6 señales ya calculadas en
-   unas pocas frases, no necesita el modelo "Pro" más grande/lento. Verificado en vivo
-   (curl real) que es el modelo vigente que Google recomienda tras retirar `2.5-flash`;
-   `3.8-flash` existe pero devolvió `503` (alta demanda) en las pruebas — ver "Revisión v3".
+2. **Modelo: `gemini-3-flash-preview`** (familia "Flash" de Google) — la tarea es resumir
+   5-6 señales ya calculadas en unas pocas frases, no necesita el modelo "Pro" más
+   grande/lento. Se probaron `gemini-3.8-flash` (`503`, alta demanda) y `gemini-3.6-flash`
+   (el que Google recomienda tras retirar `2.5-flash`, pero con una cuota gratuita real de
+   solo ~20 peticiones/día) antes de encontrar que `3-flash-preview` tiene cuota
+   notablemente más generosa dentro de la misma cuenta — ver "Revisión v3" y "v4".
 3. **Cadencia: caché con TTL de 90 min, nunca una llamada por carga de página.** Mismo
    patrón `getOrFetch` que el resto del repo (`CLAUDE.md` §2). El TTL se subió de 20 a 90
    min tras verificar en vivo la cuota real (ver "Revisión v3") — a 20 min, un día activo
@@ -63,14 +64,13 @@ usuario aprobó esa opción tal cual se le presentó.
 
 ## Consecuencia
 
-Spec `045` pasa de `Draft` a `Approved`/`Implemented` con este ADR como respaldo del
-bloqueante de §0. Implementación real sujeta a que el despliegue real tenga
-`GOOGLE_GENERATIVE_AI_API_KEY` provisionada (clave gratuita del usuario, obtenida en
-`ai.google.dev`) — sin esa credencial en este entorno de desarrollo, el endpoint se
-implementó y probó con el error de autenticación real (502 controlado, nunca un dato
-inventado); la llamada real al proveedor queda pendiente de verificación en el primer
-despliegue con la clave provisionada (mismo tipo de hueco que Upstash Redis en spec 001
-§4).
+Spec `045` pasa a `Implemented` con este ADR como respaldo del bloqueante de §0. El
+camino feliz completo (respuesta real del modelo a través del propio endpoint, con datos
+reales de la ciudad) quedó **verificado en vivo el mismo día** con la clave gratuita real
+del usuario — ver "Revisión v4". Para cualquier otro despliegue, basta con provisionar
+`GOOGLE_GENERATIVE_AI_API_KEY` (clave gratuita, `ai.google.dev`); sin ella, el endpoint
+degrada a un error controlado (502) en vez de romperse o inventar un dato, ya verificado
+también.
 
 ## Revisión v2 (2026-09-17, misma sesión) — cambio de proveedor
 
@@ -127,12 +127,42 @@ autenticación como hasta la Revisión v2. Tres hallazgos reales:
    cuota en uso normal. Si aun así se agota, el endpoint ya degrada solo (stale-on-error o
    502 controlado) — nunca rompe el panel ni inventa una síntesis.
 
-**No se pudo cerrar una verificación 100% en vivo del camino feliz completo** (una
-respuesta real y válida a través del propio endpoint `/api/sintesis/v1/actual`, con los 5
-handlers reales agregados) porque la cuota se agotó durante las pruebas de diagnóstico
-antes de poder confirmarlo una última vez con el arreglo ya aplicado. Sí se confirmó por
-separado: (a) la clave autentica correctamente, (b) `gemini-3.6-flash` responde con texto
-real cuando hay cuota, (c) el mecanismo de guardrails/schema funciona con una llamada más
-simple (fuera del prompt real, con cuota fresca). Pendiente: repetir la verificación del
-camino feliz completo cuando la cuota se recupere — no bloqueante, el sistema ya degrada
-con seguridad mientras tanto.
+**No se pudo cerrar una verificación 100% en vivo del camino feliz completo** con
+`gemini-3.6-flash` en el momento de escribir esto — la cuota se agotó durante las pruebas
+de diagnóstico. Resuelto en la Revisión v4 (mismo día) cambiando de modelo, no esperando
+a que la cuota de `3.6-flash` se recuperase.
+
+## Revisión v4 (2026-09-17, misma sesión) — modelo alternativo con cuota disponible, camino feliz confirmado
+
+A petición del usuario ("investiga y plantea posibles alternativas" mientras la cuota de
+`gemini-3.6-flash` seguía agotada), se investigaron modelos alternativos dentro de la
+misma cuenta gratuita en vez de esperar. Hallazgos:
+
+- **Los free-tier RPD (peticiones/día) de Gemini son específicos por modelo, no
+  compartidos** — confirmado empíricamente: con `gemini-3.6-flash` todavía en 429,
+  `gemini-3-flash-preview` respondió con normalidad a la primera. Fuentes públicas (no
+  oficiales, Google no publica las cifras exactas por modelo) apuntan a que modelos
+  "latest"/recién publicados como `3.6-flash` reciben cuotas iniciales mucho más
+  restringidas (del orden de 20/día) que modelos ya establecidos de la misma familia
+  (cientos o miles/día) — consistente con lo observado.
+- Otros alias probados (`gemini-flash-latest`, `gemini-flash-lite-latest`,
+  `gemini-3.5-flash`, `gemini-3.5-flash-lite`) devolvieron `404` — no son ids válidos
+  contra la API REST directa de Google con esta clave (puede que sean solo alias del
+  Gateway de Vercel u otro canal, no de la API pública v1beta).
+- **`gemini-3-flash-preview` resolvió el prompt real completo de esta spec sin truncar**
+  (con `thinkingConfig.thinkingBudget: 0`, igual que la Revisión v3) y **a través del
+  propio endpoint en ejecución** (`GET /api/sintesis/v1/actual`, no un script aislado):
+  `HTTP 200`, `fresh: true`, con datos reales del momento (tráfico denso en Extramurs,
+  incidencias reales del temporal de lluvia, aviso real del Hospital Clínico) y los
+  guardrails funcionando correctamente (`fuenteSpec` presente en cada afirmación,
+  recomendaciones en condicional: "Podría valorarse...", "Conviene monitorizar...").
+  Confirmado también en el panel real del navegador.
+
+**Cambio aplicado:** `MODELO` en `src/server/sintesis-ia.ts` pasa de `gemini-3.6-flash` a
+**`gemini-3-flash-preview`**. Único caveat: es un modelo "preview" (Google puede
+cambiarlo/retirarlo sin el mismo compromiso de estabilidad que un modelo GA) — aceptable
+para este caso de uso de bajo riesgo ("avisa, no actúa", nunca un dato crítico sin
+revisión humana) a cambio de una cuota realmente utilizable en una cuenta gratuita.
+
+**Con esto queda cerrada la última verificación pendiente de spec `045`** — el camino
+feliz completo funciona de extremo a extremo con la cuenta gratuita real del usuario.

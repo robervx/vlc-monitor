@@ -102178,10 +102178,10 @@ async function handler21() {
 // src/server/sintesis-ia.ts
 var CACHE_KEY12 = "sintesis-ia:actual:v1";
 var TTL_MS14 = 90 * 60 * 1e3;
-var MODELO = "gemini-3.6-flash";
-async function leerJson(handler26) {
+var MODELO = "gemini-3-flash-preview";
+async function leerJson(handler27) {
   try {
-    const res = await handler26();
+    const res = await handler27();
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -102240,6 +102240,92 @@ async function handler22() {
       headers: {
         "content-type": "application/json; charset=utf-8",
         "cache-control": "public, max-age=300, stale-while-revalidate=3600"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 502,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
+}
+
+// src/services/avamet-estaciones.ts
+function decodeEntidadesHtml(texto) {
+  const tabla = {
+    "&egrave;": "\xE8",
+    "&eacute;": "\xE9",
+    "&agrave;": "\xE0",
+    "&oacute;": "\xF3",
+    "&uacute;": "\xFA",
+    "&iacute;": "\xED",
+    "&ntilde;": "\xF1",
+    "&#039;": "'",
+    "&amp;": "&"
+  };
+  return texto.replace(/&[a-z#0-9]+;/gi, (m) => tabla[m] ?? m);
+}
+function numero(texto) {
+  const n = Number(texto.replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+}
+function parsearFechaAvamet(texto) {
+  const m = texto.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+  if (!m) return (/* @__PURE__ */ new Date()).toISOString();
+  const [, d, mo, y, hh, mm] = m;
+  return (/* @__PURE__ */ new Date(`${y}-${mo}-${d}T${hh}:${mm}:00`)).toISOString();
+}
+function normalizarEstacionesAvamet(crudas) {
+  const resultado = [];
+  for (const c of crudas) {
+    const lat = numero(c.lati);
+    const lon = numero(c.logi);
+    if (lat === 0 || lon === 0) continue;
+    const nombre = [c.ptda, c.dess].map((s) => decodeEntidadesHtml(s.trim())).filter((s) => s.length > 0).join(" \u2014 ");
+    resultado.push({
+      id: c.esta,
+      nombre: nombre || decodeEntidadesHtml(c.dess.trim()),
+      altitudM: numero(c.msnm),
+      lat,
+      lon,
+      temperaturaC: numero(c.temp),
+      temperaturaMinC: numero(c.temp_min),
+      temperaturaMaxC: numero(c.temp_max),
+      humedadPct: numero(c.hrel),
+      vientoKmh: numero(c.vent),
+      vientoDireccion: c.vent_dir,
+      vientoMaxKmh: numero(c.vent_max),
+      precipitacionDiaMm: numero(c.prec),
+      precipitacionMesMm: numero(c.prec_mes),
+      precipitacionAnyMm: numero(c.prec_any),
+      observadoEn: parsearFechaAvamet(c.data_ini)
+    });
+  }
+  return resultado;
+}
+
+// src/server/avamet-estaciones.ts
+var CACHE_KEY13 = "emergencia:avamet-estaciones:v1";
+var TTL_MS15 = 15 * 60 * 1e3;
+var AVAMET_URL = "https://www.avamet.org/mxo-mxo.php?territori=c15";
+var USER_AGENT2 = "vlc-monitor-emergencia-bot/1.0 (+https://github.com/robervx/vlc-monitor)";
+async function fetchEstacionesAvamet() {
+  const res = await fetch(AVAMET_URL, { headers: { "user-agent": USER_AGENT2 } });
+  if (!res.ok) throw new Error(`avamet.org respondi\xF3 HTTP ${res.status}`);
+  const html = await res.text();
+  const m = html.match(/var data = (\[.*?\]);/);
+  if (!m) throw new Error('No se encontr\xF3 el array "data" en el HTML de avamet.org (estructura cambiada)');
+  const crudas = JSON.parse(m[1]);
+  return normalizarEstacionesAvamet(crudas);
+}
+async function handler23() {
+  try {
+    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY13, TTL_MS15, fetchEstacionesAvamet);
+    return new Response(JSON.stringify({ estaciones, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=300, stale-while-revalidate=900"
       }
     });
   } catch (err) {
@@ -102395,7 +102481,7 @@ function json3(obj, status, extraHeaders) {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extraHeaders }
   });
 }
-async function handler23(req) {
+async function handler24(req) {
   if (req.method !== "POST") return json3({ ok: false }, 405);
   const secret = process.env.AUTH_SECRET;
   let users;
@@ -102437,7 +102523,7 @@ async function handler23(req) {
 }
 
 // src/server/auth-logout.ts
-async function handler24(req) {
+async function handler25(req) {
   const status = req.method === "POST" ? 200 : 405;
   return new Response(JSON.stringify({ ok: status === 200 }), {
     status,
@@ -102450,7 +102536,7 @@ async function handler24(req) {
 }
 
 // src/server/auth-estado.ts
-async function handler25(req) {
+async function handler26(req) {
   const secret = process.env.AUTH_SECRET;
   const sesion = secret ? await verificarSesion(leerCookie(req.headers.get("cookie"), COOKIE_NOMBRE), secret) : null;
   return new Response(
@@ -102482,10 +102568,11 @@ var RUTAS = {
   "emergencia/v1/pluviometros": handler19,
   "emergencia/v1/altimetria": handler20,
   "sintesis/v1/actual": handler22,
+  "emergencia/v1/avamet": handler23,
   "decision/v1/sugerencias": handler21,
-  "auth/v1/login": handler23,
-  "auth/v1/logout": handler24,
-  "auth/v1/estado": handler25
+  "auth/v1/login": handler24,
+  "auth/v1/logout": handler25,
+  "auth/v1/estado": handler26
 };
 var BASE = "http://d.invalid";
 async function dispatch(req) {
