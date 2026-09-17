@@ -102177,8 +102177,8 @@ async function handler21() {
 
 // src/server/sintesis-ia.ts
 var CACHE_KEY12 = "sintesis-ia:actual:v1";
-var TTL_MS14 = 20 * 60 * 1e3;
-var MODELO = "gemini-3.8-flash";
+var TTL_MS14 = 90 * 60 * 1e3;
+var MODELO = "gemini-3.6-flash";
 async function leerJson(handler26) {
   try {
     const res = await handler26();
@@ -102213,7 +102213,19 @@ async function fetchSintesisIA() {
     // completos, pero acotado (ni el prompt ni la respuesta necesitan más,
     // y limita coste/latencia por si el modelo se desvía).
     temperature: 0.3,
-    maxOutputTokens: 1024
+    maxOutputTokens: 1024,
+    // Bug real encontrado en vivo (2026-09-17): `gemini-3.6-flash` gasta el
+    // presupuesto de `maxOutputTokens` casi entero en tokens de "pensamiento"
+    // interno antes de escribir el JSON de salida (visto con datos reales:
+    // 979 de 1009 tokens de salida fueron `reasoningTokens`, cortando el
+    // JSON a medias — `finishReason: 'length'`). Esta tarea es síntesis
+    // factual acotada, no necesita razonamiento extendido — se desactiva.
+    providerOptions: { google: { thinkingConfig: { thinkingBudget: 0 } } },
+    // La cuota gratuita real de este modelo es muy ajustada (verificado en
+    // vivo: HTTP 429 a las ~20 peticiones) y cada reintento cuenta como una
+    // petición más — se baja de los 3 reintentos por defecto del SDK a 1
+    // para no triplicar el consumo de cuota en cada carga real del panel.
+    maxRetries: 1
   });
   if (!validarTrazabilidad(object3)) {
     throw new Error("Guardrail de trazabilidad no superado: el modelo devolvi\xF3 un insight o recomendaci\xF3n sin fuenteSpec (ADR-005)");

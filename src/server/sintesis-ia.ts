@@ -8,7 +8,9 @@
 // cada uno. Google Generative AI directo (paquete `@ai-sdk/google`, no el
 // gateway de Vercel — así el uso cae dentro de la cuota gratuita real de la
 // cuenta de Google del usuario, no de créditos de pago de Vercel) con
-// `gemini-3.8-flash`, cadencia baja (TTL 20 min).
+// `gemini-3.6-flash`, cadencia baja (TTL 20 min) — la cuota gratuita real de
+// este modelo es muy ajustada (verificado en vivo: 20 peticiones antes de
+// HTTP 429), así que `maxRetries` se deja bajo a propósito (ver más abajo).
 import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getOrFetch } from './_shared/cache';
@@ -30,8 +32,14 @@ import avisosHandler from './avisos-meteo';
 export const config = { runtime: 'edge' };
 
 const CACHE_KEY = 'sintesis-ia:actual:v1';
-const TTL_MS = 20 * 60 * 1000; // fuente más cara del producto — cadencia baja a propósito, además de que la cuota gratuita de Gemini es limitada por día (ADR-005)
-const MODELO = 'gemini-3.8-flash';
+// 90 min, no 20 — verificado en vivo que la cuota gratuita de `gemini-3.6-flash`
+// es de ~20 peticiones antes de HTTP 429 (Google no especifica si es por
+// minuto/hora/día en el mensaje de error). A 20 min de TTL, un día activo
+// pediría hasta 72 refrescos — muy por encima de 20. A 90 min, como mucho 16
+// al día, con margen. Si se agota igualmente, el endpoint degrada solo
+// (stale-on-error / 502 controlado), nunca rompe el panel.
+const TTL_MS = 90 * 60 * 1000;
+const MODELO = 'gemini-3.6-flash'; // verificado en vivo el 2026-09-17 (curl real); gemini-3.8-flash devolvió 503 "high demand" y Google recomienda 3.6 al pedir el 2.5 ya retirado
 
 async function leerJson(handler: () => Promise<Response>): Promise<unknown> {
   try {
@@ -70,6 +78,18 @@ async function fetchSintesisIA(): Promise<SintesisIA> {
     // y limita coste/latencia por si el modelo se desvía).
     temperature: 0.3,
     maxOutputTokens: 1024,
+    // Bug real encontrado en vivo (2026-09-17): `gemini-3.6-flash` gasta el
+    // presupuesto de `maxOutputTokens` casi entero en tokens de "pensamiento"
+    // interno antes de escribir el JSON de salida (visto con datos reales:
+    // 979 de 1009 tokens de salida fueron `reasoningTokens`, cortando el
+    // JSON a medias — `finishReason: 'length'`). Esta tarea es síntesis
+    // factual acotada, no necesita razonamiento extendido — se desactiva.
+    providerOptions: { google: { thinkingConfig: { thinkingBudget: 0 } } },
+    // La cuota gratuita real de este modelo es muy ajustada (verificado en
+    // vivo: HTTP 429 a las ~20 peticiones) y cada reintento cuenta como una
+    // petición más — se baja de los 3 reintentos por defecto del SDK a 1
+    // para no triplicar el consumo de cuota en cada carga real del panel.
+    maxRetries: 1,
   });
   if (!validarTrazabilidad(object)) {
     throw new Error('Guardrail de trazabilidad no superado: el modelo devolvió un insight o recomendación sin fuenteSpec (ADR-005)');

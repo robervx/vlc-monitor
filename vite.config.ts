@@ -205,7 +205,7 @@ export default defineConfig(({ mode }) => {
   // — que leen process.env directamente, igual que en Vercel — las vean.
   // Vite solo expone al cliente las VITE_*; estas nunca llegan al bundle.
   const env = loadEnv(mode, process.cwd(), '');
-  for (const clave of ['AUTH_SECRET', 'APP_USERS']) {
+  for (const clave of ['AUTH_SECRET', 'APP_USERS', 'GOOGLE_GENERATIVE_AI_API_KEY']) {
     if (env[clave] && !process.env[clave]) process.env[clave] = env[clave];
   }
 

@@ -69,5 +69,5 @@ export function montarSintesisIaPanel(): void {
     }
   }
 
-  startPolling(refresh, 20 * 60 * 1000); // mismo TTL que la caché del endpoint (ADR-005)
+  startPolling(refresh, 90 * 60 * 1000); // mismo TTL que la caché del endpoint (ADR-005 — cuota gratuita ajustada)
 }
