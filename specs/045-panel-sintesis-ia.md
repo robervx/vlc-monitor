@@ -37,6 +37,27 @@ ya calculadas por esas specs y redactar insights/recomendaciones. Antes de que e
   Anthropic directamente, un gateway (p. ej. Vercel AI Gateway, si el despliegue final usa
   Vercel), u otro proveedor — decisión de producto, no de esta spec en solitario.
 
+### 0.1 Opciones concretas para informar la decisión (investigación, no decisión)
+
+El repo ya despliega en Vercel (`CLAUDE.md` §5) — abarata la parte de infraestructura sin
+resolver la parte de producto:
+
+- **Vercel AI Gateway** (GA desde agosto 2025): API unificada con observabilidad, fallback
+  entre modelos y "zero data retention" — evitaría gestionar una clave de proveedor propia
+  y da métricas de coste por request de forma nativa. Encaja con el patrón de este repo
+  (endpoint interno propio, nunca el cliente llamando directo a un proveedor externo).
+- **Modelo**: un modelo pequeño/barato (p. ej. Claude Haiku) es probablemente suficiente
+  para "resumir 5-6 señales ya calculadas en 2-4 frases" — no hace falta el modelo más
+  grande disponible para esta tarea de síntesis acotada, lo que reduce el problema de coste
+  de §0 a un orden de magnitud menor de lo que "IA" sugiere de entrada.
+- **Cadencia barata por defecto**: cachear la síntesis igual que cualquier otra fuente de
+  este repo (`CLAUDE.md` §2) con un TTL generoso (15-30 min, no en cada carga de página) y
+  regenerar solo si alguna señal de entrada cambió de verdad (comparar un hash de las
+  señales de entrada contra la última síntesis) — evita pagar por una llamada idéntica.
+- Ninguna de estas opciones resuelve el ADR por sí sola — siguen siendo decisiones de
+  producto (aceptar el gasto recurrente, aceptar depender de un proveedor de IA) que le
+  corresponden al usuario, no a esta sesión.
+
 ## 1. Problema / motivación
 
 Hoy cada señal (Pulso de Distrito, insights, apoyo a decisión, contexto mediático,
@@ -124,3 +145,4 @@ No aplica — panel de texto dentro de `/inteligencia` (spec `040`), no una capa
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-17 | Creación (Draft) como documento de **análisis**, a petición explícita del usuario ("analizar tema IA", no implementar) — cuarto y último punto de la tanda de trabajo post-V1. Marcada con un bloqueante explícito de decisión de producto/ADR antes de `Approved` (§0), mismo peso que el bloqueante de revisión de contenido de spec `042`. Boceto de contrato de datos con guardrails (§3/§6), sin due-diligence de proveedor todavía. |
+| 1 | 2026-09-17 | Añadido §0.1 con opciones concretas (Vercel AI Gateway, modelo pequeño/barato, cadencia con TTL + hash de señales de entrada) para informar la decisión — sigue sin ser `Approved`, el bloqueante de producto/ADR de §0 sigue en pie, esto no lo resuelve. |
