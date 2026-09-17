@@ -3,10 +3,11 @@
 // En móvil (`<html data-layout="movil">`, ver deteccion-dispositivo.ts):
 //   - `#info-panels` pasa a ser un bottom sheet arrastrable de 3 estados;
 //   - `#controls` (capas), `#media-panel`, `#tendencia-panel`, `#camaras-panel`,
-//     `#agenda-panel`, `#actualidad-redes-panel` (spec 040),
-//     `#apoyo-decision-panel` (spec 041) y `#protocolos-panel` (spec 042) se
-//     reparentan dentro del sheet para que todo quede en un único sitio con
-//     scroll —
+//     `#camaras-dgt-panel` (spec 043), `#agenda-panel`,
+//     `#actualidad-redes-panel` (spec 040), `#apoyo-decision-panel` (spec 041),
+//     `#altimetria-panel`/`#meteo-zona-panel` (spec 044), `#sintesis-ia-panel`
+//     (spec 045) y `#protocolos-panel` (spec 042) se reparentan dentro del
+//     sheet para que todo quede en un único sitio con scroll —
 //     la vista activa (`:root[data-vista]`, ver `router.ts`) decide cuáles de
 //     ellos son visibles, independientemente de dónde vivan en el DOM;
 //   - al volver a escritorio se deshace todo (los paneles vuelven a <body>).
@@ -29,9 +30,13 @@ const IDS_REPARENTABLES = [
   'media-panel',
   'tendencia-panel',
   'camaras-panel',
+  'camaras-dgt-panel',
   'agenda-panel',
   'actualidad-redes-panel',
   'apoyo-decision-panel',
+  'altimetria-panel',
+  'meteo-zona-panel',
+  'sintesis-ia-panel',
   'protocolos-panel',
 ] as const;
 

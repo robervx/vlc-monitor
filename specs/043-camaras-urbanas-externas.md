@@ -7,14 +7,16 @@ estado: Implemented
 tipo: panel
 depende_de: [038, 040]
 propietario: ""
-version: 2
+version: 3
 ```
 
-> **Estado:** `Implemented` (v2, 2026-09-17) — la investigación real de fuente (§2) encontró
+> **Estado:** `Implemented` (v3, 2026-09-17) — la investigación real de fuente (§2) encontró
 > algo mejor de lo previsto: los datos de la DGT están publicados como **open data oficial
 > con licencia Creative Commons Attribution**, no hace falta pasar por `livetrafik.com` (el
 > agregador de referencia del usuario) ni por ningún mecanismo "personal" gateado. Ver §2 y
-> §6 para el detalle completo y el DoD.
+> §6 para el detalle completo y el DoD. **v3**: caja propia (`#camaras-dgt-panel`), ya no
+> comparte panel con las internas de spec 038 — primer bloque de `/inteligencia`, pedido
+> explícito del usuario ("no se pueden ver en grande" como las de ciudad).
 
 ## 1. Problema / motivación
 
@@ -145,3 +147,4 @@ debajo del bloque de cámaras internas de spec `038`, agrupado por carretera en 
 |---|---|---|
 | 1 | 2026-09-17 | Creación (Draft), a petición explícita del usuario — segundo punto de la tanda de trabajo post-V1. Due-diligence ligera de `robots.txt` de `livetrafik.com` (permisivo) y primer intento de localizar la fuente primaria probable (DGT) — sin verificar en profundidad. Pendiente de investigación real antes de implementar. |
 | 2 | 2026-09-17 | **Implemented.** Investigación real de fuente: `livetrafik.com` descartado (Cloudflare anti-bot + imágenes `blob:`), `etraffic.dgt.es` descartado (payload ofuscado); fuente real = JSON público de `dgt.es` + imágenes JPEG de `etraffic.dgt.es/camarasEtraffic/<id>.jpg`, licencia Creative Commons Attribution confirmada en `nap.dgt.es` — **pública por defecto**, mejor resultado que la hipótesis "personal" de v1. `src/services/camaras-dgt.ts` (funciones puras, 5 tests), `scripts/seed-camaras-dgt.ts` (seed real, 84 cámaras en `data/camaras-dgt-valencia.json`), bloque nuevo en `src/ui/camaras-panel.ts` agrupado por carretera. Bug real corregido: `#camaras-panel` sin scroll interno (`overflow: hidden` → `overflow: hidden auto`). Verificado en navegador con imagen real de tráfico. 382/382 tests, `typecheck`/`build` verdes. |
+| 3 | 2026-09-17 | Reestructuración de UI pedida por el usuario: pasa a tener su propia caja (`#camaras-dgt-panel`, `montarCamarasDgtPanel()`), separada del panel de cámaras internas de spec 038 — antes ambas vivían en el mismo `#camaras-panel`. Primer bloque de `/inteligencia` (`order: 1`), seguido de las cámaras internas. Sin cambio en el contenido (agrupación por carretera, refresco cada 2 min) ni en la fuente. Verificado en navegador (escritorio y móvil, bottom sheet). |

@@ -7,13 +7,15 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [004, 001, 002, 010, 013]
 propietario: ""
-version: 4
+version: 5
 ```
 
-> **Estado:** v1-v4 `Implemented` y en producción. **v3 (2026-09-16)**: quitado el chip de
+> **Estado:** v1-v5 `Implemented` y en producción. **v3 (2026-09-16)**: quitado el chip de
 > temperatura del KPI. **v4 (2026-09-16)**: el chip "Pulso" pasa a leer el `nivel`
-> ordinal de spec 010 v4 (escenarios de conjunción) en vez del `indice` 0-100 retirado
-> — ver §8.
+> ordinal de spec 010 v4 (escenarios de conjunción) en vez del `indice` 0-100 retirado.
+> **v5 (2026-09-17)**: bug real reportado por el usuario — la tira seguía viéndose
+> encima de los paneles de `/inteligencia` pese a que el router ya ponía `hidden = true`
+> al cambiar de vista — ver §8.
 
 ## 1. Problema / motivación
 
@@ -104,3 +106,4 @@ pequeña + valor + color de tono):
 | 2 | 2026-09-09 | Replanteada a **agregación en cliente** sobre datos que los paneles ya fetchean (`dashboard-kpis.ts`, patrón de `estado-frescura.ts`). Se descarta el endpoint. 5 KPIs (temperatura, aire, tráfico, pulso, alertas), chip clicable → activa la capa. Implementado y verificado. Pasa a `Implemented`. |
 | 3 | 2026-09-16 | Quitado el KPI de temperatura (duplicaba el panel de meteo, que tiene icono/descripción/viento además del número): retirado el `registrarKpi(...)` de `src/ui/meteo-panel.ts` y `'temperatura'` de `ClaveKpi`/`ORDEN` en `src/ui/dashboard-kpis.ts`. La tira de KPIs pasa de 5 a 4 chips (Aire, Tráfico, Pulso, Alertas). Verificado en navegador y `npm run typecheck`/`test` (335/335, salvo 5 tests de auth ajenos por carga de CPU del entorno). |
 | 4 | 2026-09-16 | Consumidor de spec 010 v4: el chip "Pulso" (`renderPulsoLeyenda` en `src/main.ts`) pasa de contar distritos por `categoria` (Tranquilo/Moderado/Tenso/Crítico) a contar por `nivel` (`prioritario`/`seguimiento`/`sin-senal`); tono urgente si hay algún distrito prioritario, aviso si hay seguimiento, ok si no. Sin cambios en el mecanismo de `dashboard-kpis.ts` en sí. Verificado en navegador (chip "PULSO · sin señal" en tono ok). |
+| 5 | 2026-09-17 | **Bug real corregido** (reportado por el usuario con una captura): la barra seguía visible flotando sobre los paneles de `/inteligencia` (spec 040) pese a que el router (`main.ts`) ya ponía `#dashboard-kpis.hidden = true` al salir de `/mapa`. Causa: `montarDashboardKpis` (`src/ui/dashboard-kpis.ts`) recalculaba `barra.hidden = lista.length === 0` cada vez que cualquier panel llamaba a `registrarKpi()` (aire/tráfico/pulso se refrescan solos por polling) — esa asignación pisaba lo que el router acababa de fijar, sin mirar la vista activa. Corregido añadiendo `vistaActual() !== 'mapa'` a esa condición (importa `router.ts`). Verificado en navegador: la tira desaparece al entrar en `/inteligencia` y no reaparece tras varios refrescos de datos; sigue visible en `/mapa`. `npm run typecheck`/`test` (401/401)/`build` verdes. |

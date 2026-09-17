@@ -1,7 +1,7 @@
 // Punto de entrada — mapa base + capa de distritos (spec 000) + capa mock de
 // densidad de personas (spec 003). MapLibre GL (tiles) + deck.gl (overlay
 // interleaved) — sin globo 3D, ver CLAUDE.md §5.
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer, ScatterplotLayer, IconLayer, TextLayer } from '@deck.gl/layers';
@@ -49,12 +49,12 @@ import {
   getEstadoModoSimulacion,
 } from './ui/modo-simulacion-cortes';
 import { cargarGrafoViario } from './services/grafo-viario-cliente';
-import { montarCamarasPanel } from './ui/camaras-panel';
+import { montarCamarasPanel, montarCamarasDgtPanel } from './ui/camaras-panel';
 import { montarMeteoActualPanel, montarPrediccionPanel } from './ui/meteo-panel';
 import { buildActualidadRedesContent } from './ui/actualidad-redes';
 import { initRouter } from './ui/router';
 import { montarApoyoDecisionPanel } from './ui/apoyo-decision-panel';
-import { montarEmergenciaMeteoPanel } from './ui/emergencia-meteo-panel';
+import { montarAltimetriaPanel, montarMeteoZonaPanel } from './ui/emergencia-meteo-panel';
 import { montarSintesisIaPanel } from './ui/sintesis-ia-panel';
 import { buildProtocolosContent } from './ui/protocolos-panel';
 import { onPeticionCentrarMapa } from './ui/centrar-mapa';
@@ -2357,7 +2357,9 @@ async function main(): Promise<void> {
   // mapa" pide centrar la única instancia de MapLibre (no crea una segunda) y
   // cambia a /mapa — nunca dispara ninguna acción por sí mismo (§0).
   montarApoyoDecisionPanel();
-  montarEmergenciaMeteoPanel();
+  montarCamarasDgtPanel();
+  montarAltimetriaPanel();
+  montarMeteoZonaPanel();
   montarSintesisIaPanel();
   onPeticionCentrarMapa(({ coordenadas, zoom }) => {
     map.flyTo({ center: coordenadas, zoom: zoom ?? map.getZoom() });
@@ -2482,10 +2484,12 @@ async function main(): Promise<void> {
     'media-panel',
     'tendencia-panel',
     'camaras-panel',
+    'camaras-dgt-panel',
     'agenda-panel',
     'actualidad-redes-panel',
     'apoyo-decision-panel',
-    'emergencia-meteo-panel',
+    'altimetria-panel',
+    'meteo-zona-panel',
     'sintesis-ia-panel',
     'protocolos-panel',
   ];

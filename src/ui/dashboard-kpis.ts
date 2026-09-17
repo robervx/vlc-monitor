@@ -3,6 +3,7 @@
 // Agregación en cliente: cada panel, al refrescarse, empuja aquí su cifra
 // clave (mismo patrón que `estado-frescura.ts`). No hay endpoint ni caché
 // nuevos — reutiliza datos que el frontend ya fetchea para sus paneles.
+import { vistaActual } from './router';
 
 export type TonoKpi = 'neutro' | 'ok' | 'aviso' | 'urgente';
 
@@ -65,7 +66,12 @@ export function montarDashboardKpis(onClicCapa: (idToggle: string) => void): HTM
         return chip;
       }),
     );
-    barra.hidden = lista.length === 0;
+    // `vistaActual()` además de `lista.length` — sin esto, cualquier
+    // refresco de datos en /inteligencia (aire, tráfico, pulso...) volvía a
+    // mostrar la barra encima de los paneles, aunque el router ya la hubiera
+    // ocultado al cambiar de vista (bug real reportado por el usuario,
+    // 2026-09-17): las dos piezas de código competían por el mismo `hidden`.
+    barra.hidden = lista.length === 0 || vistaActual() !== 'mapa';
   });
 
   return barra;

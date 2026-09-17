@@ -851,6 +851,13 @@
         display: none;
       }
 
+      /* El selector de ID gana en especificidad al `[hidden]{display:none}` del
+         navegador, así que sin esto el KPI seguía visible fuera de /mapa pese a
+         que main.ts ya ponía `hidden = true` (spec 040 §2). */
+      #dashboard-kpis[hidden] {
+        display: none;
+      }
+
       .kpi-chip {
         display: flex;
         flex-direction: column;
@@ -1616,7 +1623,9 @@
       #actualidad-redes-panel,
       #apoyo-decision-panel,
       #protocolos-panel,
-      #emergencia-meteo-panel,
+      #camaras-dgt-panel,
+      #altimetria-panel,
+      #meteo-zona-panel,
       #sintesis-ia-panel {
         width: 320px;
         max-height: 70vh;
@@ -1633,9 +1642,52 @@
       #actualidad-redes-panel[hidden],
       #apoyo-decision-panel[hidden],
       #protocolos-panel[hidden],
-      #emergencia-meteo-panel[hidden],
+      #camaras-dgt-panel[hidden],
+      #altimetria-panel[hidden],
+      #meteo-zona-panel[hidden],
       #sintesis-ia-panel[hidden] {
         display: none;
+      }
+
+      /* Orden de los bloques dentro de /inteligencia (pedido explícito del
+         usuario, 2026-09-17) — cámaras primero (DGT antes que ciudad),
+         contexto mediático, agenda, altimetría junto a lluvia/viento,
+         actualidad institucional/apoyo a decisión/síntesis IA/protocolos
+         después, tendencia la última (de momento aporta poco, spec 025). Solo
+         afecta al orden visual dentro del flex de /inteligencia — el orden
+         de montaje en `main.ts` no cambia. */
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-dgt-panel {
+        order: 1;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-panel {
+        order: 2;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel {
+        order: 3;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #agenda-panel {
+        order: 4;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #altimetria-panel {
+        order: 5;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #meteo-zona-panel {
+        order: 6;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #actualidad-redes-panel {
+        order: 7;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #apoyo-decision-panel {
+        order: 8;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #sintesis-ia-panel {
+        order: 9;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #protocolos-panel {
+        order: 10;
+      }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #tendencia-panel {
+        order: 11;
       }
 
       /* Spec 045 — panel de síntesis con IA (ADR-005) */
@@ -2465,9 +2517,13 @@
       :root[data-layout='movil'] #info-panels > #media-panel,
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
       :root[data-layout='movil'] #info-panels > #camaras-panel,
+      :root[data-layout='movil'] #info-panels > #camaras-dgt-panel,
       :root[data-layout='movil'] #info-panels > #agenda-panel,
       :root[data-layout='movil'] #info-panels > #actualidad-redes-panel,
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
+      :root[data-layout='movil'] #info-panels > #altimetria-panel,
+      :root[data-layout='movil'] #info-panels > #meteo-zona-panel,
+      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel,
       :root[data-layout='movil'] #info-panels > #protocolos-panel,
       :root[data-layout='movil'] #info-panels > .info-panel {
         position: static !important;
@@ -2481,18 +2537,26 @@
       :root[data-layout='movil'] #info-panels > #media-panel,
       :root[data-layout='movil'] #info-panels > #tendencia-panel,
       :root[data-layout='movil'] #info-panels > #camaras-panel,
+      :root[data-layout='movil'] #info-panels > #camaras-dgt-panel,
       :root[data-layout='movil'] #info-panels > #agenda-panel,
       :root[data-layout='movil'] #info-panels > #actualidad-redes-panel,
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
+      :root[data-layout='movil'] #info-panels > #altimetria-panel,
+      :root[data-layout='movil'] #info-panels > #meteo-zona-panel,
+      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel,
       :root[data-layout='movil'] #info-panels > #protocolos-panel {
         display: flex !important;
       }
       :root[data-layout='movil'] #info-panels > #media-panel[hidden],
       :root[data-layout='movil'] #info-panels > #tendencia-panel[hidden],
       :root[data-layout='movil'] #info-panels > #camaras-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #camaras-dgt-panel[hidden],
       :root[data-layout='movil'] #info-panels > #agenda-panel[hidden],
       :root[data-layout='movil'] #info-panels > #actualidad-redes-panel[hidden],
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #altimetria-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #meteo-zona-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel[hidden],
       :root[data-layout='movil'] #info-panels > #protocolos-panel[hidden] {
         display: none !important;
       }

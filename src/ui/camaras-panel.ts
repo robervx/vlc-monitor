@@ -1,8 +1,13 @@
-// Panel de cámaras urbanas en vivo — spec 038.
+// Panel de cámaras urbanas en vivo — spec 038 (Valencia ciudad) y spec 043
+// (red viaria externa, DGT). Dos cajas separadas a partir de la
+// reestructuración pedida por el usuario el 2026-09-17 — antes vivían juntas
+// en un único `#camaras-panel`, pero son de naturaleza muy distinta (vídeo en
+// directo con reproducción manual vs. imagen JPEG que se refresca sola) y
+// las de la DGT no se pueden ver a tamaño grande como las de ciudad.
 //
-// Sin backend ni polling: son embeds de terceros reproducidos directo en el
-// navegador de quien mira, nunca grabados ni rehosteados por nosotros (ver
-// spec 038 §1). Diseño en tarjetas "clic para reproducir" (como el panel de
+// Sin backend ni polling: son embeds/imágenes de terceros mostrados directo
+// en el navegador de quien mira, nunca grabados ni rehosteados por nosotros
+// (spec 038 §1). Diseño en tarjetas "clic para reproducir" (como el panel de
 // referencia de World Monitor): nada de vídeo se carga hasta que se pulsa su
 // tarjeta — así ninguna tarjeta se queda a medio cargar mostrando el título y
 // la interfaz de YouTube por encima en vez de la imagen.
@@ -16,21 +21,16 @@ import { camarasVisibles, type CamaraUrbana } from '../config/camaras-urbanas';
 import { agruparPorCarretera, type CamaraExternaDgt } from '../services/camaras-dgt';
 import camarasDgtValencia from '../../data/camaras-dgt-valencia.json' with { type: 'json' };
 
-function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement; externas: HTMLDivElement } {
+function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement } {
   const root = document.createElement('div');
   root.id = 'camaras-panel';
   root.hidden = true;
   root.innerHTML = `
-    <div class="media-panel__header">Cámaras en vivo</div>
+    <div class="media-panel__header">Cámaras en vivo — Valencia ciudad</div>
     <div class="camaras-grid" id="camaras-panel-grid"></div>
-    <div id="camaras-panel-externas"></div>
   `;
   document.body.appendChild(root);
-  return {
-    root,
-    grid: root.querySelector('#camaras-panel-grid')!,
-    externas: root.querySelector('#camaras-panel-externas')!,
-  };
+  return { root, grid: root.querySelector('#camaras-panel-grid')! };
 }
 
 /** Parámetros que minimizan la interfaz propia de YouTube (título, sugerencias, marca). */
@@ -135,18 +135,58 @@ function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrba
   });
 }
 
+/**
+ * Monta `#camaras-panel` (Valencia ciudad, spec 038) y lo cablea al checkbox
+ * `toggle`. Sin backend ni polling: las tarjetas se construyen la primera
+ * vez que se activa el panel, pero ningún vídeo se reproduce hasta que se
+ * pulsa "Reproducir" en su tarjeta.
+ */
+export function montarCamarasPanel(toggle: HTMLInputElement): void {
+  const camarasPanel = buildCamarasPanel();
+  let camarasCargadas = false;
+  toggle.addEventListener('change', () => {
+    camarasPanel.root.hidden = !toggle.checked;
+    if (toggle.checked && !camarasCargadas) {
+      camarasCargadas = true;
+      const camaras = camarasVisibles();
+      if (camaras.length > 0) {
+        renderCamarasPanel(camarasPanel, camaras);
+      } else {
+        camarasPanel.grid.textContent = 'No hay cámaras disponibles en esta build.';
+      }
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // spec 043 — cámaras urbanas EXTERNAS (red viaria que rodea Valencia: rondas,
-// autovías de acceso), bloque separado de las internas de spec 038 (arriba en
-// este mismo fichero). Fuente: DGT, dataset "Cámaras DGT DATEX2 v3.7"
-// (licencia Creative Commons Attribution — pública por defecto, sin gating de
-// ADR-003, a diferencia de las internas). Imagen JPEG estática que se
-// refresca sola cada ~2 min en origen — aquí se fuerza un refresco periódico
-// del lado del cliente con un parámetro de caché (`?t=timestamp`).
+// autovías de acceso), caja propia separada de las internas de arriba.
+// Fuente: DGT, dataset "Cámaras DGT DATEX2 v3.7" (licencia Creative Commons
+// Attribution — pública por defecto, sin gating de ADR-003, a diferencia de
+// las internas). Imagen JPEG estática que se refresca sola cada ~2 min en
+// origen (no un vídeo en directo — no se pueden ver a tamaño grande como las
+// de ciudad) — aquí se fuerza un refresco periódico del lado del cliente con
+// un parámetro de caché (`?t=timestamp`).
+// ---------------------------------------------------------------------------
 const REFRESCO_CAMARAS_DGT_MS = 120_000;
+
+function buildCamarasDgtPanel(): HTMLDivElement {
+  const root = document.createElement('div');
+  root.id = 'camaras-dgt-panel';
+  root.hidden = true;
+  document.body.appendChild(root);
+  return root;
+}
+
+function escapeHtmlLocal(s: string): string {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
 
 function renderCamarasExternasDgt(root: HTMLDivElement, camaras: CamaraExternaDgt[]): void {
   if (camaras.length === 0) {
-    root.innerHTML = '';
+    root.innerHTML = '<div class="media-panel__header">Cámaras en vías de acceso (DGT)</div><div class="info-panel__desc">Sin cámaras disponibles.</div>';
     return;
   }
   const grupos = agruparPorCarretera(camaras);
@@ -191,34 +231,13 @@ function renderCamarasExternasDgt(root: HTMLDivElement, camaras: CamaraExternaDg
   setInterval(refrescarImagenes, REFRESCO_CAMARAS_DGT_MS);
 }
 
-function escapeHtmlLocal(s: string): string {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
-}
-
 /**
- * Monta `#camaras-panel` (oculto) y lo cablea al checkbox `toggle`.
- * Sin backend ni polling: las tarjetas de spec 038 se construyen la primera
- * vez que se activa el panel, pero ningún vídeo se reproduce hasta que se
- * pulsa "Reproducir" en su tarjeta (ver `renderCamarasPanel`). El bloque de
- * cámaras externas de spec 043 (imágenes JPEG, no vídeo) se renderiza a la
- * vez, agrupado por carretera.
+ * Monta `#camaras-dgt-panel` (accesos, spec 043). Visibilidad por vista
+ * gestionada por el router (`idsInteligencia` en `main.ts`), no por un
+ * toggle propio — el contenido es estático (JSON local) y se renderiza de
+ * una vez al montar.
  */
-export function montarCamarasPanel(toggle: HTMLInputElement): void {
-  const camarasPanel = buildCamarasPanel();
-  let camarasCargadas = false;
-  toggle.addEventListener('change', () => {
-    camarasPanel.root.hidden = !toggle.checked;
-    if (toggle.checked && !camarasCargadas) {
-      camarasCargadas = true;
-      const camaras = camarasVisibles();
-      if (camaras.length > 0) {
-        renderCamarasPanel(camarasPanel, camaras);
-      } else {
-        camarasPanel.grid.textContent = 'No hay cámaras disponibles en esta build.';
-      }
-      renderCamarasExternasDgt(camarasPanel.externas, camarasDgtValencia as CamaraExternaDgt[]);
-    }
-  });
+export function montarCamarasDgtPanel(): void {
+  const root = buildCamarasDgtPanel();
+  renderCamarasExternasDgt(root, camarasDgtValencia as CamaraExternaDgt[]);
 }

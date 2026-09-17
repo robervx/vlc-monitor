@@ -7,14 +7,15 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [001, 040]
 propietario: ""
-version: 2
+version: 3
 ```
 
-> **Estado:** `Implemented` (v2, 2026-09-17) — al final **no hizo falta dividir en specs
+> **Estado:** `Implemented` (v3, 2026-09-17) — al final **no hizo falta dividir en specs
 > separadas**: las 3 sub-señales viables (altimetría, lluvia/viento por zona,
-> pluviómetros) tienen contrato y pipeline propios, pero conviven en el mismo documento
-> por cohesión (viven en el mismo panel). La 4ª ("capacidad de absorción") se descarta
-> explícitamente — sin fuente oficial, ver §7. Detalle completo en §2/§6.
+> pluviómetros) tienen contrato y pipeline propios. La 4ª ("capacidad de absorción") se
+> descarta explícitamente — sin fuente oficial, ver §7. Detalle completo en §2/§6. **v3**:
+> sí se dividieron en **dos cajas de UI** (aunque no en dos specs) a petición del usuario —
+> altimetría por un lado, lluvia/viento + pluviómetros por otro — ver §5.
 
 ## 1. Problema / motivación
 
@@ -92,12 +93,14 @@ interface PluviometroSaih {
 
 ## 5. Contrato de capa de mapa
 
-No es una capa de mapa (`tipo: indice-compuesto` en el yaml) — panel propio
-("Emergencia meteorológica") dentro de la vista `/inteligencia` (spec `040`), siempre
-visible (como protocolos/apoyo a decisión), con tres bloques separados y claramente
-etiquetados por naturaleza del dato (estático / modelo / medido). Se descarta mostrarlo
-solo condicionado a una alerta activa por simplicidad de v1 — documentado como
-simplificación consciente, fast-follow si se quiere ese comportamiento.
+No es una capa de mapa (`tipo: indice-compuesto` en el yaml) — dos cajas propias dentro
+de la vista `/inteligencia` (spec `040`), siempre visibles (como protocolos/apoyo a
+decisión): **"Altimetría por distrito"** (`#altimetria-panel`, dato estático) y
+**"Lluvia y viento por distrito"** (`#meteo-zona-panel`, modelo + pluviómetros medidos,
+juntos por compartir tema/cadencia) — separadas a petición explícita del usuario v3
+(2026-09-17), colocadas una al lado de la otra (`order: 5`/`order: 6` en `/inteligencia`).
+Se descarta mostrarlo solo condicionado a una alerta activa por simplicidad de v1 —
+documentado como simplificación consciente, fast-follow si se quiere ese comportamiento.
 
 ## 6. Criterios de aceptación (Definition of Done)
 
@@ -149,3 +152,4 @@ simplificación consciente, fast-follow si se quiere ese comportamiento.
 | 1 | 2026-09-17 | Creación (Draft), a petición explícita del usuario — tercer punto de la tanda de trabajo post-V1. Due-diligence ligera: SAIH Júcar (`saih.chj.es`) alcanzable, candidato fuerte para pluviometría; IGN como candidato para altimetría, sin confirmar endpoint; "lluvia/viento por zona" probablemente extensible desde Open-Meteo (ya en uso, spec 001) pidiendo varias coordenadas. "Capacidad de absorción" sin fuente identificada. Pendiente de investigación real antes de implementar — probable división en varias specs (§7). |
 | 2 | 2026-09-17 | Añadido AVAMET (`avamet.org`) como candidato fuerte para "lluvia por zona", a raíz de un enlace compartido por el usuario. Verificado con petición real (200, `robots.txt` permisivo) — tabla de precipitación en vivo por estación, con estaciones reales dentro de término de València. Pendiente: lat/lon por estación, necesario para colocar cada dato en su zona sobre el mapa (§2). |
 | 2 | 2026-09-17 | **Implemented.** Investigación real de las 3 sub-señales viables (altimetría, lluvia/viento, pluviómetros); "capacidad de absorción" descartada por falta de fuente. IGN (WMS `GetFeatureInfo`, verificado con puntos reales) para altimetría — seedeada una vez (`scripts/seed-altimetria.ts`, 19 distritos, `data/altimetria-valencia.json`). Open-Meteo multi-coordenada (misma fuente que spec 001/016) para lluvia/viento por distrito. SAIH Júcar (HTML con array `estaciones` embebido, sin API JSON separada) para pluviómetros reales — coordenadas UTM ETRS89 huso 30N convertidas a lat/lon con una fórmula propia (`src/services/utm.ts`), verificada contra 2 estaciones reales. AVAMET descartado para esta versión (geocodificación por estación sin resolver). 3 endpoints nuevos (`GET /api/emergencia/v1/{altimetria,meteo-zona,pluviometros}`), panel nuevo (`src/ui/emergencia-meteo-panel.ts`) en `/inteligencia`. 12 tests nuevos (394/394 en total), verificado en navegador con datos reales de las 3 fuentes. |
+| 3 | 2026-09-17 | Reestructuración de UI pedida por el usuario: el panel único se divide en dos cajas — `montarAltimetriaPanel()` (`#altimetria-panel`) y `montarMeteoZonaPanel()` (`#meteo-zona-panel`, lluvia/viento + pluviómetros juntos) — para poder colocarlas una al lado de la otra en `/inteligencia`. Sin cambio en contratos, endpoints ni contenido — solo en `src/ui/emergencia-meteo-panel.ts` (mismo fichero, dos funciones `montar*` en vez de una) y en `main.ts`/`index.html` (registro, CSS, `order`). Verificado en navegador (escritorio y móvil). |

@@ -1,10 +1,13 @@
 // Panel de emergencia meteorológica avanzada — spec 044, dentro de
-// /inteligencia (spec 040). Tres bloques con fuente y naturaleza de dato
-// distintas, mostrados por separado a propósito (§7): altimetría (estática,
-// IGN), lluvia/viento por distrito (modelo Open-Meteo, no medido) y
-// pluviómetros reales (SAIH Júcar, medido). "Capacidad de absorción" queda
-// fuera — sin fuente oficial identificada, no se inventa una heurística
-// (§7, mismo criterio que EMT en spec 007 o Waze en spec 015).
+// /inteligencia (spec 040). Dos cajas separadas a partir de la
+// reestructuración pedida por el usuario el 2026-09-17 — antes vivían juntas
+// en un único panel: altimetría (estática, IGN) por un lado; lluvia/viento
+// por distrito (modelo Open-Meteo) + pluviómetros reales (SAIH Júcar,
+// medido) por otro, porque estos dos últimos comparten el mismo tema
+// ("cuánta agua está cayendo ahora mismo") y cadencia de refresco.
+// "Capacidad de absorción" queda fuera — sin fuente oficial identificada, no
+// se inventa una heurística (§7, mismo criterio que EMT en spec 007 o Waze
+// en spec 015).
 import type { ResumenAltimetriaDistrito } from '../services/altimetria';
 import type { LluviaVientoDistrito } from '../services/meteo-zona';
 import type { PluviometroSaih } from '../services/pluviometros-saih';
@@ -76,18 +79,45 @@ function renderPluviometros(estaciones: PluviometroSaih[]): string {
     .join('');
 }
 
-export function buildEmergenciaMeteoContent(): HTMLDivElement {
+// ---------------------------------------------------------------------------
+// Caja 1 — Altimetría (estática, IGN)
+// ---------------------------------------------------------------------------
+
+export function montarAltimetriaPanel(): void {
   const root = document.createElement('div');
-  root.id = 'emergencia-meteo-panel';
+  root.id = 'altimetria-panel';
+  root.hidden = true;
   root.innerHTML = `
-    <div class="media-panel__header">Emergencia meteorológica</div>
-    <p class="cordon-intro">Detalle por distrito para días de alerta — lluvia y viento son un modelo (Open-Meteo), no una estación real; los pluviómetros de abajo sí son dato medido (SAIH Júcar). Sin dato de "capacidad de absorción del terreno" — no existe una fuente oficial para eso, no se inventa una estimación (spec 044 §7).</p>
+    <div class="media-panel__header">Altimetría por distrito</div>
+    <p class="cordon-intro">Más alto → más bajo. Dato estático (IGN) — no cambia con el tiempo, sirve para anticipar dónde se acumula el agua por gravedad.</p>
+    <div id="altimetria-list"></div>
+  `;
+  document.body.appendChild(root);
+  const list = root.querySelector('#altimetria-list')!;
+
+  fetchAltimetria()
+    .then((distritos) => {
+      list.innerHTML = renderAltimetria(distritos);
+    })
+    .catch((err: unknown) => {
+      list.textContent = 'Altimetría no disponible';
+      console.error('Fallo al cargar altimetría:', err);
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Caja 2 — Lluvia y viento por distrito (modelo) + pluviómetros reales (medido)
+// ---------------------------------------------------------------------------
+
+export function montarMeteoZonaPanel(): void {
+  const root = document.createElement('div');
+  root.id = 'meteo-zona-panel';
+  root.hidden = true;
+  root.innerHTML = `
+    <div class="media-panel__header">Lluvia y viento por distrito</div>
+    <p class="cordon-intro">Por distrito es un modelo (Open-Meteo), no una estación real; los pluviómetros de abajo sí son dato medido (SAIH Júcar). Sin dato de "capacidad de absorción del terreno" — no existe una fuente oficial para eso, no se inventa una estimación (spec 044 §7).</p>
     <div class="emergencia-meteo__bloque">
-      <div class="emergencia-meteo__subtitulo">Altimetría por distrito (más alto → más bajo)</div>
-      <div id="emergencia-altimetria-list"></div>
-    </div>
-    <div class="emergencia-meteo__bloque">
-      <div class="emergencia-meteo__subtitulo">Lluvia y viento por distrito (modelo)</div>
+      <div class="emergencia-meteo__subtitulo">Por distrito (modelo)</div>
       <div id="emergencia-meteo-zona-list"></div>
       <div class="info-panel__meta" id="emergencia-meteo-zona-meta"></div>
     </div>
@@ -97,26 +127,10 @@ export function buildEmergenciaMeteoContent(): HTMLDivElement {
       <div class="info-panel__meta" id="emergencia-pluviometros-meta"></div>
     </div>
   `;
-  return root;
-}
-
-export function montarEmergenciaMeteoPanel(): void {
-  const root = buildEmergenciaMeteoContent();
   document.body.appendChild(root);
 
-  const altimetriaList = root.querySelector('#emergencia-altimetria-list')!;
   const meteoZonaList = root.querySelector('#emergencia-meteo-zona-list')!;
   const pluviometrosList = root.querySelector('#emergencia-pluviometros-list')!;
-
-  // Altimetría es estática — se carga una vez, no hace falta refrescarla.
-  fetchAltimetria()
-    .then((distritos) => {
-      altimetriaList.innerHTML = renderAltimetria(distritos);
-    })
-    .catch((err: unknown) => {
-      altimetriaList.textContent = 'Altimetría no disponible';
-      console.error('Fallo al cargar altimetría:', err);
-    });
 
   async function refrescarMeteoZona(): Promise<void> {
     try {
