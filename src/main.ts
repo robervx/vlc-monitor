@@ -54,6 +54,7 @@ import { montarMeteoActualPanel, montarPrediccionPanel } from './ui/meteo-panel'
 import { buildActualidadRedesContent } from './ui/actualidad-redes';
 import { initRouter } from './ui/router';
 import { montarApoyoDecisionPanel } from './ui/apoyo-decision-panel';
+import { montarEmergenciaMeteoPanel } from './ui/emergencia-meteo-panel';
 import { buildProtocolosContent } from './ui/protocolos-panel';
 import { onPeticionCentrarMapa } from './ui/centrar-mapa';
 import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
@@ -2355,6 +2356,7 @@ async function main(): Promise<void> {
   // mapa" pide centrar la única instancia de MapLibre (no crea una segunda) y
   // cambia a /mapa — nunca dispara ninguna acción por sí mismo (§0).
   montarApoyoDecisionPanel();
+  montarEmergenciaMeteoPanel();
   onPeticionCentrarMapa(({ coordenadas, zoom }) => {
     map.flyTo({ center: coordenadas, zoom: zoom ?? map.getZoom() });
   });
@@ -2481,6 +2483,7 @@ async function main(): Promise<void> {
     'agenda-panel',
     'actualidad-redes-panel',
     'apoyo-decision-panel',
+    'emergencia-meteo-panel',
     'protocolos-panel',
   ];
 

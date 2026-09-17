@@ -58244,6 +58244,330 @@ async function handler17() {
   });
 }
 
+// src/services/meteo-zona.ts
+function construirParametrosOpenMeteo(distritos2) {
+  return {
+    latitude: distritos2.map((d) => d.centroide[1]).join(","),
+    longitude: distritos2.map((d) => d.centroide[0]).join(",")
+  };
+}
+function normalizarLluviaVientoPorDistrito(distritos2, respuesta) {
+  return distritos2.map((d, i) => {
+    const r = respuesta[i];
+    if (!r) return null;
+    return {
+      distritoCodigo: d.codigo,
+      distritoNombre: d.nombre,
+      precipitacionMm: r.current.precipitation,
+      vientoKmh: r.current.wind_speed_10m,
+      rachaKmh: r.current.wind_gusts_10m,
+      fecha: r.current.time
+    };
+  }).filter((x) => x !== null);
+}
+
+// src/server/meteo-zona.ts
+setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
+var CACHE_KEY10 = "emergencia:meteo-zona:v1";
+var TTL_MS12 = 15 * 60 * 1e3;
+async function fetchMeteoZona() {
+  const distritos2 = getLoadedDistricts().map((d) => ({
+    codigo: d.codigo,
+    nombre: d.nombre,
+    centroide: d.centroide
+  }));
+  const { latitude, longitude } = construirParametrosOpenMeteo(distritos2);
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=precipitation,wind_speed_10m,wind_gusts_10m&timezone=UTC`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Open-Meteo respondi\xF3 HTTP ${res.status}`);
+  const respuesta = await res.json();
+  return normalizarLluviaVientoPorDistrito(distritos2, respuesta);
+}
+async function handler18() {
+  try {
+    const { value: distritos2, fresh } = await getOrFetch(CACHE_KEY10, TTL_MS12, fetchMeteoZona);
+    return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=60, stale-while-revalidate=900"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 502,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
+}
+
+// src/services/utm.ts
+var A = 6378137;
+var F = 1 / 298.257223563;
+var K0 = 0.9996;
+function utmToLatLon(easting, northing, zone = 30, northern = true) {
+  const e = Math.sqrt(F * (2 - F));
+  const x = easting - 5e5;
+  const y = northern ? northing : northing - 1e7;
+  const m = y / K0;
+  const mu = m / (A * (1 - e ** 2 / 4 - 3 * e ** 4 / 64 - 5 * e ** 6 / 256));
+  const e1 = (1 - Math.sqrt(1 - e ** 2)) / (1 + Math.sqrt(1 - e ** 2));
+  const j1 = 3 * e1 / 2 - 27 * e1 ** 3 / 32;
+  const j2 = 21 * e1 ** 2 / 16 - 55 * e1 ** 4 / 32;
+  const j3 = 151 * e1 ** 3 / 96;
+  const j4 = 1097 * e1 ** 4 / 512;
+  const fp = mu + j1 * Math.sin(2 * mu) + j2 * Math.sin(4 * mu) + j3 * Math.sin(6 * mu) + j4 * Math.sin(8 * mu);
+  const e2 = e ** 2 / (1 - e ** 2);
+  const c1 = e2 * Math.cos(fp) ** 2;
+  const t1 = Math.tan(fp) ** 2;
+  const r1 = A * (1 - e ** 2) / (1 - e ** 2 * Math.sin(fp) ** 2) ** 1.5;
+  const n1 = A / Math.sqrt(1 - e ** 2 * Math.sin(fp) ** 2);
+  const d = x / (n1 * K0);
+  const q1 = n1 * Math.tan(fp) / r1;
+  const q2 = d ** 2 / 2;
+  const q3 = (5 + 3 * t1 + 10 * c1 - 4 * c1 ** 2 - 9 * e2) * d ** 4 / 24;
+  const q4 = (61 + 90 * t1 + 298 * c1 + 45 * t1 ** 2 - 3 * c1 ** 2 - 252 * e2) * d ** 6 / 720;
+  const lat = fp - q1 * (q2 - q3 + q4);
+  const q6 = (1 + 2 * t1 + c1) * d ** 3 / 6;
+  const q7 = (5 - 2 * c1 + 28 * t1 - 3 * c1 ** 2 + 8 * e2 + 24 * t1 ** 2) * d ** 5 / 120;
+  const lon = (d - q6 + q7) / Math.cos(fp);
+  const lonOrigin = (zone - 1) * 6 - 180 + 3;
+  return { lat: lat * 180 / Math.PI, lon: lon * 180 / Math.PI + lonOrigin };
+}
+
+// src/services/pluviometros-saih.ts
+var VALENCIA_LAT4 = 39.4699;
+var VALENCIA_LON4 = -0.3763;
+var RADIO_KM = 20;
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const rad = (d) => d * Math.PI / 180;
+  const dLat = rad(lat2 - lat1);
+  const dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+function normalizarPluviometrosSaih(crudas) {
+  const resultado = [];
+  for (const c of crudas) {
+    const { lat, lon } = utmToLatLon(c.fldNCoordGPSLat, c.fldNCoordGPSLon);
+    if (haversineKm(VALENCIA_LAT4, VALENCIA_LON4, lat, lon) > RADIO_KM) continue;
+    if (c.lluvia_24h == null) continue;
+    resultado.push({
+      id: c.idEstacionRemota,
+      nombre: c.fldTNombre,
+      poblacion: c.fldTPoblacion,
+      lat,
+      lon,
+      litrosM2_1h: c.lluvia_1h ?? 0,
+      litrosM2_4h: c.lluvia_4h ?? 0,
+      litrosM2_12h: c.lluvia_12h ?? 0,
+      litrosM2_24h: c.lluvia_24h,
+      fecha: c.fecha_24h ?? ""
+    });
+  }
+  return resultado.sort((a, b) => b.litrosM2_24h - a.litrosM2_24h);
+}
+
+// src/server/pluviometros-saih.ts
+var CACHE_KEY11 = "emergencia:pluviometros-saih:v1";
+var TTL_MS13 = 15 * 60 * 1e3;
+var SAIH_URL = "https://saih.chj.es/mapa-lluvias";
+var USER_AGENT = "vlc-monitor-emergencia-bot/1.0 (+https://github.com/robervx/vlc-monitor)";
+async function fetchPluviometros() {
+  const res = await fetch(SAIH_URL, { headers: { "user-agent": USER_AGENT } });
+  if (!res.ok) throw new Error(`saih.chj.es respondi\xF3 HTTP ${res.status}`);
+  const html = await res.text();
+  const m = html.match(/let estaciones = (\[.*?\]);/);
+  if (!m) throw new Error('No se encontr\xF3 el array "estaciones" en el HTML de saih.chj.es (estructura cambiada)');
+  const crudas = JSON.parse(m[1]);
+  return normalizarPluviometrosSaih(crudas);
+}
+async function handler19() {
+  try {
+    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY11, TTL_MS13, fetchPluviometros);
+    return new Response(JSON.stringify({ estaciones, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=300, stale-while-revalidate=900"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 502,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
+}
+
+// data/altimetria-valencia.json
+var altimetria_valencia_default = [
+  {
+    distritoCodigo: "18",
+    distritoNombre: "Poblats de l'Oest",
+    elevacionMinM: 29.81505584716797,
+    elevacionMaxM: 50.70057678222656,
+    elevacionMediaM: 40.94563184465681,
+    muestras: 7
+  },
+  {
+    distritoCodigo: "16",
+    distritoNombre: "Benicalap",
+    elevacionMinM: 22.43648910522461,
+    elevacionMaxM: 33.53450012207031,
+    elevacionMediaM: 26.805134773254395,
+    muestras: 6
+  },
+  {
+    distritoCodigo: "07",
+    distritoNombre: "l'Olivereta",
+    elevacionMinM: 20.92852783203125,
+    elevacionMaxM: 26.693389892578125,
+    elevacionMediaM: 23.988830947875975,
+    muestras: 5
+  },
+  {
+    distritoCodigo: "04",
+    distritoNombre: "Campanar",
+    elevacionMinM: 14.256916999816895,
+    elevacionMaxM: 31.235973358154297,
+    elevacionMediaM: 23.701482840946742,
+    muestras: 14
+  },
+  {
+    distritoCodigo: "08",
+    distritoNombre: "Patraix",
+    elevacionMinM: 16.28651237487793,
+    elevacionMaxM: 21.99294662475586,
+    elevacionMediaM: 19.653792245047434,
+    muestras: 7
+  },
+  {
+    distritoCodigo: "17",
+    distritoNombre: "Poblats del Nord",
+    elevacionMinM: 12.723814010620117,
+    elevacionMaxM: 23.032262802124023,
+    elevacionMediaM: 17.09359332493373,
+    muestras: 7
+  },
+  {
+    distritoCodigo: "03",
+    distritoNombre: "Extramurs",
+    elevacionMinM: 13.414849281311035,
+    elevacionMaxM: 18.63268280029297,
+    elevacionMediaM: 15.758403460184732,
+    muestras: 6
+  },
+  {
+    distritoCodigo: "05",
+    distritoNombre: "La Saidia",
+    elevacionMinM: 14.137200355529785,
+    elevacionMaxM: 17.905288696289062,
+    elevacionMediaM: 15.433223342895507,
+    muestras: 5
+  },
+  {
+    distritoCodigo: "01",
+    distritoNombre: "Ciutat Vella",
+    elevacionMinM: 11.531900405883789,
+    elevacionMaxM: 16.195173263549805,
+    elevacionMediaM: 14.847574234008789,
+    muestras: 5
+  },
+  {
+    distritoCodigo: "09",
+    distritoNombre: "Jesus",
+    elevacionMinM: 7.409144878387451,
+    elevacionMaxM: 17.626117706298828,
+    elevacionMediaM: 13.961213171482086,
+    muestras: 8
+  },
+  {
+    distritoCodigo: "15",
+    distritoNombre: "Rascanya",
+    elevacionMinM: 8.952692985534668,
+    elevacionMaxM: 20.872812271118164,
+    elevacionMediaM: 13.226095941331652,
+    muestras: 9
+  },
+  {
+    distritoCodigo: "02",
+    distritoNombre: "l'Eixample",
+    elevacionMinM: 10.72704029083252,
+    elevacionMaxM: 12.615260124206543,
+    elevacionMediaM: 11.681339740753174,
+    muestras: 4
+  },
+  {
+    distritoCodigo: "06",
+    distritoNombre: "El Pla del Real",
+    elevacionMinM: 5.450434684753418,
+    elevacionMaxM: 13.547780990600586,
+    elevacionMediaM: 10.059646034240723,
+    muestras: 5
+  },
+  {
+    distritoCodigo: "14",
+    distritoNombre: "Benimaclet",
+    elevacionMinM: 5.661479473114014,
+    elevacionMaxM: 13.592037200927734,
+    elevacionMediaM: 9.182842636108399,
+    muestras: 5
+  },
+  {
+    distritoCodigo: "19",
+    distritoNombre: "Poblats del Sud",
+    elevacionMinM: 0.2591051757335663,
+    elevacionMaxM: 26.97804832458496,
+    elevacionMediaM: 8.69987143027155,
+    muestras: 38
+  },
+  {
+    distritoCodigo: "12",
+    distritoNombre: "Camins al Grau",
+    elevacionMinM: 4.5090718269348145,
+    elevacionMaxM: 9.461307525634766,
+    elevacionMediaM: 7.14158312479655,
+    muestras: 6
+  },
+  {
+    distritoCodigo: "13",
+    distritoNombre: "Algiros",
+    elevacionMinM: 5.487948417663574,
+    elevacionMaxM: 8.669344902038574,
+    elevacionMediaM: 6.603510936101277,
+    muestras: 6
+  },
+  {
+    distritoCodigo: "10",
+    distritoNombre: "Quatre Carreres",
+    elevacionMinM: 1.0361292362213135,
+    elevacionMaxM: 12.397661209106445,
+    elevacionMediaM: 5.855926062121536,
+    muestras: 33
+  },
+  {
+    distritoCodigo: "11",
+    distritoNombre: "Poblats Maritims",
+    elevacionMinM: 1.3914040327072144,
+    elevacionMaxM: 5.065891742706299,
+    elevacionMediaM: 2.4880472204901953,
+    muestras: 22
+  }
+];
+
+// src/server/altimetria-valencia.ts
+async function handler20() {
+  return new Response(JSON.stringify({ distritos: altimetria_valencia_default }), {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "public, max-age=86400, stale-while-revalidate=604800"
+    }
+  });
+}
+
 // src/services/apoyo-decision.ts
 var SE\u00D1ALES_POR_ESCENARIO = {
   "incidencia-sobre-trafico-denso": ["incidencia-via-publica", "trafico-denso"],
@@ -58303,7 +58627,7 @@ var distritosBasicos3 = distritosFromGeoJSON(distritos_valencia_default).map((d)
 }));
 var CLAVE_HISTERESIS_PULSO3 = "pulso:escenarios-previos:v1";
 var CLAVE_TRAFICO_PREVIO3 = "insights:trafico:estado-previo";
-async function handler18() {
+async function handler21() {
   try {
     const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
     const [meteoResult, aireResult, traficoResult] = await Promise.all([
@@ -58502,7 +58826,7 @@ function json(obj, status, extraHeaders) {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extraHeaders }
   });
 }
-async function handler19(req) {
+async function handler22(req) {
   if (req.method !== "POST") return json({ ok: false }, 405);
   const secret = process.env.AUTH_SECRET;
   let users;
@@ -58544,7 +58868,7 @@ async function handler19(req) {
 }
 
 // src/server/auth-logout.ts
-async function handler20(req) {
+async function handler23(req) {
   const status = req.method === "POST" ? 200 : 405;
   return new Response(JSON.stringify({ ok: status === 200 }), {
     status,
@@ -58557,7 +58881,7 @@ async function handler20(req) {
 }
 
 // src/server/auth-estado.ts
-async function handler21(req) {
+async function handler24(req) {
   const secret = process.env.AUTH_SECRET;
   const sesion = secret ? await verificarSesion(leerCookie(req.headers.get("cookie"), COOKIE_NOMBRE), secret) : null;
   return new Response(
@@ -58585,10 +58909,13 @@ var RUTAS = {
   "geo/v1/distritos": handler15,
   "mock/v1/densidad-personas": handler16,
   "agenda/v1/eventos": handler17,
-  "decision/v1/sugerencias": handler18,
-  "auth/v1/login": handler19,
-  "auth/v1/logout": handler20,
-  "auth/v1/estado": handler21
+  "emergencia/v1/meteo-zona": handler18,
+  "emergencia/v1/pluviometros": handler19,
+  "emergencia/v1/altimetria": handler20,
+  "decision/v1/sugerencias": handler21,
+  "auth/v1/login": handler22,
+  "auth/v1/logout": handler23,
+  "auth/v1/estado": handler24
 };
 var BASE = "http://d.invalid";
 async function dispatch(req) {
