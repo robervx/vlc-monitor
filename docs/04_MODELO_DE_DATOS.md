@@ -223,13 +223,30 @@ tiene ninguno posible).
   ya existe `puntoMedio()` en `src/services/trafico.ts` para esto — y, si hiciera falta la
   geometría completa alguna vez, puede vivir en `payload` sin tocar el esquema.
 
-**Punto de decisión abierto, no resuelto por este documento**: usar tipos `PostGIS`
-(`geography(Point,4326)`, `geography(MultiPolygon,4326)`) en vez de columnas `numeric`
-sueltas para lat/lon. Neon soporta la extensión `postgis`. Ventaja real: `ST_Contains`/
-`ST_DWithin` en SQL sustituyen el point-in-polygon y el cálculo de distancia que hoy están
-reimplementados a mano en `district-geometry.ts`/`proximidad.ts` — pero es un cambio de
-herramienta, no solo de esquema, y hay que decidirlo explícitamente, no colarlo. Mientras
-no se decida, el modelo funciona igual con columnas `double precision` sueltas.
+**Decisión (2026-09-17): columnas `double precision` sueltas para lat/lon, sin PostGIS por
+ahora.** Se valoraron ambas opciones explícitamente:
+
+| | PostGIS (`geography(Point,4326)`/`geography(MultiPolygon,4326)`) | Columnas sueltas (`lat`/`lon` + `distrito_codigo` ya resuelto) |
+|---|---|---|
+| Corrección geométrica | Resuelve casos borde reales (polígonos con agujeros, antimeridiano) que un point-in-polygon casero puede no cubrir | El point-in-polygon/haversine de `district-geometry.ts`/`proximidad.ts` ya está escrito, probado y en producción — funciona para el tamaño real de Valencia (19 distritos, geometrías simples) |
+| Dónde vive el cálculo espacial | En SQL (`ST_Contains`/`ST_DWithin`) — el motor de base de datos hace el trabajo | En la app, antes de insertar (igual que hoy) — Postgres solo guarda el resultado ya resuelto |
+| Coste operativo | Activar la extensión `postgis`, aprender su sintaxis (WKT/WKB, `ST_*`), índices `GiST` | Ninguno nuevo — mismo patrón que ya usa el resto del proyecto |
+| Caso de uso real que lo necesitaría | Consultas de proximidad en SQL sobre volúmenes grandes, capas geométricas nuevas (tramos de calle completos, buffers) | Las 5 consultas de §11 no lo necesitan — todas filtran por `distrito_codigo`/`calle`/tiempo, ya resueltos antes de insertar |
+
+**Por qué la opción simple, para este proyecto en concreto**: Mirall mueve cientos de
+señales al día para una sola ciudad, no millones — el cuello de botella nunca ha sido el
+cálculo espacial (ya resuelto y rápido en JS), y el proyecto ya prioriza "lo más simple que
+funcione" sobre correitud teórica sin caso de uso real que la pida (mismo criterio que
+`CLAUDE.md` §5 aplica al resto de decisiones técnicas). Añadir PostGIS ahora sería resolver
+un problema que no tenemos, a cambio de una pieza operativa más que mantener en un
+proyecto de una sola persona.
+
+**No es una puerta cerrada**: si en el futuro aparece un caso real que lo justifique (capas
+geométricas nuevas tipo grafo viario completo en la base de datos, consultas de proximidad
+sobre volúmenes grandes), añadir PostGIS más adelante es aditivo — se activa la extensión y
+se añade una columna `geography` generada a partir de `lat`/`lon` ya existentes, sin romper
+nada de lo que consume `lat`/`lon`/`distrito_codigo` hoy. Sería su propia ADR cuando llegue
+ese momento, no algo a decidir ahora sin necesidad.
 
 ## 5. Dimensión temporal
 
@@ -468,7 +485,8 @@ order by e.fecha_inicio desc;
 - No congela el esquema para "los próximos cinco años" — congela lo mínimo necesario para
   que `047` pueda empezar a escribir histórico sin institucionalizar los bugs ya
   encontrados (ids duplicados, arrays sin trazabilidad, severidad mal calibrada).
-- No decide PostGIS vs columnas sueltas (§4) — queda como decisión abierta.
+- PostGIS vs columnas sueltas ya está decidido (§4: columnas sueltas, sin PostGIS por
+  ahora) — no es una decisión abierta, es aditiva si algún día hace falta reabrirla.
 - No migra `trafico-historico`/distritos/protocolos de golpe — cada uno queda anotado con
   su propio criterio (§9), para abordarse en su propia spec si procede.
 - No cambia ni relaja `CLAUDE.md` §4 en ningún punto — ninguna entidad de este modelo
