@@ -35,12 +35,13 @@ Un TTL cache (Redis u otro) no es la herramienta correcta para esto:
 
 ## Decisión
 
-**Se añade un almacén Postgres serverless (Neon o Supabase, vía Vercel Marketplace, free
-tier) como almacén histórico y de correlación de señales — sin sustituir la decisión de
+**Se añade un almacén Postgres serverless (Neon, free tier — creado directamente en
+neon.tech y enlazado a Vercel con su cadena de conexión como variable de entorno, no vía
+Marketplace) como almacén histórico y de correlación de señales — sin sustituir la decisión de
 Redis para caché/estado, que sigue en pie tal cual la fija `CLAUDE.md` §5.** Son dos
 piezas con propósitos distintos:
 
-| | Redis (Upstash, ya decidido) | Postgres (Neon/Supabase, esta ADR) |
+| | Redis (Upstash, ya decidido) | Postgres (Neon, esta ADR) |
 |---|---|---|
 | Para qué | Último valor conocido de cada fuente, TTL corto, stale-on-error | Historial creciente, consultable por calle/zona/tiempo/tipo de señal |
 | Patrón de escritura | Sobrescribe (última lectura gana) | Append-only (cada señal queda, con marca de tiempo) |
@@ -80,7 +81,7 @@ antes de tocar la base de datos, no después.
 - `047` puede diseñar su contrato de datos asumiendo Postgres como destino del histórico,
   sin tener que inventar una solución ad-hoc sobre Redis.
 - Queda pendiente, antes de poder implementar la parte de escritura de `047`: crear el
-  proyecto Neon/Supabase (Vercel Marketplace, free tier) y añadir su cadena de conexión
+  proyecto Neon (neon.tech, free tier) y añadir su cadena de conexión
   como variable de entorno — paso que necesita al usuario, igual que ya ocurrió con la
   clave de Gemini (spec `045`) y sigue pendiente para Upstash.
 - Se añade una fila a `CLAUDE.md` §5 señalando esta ADR, sin borrar ni contradecir la fila
