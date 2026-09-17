@@ -13,17 +13,24 @@
 // DOM, lo cablea y no expone nada más — `main.ts` solo la llama.
 
 import { camarasVisibles, type CamaraUrbana } from '../config/camaras-urbanas';
+import { agruparPorCarretera, type CamaraExternaDgt } from '../services/camaras-dgt';
+import camarasDgtValencia from '../../data/camaras-dgt-valencia.json' with { type: 'json' };
 
-function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement } {
+function buildCamarasPanel(): { root: HTMLDivElement; grid: HTMLDivElement; externas: HTMLDivElement } {
   const root = document.createElement('div');
   root.id = 'camaras-panel';
   root.hidden = true;
   root.innerHTML = `
     <div class="media-panel__header">Cámaras en vivo</div>
     <div class="camaras-grid" id="camaras-panel-grid"></div>
+    <div id="camaras-panel-externas"></div>
   `;
   document.body.appendChild(root);
-  return { root, grid: root.querySelector('#camaras-panel-grid')! };
+  return {
+    root,
+    grid: root.querySelector('#camaras-panel-grid')!,
+    externas: root.querySelector('#camaras-panel-externas')!,
+  };
 }
 
 /** Parámetros que minimizan la interfaz propia de YouTube (título, sugerencias, marca). */
@@ -128,11 +135,75 @@ function renderCamarasPanel(panel: { grid: HTMLDivElement }, camaras: CamaraUrba
   });
 }
 
+// spec 043 — cámaras urbanas EXTERNAS (red viaria que rodea Valencia: rondas,
+// autovías de acceso), bloque separado de las internas de spec 038 (arriba en
+// este mismo fichero). Fuente: DGT, dataset "Cámaras DGT DATEX2 v3.7"
+// (licencia Creative Commons Attribution — pública por defecto, sin gating de
+// ADR-003, a diferencia de las internas). Imagen JPEG estática que se
+// refresca sola cada ~2 min en origen — aquí se fuerza un refresco periódico
+// del lado del cliente con un parámetro de caché (`?t=timestamp`).
+const REFRESCO_CAMARAS_DGT_MS = 120_000;
+
+function renderCamarasExternasDgt(root: HTMLDivElement, camaras: CamaraExternaDgt[]): void {
+  if (camaras.length === 0) {
+    root.innerHTML = '';
+    return;
+  }
+  const grupos = agruparPorCarretera(camaras);
+  root.innerHTML = `
+    <div class="media-panel__header">Cámaras en vías de acceso (DGT)</div>
+    <div class="agenda-panel__aviso">Imágenes en directo de la Dirección General de Tráfico (dataset "Cámaras DGT DATEX2 v3.7", licencia Creative Commons Attribution) — se actualizan cada ~2 min.</div>
+    ${grupos
+      .map(
+        (g) => `
+          <details class="camaras-dgt-carretera">
+            <summary>${escapeHtmlLocal(g.carretera)} (${g.camaras.length})</summary>
+            <div class="camaras-dgt-grid" data-carretera="${escapeHtmlLocal(g.carretera)}"></div>
+          </details>
+        `,
+      )
+      .join('')}
+  `;
+  const detalles = root.querySelectorAll<HTMLDivElement>('.camaras-dgt-grid');
+  detalles.forEach((contenedor) => {
+    const carretera = contenedor.dataset.carretera;
+    const grupo = grupos.find((g) => g.carretera === carretera);
+    if (!grupo) return;
+    contenedor.innerHTML = grupo.camaras
+      .map(
+        (c) => `
+          <figure class="camara-dgt-tile">
+            <img class="camara-dgt-tile__img" loading="lazy" data-src="${escapeHtmlLocal(c.imagenUrl)}" alt="Cámara ${escapeHtmlLocal(c.carretera)} PK ${escapeHtmlLocal(c.pk)}" />
+            <figcaption>PK ${escapeHtmlLocal(c.pk)} · sentido ${escapeHtmlLocal(c.sentido)}</figcaption>
+          </figure>
+        `,
+      )
+      .join('');
+  });
+
+  function refrescarImagenes(): void {
+    root.querySelectorAll<HTMLImageElement>('.camara-dgt-tile__img').forEach((img) => {
+      const base = img.dataset.src;
+      if (base) img.src = `${base}?t=${Date.now()}`;
+    });
+  }
+  refrescarImagenes();
+  setInterval(refrescarImagenes, REFRESCO_CAMARAS_DGT_MS);
+}
+
+function escapeHtmlLocal(s: string): string {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
 /**
  * Monta `#camaras-panel` (oculto) y lo cablea al checkbox `toggle`.
- * Sin backend ni polling: las tarjetas se construyen la primera vez que se
- * activa el panel, pero ningún vídeo se reproduce hasta que se pulsa
- * "Reproducir" en su tarjeta (ver `renderCamarasPanel`).
+ * Sin backend ni polling: las tarjetas de spec 038 se construyen la primera
+ * vez que se activa el panel, pero ningún vídeo se reproduce hasta que se
+ * pulsa "Reproducir" en su tarjeta (ver `renderCamarasPanel`). El bloque de
+ * cámaras externas de spec 043 (imágenes JPEG, no vídeo) se renderiza a la
+ * vez, agrupado por carretera.
  */
 export function montarCamarasPanel(toggle: HTMLInputElement): void {
   const camarasPanel = buildCamarasPanel();
@@ -147,6 +218,7 @@ export function montarCamarasPanel(toggle: HTMLInputElement): void {
       } else {
         camarasPanel.grid.textContent = 'No hay cámaras disponibles en esta build.';
       }
+      renderCamarasExternasDgt(camarasPanel.externas, camarasDgtValencia as CamaraExternaDgt[]);
     }
   });
 }

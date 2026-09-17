@@ -15,6 +15,7 @@
     "marca": "tsx scripts/generar-marca.ts",
     "seed:distritos": "node scripts/seed-distritos.mjs",
     "seed:red-viaria": "tsx scripts/seed-red-viaria.ts",
+    "seed:camaras-dgt": "tsx scripts/seed-camaras-dgt.ts",
     "snapshot:trafico-historico": "tsx scripts/snapshot-trafico-historico.ts",
     "snapshot:pulso-sombra": "tsx scripts/snapshot-pulso-sombra.ts",
     "verificar:reconciliacion-trafico-grafo": "tsx scripts/verificar-reconciliacion-trafico-grafo.ts",

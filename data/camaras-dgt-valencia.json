@@ -1,0 +1,758 @@
+[
+  {
+    "id": "112",
+    "carretera": "A-3",
+    "pk": "336.6",
+    "sentido": "+",
+    "lat": 39.47387778,
+    "lon": -0.58961667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/112.jpg"
+  },
+  {
+    "id": "113",
+    "carretera": "A-3",
+    "pk": "341.799",
+    "sentido": "+",
+    "lat": 39.4713,
+    "lon": -0.53182778,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/113.jpg"
+  },
+  {
+    "id": "114",
+    "carretera": "A-3",
+    "pk": "345.7",
+    "sentido": "+",
+    "lat": 39.47512222,
+    "lon": -0.48474444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/114.jpg"
+  },
+  {
+    "id": "115",
+    "carretera": "A-3",
+    "pk": "348.2",
+    "sentido": "-",
+    "lat": 39.48198056,
+    "lon": -0.45796389,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/115.jpg"
+  },
+  {
+    "id": "116",
+    "carretera": "A-3",
+    "pk": "351.6",
+    "sentido": "-",
+    "lat": 39.47039,
+    "lon": -0.42516,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/116.jpg"
+  },
+  {
+    "id": "135",
+    "carretera": "A-7",
+    "pk": "306.9",
+    "sentido": "+",
+    "lat": 39.63250278,
+    "lon": -0.30326667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/135.jpg"
+  },
+  {
+    "id": "136",
+    "carretera": "A-7",
+    "pk": "311.5",
+    "sentido": "-",
+    "lat": 39.60925833,
+    "lon": -0.34463056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/136.jpg"
+  },
+  {
+    "id": "137",
+    "carretera": "A-7",
+    "pk": "315.35",
+    "sentido": "-",
+    "lat": 39.58895,
+    "lon": -0.38313056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/137.jpg"
+  },
+  {
+    "id": "138",
+    "carretera": "A-7",
+    "pk": "321.2",
+    "sentido": "-",
+    "lat": 39.55815556,
+    "lon": -0.43088056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/138.jpg"
+  },
+  {
+    "id": "139",
+    "carretera": "A-7",
+    "pk": "324.08",
+    "sentido": "+",
+    "lat": 39.53983889,
+    "lon": -0.45343889,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/139.jpg"
+  },
+  {
+    "id": "140",
+    "carretera": "A-7",
+    "pk": "327.0",
+    "sentido": "-",
+    "lat": 39.52108333,
+    "lon": -0.47518889,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/140.jpg"
+  },
+  {
+    "id": "141",
+    "carretera": "A-7",
+    "pk": "330.4",
+    "sentido": "+",
+    "lat": 39.50828889,
+    "lon": -0.50932222,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/141.jpg"
+  },
+  {
+    "id": "142",
+    "carretera": "A-7",
+    "pk": "336.1",
+    "sentido": "+",
+    "lat": 39.47239722,
+    "lon": -0.54955556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/142.jpg"
+  },
+  {
+    "id": "143",
+    "carretera": "A-7",
+    "pk": "340.9",
+    "sentido": "-",
+    "lat": 39.43598333,
+    "lon": -0.53665,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/143.jpg"
+  },
+  {
+    "id": "144",
+    "carretera": "A-7",
+    "pk": "343.785",
+    "sentido": "-",
+    "lat": 39.41709722,
+    "lon": -0.5093,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/144.jpg"
+  },
+  {
+    "id": "145",
+    "carretera": "A-7",
+    "pk": "348.0",
+    "sentido": "+",
+    "lat": 39.38685,
+    "lon": -0.47769444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/145.jpg"
+  },
+  {
+    "id": "146",
+    "carretera": "A-7",
+    "pk": "350.8",
+    "sentido": "-",
+    "lat": 39.37121944,
+    "lon": -0.45416667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/146.jpg"
+  },
+  {
+    "id": "167",
+    "carretera": "CV-500",
+    "pk": "0.5",
+    "sentido": "-",
+    "lat": 39.4287,
+    "lon": -0.34130556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/167.jpg"
+  },
+  {
+    "id": "168",
+    "carretera": "CV-500",
+    "pk": "0.75",
+    "sentido": "-",
+    "lat": 39.42658333,
+    "lon": -0.34181667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168.jpg"
+  },
+  {
+    "id": "169",
+    "carretera": "CV-500",
+    "pk": "2.9",
+    "sentido": "+",
+    "lat": 39.40774444,
+    "lon": -0.33716111,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/169.jpg"
+  },
+  {
+    "id": "170",
+    "carretera": "CV-500",
+    "pk": "4.9",
+    "sentido": "+",
+    "lat": 39.38999722,
+    "lon": -0.33471944,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/170.jpg"
+  },
+  {
+    "id": "171",
+    "carretera": "CV-500",
+    "pk": "6.5",
+    "sentido": "-",
+    "lat": 39.37653056,
+    "lon": -0.33154444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/171.jpg"
+  },
+  {
+    "id": "175",
+    "carretera": "A-7",
+    "pk": "357.05",
+    "sentido": "-",
+    "lat": 39.32490278,
+    "lon": -0.43554167,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/175.jpg"
+  },
+  {
+    "id": "176",
+    "carretera": "V-21",
+    "pk": "5.1",
+    "sentido": "+",
+    "lat": 39.58636111,
+    "lon": -0.29431111,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/176.jpg"
+  },
+  {
+    "id": "177",
+    "carretera": "V-21",
+    "pk": "8.95",
+    "sentido": "-",
+    "lat": 39.55166667,
+    "lon": -0.29722778,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/177.jpg"
+  },
+  {
+    "id": "178",
+    "carretera": "V-21",
+    "pk": "14.3",
+    "sentido": "-",
+    "lat": 39.50861944,
+    "lon": -0.32485,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/178.jpg"
+  },
+  {
+    "id": "180",
+    "carretera": "V-30",
+    "pk": "1.6",
+    "sentido": "+",
+    "lat": 39.43454444,
+    "lon": -0.35750556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/180.jpg"
+  },
+  {
+    "id": "181",
+    "carretera": "V-30",
+    "pk": "2.7",
+    "sentido": "-",
+    "lat": 39.43364722,
+    "lon": -0.37124167,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/181.jpg"
+  },
+  {
+    "id": "182",
+    "carretera": "V-30",
+    "pk": "4.4",
+    "sentido": "+",
+    "lat": 39.43827222,
+    "lon": -0.38944444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/182.jpg"
+  },
+  {
+    "id": "183",
+    "carretera": "V-30",
+    "pk": "4.9",
+    "sentido": "-",
+    "lat": 39.43801944,
+    "lon": -0.396525,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/183.jpg"
+  },
+  {
+    "id": "184",
+    "carretera": "V-30",
+    "pk": "6.8",
+    "sentido": "+",
+    "lat": 39.45262222,
+    "lon": -0.40893333,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/184.jpg"
+  },
+  {
+    "id": "185",
+    "carretera": "V-30",
+    "pk": "10.2",
+    "sentido": "+",
+    "lat": 39.47973333,
+    "lon": -0.428725,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/185.jpg"
+  },
+  {
+    "id": "186",
+    "carretera": "V-30",
+    "pk": "11.0",
+    "sentido": "+",
+    "lat": 39.48726944,
+    "lon": -0.43405,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/186.jpg"
+  },
+  {
+    "id": "187",
+    "carretera": "V-30",
+    "pk": "14.55",
+    "sentido": "+",
+    "lat": 39.5064,
+    "lon": -0.46074722,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/187.jpg"
+  },
+  {
+    "id": "188",
+    "carretera": "V-30",
+    "pk": "16.0",
+    "sentido": "+",
+    "lat": 39.51336667,
+    "lon": -0.47700556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/188.jpg"
+  },
+  {
+    "id": "189",
+    "carretera": "V-31",
+    "pk": "0.82",
+    "sentido": "+",
+    "lat": 39.34898333,
+    "lon": -0.42906667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/189.jpg"
+  },
+  {
+    "id": "190",
+    "carretera": "V-31",
+    "pk": "2.6",
+    "sentido": "+",
+    "lat": 39.36448056,
+    "lon": -0.42607222,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/190.jpg"
+  },
+  {
+    "id": "191",
+    "carretera": "V-31",
+    "pk": "6.8",
+    "sentido": "+",
+    "lat": 39.38742778,
+    "lon": -0.39559444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/191.jpg"
+  },
+  {
+    "id": "523",
+    "carretera": "V-15",
+    "pk": "2.8",
+    "sentido": "-",
+    "lat": 39.40878056,
+    "lon": -0.33716111,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/523.jpg"
+  },
+  {
+    "id": "1089",
+    "carretera": "V-31",
+    "pk": "4.85",
+    "sentido": "+",
+    "lat": 39.376125,
+    "lon": -0.41188889,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1089.jpg"
+  },
+  {
+    "id": "1350",
+    "carretera": "CV-30",
+    "pk": "1.5",
+    "sentido": "-",
+    "lat": 39.4943,
+    "lon": -0.42611,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1350.jpg"
+  },
+  {
+    "id": "1351",
+    "carretera": "CV-30",
+    "pk": "2.95",
+    "sentido": "-",
+    "lat": 39.49676,
+    "lon": -0.41109,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1351.jpg"
+  },
+  {
+    "id": "1352",
+    "carretera": "CV-365",
+    "pk": "0.9",
+    "sentido": "+",
+    "lat": 39.50843611,
+    "lon": -0.43383611,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1352.jpg"
+  },
+  {
+    "id": "1353",
+    "carretera": "CV-365",
+    "pk": "2.4",
+    "sentido": "-",
+    "lat": 39.51151667,
+    "lon": -0.44693056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1353.jpg"
+  },
+  {
+    "id": "1354",
+    "carretera": "N-220",
+    "pk": "0.15",
+    "sentido": "+",
+    "lat": 39.50523333,
+    "lon": -0.46253611,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1354.jpg"
+  },
+  {
+    "id": "1471",
+    "carretera": "V-21",
+    "pk": "11.0",
+    "sentido": "+",
+    "lat": 39.53540833,
+    "lon": -0.30873611,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1471.jpg"
+  },
+  {
+    "id": "1472",
+    "carretera": "V-21",
+    "pk": "0.15",
+    "sentido": "-",
+    "lat": 39.62945278,
+    "lon": -0.30032222,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1472.jpg"
+  },
+  {
+    "id": "1473",
+    "carretera": "V-30",
+    "pk": "7.6",
+    "sentido": "-",
+    "lat": 39.458275,
+    "lon": -0.41580278,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1473.jpg"
+  },
+  {
+    "id": "1474",
+    "carretera": "V-30",
+    "pk": "2.7",
+    "sentido": "+",
+    "lat": 39.43675833,
+    "lon": -0.3701,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1474.jpg"
+  },
+  {
+    "id": "1475",
+    "carretera": "A-7",
+    "pk": "354.006",
+    "sentido": "+",
+    "lat": 39.34973889,
+    "lon": -0.43031944,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1475.jpg"
+  },
+  {
+    "id": "1580",
+    "carretera": "V-23",
+    "pk": "1.0",
+    "sentido": "+",
+    "lat": 39.63475833,
+    "lon": -0.29559722,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1580.jpg"
+  },
+  {
+    "id": "1603",
+    "carretera": "V-31",
+    "pk": "8.5",
+    "sentido": "+",
+    "lat": 39.40139722,
+    "lon": -0.38631389,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1603.jpg"
+  },
+  {
+    "id": "1604",
+    "carretera": "V-31",
+    "pk": "9.8",
+    "sentido": "+",
+    "lat": 39.41150556,
+    "lon": -0.37952778,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1604.jpg"
+  },
+  {
+    "id": "1607",
+    "carretera": "V-31",
+    "pk": "11.2",
+    "sentido": "+",
+    "lat": 39.42320833,
+    "lon": -0.37383611,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1607.jpg"
+  },
+  {
+    "id": "1635",
+    "carretera": "CV-33",
+    "pk": "0.5",
+    "sentido": "+",
+    "lat": 39.38908333,
+    "lon": -0.40311667,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1635.jpg"
+  },
+  {
+    "id": "1636",
+    "carretera": "CV-33",
+    "pk": "3.0",
+    "sentido": "+",
+    "lat": 39.40148056,
+    "lon": -0.42355556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1636.jpg"
+  },
+  {
+    "id": "1637",
+    "carretera": "CV-33",
+    "pk": "6.0",
+    "sentido": "+",
+    "lat": 39.42101667,
+    "lon": -0.44658056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1637.jpg"
+  },
+  {
+    "id": "1638",
+    "carretera": "CV-36",
+    "pk": "2.2",
+    "sentido": "-",
+    "lat": 39.44062222,
+    "lon": -0.42755,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1638.jpg"
+  },
+  {
+    "id": "1639",
+    "carretera": "CV-36",
+    "pk": "3.5",
+    "sentido": "+",
+    "lat": 39.44002222,
+    "lon": -0.44230556,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1639.jpg"
+  },
+  {
+    "id": "1640",
+    "carretera": "CV-36",
+    "pk": "6.5",
+    "sentido": "+",
+    "lat": 39.446475,
+    "lon": -0.47419444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1640.jpg"
+  },
+  {
+    "id": "1641",
+    "carretera": "CV-36",
+    "pk": "8.0",
+    "sentido": "-",
+    "lat": 39.44409722,
+    "lon": -0.49106944,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1641.jpg"
+  },
+  {
+    "id": "1642",
+    "carretera": "CV-36",
+    "pk": "10.2",
+    "sentido": "-",
+    "lat": 39.44364444,
+    "lon": -0.51603056,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1642.jpg"
+  },
+  {
+    "id": "1643",
+    "carretera": "CV-36",
+    "pk": "12.57",
+    "sentido": "-",
+    "lat": 39.439925,
+    "lon": -0.5362,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1643.jpg"
+  },
+  {
+    "id": "1645",
+    "carretera": "CV-410",
+    "pk": "3.9",
+    "sentido": "-",
+    "lat": 39.46973611,
+    "lon": -0.47579444,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/1645.jpg"
+  },
+  {
+    "id": "164259",
+    "carretera": "A-3",
+    "pk": "340.0",
+    "sentido": "+",
+    "lat": 39.47244,
+    "lon": -0.54962,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/164259.jpg"
+  },
+  {
+    "id": "164260",
+    "carretera": "A-3",
+    "pk": "340.0",
+    "sentido": "-",
+    "lat": 39.47244,
+    "lon": -0.54962,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/164260.jpg"
+  },
+  {
+    "id": "164261",
+    "carretera": "A-7",
+    "pk": "336.1",
+    "sentido": "+",
+    "lat": 39.47244,
+    "lon": -0.54962,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/164261.jpg"
+  },
+  {
+    "id": "164262",
+    "carretera": "A-7",
+    "pk": "336.1",
+    "sentido": "-",
+    "lat": 39.47244,
+    "lon": -0.54962,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/164262.jpg"
+  },
+  {
+    "id": "167446",
+    "carretera": "V-21",
+    "pk": "16.3",
+    "sentido": "+",
+    "lat": 39.49361,
+    "lon": -0.33199,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/167446.jpg"
+  },
+  {
+    "id": "168255",
+    "carretera": "A-7",
+    "pk": "334.85",
+    "sentido": "+",
+    "lat": 39.48271,
+    "lon": -0.54507,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168255.jpg"
+  },
+  {
+    "id": "168275",
+    "carretera": "V-21",
+    "pk": "12.0",
+    "sentido": "-",
+    "lat": 39.52736,
+    "lon": -0.31388,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168275.jpg"
+  },
+  {
+    "id": "168276",
+    "carretera": "V-21",
+    "pk": "13.15",
+    "sentido": "-",
+    "lat": 39.51891,
+    "lon": -0.31929,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168276.jpg"
+  },
+  {
+    "id": "168277",
+    "carretera": "V-21",
+    "pk": "15.9",
+    "sentido": "-",
+    "lat": 39.4952,
+    "lon": -0.32826,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168277.jpg"
+  },
+  {
+    "id": "168278",
+    "carretera": "V-21",
+    "pk": "16.75",
+    "sentido": "+",
+    "lat": 39.49142,
+    "lon": -0.33593,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/168278.jpg"
+  },
+  {
+    "id": "169217",
+    "carretera": "A-7",
+    "pk": "319.0",
+    "sentido": "+",
+    "lat": 39.57705,
+    "lon": -0.42065,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/169217.jpg"
+  },
+  {
+    "id": "169218",
+    "carretera": "A-7",
+    "pk": "332.9",
+    "sentido": "-",
+    "lat": 39.49623,
+    "lon": -0.53123,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/169218.jpg"
+  },
+  {
+    "id": "176526",
+    "carretera": "A-3",
+    "pk": "349.9",
+    "sentido": "+",
+    "lat": 39.47512,
+    "lon": -0.43988,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/176526.jpg"
+  },
+  {
+    "id": "178506",
+    "carretera": "V-30",
+    "pk": "9.0",
+    "sentido": "+",
+    "lat": 39.4687988,
+    "lon": -0.4204635,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/178506.jpg"
+  },
+  {
+    "id": "178574",
+    "carretera": "A-3",
+    "pk": "343,6",
+    "sentido": "+",
+    "lat": 39.472328,
+    "lon": -0.507581,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/178574.jpg"
+  },
+  {
+    "id": "181921",
+    "carretera": "V-31",
+    "pk": "13.6",
+    "sentido": "-",
+    "lat": 39.44448056,
+    "lon": -0.36925278,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/181921.jpg"
+  },
+  {
+    "id": "186230",
+    "carretera": "A-3",
+    "pk": "349.9",
+    "sentido": "+",
+    "lat": 39.47512,
+    "lon": -0.43988,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/186230.jpg"
+  },
+  {
+    "id": "176530",
+    "carretera": "A-7",
+    "pk": "316.51",
+    "sentido": "-",
+    "lat": 39.58612778,
+    "lon": -0.39649722,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/176530.jpg"
+  },
+  {
+    "id": "176537",
+    "carretera": "AP-7",
+    "pk": "529.01",
+    "sentido": "-",
+    "lat": 39.33476111,
+    "lon": -0.42187778,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/176537.jpg"
+  },
+  {
+    "id": "187251",
+    "carretera": "A-3",
+    "pk": "335.100",
+    "sentido": "-",
+    "lat": 39.474578,
+    "lon": -0.606628,
+    "imagenUrl": "https://etraffic.dgt.es/camarasEtraffic/187251.jpg"
+  }
+]

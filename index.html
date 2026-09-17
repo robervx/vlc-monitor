@@ -1574,7 +1574,11 @@
         border-radius: 6px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         font-size: 14px;
-        overflow: hidden;
+        /* spec 043 — el bloque de cámaras externas (DGT) puede crecer bastante
+           más que las 4 tarjetas de spec 038; con scroll interno en vez de
+           `overflow: hidden` no se recorta contenido invisible sin aviso
+           (mismo bug real que #insights-panel en spec 013 v8). */
+        overflow: hidden auto;
       }
 
       #camaras-panel[hidden] {
@@ -1881,6 +1885,49 @@
 
       .camara-tile__atribucion:hover {
         text-decoration: underline;
+      }
+
+      /* Spec 043 — cámaras externas DGT, bloque separado de las internas de
+         arriba (imagen JPEG estática que se refresca, no vídeo en directo). */
+      .camaras-dgt-carretera {
+        margin: 0 8px 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .camaras-dgt-carretera > summary {
+        cursor: pointer;
+        padding: 6px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #cbd5e1;
+      }
+
+      .camaras-dgt-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+        padding: 0 8px 8px;
+      }
+
+      .camara-dgt-tile {
+        margin: 0;
+      }
+
+      .camara-dgt-tile__img {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 4px;
+        background: #16202e;
+        display: block;
+      }
+
+      .camara-dgt-tile figcaption {
+        font-size: 10px;
+        color: #888;
+        margin-top: 2px;
+        text-align: center;
       }
 
       .tendencia-panel__select {

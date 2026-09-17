@@ -116,9 +116,9 @@ const META_CAPAS: Record<string, MetaCapa> = {
   },
   camaras: {
     nombre: 'Cámaras en vivo',
-    mide: 'Vídeo en directo de cámaras urbanas — embeds de terceros, sin captura ni almacenamiento propio',
-    frecuencia: 'Directo (según disponibilidad del proveedor)',
-    fuente: 'Xarxa de Webcams de Turisme CV (fuente "personal", no activa por defecto — ver ADR-003)',
+    mide: 'Vídeo/imagen en directo de cámaras urbanas (Valencia ciudad) y de la red viaria que rodea la ciudad (rondas, autovías de acceso) — embeds/imágenes de terceros, sin captura ni almacenamiento propio',
+    frecuencia: 'Directo (vídeo) / ~2 min (imágenes DGT)',
+    fuente: 'Xarxa de Webcams de Turisme CV (fuente "personal", no activa por defecto — ver ADR-003) + DGT, dataset "Cámaras DGT DATEX2 v3.7" (licencia Creative Commons Attribution, pública por defecto — spec 043)',
   },
   agendaEventos: {
     nombre: 'Agenda de eventos',

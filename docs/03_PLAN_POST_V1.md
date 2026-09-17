@@ -9,18 +9,15 @@ congelado.
 
 ## Orden de prioridad (decidido explícitamente por el usuario)
 
-1. **[`027` v4](../specs/027-agenda-eventos-scraping.md)** — Agenda de eventos con impacto
-   en vía pública (fútbol en Mestalla/Ciutat de València, conciertos del Roig Arena u
-   otros, calendario de carreras). Extiende una spec ya `Implemented`, no una spec nueva.
-   Due-diligence ligera ya hecha (`robots.txt` de los 3 sitios de clubes/recinto,
-   permisivos). **El más cercano a poder empezar.**
-2. **[`043`](../specs/043-camaras-urbanas-externas.md)** — Bloque de cámaras urbanas
-   *externas* (red viaria que rodea Valencia — accesos, rondas, autovías), separado del
-   bloque de cámaras internas de spec `038`. Inspirado por el usuario en
-   `livetrafik.com/es/camaras/comunidad-valenciana` (agregador, no la fuente primaria —
-   hipótesis principal: red de cámaras de la DGT, sin confirmar). Uso previsto:
-   personal/interno del usuario, mismo mecanismo de fuente "personal" que spec 038 si
-   corresponde (`ADR-003`).
+1. ~~**[`027` v4](../specs/027-agenda-eventos-scraping.md)**~~ — **Implementado
+   (2026-09-17).** Agenda de eventos con impacto en vía pública (fútbol de Valencia
+   CF/Levante UD como local, Roig Arena, carreras FDM) — las 4 fuentes nuevas no
+   necesitaron Playwright, HTML/JSON plano vía `fetch()`.
+2. ~~**[`043`](../specs/043-camaras-urbanas-externas.md)**~~ — **Implementado
+   (2026-09-17).** Bloque de cámaras urbanas *externas* (red viaria que rodea Valencia).
+   `livetrafik.com` descartado por protecciones anti-bot; fuente real = DGT (JSON +
+   imágenes JPEG oficiales, licencia Creative Commons Attribution) — **pública por
+   defecto**, mejor resultado que la hipótesis "personal" de partida. 84 cámaras.
 3. **[`044`](../specs/044-panel-emergencia-meteorologica.md)** — Pestaña de días de
    emergencia/alerta: lluvia y viento por zona de la ciudad, pluviómetros (litros/hora vs.
    capacidad de absorción — sin fuente identificada todavía para la parte de capacidad),
@@ -46,13 +43,7 @@ paso real de cada una es la misma investigación en profundidad que ya se ha hec
 cada spec `Implemented` de este repo (`CLAUDE.md` §8.2), no asumir que lo apuntado aquí ya
 vale como verificación.
 
-- **`027` v4**: verificar en navegador real (no solo `curl`) si `valenciacf.com`,
-  `levanteud.com` y `roigarena.com` sirven su calendario sin JavaScript, o si hace falta
-  Playwright como el resto de esta spec. Localizar fuente del calendario de carreras
-  (sin identificar todavía).
-- **`043`**: identificar la fuente primaria real detrás de `livetrafik.com` (hipótesis:
-  DGT) y verificar mecanismo técnico + condiciones de reuso antes de escribir ningún
-  código.
+- **`027` v4** y **`043`**: ya `Implemented` (2026-09-17) — siguiente paso real: **`044`**.
 - **`044`**: investigar si SAIH Júcar (`saih.chj.es`) publica datos abiertos/API o solo un
   visor web; confirmar endpoint de altimetría del IGN; decidir si "capacidad de absorción"
   tiene fuente viable o se descarta explícitamente.
