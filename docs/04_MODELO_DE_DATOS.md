@@ -202,7 +202,7 @@ erDiagram
 |---|---|---|
 | `Distrito` | código oficial municipal (natural, ya existe) | Estable, público, no lo inventamos nosotros. |
 | `Fuente` | slug estable (`dgt`, `avamet`, `open-meteo`, `ayto-valencia-geoportal`...) | Legible, no cambia, sirve de FK humano-legible. |
-| `Señal` | `id` surrogate (UUID) **+** `UNIQUE(fuente_id, id_origen)` | El id nativo de cada fuente (`id_incidencia`, `objectid` del tramo, `esta` de AVAMET...) se guarda tal cual en `id_origen` — el `UNIQUE` compuesto es lo que permite un `INSERT ... ON CONFLICT DO NOTHING` idempotente. **Esto resuelve directamente el bug de incidencias duplicadas encontrado en `047`** (la fuente repetía el mismo `id_incidencia` en varias features — con esta regla, la segunda inserción simplemente no duplica). |
+| `Señal` | `id` surrogate (UUID) **+** `id_origen` (natural de la fuente) **+** `UNIQUE(fuente_id, id_origen, observado_en)` | El id nativo de cada fuente (`id_incidencia`, `objectid` del tramo, `esta` de AVAMET...) se guarda tal cual en `id_origen`. **Corrección tras revisión senior (2026-09-17, ver §14)**: el `UNIQUE` va sobre `(fuente_id, id_origen, observado_en)`, no sobre `(fuente_id, id_origen)` a secas — esa versión anterior habría colapsado el histórico a una sola fila por entidad (perfecto para deduplicar duplicados *dentro de un mismo lote*, que es el bug real de `047`, pero incompatible con guardar la evolución de un mismo tramo/incidencia *a lo largo del tiempo*, que es el objetivo entero de tener histórico). La deduplicación intra-lote ya la hace `correlacion-senales.ts` en memoria antes de escribir (`deduplicarPorId`) — el `UNIQUE` de la tabla es solo una salvaguarda de idempotencia por si un mismo ciclo de escritura se reintenta, no un mecanismo para colapsar la serie temporal. |
 | `Asociación` | clave compuesta `(senal_id, asociada_id, criterio)` | Es una arista, no necesita id propio; la clave compuesta evita duplicar la misma arista dos veces. |
 | `Recomendación` | `id` surrogate (UUID) | No tiene identidad natural — es generada. |
 | `EventoProgramado` | slug de la URL de ficha (natural, ya existe y es estable) | Igual que `Distrito`: ya lo da la fuente, no hay que inventar nada. |
@@ -307,7 +307,7 @@ una implementación *en memoria* del concepto `Señal` de este documento — con
 
 | En código hoy (`047`) | En este modelo | Cambio necesario |
 |---|---|---|
-| `id: string` tipo `` `trafico:${id}` `` (compuesto, parseado por convención) | `id` (UUID) + `fuente_id` + `id_origen` (columnas separadas) | Separar en dos columnas reales — así el `UNIQUE(fuente_id, id_origen)` puede hacer su trabajo (§3), en vez de fiarnos de una convención de string. |
+| `id: string` tipo `` `trafico:${id}` `` (compuesto, parseado por convención) | `id` (UUID) + `fuente_id` + `id_origen` (columnas separadas) | Separar en dos columnas reales — así el `UNIQUE(fuente_id, id_origen, observado_en)` puede hacer su trabajo (§3) sin fiarnos de una convención de string. |
 | `fuenteSpec: string[]` (specs de este repo) | `fuente_id` (procedencia real) + `payload.fuenteSpec` (trazabilidad interna, opcional) | Añadir la columna que falta; lo que ya existe se conserva en `payload`, no se pierde. |
 | `relacionadas: string[]` | tabla `asociacion` | Dejar de calcular esto solo en memoria por request — persistirlo cuando se escriba la señal. |
 | `RecomendacionActuacion.situacionAsociada: string[]` | tabla `recomendacion_senal` | Mismo principio que arriba. |
@@ -365,13 +365,15 @@ create table senal (
   severidad text not null,        -- 'informativo' | 'aviso' | 'urgente'
   descripcion text not null,
   payload jsonb not null default '{}',
+  es_sintetico boolean not null default false,  -- CLAUDE.md §4: ninguna capa simulada se sirve sin marcarlo
   observado_en timestamptz not null,
   ingerido_en timestamptz not null default now(),
-  unique (fuente_id, id_origen)
+  unique (fuente_id, id_origen, observado_en)  -- idempotencia por reintento, NO dedup entre ciclos (ver §3/§14)
 );
 create index on senal (distrito_codigo, observado_en);
 create index on senal (calle, observado_en);
 create index on senal (dominio, severidad, observado_en);
+create index on senal (fuente_id, id_origen, observado_en desc);  -- "última fila conocida de esta entidad", para escritura por cambio de estado (§14)
 
 create table asociacion (
   senal_id uuid not null references senal(id) on delete cascade,
@@ -493,7 +495,79 @@ order by e.fecha_inicio desc;
   identifica a una persona o vehículo concreto, y `Recomendación` sigue siendo
   puramente advisoria.
 
-## 13. Siguiente paso
+## 13. Revisión senior (2026-09-17) — un bug de diseño corregido, y el potencial real
+
+Pedido explícito del usuario: revisar el modelo con criterio senior antes de tocar nada
+más. Dos tipos de hallazgo, distintos a propósito — uno es un error que había que corregir
+antes de construir nada encima, el otro es potencial que el modelo ya deja abierto sin
+necesitar rediseño.
+
+### 13.1 Corrección real: el `UNIQUE` original habría matado el histórico
+
+La primera versión de este documento (§3/§10) ponía `UNIQUE(fuente_id, id_origen)` en
+`senal`, pensado para resolver el bug real de `047` (la misma incidencia duplicada varias
+veces *dentro de un mismo lote*). Pero esa restricción, tal como estaba escrita, tiene un
+efecto secundario que contradice el propósito entero de esta tabla: con `ON CONFLICT` sobre
+esa clave, un tramo de tráfico que pasa por fluido→denso→congestionado→fluido a lo largo
+de un día solo dejaría **una fila**, la última — y la consulta de tendencia del §11 ("¿cómo
+ha evolucionado el tráfico este mes?") no tendría nada real que agregar. Se estaría
+construyendo, sin darse cuenta, un almacén de "último estado conocido" — que es exactamente
+lo que Redis ya hace — en vez de un histórico.
+
+**Corregido**: el `UNIQUE` pasa a `(fuente_id, id_origen, observado_en)` — permite (y
+espera) múltiples filas por entidad a lo largo del tiempo; solo actúa como salvaguarda de
+idempotencia si el mismo ciclo de escritura se reintenta. La deduplicación *intra-lote* que
+sí hacía falta para el bug de `047` ya vive donde tiene que vivir: en
+`correlacion-senales.ts` (`deduplicarPorId`), antes de que nada llegue a la base de datos.
+
+### 13.2 Refinamiento recomendado: escribir por cambio de estado, no por ciclo de sondeo
+
+Consecuencia directa de 13.1: si se inserta una fila cada vez que se recalcula `047`
+(cada 90 min), un tramo que lleva días "fluido" sin cambiar generaría cientos de filas
+idénticas — desperdicia el espacio limitado del free tier de Neon sin añadir información
+real. **Recomendación**: antes de insertar una `Señal`, comparar contra la última fila
+conocida para esa `(fuente_id, id_origen)` (el índice de §10 ya está pensado para esa
+consulta) y solo escribir si `severidad` o `descripcion` cambiaron, o si ha pasado más de
+un umbral razonable (p. ej. 24h) sin escribir nada — un "heartbeat" para saber que la
+fuente sigue viva. Esto es una decisión de la capa de escritura (el futuro
+`sintesis-ia-v2.ts` cuando implemente el histórico), no del esquema — no bloquea nada de
+lo ya construido.
+
+### 13.3 Corrección menor: falta el marcador de sintético
+
+`CLAUDE.md` §4 exige que ninguna capa con datos simulados se sirva sin marcarlo — el
+modelo no tenía dónde guardar eso. Añadido `es_sintetico boolean` a `senal` (§10).
+
+### 13.4 Potencial real que este modelo ya deja abierto, sin rediseñar nada
+
+- **Perfil "normal" por distrito/hora, y detectar cuándo algo se sale de lo normal.** Con
+  histórico real, Mirall puede dejar de mostrar solo lecturas absolutas ("3 de 26 tramos
+  congestionados") y empezar a comparar contra la media de ese distrito a esa hora/día de
+  la semana — "un 40% peor de lo habitual un jueves a las 18h" es mucho más útil para
+  "comprender qué está ocurriendo" (la misión declarada) que el número solo. Evolución
+  natural del motor de `024`, una vez haya semanas de datos reales.
+- **Puntuación de fiabilidad por fuente.** `ingerido_en` vs `observado_en` y el flag
+  `fresh` ya existen conceptualmente en todo el proyecto (stale-on-error) — con histórico,
+  se puede calcular y mostrar "esta fuente lleva fallando el 30% de las veces esta semana"
+  por `fuente`, algo que hoy se pierde en cuanto expira la caché en memoria.
+  Complementa Fuente sin añadir una entidad nueva.
+- **Reutilizar `senal`/`fuente` para la spec `046` (escorrentía)**, en vez de que
+  construya su propio almacén paralelo — el "riesgo de acumulación de agua por distrito"
+  encaja como `dominio = 'escorrentia'` dentro del mismo modelo, y hereda gratis la
+  correlación, el histórico y la trazabilidad de fuente que ya tiene todo lo demás.
+- **Contexto histórico real para las recomendaciones de `047`** (la v3 ya anotada en la
+  propia spec): en cuanto haya semanas de `senal` acumuladas, el prompt de
+  `sintesis-ia-v2.ts` puede incluir "la última vez que pasó algo parecido en este
+  distrito, la recomendación fue X" — esto es, literalmente, lo que el usuario pidió al
+  principio ("mejorar exponencialmente la capacidad de ofrecer recomendaciones") y es la
+  razón de fondo por la que merece la pena tener este histórico, no un efecto colateral.
+- **Base para una API/exportación pública de solo lectura.** La misión de Mirall habla de
+  "comprender qué está ocurriendo" — con datos que persisten de verdad (no solo en una
+  caché de 90 minutos), se vuelve viable ofrecer un histórico consultable a periodistas o
+  investigadores sin montar nada nuevo, solo exponiendo `senal` de forma controlada. No es
+  parte de esta ronda, pero es una opción real que antes no existía.
+
+## 14. Siguiente paso
 
 Este documento es el gate — antes de escribir la migración SQL real contra Neon:
 
