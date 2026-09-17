@@ -3,12 +3,22 @@
 ```yaml
 id: 047
 titulo: "Panel de síntesis IA dividido en dos cajas: señales detalladas correlacionadas y recomendaciones de actuación por zona"
-estado: Draft
+estado: Implemented   # v2 — correlación en caliente + recomendaciones IA verificadas en vivo; histórico en Postgres (ADR-006) sigue pendiente de aprovisionar
 tipo: capa
 depende_de: [004, 013, 024, 026, 027, 044, 045]
 propietario: ""
-version: 1
+version: 2
 ```
+
+> **v2 (2026-09-17)**: implementada y verificada en vivo la correlación en caliente
+> (`src/services/correlacion-senales.ts`) y las recomendaciones de actuación
+> (`src/services/sintesis-ia-v2.ts`, `src/server/sintesis-ia-v2.ts`), endpoint
+> `GET /api/sintesis/v2/actual`, dos cajas en `/inteligencia`
+> (`senales-ia-panel.ts`/`recomendaciones-actuacion-panel.ts`). **Pendiente
+> explícitamente**: la escritura en `senales_historico` (Postgres, `ADR-006`) — bloqueada
+> en crear el proyecto Neon/Supabase, paso que necesita al usuario. Sin esa pieza, todo lo
+> demás de esta spec (correlación, endpoint, dos cajas, guardrails) funciona igual — es
+> aditivo, no bloqueante (§7).
 
 > Sustituye/amplía `045` (no lo deprecamos: sigue `Implemented` como base — esta es la
 > siguiente versión de su mismo panel, prioridad explícita del usuario: "esa tarjeta la
@@ -165,24 +175,30 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
 
 ## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] `correlacion-senales.ts` probado con datos reales de al menos 3 fuentes distintas
-      correlacionadas por distrito/proximidad.
-- [ ] Endpoint `v2/actual` responde con el contrato de §3, con `relacionadas` no vacío en
-      al menos un caso real.
-- [ ] Las dos cajas se muestran separadas y con orden fijo en `/inteligencia` (señales
-      primero, recomendaciones después, o lado a lado según espacio disponible).
-- [ ] Cada recomendación pasa una verificación automática (test) de que su `texto`
-      contiene una fórmula condicional (lista cerrada: "podría", "conviene", "cabría",
-      "se sugiere valorar") — mismo patrón de guardrail por código, no solo por prompt,
-      que ya usa `041`.
-- [ ] Ninguna `SenalCorrelacionada`/`RecomendacionActuacion` contiene un identificador de
-      persona o vehículo — verificado por revisión manual del esquema (no hay campo para
-      ello, por diseño) más un test que rechace cualquier payload con matrícula/DNI-like.
+- [x] `correlacion-senales.ts` probado con datos reales de 3+ fuentes (tráfico, incidencias,
+      cámaras DGT — clima/eventos también cableados, sin señal activa en el momento de
+      verificar) correlacionadas por distrito/proximidad — 11 tests, y en vivo contra el
+      endpoint real (255 señales, tipos `trafico`/`incidencia`/`camara` presentes).
+- [x] Endpoint `v2/actual` responde con el contrato de §3, con `relacionadas` no vacío en
+      casos reales (verificado: un tramo cortado enlazado con decenas de incidencias reales
+      del mismo distrito).
+- [x] Las dos cajas se muestran separadas con orden fijo en `/inteligencia` (señales junto a
+      cámaras, recomendaciones justo debajo) — verificado en navegador, escritorio y móvil
+      (bottom sheet).
+- [x] Cada recomendación pasa una verificación automática (`esTextoCondicional`) de que su
+      `texto` contiene una fórmula condicional — mismo principio de guardrail por código que
+      ya usa `041`. Verificado con datos reales: 8/8 recomendaciones generadas en una
+      llamada real pasaron el filtro sin necesitar descartar ninguna.
+- [x] Ninguna `SenalCorrelacionada`/`RecomendacionActuacion` contiene un identificador de
+      persona o vehículo — sin campo para ello por diseño, más `contieneIdentificadorPersonal`
+      (test con matrícula/DNI-like simulados).
 - [ ] Escritura en `senales_historico` verificada con al menos una inserción y lectura
-      reales contra la instancia Postgres del usuario.
-- [ ] Advertencias visibles (banner general + línea de "no autoriza ninguna actuación")
+      reales contra la instancia Postgres del usuario — **pendiente**, bloqueado en crear el
+      proyecto Neon/Supabase (§7).
+- [x] Advertencias visibles (banner general + línea de "no autoriza ninguna actuación")
       verificadas en navegador.
-- [ ] `v1/actual` (`045`) sigue respondiendo sin cambios mientras `v2` se verifica.
+- [x] `v1/actual` (`045`) sigue respondiendo sin cambios mientras `v2` se verifica — no se
+      tocó `sintesis-ia.ts`.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -202,11 +218,26 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
   `generateObject` devolviera una relación no presente en `relacionadas`, se descarta esa
   recomendación (guardrail de esquema, mismo principio que `fuenteSpec` obligatorio en
   `045`).
-- **Fuera de alcance de v1**: usar el histórico para mejorar la calidad de las
+- **Fuera de alcance de v2**: usar el histórico para mejorar la calidad de las
   recomendaciones (few-shot con contexto pasado, detección de patrones recurrentes por
   calle) — eso es exactamente lo que pide el usuario a medio plazo ("mejorar
   exponencialmente"), pero necesita que el histórico lleve tiempo acumulando datos reales
-  antes de que tenga sentido diseñarlo. Se deja anotado como v2 de esta misma spec.
+  antes de que tenga sentido diseñarlo. Se deja anotado como v3 de esta misma spec.
+- **Calibrar severidad por `afectacion`, no por `tipo`** (hallazgo real, 2026-09-17): la
+  primera versión mapeaba `tipo === 'incidencias' → aviso`, pero los datos reales de vía
+  pública muestran que la inmensa mayoría de incidencias activas (de 498 totales) son
+  ocupaciones administrativas rutinarias de acera/zona de estacionamiento — irrelevantes
+  para una recomendación — independientemente de su `tipo`. Se cambió a analizar el texto
+  de `afectacion` (`100% CALZADA` → urgente, `CALZADA`/`CARRIL` → aviso, resto →
+  informativo), que sí distingue impacto real en calzada.
+- **Prompt/salida acotados por volumen real de Valencia** (hallazgo real, 2026-09-17): sin
+  límite, un solo distrito con obra larga fragmentada en muchos permisos generó un prompt
+  de 60 KB (con `gemini-3-flash-preview` respondiendo 503 "high demand" de forma
+  persistente); y con 12+ distritos activos a la vez, una respuesta completa superaba
+  `maxOutputTokens: 1024` y salía cortada (`finishReason: 'length'`). Se acotó a los 8
+  distritos más severos y a las 8 señales más severas por distrito (resumiendo el resto
+  como recuento, nunca omitiéndolo en silencio), y se subió `maxOutputTokens` a 4096. Con
+  ambos cambios, la llamada real generó 8/8 recomendaciones válidas sin cortes.
 - **Riesgo de deriva de uso**: el framing "interés policial"/"actuación policial" de esta
   spec no cambia ni relaja `CLAUDE.md` §4 en ningún despliegue — cualquier intervención real
   sigue el cauce legal normal (policía, protocolo, autorización judicial si aplica), fuera
@@ -219,3 +250,4 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1 | 2026-09-17 | Creación — inventario de fuentes ya `Implemented` con granularidad calle/punto (confirmado: no hace falta fuente nueva ni lectura de imagen del mapa), contrato de datos propuesto para dos cajas (señales/recomendaciones), esquema de histórico ligado a `ADR-006`. Sin implementar todavía. |
+| 2 | 2026-09-17 | **Implementado** — correlación en caliente (`correlacion-senales.ts`, 11 tests) y recomendaciones de actuación (`sintesis-ia-v2.ts`, 11 tests) sin esperar a Postgres, a petición explícita del usuario. Endpoint `GET /api/sintesis/v2/actual` registrado junto a `v1`. Dos cajas nuevas en `/inteligencia` (`senales-ia-panel.ts`, `recomendaciones-actuacion-panel.ts`), sustituyen la UI de `045` v1 (el endpoint `v1` se mantiene intacto). 3 bugs reales encontrados y corregidos en la verificación en vivo: duplicados de incidencias con el mismo id (una obra partida en varias features), severidad mal calibrada por `tipo` en vez de `afectacion`, y prompt/salida sin acotar que producía 503 por tamaño y respuestas cortadas por `maxOutputTokens`. Verificado con 8/8 recomendaciones reales válidas en una llamada, señales reales renderizadas en navegador (escritorio y móvil). 428/428 tests, `typecheck`/`build` verdes. Pendiente: escritura en `senales_historico` (bloqueada en crear el proyecto Postgres, `ADR-006`). |

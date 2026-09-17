@@ -69,7 +69,7 @@ export const UMBRAL_CALOR_SENSACION = 42;
 /** Banda de aviso más temprana — spec 013 v4b §9.2. */
 export const UMBRAL_CALOR_AVISO_TEMPERATURA = 35;
 const UMBRAL_FRIO_TEMPERATURA = 0;
-const UMBRAL_LLUVIA_MM = 5;
+export const UMBRAL_LLUVIA_MM = 5;
 /** Probabilidad de precipitación que dispara `lluvia-prevista` (regla blanda, v4b §9.2). Exportado — spec 010 v4 lo reutiliza para el escenario de lluvia. */
 export const UMBRAL_LLUVIA_PROB_PCT = 60;
 // Basado en rachas (vientoRachas), no en velocidad sostenida — más indicativo

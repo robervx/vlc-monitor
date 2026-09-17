@@ -55,7 +55,8 @@ import { buildActualidadRedesContent } from './ui/actualidad-redes';
 import { initRouter } from './ui/router';
 import { montarApoyoDecisionPanel } from './ui/apoyo-decision-panel';
 import { montarAltimetriaPanel, montarMeteoZonaPanel } from './ui/emergencia-meteo-panel';
-import { montarSintesisIaPanel } from './ui/sintesis-ia-panel';
+import { montarSenalesPanel } from './ui/senales-ia-panel';
+import { montarRecomendacionesPanel } from './ui/recomendaciones-actuacion-panel';
 import { buildProtocolosContent } from './ui/protocolos-panel';
 import { onPeticionCentrarMapa } from './ui/centrar-mapa';
 import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
@@ -2360,7 +2361,8 @@ async function main(): Promise<void> {
   montarCamarasDgtPanel();
   montarAltimetriaPanel();
   montarMeteoZonaPanel();
-  montarSintesisIaPanel();
+  montarSenalesPanel();
+  montarRecomendacionesPanel();
   onPeticionCentrarMapa(({ coordenadas, zoom }) => {
     map.flyTo({ center: coordenadas, zoom: zoom ?? map.getZoom() });
   });
@@ -2490,7 +2492,8 @@ async function main(): Promise<void> {
     'apoyo-decision-panel',
     'altimetria-panel',
     'meteo-zona-panel',
-    'sintesis-ia-panel',
+    'senales-ia-panel',
+    'recomendaciones-ia-panel',
     'protocolos-panel',
   ];
 

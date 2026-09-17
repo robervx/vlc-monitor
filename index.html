@@ -1626,7 +1626,8 @@
       #camaras-dgt-panel,
       #altimetria-panel,
       #meteo-zona-panel,
-      #sintesis-ia-panel {
+      #senales-ia-panel,
+      #recomendaciones-ia-panel {
         width: 320px;
         max-height: 70vh;
         display: flex;
@@ -1645,15 +1646,17 @@
       #camaras-dgt-panel[hidden],
       #altimetria-panel[hidden],
       #meteo-zona-panel[hidden],
-      #sintesis-ia-panel[hidden] {
+      #senales-ia-panel[hidden],
+      #recomendaciones-ia-panel[hidden] {
         display: none;
       }
 
       /* Orden de los bloques dentro de /inteligencia (pedido explícito del
          usuario, 2026-09-17; reordenado el mismo día) — cámaras primero (DGT
-         antes que ciudad), síntesis IA justo al lado (prioridad del usuario:
-         "esa tarjeta la vamos a poner la primera arriba, al lado de las
-         cámaras"), agenda, altimetría junto a lluvia/viento, actualidad
+         antes que ciudad), señales+recomendaciones IA justo al lado
+         (prioridad del usuario: "esa tarjeta la vamos a poner la primera
+         arriba, al lado de las cámaras" — spec 047 la dividió en dos cajas),
+         agenda, altimetría junto a lluvia/viento, actualidad
          institucional/apoyo a decisión después, contexto mediático relegado
          más abajo (mismo pedido), tendencia la última (de momento aporta
          poco, spec 025). Solo afecta al orden visual dentro del flex de
@@ -1664,35 +1667,40 @@
       :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-panel {
         order: 2;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #sintesis-ia-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #senales-ia-panel {
         order: 3;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #agenda-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #recomendaciones-ia-panel {
         order: 4;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #altimetria-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #agenda-panel {
         order: 5;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #meteo-zona-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #altimetria-panel {
         order: 6;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #actualidad-redes-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #meteo-zona-panel {
         order: 7;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #apoyo-decision-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #actualidad-redes-panel {
         order: 8;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #apoyo-decision-panel {
         order: 9;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #protocolos-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel {
         order: 10;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #tendencia-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #protocolos-panel {
         order: 11;
       }
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #tendencia-panel {
+        order: 12;
+      }
 
-      /* Spec 045 — panel de síntesis con IA (ADR-005) */
+      /* Spec 045/047 — advertencia de IA, compartida por síntesis v1 y por
+         la caja de recomendaciones v2 (mismo principio: nunca en letra
+         pequeña, CLAUDE.md §4). */
       .sintesis-ia__advertencia {
         margin: 8px;
         padding: 6px 8px;
@@ -1703,37 +1711,30 @@
         border-radius: 4px;
       }
 
-      .sintesis-ia__resumen {
-        margin: 0 8px 8px;
-        font-size: 13px;
-        color: #333;
-      }
-
-      .sintesis-ia__subtitulo {
-        margin: 8px 8px 4px;
-        font-size: 11px;
-        font-weight: 600;
+      /* Spec 047 — caja "Señales" (correlación determinista, sin IA). */
+      .senales-ia__vacio {
+        margin: 8px;
+        font-size: 12px;
         color: #666;
-        text-transform: uppercase;
       }
 
-      .sintesis-ia__item {
-        margin: 0 8px 6px;
+      .senales-ia__item {
+        margin: 8px 8px 6px;
         padding: 6px;
         border-left: 3px solid #ccc;
         background: #fafafa;
         font-size: 12px;
       }
 
-      .sintesis-ia__item--aviso {
+      .senales-ia__item--aviso {
         border-left-color: #d4a017;
       }
 
-      .sintesis-ia__item--urgente {
+      .senales-ia__item--urgente {
         border-left-color: #b03a2e;
       }
 
-      .sintesis-ia__severidad {
+      .senales-ia__tipo {
         display: inline-block;
         font-size: 9px;
         font-weight: 700;
@@ -1742,12 +1743,46 @@
         margin-right: 6px;
       }
 
-      .sintesis-ia__texto {
+      .senales-ia__texto {
         display: block;
         color: #333;
       }
 
-      .sintesis-ia__fuentes {
+      .senales-ia__fuentes {
+        display: block;
+        margin-top: 4px;
+      }
+
+      /* Spec 047 — caja "Recomendaciones de actuación" (IA, condicional). */
+      .recomendaciones-ia__vacio {
+        margin: 8px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .recomendaciones-ia__item {
+        margin: 0 8px 8px;
+        padding: 6px;
+        border-left: 3px solid #2563eb;
+        background: #f0f5ff;
+        font-size: 12px;
+      }
+
+      .recomendaciones-ia__zona {
+        display: block;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #2563eb;
+        margin-bottom: 2px;
+      }
+
+      .recomendaciones-ia__texto {
+        display: block;
+        color: #333;
+      }
+
+      .recomendaciones-ia__fuentes {
         display: block;
         margin-top: 4px;
       }
@@ -2545,7 +2580,8 @@
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
       :root[data-layout='movil'] #info-panels > #altimetria-panel,
       :root[data-layout='movil'] #info-panels > #meteo-zona-panel,
-      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel,
+      :root[data-layout='movil'] #info-panels > #senales-ia-panel,
+      :root[data-layout='movil'] #info-panels > #recomendaciones-ia-panel,
       :root[data-layout='movil'] #info-panels > #protocolos-panel,
       :root[data-layout='movil'] #info-panels > .info-panel {
         position: static !important;
@@ -2565,7 +2601,8 @@
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel,
       :root[data-layout='movil'] #info-panels > #altimetria-panel,
       :root[data-layout='movil'] #info-panels > #meteo-zona-panel,
-      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel,
+      :root[data-layout='movil'] #info-panels > #senales-ia-panel,
+      :root[data-layout='movil'] #info-panels > #recomendaciones-ia-panel,
       :root[data-layout='movil'] #info-panels > #protocolos-panel {
         display: flex !important;
       }
@@ -2578,7 +2615,8 @@
       :root[data-layout='movil'] #info-panels > #apoyo-decision-panel[hidden],
       :root[data-layout='movil'] #info-panels > #altimetria-panel[hidden],
       :root[data-layout='movil'] #info-panels > #meteo-zona-panel[hidden],
-      :root[data-layout='movil'] #info-panels > #sintesis-ia-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #senales-ia-panel[hidden],
+      :root[data-layout='movil'] #info-panels > #recomendaciones-ia-panel[hidden],
       :root[data-layout='movil'] #info-panels > #protocolos-panel[hidden] {
         display: none !important;
       }

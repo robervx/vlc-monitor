@@ -35,6 +35,7 @@ import meteoZona from '../src/server/meteo-zona';
 import pluviometrosSaih from '../src/server/pluviometros-saih';
 import altimetriaValencia from '../src/server/altimetria-valencia';
 import sintesisIa from '../src/server/sintesis-ia';
+import sintesisIaV2 from '../src/server/sintesis-ia-v2';
 import avametEstaciones from '../src/server/avamet-estaciones';
 import decisionSugerencias from '../src/server/decision-sugerencias';
 import authLogin from '../src/server/auth-login';
@@ -65,6 +66,7 @@ const RUTAS: Record<string, Handler> = {
   'emergencia/v1/pluviometros': pluviometrosSaih,
   'emergencia/v1/altimetria': altimetriaValencia,
   'sintesis/v1/actual': sintesisIa,
+  'sintesis/v2/actual': sintesisIaV2,
   'emergencia/v1/avamet': avametEstaciones,
   'decision/v1/sugerencias': decisionSugerencias,
   'auth/v1/login': authLogin,

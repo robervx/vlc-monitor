@@ -102179,9 +102179,9 @@ async function handler21() {
 var CACHE_KEY12 = "sintesis-ia:actual:v1";
 var TTL_MS14 = 90 * 60 * 1e3;
 var MODELO = "gemini-3-flash-preview";
-async function leerJson(handler27) {
+async function leerJson(handler28) {
   try {
-    const res = await handler27();
+    const res = await handler28();
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -102250,6 +102250,1132 @@ async function handler22() {
   }
 }
 
+// src/services/proximidad.ts
+var RADIO_TIERRA_M = 6371e3;
+function distanciaMetros(a, b) {
+  const rad = Math.PI / 180;
+  const [lon1, lat1] = a;
+  const [lon2, lat2] = b;
+  const dLat = (lat2 - lat1) * rad;
+  const dLon = (lon2 - lon1) * rad;
+  const lat1r = lat1 * rad;
+  const lat2r = lat2 * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1r) * Math.cos(lat2r) * Math.sin(dLon / 2) ** 2;
+  return 2 * RADIO_TIERRA_M * Math.asin(Math.sqrt(Math.min(1, h)));
+}
+
+// src/services/correlacion-senales.ts
+var RADIO_CAMARA_METROS = 500;
+var VENTANA_EVENTOS_HORAS = 48;
+var ETIQUETA_INCIDENCIA = {
+  obras: "Obra",
+  incidencias: "Incidencia",
+  festejos: "Festejo"
+};
+function severidadTrafico(estado) {
+  if (estado === "denso") return "informativo";
+  if (estado === "congestionado") return "aviso";
+  if (estado === "cortado") return "urgente";
+  return null;
+}
+function correlacionarTrafico(tramos, fetchedAt) {
+  const salida = [];
+  for (const t of tramos) {
+    const severidad = severidadTrafico(t.estado);
+    if (!severidad) continue;
+    const [lon, lat] = puntoMedio(t.geometry);
+    salida.push({
+      id: `trafico:${t.id}`,
+      tipo: "trafico",
+      distritoCodigo: t.distrito,
+      calle: t.nombre,
+      lat,
+      lon,
+      descripcion: `Tr\xE1fico ${t.estado} en ${t.nombre}${t.esPasoInferior ? " (paso inferior)" : ""}.`,
+      severidad,
+      relacionadas: [],
+      observedAt: t.observedAt,
+      fetchedAt,
+      fuenteSpec: ["004"]
+    });
+  }
+  return salida;
+}
+function deduplicarPorId(incidencias) {
+  const vistos = /* @__PURE__ */ new Map();
+  for (const i of incidencias) {
+    if (!vistos.has(i.id)) vistos.set(i.id, i);
+  }
+  return [...vistos.values()];
+}
+function severidadIncidencia(i) {
+  const afectacion = i.afectacion.toUpperCase();
+  if (/100\s*%\s*CALZADA/.test(afectacion)) return "urgente";
+  if (/CALZADA|CARRIL/.test(afectacion)) return "aviso";
+  return "informativo";
+}
+function correlacionarIncidencias(incidenciasCrudas, fetchedAt) {
+  const incidencias = deduplicarPorId(incidenciasCrudas);
+  return incidencias.map((i) => ({
+    id: `incidencia:${i.id}`,
+    tipo: "incidencia",
+    distritoCodigo: i.distritoCodigo,
+    calle: i.calle,
+    lat: i.lat,
+    lon: i.lon,
+    descripcion: `${ETIQUETA_INCIDENCIA[i.tipo]} en ${i.calle}: ${i.descripcion} (${i.afectacion}).`,
+    severidad: severidadIncidencia(i),
+    relacionadas: [],
+    observedAt: i.vigenciaDesde,
+    fetchedAt,
+    fuenteSpec: ["026"]
+  }));
+}
+function severidadClima(d) {
+  if (d.rachaKmh >= UMBRAL_VIENTO_URGENTE_KMH || d.precipitacionMm >= UMBRAL_LLUVIA_MM * 2) return "urgente";
+  if (d.rachaKmh >= UMBRAL_VIENTO_AVISO_KMH || d.precipitacionMm >= UMBRAL_LLUVIA_MM) return "aviso";
+  return null;
+}
+function correlacionarClima(distritos2, fetchedAt) {
+  const salida = [];
+  for (const d of distritos2) {
+    const severidad = severidadClima(d);
+    if (!severidad) continue;
+    salida.push({
+      id: `clima:${d.distritoCodigo}`,
+      tipo: "clima",
+      distritoCodigo: d.distritoCodigo,
+      calle: null,
+      lat: null,
+      lon: null,
+      descripcion: `${d.distritoNombre}: ${d.precipitacionMm} mm de precipitaci\xF3n, viento ${d.vientoKmh} km/h (rachas ${d.rachaKmh} km/h).`,
+      severidad,
+      relacionadas: [],
+      observedAt: d.fecha,
+      fetchedAt,
+      fuenteSpec: ["044"]
+    });
+  }
+  return salida;
+}
+function correlacionarEventos(eventos, ahora, fetchedAt, ventanaHoras = VENTANA_EVENTOS_HORAS) {
+  const limite = new Date(ahora.getTime() + ventanaHoras * 60 * 60 * 1e3);
+  const salida = [];
+  for (const e of eventos) {
+    if (!e.impactoViaPublica) continue;
+    const inicio = new Date(e.fechaInicio);
+    const fin = new Date(e.fechaFin);
+    if (!(fin >= ahora && inicio <= limite)) continue;
+    for (const mencion of e.distritosMencionados) {
+      if (mencion.bajaConfianza) continue;
+      salida.push({
+        id: `evento:${e.id}:${mencion.distritoCodigo}`,
+        tipo: "evento",
+        distritoCodigo: mencion.distritoCodigo,
+        calle: null,
+        lat: null,
+        lon: null,
+        descripcion: `${e.titulo} (${mencion.distritoNombre}), ${e.fechaInicio.slice(0, 10)}\u2013${e.fechaFin.slice(0, 10)}.`,
+        severidad: "informativo",
+        relacionadas: [],
+        observedAt: e.fechaInicio,
+        fetchedAt,
+        fuenteSpec: ["027"]
+      });
+    }
+  }
+  return salida;
+}
+function enlazarPorDistrito(senales) {
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const s of senales) {
+    if (!s.distritoCodigo) continue;
+    const lista = porDistrito.get(s.distritoCodigo) ?? [];
+    lista.push(s);
+    porDistrito.set(s.distritoCodigo, lista);
+  }
+  return senales.map((s) => {
+    if (!s.distritoCodigo) return s;
+    const relacionadas = (porDistrito.get(s.distritoCodigo) ?? []).filter((otra) => otra.id !== s.id).map((otra) => otra.id);
+    return relacionadas.length ? { ...s, relacionadas } : s;
+  });
+}
+function correlacionarCamaras(camaras, senalesConDistrito, fetchedAt) {
+  const conCoordenadas = senalesConDistrito.filter((s) => s.lat !== null && s.lon !== null);
+  const salida = [];
+  for (const c of camaras) {
+    const punto = [c.lon, c.lat];
+    const cercanas = conCoordenadas.filter((s) => distanciaMetros(punto, [s.lon, s.lat]) <= RADIO_CAMARA_METROS);
+    if (cercanas.length === 0) continue;
+    salida.push({
+      id: `camara:${c.id}`,
+      tipo: "camara",
+      distritoCodigo: cercanas[0].distritoCodigo,
+      calle: c.carretera,
+      lat: c.lat,
+      lon: c.lon,
+      descripcion: `C\xE1mara DGT en ${c.carretera} (PK ${c.pk}, sentido ${c.sentido}), a menos de ${RADIO_CAMARA_METROS} m de ${cercanas.length} se\xF1al(es) activa(s).`,
+      severidad: "informativo",
+      relacionadas: cercanas.map((s) => s.id),
+      observedAt: fetchedAt,
+      fetchedAt,
+      fuenteSpec: ["043"]
+    });
+  }
+  return salida;
+}
+function correlacionarSenales(entrada, ahora = /* @__PURE__ */ new Date()) {
+  const fetchedAt = ahora.toISOString();
+  const base = [
+    ...correlacionarTrafico(entrada.tramos, fetchedAt),
+    ...correlacionarIncidencias(entrada.incidencias, fetchedAt),
+    ...correlacionarClima(entrada.climaDistritos, fetchedAt),
+    ...correlacionarEventos(entrada.eventos, ahora, fetchedAt)
+  ];
+  const conDistrito = enlazarPorDistrito(base);
+  const camaras = correlacionarCamaras(entrada.camaras, conDistrito, fetchedAt);
+  return [...conDistrito, ...camaras];
+}
+
+// src/services/sintesis-ia-v2.ts
+var RecomendacionActuacionSchema = external_exports.object({
+  distritoCodigo: external_exports.string().nullable(),
+  zona: external_exports.string().min(1),
+  situacionAsociada: external_exports.array(external_exports.string()).min(1),
+  texto: external_exports.string().min(1),
+  tipoActuacionSugerida: external_exports.enum(["informativa", "coordinacion-protocolo", "revision-tecnica", "refuerzo-preventivo"])
+});
+var RecomendacionesSchema = external_exports.object({
+  recomendaciones: external_exports.array(RecomendacionActuacionSchema)
+});
+var ADVERTENCIA_RECOMENDACION = "Generado por IA a partir de se\xF1ales del producto \u2014 no sustituye al criterio profesional ni autoriza ninguna actuaci\xF3n por s\xED sola.";
+var INSTRUCCIONES_SISTEMA_RECOMENDACIONES = `Eres un asistente de s\xEDntesis para un panel de inteligencia urbana de Valencia
+(proyecto Mirall). Recibes se\xF1ales ya correlacionadas (tr\xE1fico, incidencias, clima,
+eventos, c\xE1maras) agrupadas por distrito. Tu \xFAnica tarea es redactar, para cada
+distrito con se\xF1ales relevantes, una recomendaci\xF3n de actuaci\xF3n breve.
+
+Reglas estrictas, sin excepci\xF3n:
+1. El texto de cada recomendaci\xF3n debe estar SIEMPRE en condicional \u2014 usa f\xF3rmulas
+   como "podr\xEDa valorarse", "conviene monitorizar", "cabr\xEDa revisar". Nunca una
+   orden ("hay que", "debe", "cortar", "enviar").
+2. Nunca menciones a una persona, veh\xEDculo, matr\xEDcula o identificador individual.
+   Todas las se\xF1ales son de infraestructura p\xFAblica (calles, distritos, eventos
+   programados) \u2014 la recomendaci\xF3n tambi\xE9n debe quedarse en ese nivel.
+3. En "situacionAsociada" usa EXCLUSIVAMENTE los ids de se\xF1al que se te han dado,
+   tal cual. No inventes relaciones ni ids nuevos.
+4. Si un distrito no tiene ninguna se\xF1al de severidad "aviso" o "urgente", no le
+   generes ninguna recomendaci\xF3n.
+5. M\xE1ximo una recomendaci\xF3n por distrito.`;
+function etiquetaSeveridad(s) {
+  return s === "urgente" ? "URGENTE" : s === "aviso" ? "aviso" : "informativo";
+}
+var ORDEN_SEVERIDAD = { urgente: 0, aviso: 1, informativo: 2 };
+var MAX_SENALES_POR_DISTRITO_EN_PROMPT = 8;
+var MAX_DISTRITOS_EN_PROMPT = 8;
+function severidadMaxima(lista) {
+  return Math.min(...lista.map((s) => ORDEN_SEVERIDAD[s.severidad]));
+}
+function construirPromptRecomendaciones(senales) {
+  const porDistrito = /* @__PURE__ */ new Map();
+  for (const s of senales) {
+    if (!s.distritoCodigo || s.tipo === "camara") continue;
+    const lista = porDistrito.get(s.distritoCodigo) ?? [];
+    lista.push(s);
+    porDistrito.set(s.distritoCodigo, lista);
+  }
+  const distritosConRelevancia = [...porDistrito.entries()].map(([distrito, lista]) => ({ distrito, lista, relevantes: lista.filter((s) => s.severidad !== "informativo") })).filter((d) => d.relevantes.length > 0).sort((a, b) => severidadMaxima(a.relevantes) - severidadMaxima(b.relevantes));
+  const distritosOmitidos = distritosConRelevancia.length - MAX_DISTRITOS_EN_PROMPT;
+  const bloques = [];
+  for (const { distrito, relevantes } of distritosConRelevancia.slice(0, MAX_DISTRITOS_EN_PROMPT)) {
+    const ordenadas = relevantes.sort((a, b) => ORDEN_SEVERIDAD[a.severidad] - ORDEN_SEVERIDAD[b.severidad]);
+    const incluidas = ordenadas.slice(0, MAX_SENALES_POR_DISTRITO_EN_PROMPT);
+    const restantes = ordenadas.length - incluidas.length;
+    const lineas = incluidas.map((s) => `  - [${s.id}] (${etiquetaSeveridad(s.severidad)}) ${s.descripcion}`).join("\n");
+    const nota = restantes > 0 ? `
+  (+ ${restantes} se\xF1al(es) m\xE1s de severidad aviso/urgente en este distrito, no mostradas aqu\xED)` : "";
+    bloques.push(`Distrito ${distrito}:
+${lineas}${nota}`);
+  }
+  if (bloques.length === 0) {
+    return 'No hay se\xF1ales de severidad aviso/urgente en ning\xFAn distrito ahora mismo. Devuelve "recomendaciones": [].';
+  }
+  const notaDistritos = distritosOmitidos > 0 ? `
+
+(Hay ${distritosOmitidos} distrito(s) adicional(es) con se\xF1ales de severidad aviso/urgente no incluidos aqu\xED por espacio \u2014 prioriza los mostrados, no los inventes.)` : "";
+  return `Se\xF1ales correlacionadas por distrito:
+
+${bloques.join("\n\n")}${notaDistritos}
+
+Genera las recomendaciones siguiendo las reglas del sistema.`;
+}
+var MARCADORES_CONDICIONALES = ["podr\xEDa", "podr\xEDan", "conviene", "convendr\xEDa", "cabr\xEDa", "valorar"];
+function esTextoCondicional(texto) {
+  const normalizado = texto.toLowerCase();
+  return MARCADORES_CONDICIONALES.some((m) => normalizado.includes(m));
+}
+var PATRON_MATRICULA = /\b\d{4}[ -]?[BCDFGHJKLMNPRSTVWXYZ]{3}\b/i;
+var PATRON_DNI = /\b\d{8}[ -]?[A-Z]\b/i;
+function contieneIdentificadorPersonal(texto) {
+  return PATRON_MATRICULA.test(texto) || PATRON_DNI.test(texto);
+}
+function filtrarRecomendacionesValidas(recomendaciones, senalesPorId) {
+  return recomendaciones.filter((r) => {
+    if (!esTextoCondicional(r.texto)) return false;
+    if (contieneIdentificadorPersonal(r.texto)) return false;
+    if (r.situacionAsociada.length === 0) return false;
+    if (!r.situacionAsociada.every((id) => senalesPorId.has(id))) return false;
+    return true;
+  });
+}
+
+// data/camaras-dgt-valencia.json
+var camaras_dgt_valencia_default = [
+  {
+    id: "112",
+    carretera: "A-3",
+    pk: "336.6",
+    sentido: "+",
+    lat: 39.47387778,
+    lon: -0.58961667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/112.jpg"
+  },
+  {
+    id: "113",
+    carretera: "A-3",
+    pk: "341.799",
+    sentido: "+",
+    lat: 39.4713,
+    lon: -0.53182778,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/113.jpg"
+  },
+  {
+    id: "114",
+    carretera: "A-3",
+    pk: "345.7",
+    sentido: "+",
+    lat: 39.47512222,
+    lon: -0.48474444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/114.jpg"
+  },
+  {
+    id: "115",
+    carretera: "A-3",
+    pk: "348.2",
+    sentido: "-",
+    lat: 39.48198056,
+    lon: -0.45796389,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/115.jpg"
+  },
+  {
+    id: "116",
+    carretera: "A-3",
+    pk: "351.6",
+    sentido: "-",
+    lat: 39.47039,
+    lon: -0.42516,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/116.jpg"
+  },
+  {
+    id: "135",
+    carretera: "A-7",
+    pk: "306.9",
+    sentido: "+",
+    lat: 39.63250278,
+    lon: -0.30326667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/135.jpg"
+  },
+  {
+    id: "136",
+    carretera: "A-7",
+    pk: "311.5",
+    sentido: "-",
+    lat: 39.60925833,
+    lon: -0.34463056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/136.jpg"
+  },
+  {
+    id: "137",
+    carretera: "A-7",
+    pk: "315.35",
+    sentido: "-",
+    lat: 39.58895,
+    lon: -0.38313056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/137.jpg"
+  },
+  {
+    id: "138",
+    carretera: "A-7",
+    pk: "321.2",
+    sentido: "-",
+    lat: 39.55815556,
+    lon: -0.43088056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/138.jpg"
+  },
+  {
+    id: "139",
+    carretera: "A-7",
+    pk: "324.08",
+    sentido: "+",
+    lat: 39.53983889,
+    lon: -0.45343889,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/139.jpg"
+  },
+  {
+    id: "140",
+    carretera: "A-7",
+    pk: "327.0",
+    sentido: "-",
+    lat: 39.52108333,
+    lon: -0.47518889,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/140.jpg"
+  },
+  {
+    id: "141",
+    carretera: "A-7",
+    pk: "330.4",
+    sentido: "+",
+    lat: 39.50828889,
+    lon: -0.50932222,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/141.jpg"
+  },
+  {
+    id: "142",
+    carretera: "A-7",
+    pk: "336.1",
+    sentido: "+",
+    lat: 39.47239722,
+    lon: -0.54955556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/142.jpg"
+  },
+  {
+    id: "143",
+    carretera: "A-7",
+    pk: "340.9",
+    sentido: "-",
+    lat: 39.43598333,
+    lon: -0.53665,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/143.jpg"
+  },
+  {
+    id: "144",
+    carretera: "A-7",
+    pk: "343.785",
+    sentido: "-",
+    lat: 39.41709722,
+    lon: -0.5093,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/144.jpg"
+  },
+  {
+    id: "145",
+    carretera: "A-7",
+    pk: "348.0",
+    sentido: "+",
+    lat: 39.38685,
+    lon: -0.47769444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/145.jpg"
+  },
+  {
+    id: "146",
+    carretera: "A-7",
+    pk: "350.8",
+    sentido: "-",
+    lat: 39.37121944,
+    lon: -0.45416667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/146.jpg"
+  },
+  {
+    id: "167",
+    carretera: "CV-500",
+    pk: "0.5",
+    sentido: "-",
+    lat: 39.4287,
+    lon: -0.34130556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/167.jpg"
+  },
+  {
+    id: "168",
+    carretera: "CV-500",
+    pk: "0.75",
+    sentido: "-",
+    lat: 39.42658333,
+    lon: -0.34181667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168.jpg"
+  },
+  {
+    id: "169",
+    carretera: "CV-500",
+    pk: "2.9",
+    sentido: "+",
+    lat: 39.40774444,
+    lon: -0.33716111,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/169.jpg"
+  },
+  {
+    id: "170",
+    carretera: "CV-500",
+    pk: "4.9",
+    sentido: "+",
+    lat: 39.38999722,
+    lon: -0.33471944,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/170.jpg"
+  },
+  {
+    id: "171",
+    carretera: "CV-500",
+    pk: "6.5",
+    sentido: "-",
+    lat: 39.37653056,
+    lon: -0.33154444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/171.jpg"
+  },
+  {
+    id: "175",
+    carretera: "A-7",
+    pk: "357.05",
+    sentido: "-",
+    lat: 39.32490278,
+    lon: -0.43554167,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/175.jpg"
+  },
+  {
+    id: "176",
+    carretera: "V-21",
+    pk: "5.1",
+    sentido: "+",
+    lat: 39.58636111,
+    lon: -0.29431111,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/176.jpg"
+  },
+  {
+    id: "177",
+    carretera: "V-21",
+    pk: "8.95",
+    sentido: "-",
+    lat: 39.55166667,
+    lon: -0.29722778,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/177.jpg"
+  },
+  {
+    id: "178",
+    carretera: "V-21",
+    pk: "14.3",
+    sentido: "-",
+    lat: 39.50861944,
+    lon: -0.32485,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/178.jpg"
+  },
+  {
+    id: "180",
+    carretera: "V-30",
+    pk: "1.6",
+    sentido: "+",
+    lat: 39.43454444,
+    lon: -0.35750556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/180.jpg"
+  },
+  {
+    id: "181",
+    carretera: "V-30",
+    pk: "2.7",
+    sentido: "-",
+    lat: 39.43364722,
+    lon: -0.37124167,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/181.jpg"
+  },
+  {
+    id: "182",
+    carretera: "V-30",
+    pk: "4.4",
+    sentido: "+",
+    lat: 39.43827222,
+    lon: -0.38944444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/182.jpg"
+  },
+  {
+    id: "183",
+    carretera: "V-30",
+    pk: "4.9",
+    sentido: "-",
+    lat: 39.43801944,
+    lon: -0.396525,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/183.jpg"
+  },
+  {
+    id: "184",
+    carretera: "V-30",
+    pk: "6.8",
+    sentido: "+",
+    lat: 39.45262222,
+    lon: -0.40893333,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/184.jpg"
+  },
+  {
+    id: "185",
+    carretera: "V-30",
+    pk: "10.2",
+    sentido: "+",
+    lat: 39.47973333,
+    lon: -0.428725,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/185.jpg"
+  },
+  {
+    id: "186",
+    carretera: "V-30",
+    pk: "11.0",
+    sentido: "+",
+    lat: 39.48726944,
+    lon: -0.43405,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/186.jpg"
+  },
+  {
+    id: "187",
+    carretera: "V-30",
+    pk: "14.55",
+    sentido: "+",
+    lat: 39.5064,
+    lon: -0.46074722,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/187.jpg"
+  },
+  {
+    id: "188",
+    carretera: "V-30",
+    pk: "16.0",
+    sentido: "+",
+    lat: 39.51336667,
+    lon: -0.47700556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/188.jpg"
+  },
+  {
+    id: "189",
+    carretera: "V-31",
+    pk: "0.82",
+    sentido: "+",
+    lat: 39.34898333,
+    lon: -0.42906667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/189.jpg"
+  },
+  {
+    id: "190",
+    carretera: "V-31",
+    pk: "2.6",
+    sentido: "+",
+    lat: 39.36448056,
+    lon: -0.42607222,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/190.jpg"
+  },
+  {
+    id: "191",
+    carretera: "V-31",
+    pk: "6.8",
+    sentido: "+",
+    lat: 39.38742778,
+    lon: -0.39559444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/191.jpg"
+  },
+  {
+    id: "523",
+    carretera: "V-15",
+    pk: "2.8",
+    sentido: "-",
+    lat: 39.40878056,
+    lon: -0.33716111,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/523.jpg"
+  },
+  {
+    id: "1089",
+    carretera: "V-31",
+    pk: "4.85",
+    sentido: "+",
+    lat: 39.376125,
+    lon: -0.41188889,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1089.jpg"
+  },
+  {
+    id: "1350",
+    carretera: "CV-30",
+    pk: "1.5",
+    sentido: "-",
+    lat: 39.4943,
+    lon: -0.42611,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1350.jpg"
+  },
+  {
+    id: "1351",
+    carretera: "CV-30",
+    pk: "2.95",
+    sentido: "-",
+    lat: 39.49676,
+    lon: -0.41109,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1351.jpg"
+  },
+  {
+    id: "1352",
+    carretera: "CV-365",
+    pk: "0.9",
+    sentido: "+",
+    lat: 39.50843611,
+    lon: -0.43383611,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1352.jpg"
+  },
+  {
+    id: "1353",
+    carretera: "CV-365",
+    pk: "2.4",
+    sentido: "-",
+    lat: 39.51151667,
+    lon: -0.44693056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1353.jpg"
+  },
+  {
+    id: "1354",
+    carretera: "N-220",
+    pk: "0.15",
+    sentido: "+",
+    lat: 39.50523333,
+    lon: -0.46253611,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1354.jpg"
+  },
+  {
+    id: "1471",
+    carretera: "V-21",
+    pk: "11.0",
+    sentido: "+",
+    lat: 39.53540833,
+    lon: -0.30873611,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1471.jpg"
+  },
+  {
+    id: "1472",
+    carretera: "V-21",
+    pk: "0.15",
+    sentido: "-",
+    lat: 39.62945278,
+    lon: -0.30032222,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1472.jpg"
+  },
+  {
+    id: "1473",
+    carretera: "V-30",
+    pk: "7.6",
+    sentido: "-",
+    lat: 39.458275,
+    lon: -0.41580278,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1473.jpg"
+  },
+  {
+    id: "1474",
+    carretera: "V-30",
+    pk: "2.7",
+    sentido: "+",
+    lat: 39.43675833,
+    lon: -0.3701,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1474.jpg"
+  },
+  {
+    id: "1475",
+    carretera: "A-7",
+    pk: "354.006",
+    sentido: "+",
+    lat: 39.34973889,
+    lon: -0.43031944,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1475.jpg"
+  },
+  {
+    id: "1580",
+    carretera: "V-23",
+    pk: "1.0",
+    sentido: "+",
+    lat: 39.63475833,
+    lon: -0.29559722,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1580.jpg"
+  },
+  {
+    id: "1603",
+    carretera: "V-31",
+    pk: "8.5",
+    sentido: "+",
+    lat: 39.40139722,
+    lon: -0.38631389,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1603.jpg"
+  },
+  {
+    id: "1604",
+    carretera: "V-31",
+    pk: "9.8",
+    sentido: "+",
+    lat: 39.41150556,
+    lon: -0.37952778,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1604.jpg"
+  },
+  {
+    id: "1607",
+    carretera: "V-31",
+    pk: "11.2",
+    sentido: "+",
+    lat: 39.42320833,
+    lon: -0.37383611,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1607.jpg"
+  },
+  {
+    id: "1635",
+    carretera: "CV-33",
+    pk: "0.5",
+    sentido: "+",
+    lat: 39.38908333,
+    lon: -0.40311667,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1635.jpg"
+  },
+  {
+    id: "1636",
+    carretera: "CV-33",
+    pk: "3.0",
+    sentido: "+",
+    lat: 39.40148056,
+    lon: -0.42355556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1636.jpg"
+  },
+  {
+    id: "1637",
+    carretera: "CV-33",
+    pk: "6.0",
+    sentido: "+",
+    lat: 39.42101667,
+    lon: -0.44658056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1637.jpg"
+  },
+  {
+    id: "1638",
+    carretera: "CV-36",
+    pk: "2.2",
+    sentido: "-",
+    lat: 39.44062222,
+    lon: -0.42755,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1638.jpg"
+  },
+  {
+    id: "1639",
+    carretera: "CV-36",
+    pk: "3.5",
+    sentido: "+",
+    lat: 39.44002222,
+    lon: -0.44230556,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1639.jpg"
+  },
+  {
+    id: "1640",
+    carretera: "CV-36",
+    pk: "6.5",
+    sentido: "+",
+    lat: 39.446475,
+    lon: -0.47419444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1640.jpg"
+  },
+  {
+    id: "1641",
+    carretera: "CV-36",
+    pk: "8.0",
+    sentido: "-",
+    lat: 39.44409722,
+    lon: -0.49106944,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1641.jpg"
+  },
+  {
+    id: "1642",
+    carretera: "CV-36",
+    pk: "10.2",
+    sentido: "-",
+    lat: 39.44364444,
+    lon: -0.51603056,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1642.jpg"
+  },
+  {
+    id: "1643",
+    carretera: "CV-36",
+    pk: "12.57",
+    sentido: "-",
+    lat: 39.439925,
+    lon: -0.5362,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1643.jpg"
+  },
+  {
+    id: "1645",
+    carretera: "CV-410",
+    pk: "3.9",
+    sentido: "-",
+    lat: 39.46973611,
+    lon: -0.47579444,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/1645.jpg"
+  },
+  {
+    id: "164259",
+    carretera: "A-3",
+    pk: "340.0",
+    sentido: "+",
+    lat: 39.47244,
+    lon: -0.54962,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/164259.jpg"
+  },
+  {
+    id: "164260",
+    carretera: "A-3",
+    pk: "340.0",
+    sentido: "-",
+    lat: 39.47244,
+    lon: -0.54962,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/164260.jpg"
+  },
+  {
+    id: "164261",
+    carretera: "A-7",
+    pk: "336.1",
+    sentido: "+",
+    lat: 39.47244,
+    lon: -0.54962,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/164261.jpg"
+  },
+  {
+    id: "164262",
+    carretera: "A-7",
+    pk: "336.1",
+    sentido: "-",
+    lat: 39.47244,
+    lon: -0.54962,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/164262.jpg"
+  },
+  {
+    id: "167446",
+    carretera: "V-21",
+    pk: "16.3",
+    sentido: "+",
+    lat: 39.49361,
+    lon: -0.33199,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/167446.jpg"
+  },
+  {
+    id: "168255",
+    carretera: "A-7",
+    pk: "334.85",
+    sentido: "+",
+    lat: 39.48271,
+    lon: -0.54507,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168255.jpg"
+  },
+  {
+    id: "168275",
+    carretera: "V-21",
+    pk: "12.0",
+    sentido: "-",
+    lat: 39.52736,
+    lon: -0.31388,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168275.jpg"
+  },
+  {
+    id: "168276",
+    carretera: "V-21",
+    pk: "13.15",
+    sentido: "-",
+    lat: 39.51891,
+    lon: -0.31929,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168276.jpg"
+  },
+  {
+    id: "168277",
+    carretera: "V-21",
+    pk: "15.9",
+    sentido: "-",
+    lat: 39.4952,
+    lon: -0.32826,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168277.jpg"
+  },
+  {
+    id: "168278",
+    carretera: "V-21",
+    pk: "16.75",
+    sentido: "+",
+    lat: 39.49142,
+    lon: -0.33593,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/168278.jpg"
+  },
+  {
+    id: "169217",
+    carretera: "A-7",
+    pk: "319.0",
+    sentido: "+",
+    lat: 39.57705,
+    lon: -0.42065,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/169217.jpg"
+  },
+  {
+    id: "169218",
+    carretera: "A-7",
+    pk: "332.9",
+    sentido: "-",
+    lat: 39.49623,
+    lon: -0.53123,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/169218.jpg"
+  },
+  {
+    id: "176526",
+    carretera: "A-3",
+    pk: "349.9",
+    sentido: "+",
+    lat: 39.47512,
+    lon: -0.43988,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/176526.jpg"
+  },
+  {
+    id: "178506",
+    carretera: "V-30",
+    pk: "9.0",
+    sentido: "+",
+    lat: 39.4687988,
+    lon: -0.4204635,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/178506.jpg"
+  },
+  {
+    id: "178574",
+    carretera: "A-3",
+    pk: "343,6",
+    sentido: "+",
+    lat: 39.472328,
+    lon: -0.507581,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/178574.jpg"
+  },
+  {
+    id: "181921",
+    carretera: "V-31",
+    pk: "13.6",
+    sentido: "-",
+    lat: 39.44448056,
+    lon: -0.36925278,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/181921.jpg"
+  },
+  {
+    id: "186230",
+    carretera: "A-3",
+    pk: "349.9",
+    sentido: "+",
+    lat: 39.47512,
+    lon: -0.43988,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/186230.jpg"
+  },
+  {
+    id: "176530",
+    carretera: "A-7",
+    pk: "316.51",
+    sentido: "-",
+    lat: 39.58612778,
+    lon: -0.39649722,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/176530.jpg"
+  },
+  {
+    id: "176537",
+    carretera: "AP-7",
+    pk: "529.01",
+    sentido: "-",
+    lat: 39.33476111,
+    lon: -0.42187778,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/176537.jpg"
+  },
+  {
+    id: "187251",
+    carretera: "A-3",
+    pk: "335.100",
+    sentido: "-",
+    lat: 39.474578,
+    lon: -0.606628,
+    imagenUrl: "https://etraffic.dgt.es/camarasEtraffic/187251.jpg"
+  }
+];
+
+// src/server/sintesis-ia-v2.ts
+var CACHE_KEY13 = "sintesis-ia:v2:actual";
+var TTL_MS15 = 90 * 60 * 1e3;
+var MODELO2 = "gemini-3-flash-preview";
+async function leerJson2(handler28) {
+  try {
+    const res = await handler28();
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Fuente de correlaci\xF3n de se\xF1ales no disponible:", err);
+    return null;
+  }
+}
+async function construirSenales() {
+  const [trafico, incidencias, meteoZona, agenda] = await Promise.all([
+    leerJson2(handler5),
+    leerJson2(handler14),
+    leerJson2(handler18),
+    leerJson2(handler17)
+  ]);
+  return correlacionarSenales({
+    tramos: trafico?.tramos ?? [],
+    incidencias: incidencias?.incidencias ?? [],
+    climaDistritos: meteoZona?.distritos ?? [],
+    eventos: agenda?.eventos ?? [],
+    camaras: camaras_dgt_valencia_default
+  });
+}
+async function generarRecomendaciones(senales) {
+  const hayAlgoQueRecomendar = senales.some((s) => s.severidad !== "informativo");
+  if (!hayAlgoQueRecomendar) return [];
+  try {
+    const { object: object3 } = await generateObject({
+      model: google(MODELO2),
+      schema: RecomendacionesSchema,
+      system: INSTRUCCIONES_SISTEMA_RECOMENDACIONES,
+      prompt: construirPromptRecomendaciones(senales),
+      temperature: 0.3,
+      // Verificado en vivo el 2026-09-17: incluso con los topes de
+      // `construirPromptRecomendaciones` (máx. 8 distritos), una
+      // recomendación completa por distrito puede superar 1024 tokens de
+      // salida real (sin razonamiento interno de por medio — ver el
+      // `thinkingBudget: 0` de abajo) y el JSON sale cortado
+      // (`finishReason: 'length'`, `NoObjectGeneratedError`). 4096 da margen
+      // de sobra para 8 recomendaciones completas.
+      maxOutputTokens: 4096,
+      // mismo fix que v1 (045) — sin esto, gemini-3-flash-preview agota
+      // maxOutputTokens en tokens de "pensamiento" interno antes del JSON.
+      providerOptions: { google: { thinkingConfig: { thinkingBudget: 0 } } },
+      maxRetries: 1
+    });
+    const senalesPorId = new Map(senales.map((s) => [s.id, s]));
+    const validas = filtrarRecomendacionesValidas(object3.recomendaciones, senalesPorId);
+    return validas.map((r, i) => ({
+      ...r,
+      id: `recomendacion:${r.distritoCodigo ?? "ciudad"}:${i}`,
+      fuenteSpec: Array.from(new Set(r.situacionAsociada.flatMap((id) => senalesPorId.get(id)?.fuenteSpec ?? []))),
+      advertencia: ADVERTENCIA_RECOMENDACION
+    }));
+  } catch (err) {
+    console.error("Fallo al generar recomendaciones de actuaci\xF3n (degradando a lista vac\xEDa):", err);
+    return [];
+  }
+}
+async function fetchSintesisV2() {
+  const senales = await construirSenales();
+  const recomendaciones = await generarRecomendaciones(senales);
+  return { senales, recomendaciones, generadaEn: (/* @__PURE__ */ new Date()).toISOString(), modelo: MODELO2 };
+}
+async function handler23() {
+  try {
+    const { value, fresh } = await getOrFetch(CACHE_KEY13, TTL_MS15, fetchSintesisV2);
+    return new Response(JSON.stringify({ ...value, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=300, stale-while-revalidate=900"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 502,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
+}
+
 // src/services/avamet-estaciones.ts
 function decodeEntidadesHtml(texto) {
   const tabla = {
@@ -102305,8 +103431,8 @@ function normalizarEstacionesAvamet(crudas) {
 }
 
 // src/server/avamet-estaciones.ts
-var CACHE_KEY13 = "emergencia:avamet-estaciones:v1";
-var TTL_MS15 = 15 * 60 * 1e3;
+var CACHE_KEY14 = "emergencia:avamet-estaciones:v1";
+var TTL_MS16 = 15 * 60 * 1e3;
 var AVAMET_URL = "https://www.avamet.org/mxo-mxo.php?territori=c15";
 var USER_AGENT2 = "vlc-monitor-emergencia-bot/1.0 (+https://github.com/robervx/vlc-monitor)";
 async function fetchEstacionesAvamet() {
@@ -102318,9 +103444,9 @@ async function fetchEstacionesAvamet() {
   const crudas = JSON.parse(m[1]);
   return normalizarEstacionesAvamet(crudas);
 }
-async function handler23() {
+async function handler24() {
   try {
-    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY13, TTL_MS15, fetchEstacionesAvamet);
+    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY14, TTL_MS16, fetchEstacionesAvamet);
     return new Response(JSON.stringify({ estaciones, fresh }), {
       status: 200,
       headers: {
@@ -102481,7 +103607,7 @@ function json3(obj, status, extraHeaders) {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extraHeaders }
   });
 }
-async function handler24(req) {
+async function handler25(req) {
   if (req.method !== "POST") return json3({ ok: false }, 405);
   const secret = process.env.AUTH_SECRET;
   let users;
@@ -102523,7 +103649,7 @@ async function handler24(req) {
 }
 
 // src/server/auth-logout.ts
-async function handler25(req) {
+async function handler26(req) {
   const status = req.method === "POST" ? 200 : 405;
   return new Response(JSON.stringify({ ok: status === 200 }), {
     status,
@@ -102536,7 +103662,7 @@ async function handler25(req) {
 }
 
 // src/server/auth-estado.ts
-async function handler26(req) {
+async function handler27(req) {
   const secret = process.env.AUTH_SECRET;
   const sesion = secret ? await verificarSesion(leerCookie(req.headers.get("cookie"), COOKIE_NOMBRE), secret) : null;
   return new Response(
@@ -102568,11 +103694,12 @@ var RUTAS = {
   "emergencia/v1/pluviometros": handler19,
   "emergencia/v1/altimetria": handler20,
   "sintesis/v1/actual": handler22,
-  "emergencia/v1/avamet": handler23,
+  "sintesis/v2/actual": handler23,
+  "emergencia/v1/avamet": handler24,
   "decision/v1/sugerencias": handler21,
-  "auth/v1/login": handler24,
-  "auth/v1/logout": handler25,
-  "auth/v1/estado": handler26
+  "auth/v1/login": handler25,
+  "auth/v1/logout": handler26,
+  "auth/v1/estado": handler27
 };
 var BASE = "http://d.invalid";
 async function dispatch(req) {
