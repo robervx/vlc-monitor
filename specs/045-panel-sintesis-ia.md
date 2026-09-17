@@ -7,17 +7,20 @@ estado: Implemented
 tipo: indice-compuesto
 depende_de: [013, 041, 040]
 propietario: ""
-version: 2
+version: 3
 ```
 
-> **Estado:** `Implemented` (v2, 2026-09-17) — el usuario resolvió el bloqueante de §0
-> aprobando la opción de §0.1 (Vercel AI Gateway + modelo barato + caché con TTL), ver
-> `docs/decisiones/ADR-005-panel-sintesis-ia.md`. **Limitación honesta**: este entorno de
-> desarrollo no tiene `AI_GATEWAY_API_KEY`/`VERCEL_OIDC_TOKEN` provisionado, así que la
-> llamada real al modelo no se ha podido verificar en vivo — el endpoint se comprobó
-> devolviendo un error controlado (502, "Unauthenticated request to AI Gateway") en vez de
-> romperse o inventar datos, y el panel se verificó en navegador con una respuesta simulada
-> con la forma real del contrato. Queda pendiente de su primera llamada real en el primer
+> **Estado:** `Implemented` (v3, 2026-09-17) — el usuario resolvió el bloqueante de §0 en
+> dos pasos el mismo día: primero aprobó Vercel AI Gateway + modelo barato (v2), y tras
+> verlo reconsideró por un proveedor **gratuito de verdad** — Google Gemini con clave
+> personal de Google AI Studio, no facturación por token de ningún tipo. Ver
+> `docs/decisiones/ADR-005-panel-sintesis-ia.md` ("Revisión v2") para el porqué exacto.
+> **Limitación honesta**: este entorno de desarrollo no tiene `GOOGLE_GENERATIVE_AI_API_KEY`
+> provisionada, así que la llamada real al modelo no se ha podido verificar en vivo — el
+> endpoint se comprobó devolviendo un error controlado (502, "Google Generative AI API key
+> is missing...") en vez de romperse o inventar datos, y el panel se verificó en navegador
+> con una respuesta simulada con la forma real del contrato. Queda pendiente de su primera
+> llamada real en el primer
 > despliegue con credenciales — mismo tipo de hueco que Upstash Redis en spec 001 §4.
 
 ## 0. Por qué esta spec es distinta de las demás — decisión pendiente, no solo técnica
@@ -87,8 +90,10 @@ peticiones con un origen ficticio (`_router-src.ts`, `BASE = 'http://d.invalid'`
 un `fetch` a una URL relativa no resolvería en producción; llamar la función directamente
 evita ese problema y de paso reutiliza la caché propia de cada handler sin coste extra.
 
-La fuente nueva es el **modelo de IA en sí**: Vercel AI Gateway, `anthropic/claude-haiku-4.5`
-(decisión de producto, `docs/decisiones/ADR-005-panel-sintesis-ia.md`).
+La fuente nueva es el **modelo de IA en sí**: Google Generative AI directo (paquete
+`@ai-sdk/google`, no Vercel AI Gateway), modelo `gemini-3.8-flash`, con la clave
+gratuita personal del usuario (decisión de producto,
+`docs/decisiones/ADR-005-panel-sintesis-ia.md`, "Revisión v2").
 
 ## 3. Contrato de datos (normalizado)
 
@@ -144,18 +149,19 @@ No aplica — panel de texto (`src/ui/sintesis-ia-panel.ts`) dentro de `/intelig
 - [x] Comportamiento definido y probado ante una respuesta del modelo mal formada o vacía
       — `SintesisIASchema.safeParse` rechaza severidad fuera de enum y `fuenteSpec` vacío
       (2 tests); sin credenciales reales en este entorno, se verificó con el error real de
-      autenticación del gateway: el endpoint devuelve 502 controlado y el panel degrada a
-      "Síntesis con IA no disponible ahora mismo" — nunca rompe ni inventa contenido.
-      **Pendiente**: verificar el camino feliz (respuesta real del modelo) en el primer
-      despliegue con `AI_GATEWAY_API_KEY`/`VERCEL_OIDC_TOKEN` provisionado.
+      autenticación de Google ("Google Generative AI API key is missing..."): el endpoint
+      devuelve 502 controlado y el panel degrada a "Síntesis con IA no disponible ahora
+      mismo" — nunca rompe ni inventa contenido. **Pendiente**: verificar el camino feliz
+      (respuesta real del modelo) en el primer despliegue con
+      `GOOGLE_GENERATIVE_AI_API_KEY` provisionada (clave gratuita del usuario).
 - [x] Diseño visual verificado en navegador con una respuesta simulada de la forma real del
       contrato — advertencia siempre visible, insights con severidad y chips de fuente,
       recomendaciones con chips de fuente.
 - [x] 7 tests nuevos (`sintesis-ia.test.ts`) — esquema, guardrail de trazabilidad,
       ensamblado de metadatos, construcción de prompt.
 - [x] `npm run typecheck` / `npm run test` (401/401) / `npm run build` verdes. El bundle de
-      `api/router.js` pasa de 1,2 MB a 2,4 MB (paquetes `ai` + `zod` + proveedor del
-      gateway) — muy por debajo del límite de Vercel, documentado por transparencia.
+      `api/router.js` pasa de 1,2 MB a 2,7 MB (paquetes `ai` + `zod` + `@ai-sdk/google`) —
+      muy por debajo del límite de Vercel, documentado por transparencia.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -179,3 +185,4 @@ No aplica — panel de texto (`src/ui/sintesis-ia-panel.ts`) dentro de `/intelig
 | 1 | 2026-09-17 | Creación (Draft) como documento de **análisis**, a petición explícita del usuario ("analizar tema IA", no implementar) — cuarto y último punto de la tanda de trabajo post-V1. Marcada con un bloqueante explícito de decisión de producto/ADR antes de `Approved` (§0), mismo peso que el bloqueante de revisión de contenido de spec `042`. Boceto de contrato de datos con guardrails (§3/§6), sin due-diligence de proveedor todavía. |
 | 1 | 2026-09-17 | Añadido §0.1 con opciones concretas (Vercel AI Gateway, modelo pequeño/barato, cadencia con TTL + hash de señales de entrada) para informar la decisión — sigue sin ser `Approved`, el bloqueante de producto/ADR de §0 sigue en pie, esto no lo resuelve. |
 | 2 | 2026-09-17 | **Implemented.** Usuario aprobó explícitamente la opción de §0.1 → `docs/decisiones/ADR-005-panel-sintesis-ia.md` (Vercel AI Gateway, `anthropic/claude-haiku-4.5`, TTL 20 min, guardrails por esquema). `src/services/sintesis-ia.ts` (esquema zod, prompt, guardrail de trazabilidad, 7 tests), `src/server/sintesis-ia.ts` (`GET /api/sintesis/v1/actual`, invoca los handlers existentes como funciones en el mismo proceso — evita el problema del origen ficticio del router), `src/ui/sintesis-ia-panel.ts`. Sin credenciales de proveedor en este entorno — verificado el camino de error controlado (502, panel degrada sin romperse) y el diseño visual con una respuesta simulada; la llamada real al modelo queda pendiente del primer despliegue con credenciales. 401/401 tests, `typecheck`/`build` verdes (bundle de `api/router.js`: 1,2 MB → 2,4 MB). |
+| 3 | 2026-09-17 | **Cambio de proveedor**, misma sesión: el usuario reconsideró tras ver v2 — quiere un proveedor gratuito de verdad, no facturación por token vía Vercel AI Gateway. Pivote a **Google Generative AI directo** (`@ai-sdk/google`, `gemini-3.8-flash`, `GOOGLE_GENERATIVE_AI_API_KEY` — clave personal gratuita de Google AI Studio), ver ADR-005 "Revisión v2". Añadidos los "parámetros de actuación" pedidos explícitamente: `temperature: 0.3` (síntesis factual, no creativa) y `maxOutputTokens: 1024`. Sin cambio en guardrails, contrato ni UI. Verificado el mismo camino de error controlado, ahora con el mensaje real de Google ("API key is missing"). 401/401 tests, `typecheck`/`build` verdes (bundle de `api/router.js`: 2,4 MB → 2,7 MB). |

@@ -23,6 +23,7 @@
     "scrape:agenda-eventos": "tsx scripts/scrape-agenda-eventos.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.74",
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/layers": "^9.0.0",
     "@deck.gl/mapbox": "^9.0.0",

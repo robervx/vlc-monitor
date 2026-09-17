@@ -1,12 +1,16 @@
 // GET /api/sintesis/v1/actual — spec 045, decisión de producto en
-// docs/decisiones/ADR-005-panel-sintesis-ia.md. Consume exclusivamente los
+// docs/decisiones/ADR-005-panel-sintesis-ia.md (v2: Google Gemini gratuito,
+// no Vercel AI Gateway — ver historial del ADR). Consume exclusivamente los
 // endpoints internos ya existentes (nunca una fuente externa directamente,
 // CLAUDE.md §3.3) — se invocan como funciones en el mismo proceso (no HTTP:
 // el router los reescribe con un origen ficticio, `_router-src.ts`, así que
 // un `fetch` interno no resolvería) y de paso reutilizan la caché propia de
-// cada uno. Vercel AI Gateway (paquete `ai`) con `anthropic/claude-haiku-4.5`
-// — modelo barato, cadencia baja (TTL 20 min, ver ADR-005).
+// cada uno. Google Generative AI directo (paquete `@ai-sdk/google`, no el
+// gateway de Vercel — así el uso cae dentro de la cuota gratuita real de la
+// cuenta de Google del usuario, no de créditos de pago de Vercel) con
+// `gemini-3.8-flash`, cadencia baja (TTL 20 min).
 import { generateObject } from 'ai';
+import { google } from '@ai-sdk/google';
 import { getOrFetch } from './_shared/cache';
 import {
   SintesisIASchema,
@@ -26,8 +30,8 @@ import avisosHandler from './avisos-meteo';
 export const config = { runtime: 'edge' };
 
 const CACHE_KEY = 'sintesis-ia:actual:v1';
-const TTL_MS = 20 * 60 * 1000; // fuente más cara del producto — cadencia baja a propósito (ADR-005)
-const MODELO = 'anthropic/claude-haiku-4.5';
+const TTL_MS = 20 * 60 * 1000; // fuente más cara del producto — cadencia baja a propósito, además de que la cuota gratuita de Gemini es limitada por día (ADR-005)
+const MODELO = 'gemini-3.8-flash';
 
 async function leerJson(handler: () => Promise<Response>): Promise<unknown> {
   try {
@@ -54,10 +58,18 @@ async function recolectarSenales(): Promise<SenalesEntrada> {
 async function fetchSintesisIA(): Promise<SintesisIA> {
   const senales = await recolectarSenales();
   const { object } = await generateObject({
-    model: MODELO,
+    model: google(MODELO),
     schema: SintesisIASchema,
     system: INSTRUCCIONES_SISTEMA,
     prompt: construirPrompt(senales),
+    // Parámetros de actuación (ADR-005 v2): temperatura baja porque esto es
+    // síntesis factual sobre datos ya calculados, no redacción creativa —
+    // menos variación entre llamadas consecutivas con las mismas señales.
+    // Tope de salida generoso mismo para el resumen+insights+recomendaciones
+    // completos, pero acotado (ni el prompt ni la respuesta necesitan más,
+    // y limita coste/latencia por si el modelo se desvía).
+    temperature: 0.3,
+    maxOutputTokens: 1024,
   });
   if (!validarTrazabilidad(object)) {
     throw new Error('Guardrail de trazabilidad no superado: el modelo devolvió un insight o recomendación sin fuenteSpec (ADR-005)');
