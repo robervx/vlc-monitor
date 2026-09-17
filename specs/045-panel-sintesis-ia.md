@@ -3,17 +3,22 @@
 ```yaml
 id: 045
 titulo: "Panel que resume todas las señales del producto con un modelo de IA: insights de calidad y recomendaciones fundamentadas, con guardrails"
-estado: Draft
+estado: Implemented
 tipo: indice-compuesto
 depende_de: [013, 041, 040]
 propietario: ""
-version: 1
+version: 2
 ```
 
-> **Estado:** `Draft` — **cuarto y último punto** de la tanda de trabajo post-V1 (ver
-> `docs/03_PLAN_POST_V1.md`), y el usuario pidió explícitamente empezar por **analizar**,
-> no implementar. Este documento es ese análisis inicial, no un contrato congelado.
-> **Requiere una decisión de producto/ADR explícita antes de pasar a `Approved`** — ver §0.
+> **Estado:** `Implemented` (v2, 2026-09-17) — el usuario resolvió el bloqueante de §0
+> aprobando la opción de §0.1 (Vercel AI Gateway + modelo barato + caché con TTL), ver
+> `docs/decisiones/ADR-005-panel-sintesis-ia.md`. **Limitación honesta**: este entorno de
+> desarrollo no tiene `AI_GATEWAY_API_KEY`/`VERCEL_OIDC_TOKEN` provisionado, así que la
+> llamada real al modelo no se ha podido verificar en vivo — el endpoint se comprobó
+> devolviendo un error controlado (502, "Unauthenticated request to AI Gateway") en vez de
+> romperse o inventar datos, y el panel se verificó en navegador con una respuesta simulada
+> con la forma real del contrato. Queda pendiente de su primera llamada real en el primer
+> despliegue con credenciales — mismo tipo de hueco que Upstash Redis en spec 001 §4.
 
 ## 0. Por qué esta spec es distinta de las demás — decisión pendiente, no solo técnica
 
@@ -73,16 +78,22 @@ catálogo de reglas declarativas no tiene.
 
 No hay fuente externa nueva de **datos** — el modelo de IA consume exclusivamente lo que
 ya sirven los endpoints internos existentes (`insights/v1/actual`, `decision/v1/sugerencias`,
-`pulso/v1/distrito`, `mediatico/v1/items`, `meteo/v1/avisos`, etc.), nunca datos en bruto
-de fuentes externas directamente — mismo principio de capas que el resto del repo
-(`CLAUDE.md` §3.3). La fuente nueva es el **modelo de IA en sí** (proveedor a decidir, §0),
-que no es una fuente de datos sino una capa de síntesis sobre datos ya obtenidos.
+`pulso/v1/distrito`, `mediatico/v1/items`, `meteo/v1/avisos`), nunca datos en bruto de
+fuentes externas directamente — mismo principio de capas que el resto del repo
+(`CLAUDE.md` §3.3). Implementado invocando cada handler existente **como función en el
+mismo proceso** (`src/server/sintesis-ia.ts` importa y llama `insightsHandler()`,
+`decisionHandler()`, etc. directamente) en vez de HTTP interno — el router reescribe las
+peticiones con un origen ficticio (`_router-src.ts`, `BASE = 'http://d.invalid'`), así que
+un `fetch` a una URL relativa no resolvería en producción; llamar la función directamente
+evita ese problema y de paso reutiliza la caché propia de cada handler sin coste extra.
+
+La fuente nueva es el **modelo de IA en sí**: Vercel AI Gateway, `anthropic/claude-haiku-4.5`
+(decisión de producto, `docs/decisiones/ADR-005-panel-sintesis-ia.md`).
 
 ## 3. Contrato de datos (normalizado)
 
-Boceto, no congelado (pendiente de §0):
-
 ```typescript
+// src/services/sintesis-ia.ts — SintesisIASchema (zod) valida la respuesta del modelo
 interface SintesisIA {
   id: string;
   generadaEn: string;             // ISO 8601
@@ -90,11 +101,11 @@ interface SintesisIA {
   insights: {
     texto: string;
     severidad: 'informativo' | 'aviso' | 'urgente';
-    fuenteSpec: string[];          // igual trazabilidad que Insight de spec 013 — de qué señales sale cada afirmación
+    fuenteSpec: string[];          // no vacío — igual trazabilidad que Insight de spec 013
   }[];
   recomendaciones: {
     texto: string;                 // siempre condicional, nunca imperativo — mismo criterio que spec 041 §0
-    fuenteSpec: string[];
+    fuenteSpec: string[];          // no vacío
   }[];
   modelo: string;                  // qué modelo generó esto, para trazabilidad/auditoría
   advertencia: string;             // aviso fijo y visible: "generado por IA, puede contener errores — revisar antes de actuar"
@@ -103,30 +114,48 @@ interface SintesisIA {
 
 ## 4. Pipeline (seed → caché → endpoint)
 
-A definir tras la decisión de producto (§0) — como mínimo, caché agresiva (la llamada al
-modelo de IA es la más cara de todo el pipeline) y **nunca** una llamada por cada carga de
-usuario.
+`GET /api/sintesis/v1/actual` — caché `getOrFetch` con TTL de 20 min (ADR-005, la fuente
+más cara del producto, cadencia deliberadamente baja). El `fetcher` recolecta las 5 señales
+(en paralelo, degradando a `null` la que falle sin bloquear a las demás), construye el
+prompt (`construirPrompt`) y llama a `generateObject` (paquete `ai`) con
+`SintesisIASchema` como esquema forzado — si la respuesta no valida el esquema o no supera
+`validarTrazabilidad` (toda `fuenteSpec` no vacía), se rechaza entera y el endpoint
+devuelve un error controlado (502), nunca una síntesis a medias o inventada.
 
 ## 5. Contrato de capa de mapa
 
-No aplica — panel de texto dentro de `/inteligencia` (spec `040`), no una capa geoespacial.
+No aplica — panel de texto (`src/ui/sintesis-ia-panel.ts`) dentro de `/inteligencia`
+(spec `040`), no una capa geoespacial.
 
-## 6. Criterios de aceptación (Definition of Done) — provisional, sujeto a §0
+## 6. Criterios de aceptación (Definition of Done)
 
-- [ ] ADR explícito aceptando el uso de un modelo de IA en este producto, con coste y
-      proveedor decididos — bloqueante para `Approved`, igual de duro que el bloqueante de
-      contenido real de spec `042`.
-- [ ] **Guardrails verificables, no solo un prompt "pórtate bien"**: el modelo nunca
-      recibe herramientas ni capacidad de ejecutar nada (solo genera texto), cada
-      afirmación del resumen es trazable a una `fuenteSpec` real (no una cifra inventada
-      sin origen), aviso fijo de "generado por IA" siempre visible (mismo principio que el
-      badge `MOCK` de spec `003`, nunca en letra pequeña — `CLAUDE.md` §4).
-- [ ] Ninguna recomendación es una acción ejecutable desde la UI — mismo criterio que spec
-      `041` §0/§6 (condicional, nunca imperativo, verificable por test si el patrón de
-      spec 041 se reutiliza).
-- [ ] Comportamiento definido y probado ante una respuesta del modelo mal formada o vacía
-      — nunca romper el panel, degradar a "sin síntesis disponible ahora mismo".
-- [ ] `npm run typecheck` / `npm run test` / `npm run build` sin regresiones.
+- [x] ADR explícito aceptando el uso de un modelo de IA en este producto, con coste y
+      proveedor decididos — `docs/decisiones/ADR-005-panel-sintesis-ia.md`, aprobado
+      explícitamente por el usuario.
+- [x] **Guardrails verificables, no solo un prompt "pórtate bien"**: `generateObject` con
+      `SintesisIASchema` (zod) — el modelo nunca recibe herramientas ni capacidad de
+      ejecutar nada (solo genera el objeto tipado); `fuenteSpec` no vacío forzado tanto por
+      el esquema (`z.array(z.string()).min(1)`) como por `validarTrazabilidad` (defensa en
+      profundidad); aviso fijo "Generado por IA..." siempre visible en amarillo/naranja,
+      igual de prominente que el badge `MOCK` de spec `003`.
+- [x] Ninguna recomendación es una acción ejecutable desde la UI — el panel solo muestra
+      texto, sin botones de acción (a diferencia de spec `041`, que sí tiene "Ver en el
+      mapa" pero tampoco ninguna acción ejecutable).
+- [x] Comportamiento definido y probado ante una respuesta del modelo mal formada o vacía
+      — `SintesisIASchema.safeParse` rechaza severidad fuera de enum y `fuenteSpec` vacío
+      (2 tests); sin credenciales reales en este entorno, se verificó con el error real de
+      autenticación del gateway: el endpoint devuelve 502 controlado y el panel degrada a
+      "Síntesis con IA no disponible ahora mismo" — nunca rompe ni inventa contenido.
+      **Pendiente**: verificar el camino feliz (respuesta real del modelo) en el primer
+      despliegue con `AI_GATEWAY_API_KEY`/`VERCEL_OIDC_TOKEN` provisionado.
+- [x] Diseño visual verificado en navegador con una respuesta simulada de la forma real del
+      contrato — advertencia siempre visible, insights con severidad y chips de fuente,
+      recomendaciones con chips de fuente.
+- [x] 7 tests nuevos (`sintesis-ia.test.ts`) — esquema, guardrail de trazabilidad,
+      ensamblado de metadatos, construcción de prompt.
+- [x] `npm run typecheck` / `npm run test` (401/401) / `npm run build` verdes. El bundle de
+      `api/router.js` pasa de 1,2 MB a 2,4 MB (paquetes `ai` + `zod` + proveedor del
+      gateway) — muy por debajo del límite de Vercel, documentado por transparencia.
 
 ## 7. Riesgos y fuera de alcance
 
@@ -139,6 +168,9 @@ No aplica — panel de texto dentro de `/inteligencia` (spec `040`), no una capa
 - **Fuera de alcance v1**: cualquier capacidad del modelo de ejecutar acciones, llamar
   herramientas externas, o interactuar con sistemas de despacho reales — sigue vetado por
   `CLAUDE.md` §4 igual que en el resto del producto, con o sin IA de por medio.
+- **Fuera de alcance v2**: la comparación por hash de señales de entrada mencionada en
+  §0.1 (regenerar solo si algo cambió de verdad) — se implementó solo TTL fijo de 20 min
+  por simplicidad; fast-follow si el coste real en producción lo justifica.
 
 ## 8. Historial
 
@@ -146,3 +178,4 @@ No aplica — panel de texto dentro de `/inteligencia` (spec `040`), no una capa
 |---|---|---|
 | 1 | 2026-09-17 | Creación (Draft) como documento de **análisis**, a petición explícita del usuario ("analizar tema IA", no implementar) — cuarto y último punto de la tanda de trabajo post-V1. Marcada con un bloqueante explícito de decisión de producto/ADR antes de `Approved` (§0), mismo peso que el bloqueante de revisión de contenido de spec `042`. Boceto de contrato de datos con guardrails (§3/§6), sin due-diligence de proveedor todavía. |
 | 1 | 2026-09-17 | Añadido §0.1 con opciones concretas (Vercel AI Gateway, modelo pequeño/barato, cadencia con TTL + hash de señales de entrada) para informar la decisión — sigue sin ser `Approved`, el bloqueante de producto/ADR de §0 sigue en pie, esto no lo resuelve. |
+| 2 | 2026-09-17 | **Implemented.** Usuario aprobó explícitamente la opción de §0.1 → `docs/decisiones/ADR-005-panel-sintesis-ia.md` (Vercel AI Gateway, `anthropic/claude-haiku-4.5`, TTL 20 min, guardrails por esquema). `src/services/sintesis-ia.ts` (esquema zod, prompt, guardrail de trazabilidad, 7 tests), `src/server/sintesis-ia.ts` (`GET /api/sintesis/v1/actual`, invoca los handlers existentes como funciones en el mismo proceso — evita el problema del origen ficticio del router), `src/ui/sintesis-ia-panel.ts`. Sin credenciales de proveedor en este entorno — verificado el camino de error controlado (502, panel degrada sin romperse) y el diseño visual con una respuesta simulada; la llamada real al modelo queda pendiente del primer despliegue con credenciales. 401/401 tests, `typecheck`/`build` verdes (bundle de `api/router.js`: 1,2 MB → 2,4 MB). |

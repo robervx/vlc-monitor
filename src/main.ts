@@ -55,6 +55,7 @@ import { buildActualidadRedesContent } from './ui/actualidad-redes';
 import { initRouter } from './ui/router';
 import { montarApoyoDecisionPanel } from './ui/apoyo-decision-panel';
 import { montarEmergenciaMeteoPanel } from './ui/emergencia-meteo-panel';
+import { montarSintesisIaPanel } from './ui/sintesis-ia-panel';
 import { buildProtocolosContent } from './ui/protocolos-panel';
 import { onPeticionCentrarMapa } from './ui/centrar-mapa';
 import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
@@ -2357,6 +2358,7 @@ async function main(): Promise<void> {
   // cambia a /mapa — nunca dispara ninguna acción por sí mismo (§0).
   montarApoyoDecisionPanel();
   montarEmergenciaMeteoPanel();
+  montarSintesisIaPanel();
   onPeticionCentrarMapa(({ coordenadas, zoom }) => {
     map.flyTo({ center: coordenadas, zoom: zoom ?? map.getZoom() });
   });
@@ -2484,6 +2486,7 @@ async function main(): Promise<void> {
     'actualidad-redes-panel',
     'apoyo-decision-panel',
     'emergencia-meteo-panel',
+    'sintesis-ia-panel',
     'protocolos-panel',
   ];
 

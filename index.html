@@ -1616,7 +1616,8 @@
       #actualidad-redes-panel,
       #apoyo-decision-panel,
       #protocolos-panel,
-      #emergencia-meteo-panel {
+      #emergencia-meteo-panel,
+      #sintesis-ia-panel {
         width: 320px;
         max-height: 70vh;
         display: flex;
@@ -1632,8 +1633,69 @@
       #actualidad-redes-panel[hidden],
       #apoyo-decision-panel[hidden],
       #protocolos-panel[hidden],
-      #emergencia-meteo-panel[hidden] {
+      #emergencia-meteo-panel[hidden],
+      #sintesis-ia-panel[hidden] {
         display: none;
+      }
+
+      /* Spec 045 — panel de síntesis con IA (ADR-005) */
+      .sintesis-ia__advertencia {
+        margin: 8px;
+        padding: 6px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #7d3c00;
+        background: #fdebd0;
+        border-radius: 4px;
+      }
+
+      .sintesis-ia__resumen {
+        margin: 0 8px 8px;
+        font-size: 13px;
+        color: #333;
+      }
+
+      .sintesis-ia__subtitulo {
+        margin: 8px 8px 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+      }
+
+      .sintesis-ia__item {
+        margin: 0 8px 6px;
+        padding: 6px;
+        border-left: 3px solid #ccc;
+        background: #fafafa;
+        font-size: 12px;
+      }
+
+      .sintesis-ia__item--aviso {
+        border-left-color: #d4a017;
+      }
+
+      .sintesis-ia__item--urgente {
+        border-left-color: #b03a2e;
+      }
+
+      .sintesis-ia__severidad {
+        display: inline-block;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #888;
+        margin-right: 6px;
+      }
+
+      .sintesis-ia__texto {
+        display: block;
+        color: #333;
+      }
+
+      .sintesis-ia__fuentes {
+        display: block;
+        margin-top: 4px;
       }
 
       /* Spec 044 — panel de emergencia meteorológica avanzada */
