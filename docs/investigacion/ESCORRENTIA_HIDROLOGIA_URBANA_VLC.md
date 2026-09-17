@@ -59,14 +59,18 @@ el propio Ayuntamiento. Es, en teoría, la pieza que le falta al cálculo de "cu
 para convertirlo en "cuánta agua se acumula": cruzar el caudal de entrada (lluvia +
 escorrentía) contra el caudal de evacuación (capacidad real del tramo de red en esa zona).
 
-**Estado de la integración: sin verificar todavía.** No se ha comprobado si SIRA expone
-algún dato públicamente (portal de datos abiertos, capas WMS/WFS, dataset descargable) o si
-es una herramienta interna de gestión sin cara pública. Es el primer punto a resolver antes
-de escribir la due-diligence de la spec `046` — puede que la respuesta sea "no hay canal
-público", en cuyo caso el indicador de riesgo tendría que aproximarse solo con topografía +
-lluvia (ver §4), marcando explícitamente esa limitación en la UI (coherente con `CLAUDE.md`
-§4: si es una aproximación sin la pieza de red real, se dice así, no se presenta como si
-fuera el dato de SIRA).
+**Actualización (2026-09-17) — due-diligence completada, ver `specs/046-escorrentia-hidrologia-urbana.md`
+§2:** SIRA queda **descartado** como fuente. Es una base de datos de gestión interna del
+contrato de mantenimiento de la red, sin cara pública ni API. El único canal de acceso es
+un trámite de la sede electrónica (`SN.OT.30`) solo para quien vaya a ejecutar una obra o
+acometida real sobre la red — con tasas por plano en 2017 (140,87 € a 365,24 € según
+formato) y sin mención a reutilización como fuente de datos. No sirve para este proyecto.
+
+En su lugar se encontró y verificó en vivo una alternativa real: el geoportal municipal
+(ArcGIS Server, carpeta `OPENDATA`) expone una capa pública de **imbornales** (68.152
+puntos, con licencia de reutilización explícita bajo Ley 37/2007) que sirve como proxy de
+densidad de drenaje superficial por zona — no la capacidad real de los colectores, pero sí
+un indicador aproximable y con datos reales. Es la base de la v1 de `046`.
 
 ---
 
@@ -95,10 +99,13 @@ Cuando la red de saneamiento se satura (o no tenemos ese dato porque SIRA no es 
 la topografía por sí sola ya dice mucho: el agua busca las cotas más bajas. El plan técnico
 que se plantea para esta pieza, si se llega a implementar como spec propia, sería:
 
-1. Descargar el **Modelo Digital del Terreno (MDT) de 50 cm de resolución del PNOA** (Plan
-   Nacional de Ortofotografía Aérea, IGN — gratuito, LiDAR de alta resolución) para el
-   término municipal de Valencia.
-2. Recortar al término municipal y generar un **mapa hipsométrico** (altitud coloreada).
+1. ~~Descargar el **Modelo Digital del Terreno (MDT) de 50 cm de resolución del PNOA**~~ —
+   **actualización 2026-09-17**: no hace falta. El mismo geoportal municipal que expone
+   los imbornales (§2 de `specs/046-escorrentia-hidrologia-urbana.md`) ya sirve, en vivo y
+   consultable, **puntos de cota reales** (29.700 puntos con Z, capa `111`) y **curvas de
+   nivel** (198.014 líneas, capa `131`) — topografía real de Valencia sin descargar ni
+   procesar un ráster LiDAR de varios GB.
+2. Con esos puntos/curvas, generar un **mapa hipsométrico** (altitud coloreada).
 3. Detectar **depresiones del terreno y rutas de escorrentía** con las herramientas
    estándar de hidrología GIS (relleno de sumideros, dirección de flujo, acumulación de
    flujo) — el método conocido como **HAND** (*Height Above Nearest Drainage*, altura sobre
@@ -152,19 +159,23 @@ Siguiendo el mismo patrón de due-diligence que ya se ha aplicado a cada spec `I
 de este repo (`CLAUDE.md` §8.2), antes de congelar un contrato de datos para `046` hay que
 verificar, con llamadas/descargas reales, no solo por lectura de documentación:
 
-1. **SIRA**: ¿existe algún canal público (API, WMS/WFS, dataset descargable) o es una
-   herramienta interna sin cara pública? Esto condiciona si el ISH puede tener la pieza de
-   red real o solo la aproximación topográfica.
+1. ~~**SIRA**: ¿existe algún canal público?~~ **Resuelto (2026-09-17): no, descartado.**
+   Ver `specs/046-escorrentia-hidrologia-urbana.md` §2.
 2. **Pluviómetros municipales adicionales** (Ciclo Integral del Agua): ¿hay portal de datos
-   abiertos o feed propio, más allá de SAIH/AVAMET ya integrados en `044`?
+   abiertos o feed propio, más allá de SAIH/AVAMET ya integrados en `044`? — **sin
+   verificar todavía.**
 3. **Usos del suelo / zonas verdes**: ¿qué capa de datos abiertos del Ayuntamiento o
    catastro sirve para derivar el coeficiente de escorrentía por zona sin campaña de campo?
-4. **MDT PNOA 0,5 m**: confirmar el punto de descarga real (Centro de Descargas del CNIG/
-   IGN), el tamaño del fichero para el término municipal de Valencia, y si hace falta algo
-   más que `fetch()` (herramientas GIS del lado del seed, no del endpoint en vivo).
+   — **sin verificar todavía**, no hace falta para la v1 acotada de `046` (densidad de
+   imbornales + lluvia), solo para una futura v2 con el modelo ISH completo.
+4. ~~**MDT PNOA 0,5 m**~~ **Resuelto (2026-09-17): no hace falta.** El geoportal municipal
+   ya sirve puntos de cota reales y curvas de nivel consultables — ver §4 más arriba y
+   `specs/046-escorrentia-hidrologia-urbana.md` §2.
 5. **PATRICOVA/SNCZI**: confirmar si publican capas WMS reutilizables directamente o solo
-   visores, para usarlas como validación del modelo propio.
+   visores, para usarlas como validación del modelo propio — **sin verificar todavía**,
+   relevante solo para una futura v2.
 
-Hasta que estos cinco puntos estén verificados, `046` se queda en `Planned` — es
-deliberadamente el paso siguiente después de dejar la investigación documental, no un
-trabajo que se empieza a mitad de otra spec (`CLAUDE.md` §8.5).
+`046` ya tiene spec propia (`specs/046-escorrentia-hidrologia-urbana.md`, estado `Draft`)
+con una v1 acotada y realista (densidad de imbornales × lluvia por distrito) que no
+necesita los puntos 2/3/5 pendientes — esos quedan para cuando se aborde la v2 (modelo ISH
+completo, ver §7 de la spec).

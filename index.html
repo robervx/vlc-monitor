@@ -1650,19 +1650,21 @@
       }
 
       /* Orden de los bloques dentro de /inteligencia (pedido explícito del
-         usuario, 2026-09-17) — cámaras primero (DGT antes que ciudad),
-         contexto mediático, agenda, altimetría junto a lluvia/viento,
-         actualidad institucional/apoyo a decisión/síntesis IA/protocolos
-         después, tendencia la última (de momento aporta poco, spec 025). Solo
-         afecta al orden visual dentro del flex de /inteligencia — el orden
-         de montaje en `main.ts` no cambia. */
+         usuario, 2026-09-17; reordenado el mismo día) — cámaras primero (DGT
+         antes que ciudad), síntesis IA justo al lado (prioridad del usuario:
+         "esa tarjeta la vamos a poner la primera arriba, al lado de las
+         cámaras"), agenda, altimetría junto a lluvia/viento, actualidad
+         institucional/apoyo a decisión después, contexto mediático relegado
+         más abajo (mismo pedido), tendencia la última (de momento aporta
+         poco, spec 025). Solo afecta al orden visual dentro del flex de
+         /inteligencia — el orden de montaje en `main.ts` no cambia. */
       :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-dgt-panel {
         order: 1;
       }
       :root[data-vista='inteligencia']:not([data-layout='movil']) #camaras-panel {
         order: 2;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #sintesis-ia-panel {
         order: 3;
       }
       :root[data-vista='inteligencia']:not([data-layout='movil']) #agenda-panel {
@@ -1680,7 +1682,7 @@
       :root[data-vista='inteligencia']:not([data-layout='movil']) #apoyo-decision-panel {
         order: 8;
       }
-      :root[data-vista='inteligencia']:not([data-layout='movil']) #sintesis-ia-panel {
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #media-panel {
         order: 9;
       }
       :root[data-vista='inteligencia']:not([data-layout='movil']) #protocolos-panel {
