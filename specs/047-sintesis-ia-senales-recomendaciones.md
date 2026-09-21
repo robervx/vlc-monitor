@@ -3,22 +3,35 @@
 ```yaml
 id: 047
 titulo: "Panel de síntesis IA dividido en dos cajas: señales detalladas correlacionadas y recomendaciones de actuación por zona"
-estado: Implemented   # v2 — correlación en caliente + recomendaciones IA verificadas en vivo; histórico en Postgres (ADR-006) sigue pendiente de aprovisionar
+estado: Implemented   # v3 — correlación en caliente, recomendaciones IA e histórico en Postgres, los tres verificados en vivo
 tipo: capa
 depende_de: [004, 013, 024, 026, 027, 044, 045]
 propietario: ""
-version: 2
+version: 3
 ```
 
+> **v3 (2026-09-21)**: el usuario creó el proyecto Neon (neon.tech, free tier) y compartió
+> la cadena de conexión — verificada con una consulta real antes de tocar nada
+> (`select version()`, Postgres 18.6). Migraciones aplicadas
+> (`scripts/migrations/001_modelo_dominio.sql`, `002_seed_distritos_fuentes.sql`, ver
+> `docs/04_MODELO_DE_DATOS.md` §13 para la corrección de diseño que se aplicó antes de
+> escribir el esquema real). Implementada la escritura histórica
+> (`src/services/historico-senales.ts`): `SenalCorrelacionada` gana un campo `fuenteId`
+> real (antes solo existía `fuenteSpec`, que apunta a specs de este repo, no a la
+> procedencia real — corrige el gap que señalaba `docs/04_MODELO_DE_DATOS.md` §6/§8).
+> Alcance deliberado de v1 de la escritura: solo se persisten señales `aviso`/`urgente`
+> (verificado en vivo: la mayoría de las ~250-500 señales por ciclo son `informativo` y no
+> aportan valor histórico) y solo se inserta una fila nueva si cambió la severidad o la
+> descripción respecto a la última fila conocida de esa entidad (evita llenar el free tier
+> de filas idénticas repetidas cada 90 min). Verificado end-to-end contra la base de datos
+> real: 62 señales, 336 asociaciones y varias recomendaciones con su enlace a las señales
+> que las motivaron, todo consultado directamente en Neon tras un ciclo real.
+>
 > **v2 (2026-09-17)**: implementada y verificada en vivo la correlación en caliente
 > (`src/services/correlacion-senales.ts`) y las recomendaciones de actuación
 > (`src/services/sintesis-ia-v2.ts`, `src/server/sintesis-ia-v2.ts`), endpoint
 > `GET /api/sintesis/v2/actual`, dos cajas en `/inteligencia`
-> (`senales-ia-panel.ts`/`recomendaciones-actuacion-panel.ts`). **Pendiente
-> explícitamente**: la escritura en `senales_historico` (Postgres, `ADR-006`) — bloqueada
-> en crear el proyecto Neon/Supabase, paso que necesita al usuario. Sin esa pieza, todo lo
-> demás de esta spec (correlación, endpoint, dos cajas, guardrails) funciona igual — es
-> aditivo, no bloqueante (§7).
+> (`senales-ia-panel.ts`/`recomendaciones-actuacion-panel.ts`).
 
 > Sustituye/amplía `045` (no lo deprecamos: sigue `Implemented` como base — esta es la
 > siguiente versión de su mismo panel, prioridad explícita del usuario: "esa tarjeta la
@@ -192,9 +205,11 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
 - [x] Ninguna `SenalCorrelacionada`/`RecomendacionActuacion` contiene un identificador de
       persona o vehículo — sin campo para ello por diseño, más `contieneIdentificadorPersonal`
       (test con matrícula/DNI-like simulados).
-- [ ] Escritura en `senales_historico` verificada con al menos una inserción y lectura
-      reales contra la instancia Postgres del usuario — **pendiente**, bloqueado en crear el
-      proyecto Neon/Supabase (§7).
+- [x] Escritura histórica verificada con inserciones y lecturas reales contra la instancia
+      Postgres del usuario (`historico-senales.ts`, esquema real `senal`/`asociacion`/
+      `recomendacion`/`recomendacion_senal` de `docs/04_MODELO_DE_DATOS.md`) — 62 señales,
+      336 asociaciones y varias recomendaciones enlazadas, confirmadas con consultas
+      directas a Neon tras un ciclo real (v3).
 - [x] Advertencias visibles (banner general + línea de "no autoriza ninguna actuación")
       verificadas en navegador.
 - [x] `v1/actual` (`045`) sigue respondiendo sin cambios mientras `v2` se verifica — no se
@@ -202,19 +217,16 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
 
 ## 7. Riesgos y fuera de alcance
 
-- **Bloqueante de despliegue**: crear el proyecto Neon/Supabase (Vercel Marketplace, free
-  tier) y añadir su cadena de conexión como variable de entorno — paso que necesita al
-  usuario (`ADR-006`), igual que ya pasó con Upstash (sin aprovisionar todavía) y con la
-  clave de Gemini de `045`. Sin esa pieza, la correlación en caliente (§3-§4 sin la
-  escritura histórica) sigue siendo implementable y útil por sí sola — no bloquea todo lo
-  demás. El esquema de la tabla histórica (§3 de aquí, `senales_historico`) queda
-  superado por el modelo de dominio completo de `docs/04_MODELO_DE_DATOS.md`
-  (`senal`/`fuente`/`asociacion`/`recomendacion`/`evento_programado`) — cuando se
-  implemente la escritura, usar ese esquema, no el borrador de §3.
-- **Crecimiento de la tabla histórica**: sin política de retención, `senales_historico`
-  crece sin límite. Mitigación prevista (igual que ya hace `trafico-historico` con
-  rollups diarios): agregar/podar registros más allá de N días a un rollup por
-  distrito/día, no borrar sin más.
+- ~~**Bloqueante de despliegue**: crear el proyecto Neon~~ **Resuelto en v3** (2026-09-21)
+  — proyecto creado en neon.tech, conexión verificada, migraciones aplicadas. El esquema
+  real usado es el de `docs/04_MODELO_DE_DATOS.md` (`senal`/`fuente`/`asociacion`/
+  `recomendacion`/`evento_programado`), no el borrador de una única tabla
+  `senales_historico` que barajaba una versión anterior de esta spec.
+- **Crecimiento de la tabla histórica**: mitigado en la propia escritura de v3 — solo se
+  persisten señales `aviso`/`urgente` (no toda señal `informativo`) y solo si cambió el
+  estado respecto a la última fila conocida (§13.2 de `docs/04_MODELO_DE_DATOS.md`), no en
+  cada ciclo de 90 min. Si aun así creciera demasiado, el mismo patrón de rollup que ya usa
+  `trafico-historico` (agregar por distrito/día) sigue disponible como mitigación futura.
 - **El modelo no debe inventar correlaciones**: `relacionadas` se calcula en servidor de
   forma determinista (distrito/proximidad/ventana horaria) antes de llamar al modelo — el
   modelo redacta a partir de eso, nunca decide qué está relacionado con qué. Si el
@@ -254,3 +266,4 @@ No aplica — sigue siendo un panel de `/inteligencia`, no una capa de `/mapa` (
 |---|---|---|
 | 1 | 2026-09-17 | Creación — inventario de fuentes ya `Implemented` con granularidad calle/punto (confirmado: no hace falta fuente nueva ni lectura de imagen del mapa), contrato de datos propuesto para dos cajas (señales/recomendaciones), esquema de histórico ligado a `ADR-006`. Sin implementar todavía. |
 | 2 | 2026-09-17 | **Implementado** — correlación en caliente (`correlacion-senales.ts`, 11 tests) y recomendaciones de actuación (`sintesis-ia-v2.ts`, 11 tests) sin esperar a Postgres, a petición explícita del usuario. Endpoint `GET /api/sintesis/v2/actual` registrado junto a `v1`. Dos cajas nuevas en `/inteligencia` (`senales-ia-panel.ts`, `recomendaciones-actuacion-panel.ts`), sustituyen la UI de `045` v1 (el endpoint `v1` se mantiene intacto). 3 bugs reales encontrados y corregidos en la verificación en vivo: duplicados de incidencias con el mismo id (una obra partida en varias features), severidad mal calibrada por `tipo` en vez de `afectacion`, y prompt/salida sin acotar que producía 503 por tamaño y respuestas cortadas por `maxOutputTokens`. Verificado con 8/8 recomendaciones reales válidas en una llamada, señales reales renderizadas en navegador (escritorio y móvil). 428/428 tests, `typecheck`/`build` verdes. Pendiente: escritura en `senales_historico` (bloqueada en crear el proyecto Postgres, `ADR-006`). |
+| 3 | 2026-09-21 | **Cierra el pendiente de v2** — proyecto Neon creado y conectado (verificado con `select version()` antes de tocar nada), migraciones aplicadas contra el esquema real de `docs/04_MODELO_DE_DATOS.md`. `historico-senales.ts` implementa la escritura por cambio de estado (solo señales aviso/urgente, solo si cambió el estado desde la última fila conocida) y las asociaciones/recomendaciones como filas de relación, nunca arrays. `SenalCorrelacionada` gana `fuenteId` (procedencia real, distinta de `fuenteSpec`). Verificado end-to-end contra la base real: 62 señales, 336 asociaciones, recomendaciones con su enlace a las señales que las motivaron. 12 tests nuevos (440 en total), `typecheck`/`build` verdes. Sin huecos pendientes. |

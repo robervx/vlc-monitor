@@ -53,6 +53,11 @@ describe('correlacionarTrafico', () => {
     expect(senal!.lat).not.toBeNull();
     expect(senal!.lon).not.toBeNull();
   });
+
+  it('asigna la fuente real del catálogo (docs/04_MODELO_DE_DATOS.md), no el id de spec', () => {
+    const [senal] = correlacionarTrafico([tramo()], FETCHED_AT);
+    expect(senal!.fuenteId).toBe('ajuntament-valencia-geoportal');
+  });
 });
 
 function incidencia(overrides: Partial<IncidenciaViaPublica> = {}): IncidenciaViaPublica {
@@ -183,6 +188,26 @@ describe('correlacionarEventos', () => {
     expect(senales).toHaveLength(1);
     expect(senales[0]!.id).toBe('evento:e1:07');
   });
+
+  it('usa el `source` real del evento como fuenteId, no un valor fijo', () => {
+    const eventos: EventoAgenda[] = [
+      {
+        id: 'e1',
+        titulo: 'Partido Valencia CF',
+        categoria: 'DEPORTE',
+        fechaInicio: '2026-09-17T18:00:00.000Z',
+        fechaFin: '2026-09-17T20:00:00.000Z',
+        resumen: null,
+        url: 'https://example.com/e1',
+        distritosMencionados: [{ distritoCodigo: '07', distritoNombre: 'Quatre Carreres', coincidencia: 'distrito', textoCoincidente: 'Mestalla', bajaConfianza: false }],
+        fetchedAt: FETCHED_AT,
+        source: 'valencia-cf-scraping',
+        impactoViaPublica: true,
+      },
+    ];
+    const [senal] = correlacionarEventos(eventos, AHORA, FETCHED_AT);
+    expect(senal!.fuenteId).toBe('valencia-cf-scraping');
+  });
 });
 
 describe('enlazarPorDistrito', () => {
@@ -212,6 +237,7 @@ describe('correlacionarCamaras', () => {
     expect(senales).toHaveLength(1);
     expect(senales[0]!.id).toBe('camara:cam1');
     expect(senales[0]!.relacionadas).toEqual(['trafico:t1']);
+    expect(senales[0]!.fuenteId).toBe('dgt');
   });
 });
 

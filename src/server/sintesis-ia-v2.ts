@@ -14,6 +14,8 @@
 import { generateObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { getOrFetch } from './_shared/cache';
+import { db } from './_shared/db';
+import { escribirHistoricoSenales, escribirHistoricoRecomendaciones } from '../services/historico-senales';
 import {
   correlacionarSenales,
   type SenalCorrelacionada,
@@ -118,6 +120,10 @@ interface SintesisV2 {
 async function fetchSintesisV2(): Promise<SintesisV2> {
   const senales = await construirSenales();
   const recomendaciones = await generarRecomendaciones(senales);
+  // Histórico (ADR-006) — best-effort: sin DATABASE_URL o si falla, no
+  // afecta a la respuesta en caliente (ver historico-senales.ts).
+  const { idsPersistidos } = await escribirHistoricoSenales(db(), senales);
+  await escribirHistoricoRecomendaciones(db(), recomendaciones, MODELO, idsPersistidos);
   return { senales, recomendaciones, generadaEn: new Date().toISOString(), modelo: MODELO };
 }
 

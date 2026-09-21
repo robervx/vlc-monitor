@@ -80,9 +80,11 @@ antes de tocar la base de datos, no después.
 
 - `047` puede diseñar su contrato de datos asumiendo Postgres como destino del histórico,
   sin tener que inventar una solución ad-hoc sobre Redis.
-- Queda pendiente, antes de poder implementar la parte de escritura de `047`: crear el
-  proyecto Neon (neon.tech, free tier) y añadir su cadena de conexión
-  como variable de entorno — paso que necesita al usuario, igual que ya ocurrió con la
-  clave de Gemini (spec `045`) y sigue pendiente para Upstash.
 - Se añade una fila a `CLAUDE.md` §5 señalando esta ADR, sin borrar ni contradecir la fila
   de Redis existente.
+
+**Actualización (2026-09-21) — resuelta**: el usuario creó el proyecto Neon (neon.tech,
+free tier) y compartió la cadena de conexión, verificada con una consulta real
+(`select version()`, Postgres 18.6) antes de tocar nada más. Migraciones aplicadas
+(`scripts/migrations/`), y `047` v3 escribe histórico real — ver su historial. Redis
+(Upstash) sigue sin aprovisionar, sin relación con esto.

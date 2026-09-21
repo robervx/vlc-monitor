@@ -22,6 +22,7 @@ function senal(overrides: Partial<SenalCorrelacionada> = {}): SenalCorrelacionad
     observedAt: '2026-09-17T12:00:00.000Z',
     fetchedAt: '2026-09-17T12:00:00.000Z',
     fuenteSpec: ['004'],
+    fuenteId: 'ajuntament-valencia-geoportal',
     ...overrides,
   };
 }

@@ -43,6 +43,12 @@ export interface SenalCorrelacionada {
   observedAt: string;
   fetchedAt: string;
   fuenteSpec: string[];
+  /**
+   * Procedencia real (catálogo `fuente` de `docs/04_MODELO_DE_DATOS.md` §1.2/§10)
+   * — distinta de `fuenteSpec` (qué spec de este repo la produce). Necesaria
+   * para persistir en Postgres (ADR-006) con `fuente_id` real, no un id de spec.
+   */
+  fuenteId: string;
 }
 
 export interface EntradaCorrelacion {
@@ -88,6 +94,7 @@ export function correlacionarTrafico(tramos: TramoTrafico[], fetchedAt: string):
       observedAt: t.observedAt,
       fetchedAt,
       fuenteSpec: ['004'],
+      fuenteId: 'ajuntament-valencia-geoportal',
     });
   }
   return salida;
@@ -137,6 +144,7 @@ export function correlacionarIncidencias(incidenciasCrudas: IncidenciaViaPublica
     observedAt: i.vigenciaDesde,
     fetchedAt,
     fuenteSpec: ['026'],
+    fuenteId: 'ajuntament-valencia-geoportal',
   }));
 }
 
@@ -164,6 +172,7 @@ export function correlacionarClima(distritos: LluviaVientoDistrito[], fetchedAt:
       observedAt: d.fecha,
       fetchedAt,
       fuenteSpec: ['044'],
+      fuenteId: 'open-meteo',
     });
   }
   return salida;
@@ -198,6 +207,7 @@ export function correlacionarEventos(
         observedAt: e.fechaInicio,
         fetchedAt,
         fuenteSpec: ['027'],
+        fuenteId: e.source,
       });
     }
   }
@@ -245,6 +255,7 @@ export function correlacionarCamaras(
       observedAt: fetchedAt,
       fetchedAt,
       fuenteSpec: ['043'],
+      fuenteId: 'dgt',
     });
   }
   return salida;

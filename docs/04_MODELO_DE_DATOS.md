@@ -567,14 +567,28 @@ modelo no tenía dónde guardar eso. Añadido `es_sintetico boolean` a `senal` (
   investigadores sin montar nada nuevo, solo exponiendo `senal` de forma controlada. No es
   parte de esta ronda, pero es una opción real que antes no existía.
 
-## 14. Siguiente paso
+## 14. Siguiente paso — completado (2026-09-21)
 
-Este documento es el gate — antes de escribir la migración SQL real contra Neon:
+Los tres pasos de este gate ya se cumplieron, en orden:
 
-1. El usuario crea el proyecto Neon (ver mensaje de chat correspondiente — requiere una
-   cuenta, paso que no puede hacer una sesión de Claude Code) y comparte la cadena de
-   conexión (solo por env var, nunca en un fichero versionado — mismo patrón que
-   `GOOGLE_GENERATIVE_AI_API_KEY`).
-2. Se revisa/ajusta este documento con lo que el usuario quiera cambiar.
-3. Solo entonces: migración SQL real (§10, ajustado), cliente Postgres en
-   `src/server/_shared/`, y la escritura histórica de `047` (pendiente desde su v2).
+1. ~~El usuario crea el proyecto Neon...~~ **Hecho**: proyecto creado en neon.tech,
+   conexión verificada con una consulta real (`select version()`, Postgres 18.6) antes de
+   tocar nada más. Cadena de conexión solo en `.env.local` (gitignored), nunca en un
+   fichero versionado.
+2. ~~Se revisa/ajusta este documento...~~ **Hecho**: revisión senior aplicada en §13 —
+   corrigió un bug de diseño real (el `UNIQUE` original habría colapsado el histórico) y
+   decidió columnas sueltas sin PostGIS (§4) antes de aplicar nada.
+3. ~~Migración SQL real, cliente Postgres, escritura histórica de `047`...~~ **Hecho**:
+   `scripts/migrations/001_modelo_dominio.sql` + `002_seed_distritos_fuentes.sql`
+   (aplicadas con `scripts/aplicar-migracion.ts`, que registra en `schema_migrations` cuáles
+   ya se ejecutaron), `src/server/_shared/db.ts` (cliente Neon compartido, degrada a `null`
+   sin `DATABASE_URL`), `src/services/historico-senales.ts` (escritura por cambio de
+   estado, solo señales `aviso`/`urgente` — ver `047` v3 para el detalle). Verificado
+   end-to-end contra la base real: 62 señales, 336 asociaciones, recomendaciones
+   enlazadas.
+
+**Qué sigue, si hace falta más adelante** (no bloqueante, no es parte de este gate):
+usar el histórico ya real para dar contexto a las recomendaciones de `047` (la v3 que la
+propia spec ya anota como pendiente futura — la razón de fondo de todo este trabajo),
+perfiles de "normalidad" por distrito/hora, y reutilizar este mismo modelo para la spec
+`046` en vez de un almacén paralelo (§13.4).
