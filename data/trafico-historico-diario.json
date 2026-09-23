@@ -1,1 +1,702 @@
-[]
+[
+  {
+    "fecha": "2026-08-18",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 4
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0.022222222222222223,
+        "muestras": 4
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 4
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0.041666666666666664,
+        "muestras": 4
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 4
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-19",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 2
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0.022222222222222223,
+        "muestras": 2
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 2
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0.041666666666666664,
+        "muestras": 2
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 2
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-20",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 2
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0.022222222222222223,
+        "muestras": 2
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 2
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0.041666666666666664,
+        "muestras": 2
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 2
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-21",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 4
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 4
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 4
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 4
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-22",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 2
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 2
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 2
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-23",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.15384615384615385,
+        "muestras": 2
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 2
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 2
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 2
+      }
+    ]
+  },
+  {
+    "fecha": "2026-08-24",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "02",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "03",
+        "congestionMedia": 0.16666666666666666,
+        "muestras": 3
+      },
+      {
+        "codigo": "04",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "05",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "06",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "07",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "08",
+        "congestionMedia": 0.07692307692307693,
+        "muestras": 3
+      },
+      {
+        "codigo": "09",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "10",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "11",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "12",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "13",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "14",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "15",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "16",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "17",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "18",
+        "congestionMedia": 0,
+        "muestras": 3
+      },
+      {
+        "codigo": "19",
+        "congestionMedia": 0,
+        "muestras": 3
+      }
+    ]
+  }
+]
