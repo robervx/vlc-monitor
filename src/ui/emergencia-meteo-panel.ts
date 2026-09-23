@@ -12,6 +12,7 @@ import type { ResumenAltimetriaDistrito } from '../services/altimetria';
 import type { LluviaVientoDistrito } from '../services/meteo-zona';
 import type { PluviometroSaih } from '../services/pluviometros-saih';
 import type { EstacionAvamet } from '../services/avamet-estaciones';
+import { ADVERTENCIA_RIESGO_ESCORRENTIA, type RiesgoEscorrentiaDistrito } from '../services/riesgo-escorrentia';
 import { escapeHtml, metaFrescura, startPolling } from './panel-utils';
 
 async function fetchAltimetria(): Promise<ResumenAltimetriaDistrito[]> {
@@ -37,6 +38,12 @@ async function fetchAvamet(): Promise<{ estaciones: EstacionAvamet[]; fresh: boo
   const res = await fetch('/api/emergencia/v1/avamet');
   if (!res.ok) throw new Error(`GET /api/emergencia/v1/avamet -> HTTP ${res.status}`);
   return (await res.json()) as { estaciones: EstacionAvamet[]; fresh: boolean };
+}
+
+async function fetchRiesgoEscorrentia(): Promise<{ distritos: RiesgoEscorrentiaDistrito[]; fresh: boolean }> {
+  const res = await fetch('/api/emergencia/v1/riesgo-escorrentia');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/riesgo-escorrentia -> HTTP ${res.status}`);
+  return (await res.json()) as { distritos: RiesgoEscorrentiaDistrito[]; fresh: boolean };
 }
 
 function renderAltimetria(distritos: ResumenAltimetriaDistrito[]): string {
@@ -103,6 +110,31 @@ function renderPluviometros(estaciones: PluviometroSaih[]): string {
     .join('');
 }
 
+// Ranking ordinal (no bandas "alto/medio/bajo": con solo 19 distritos, cortes
+// fijos son arbitrarios y se confunden con niveles oficiales de Protección
+// Civil/AEMET — spec 046 §3). Solo lista distritos `activo` (lluvia por
+// encima del umbral); si ninguno lo está, el estado es "sin lluvia" — nunca
+// un índice en reposo que invite a leerse como "riesgo bajo pero presente".
+function renderRiesgoEscorrentia(distritos: RiesgoEscorrentiaDistrito[]): string {
+  if (distritos.length === 0) return '<div class="info-panel__desc">Sin datos de riesgo de escorrentía.</div>';
+  const activos = distritos.filter((d) => d.activo);
+  if (activos.length === 0) {
+    return '<div class="info-panel__desc">Sin lluvia registrada ahora mismo — el indicador solo se activa con lluvia en curso.</div>';
+  }
+  const ordenado = [...activos].sort((a, b) => b.indiceRelativo - a.indiceRelativo);
+  return ordenado
+    .map(
+      (d) => `
+        <div class="escorrentia-fila">
+          <span class="escorrentia-fila__nombre">${escapeHtml(d.distritoNombre)}</span>
+          <span class="escorrentia-fila__barra"><span style="width:${d.indiceRelativo}%"></span></span>
+          <span class="escorrentia-fila__valor">${d.indiceRelativo}</span>
+        </div>
+      `,
+    )
+    .join('');
+}
+
 // ---------------------------------------------------------------------------
 // Caja 1 — Altimetría (estática, IGN)
 // ---------------------------------------------------------------------------
@@ -155,12 +187,19 @@ export function montarMeteoZonaPanel(): void {
       <div id="emergencia-avamet-list"></div>
       <div class="info-panel__meta" id="emergencia-avamet-meta"></div>
     </div>
+    <div class="emergencia-meteo__bloque">
+      <div class="emergencia-meteo__subtitulo">Riesgo de acumulación de agua (imbornales × lluvia) — spec 046</div>
+      <p class="cordon-intro">${escapeHtml(ADVERTENCIA_RIESGO_ESCORRENTIA)}</p>
+      <div id="emergencia-escorrentia-list"></div>
+      <div class="info-panel__meta" id="emergencia-escorrentia-meta"></div>
+    </div>
   `;
   document.body.appendChild(root);
 
   const meteoZonaList = root.querySelector('#emergencia-meteo-zona-list')!;
   const pluviometrosList = root.querySelector('#emergencia-pluviometros-list')!;
   const avametList = root.querySelector('#emergencia-avamet-list')!;
+  const escorrentiaList = root.querySelector('#emergencia-escorrentia-list')!;
 
   async function refrescarMeteoZona(): Promise<void> {
     try {
@@ -195,7 +234,23 @@ export function montarMeteoZonaPanel(): void {
     }
   }
 
+  async function refrescarEscorrentia(): Promise<void> {
+    try {
+      const { distritos, fresh } = await fetchRiesgoEscorrentia();
+      escorrentiaList.innerHTML = renderRiesgoEscorrentia(distritos);
+      root.querySelector('#emergencia-escorrentia-meta')!.innerHTML = metaFrescura(
+        'Geoportal (imbornales) + Open-Meteo (lluvia)',
+        new Date().toISOString(),
+        fresh,
+      );
+    } catch (err) {
+      escorrentiaList.textContent = 'Riesgo de acumulación de agua no disponible';
+      console.error('Fallo al cargar riesgo de escorrentía:', err);
+    }
+  }
+
   startPolling(refrescarMeteoZona, 15 * 60 * 1000);
   startPolling(refrescarPluviometros, 15 * 60 * 1000);
   startPolling(refrescarAvamet, 15 * 60 * 1000);
+  startPolling(refrescarEscorrentia, 15 * 60 * 1000); // misma cadencia que meteo-zona — el único término dinámico es la lluvia
 }

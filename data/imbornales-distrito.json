@@ -1,0 +1,154 @@
+[
+  {
+    "distritoCodigo": "19",
+    "distritoNombre": "Poblats del Sud",
+    "imbornalesCount": 2834,
+    "areaKm2": 66.02727646109997,
+    "densidadImbornalesPorKm2": 42.921655289986916,
+    "vulnerabilidadPercentil": 100
+  },
+  {
+    "distritoCodigo": "17",
+    "distritoNombre": "Poblats del Nord",
+    "imbornalesCount": 1282,
+    "areaKm2": 15.156451979659323,
+    "densidadImbornalesPorKm2": 84.58443979636559,
+    "vulnerabilidadPercentil": 94.44444444444444
+  },
+  {
+    "distritoCodigo": "10",
+    "distritoNombre": "Quatre Carreres",
+    "imbornalesCount": 6534,
+    "areaKm2": 11.311509694620327,
+    "densidadImbornalesPorKm2": 577.6417274439966,
+    "vulnerabilidadPercentil": 88.88888888888889
+  },
+  {
+    "distritoCodigo": "04",
+    "distritoNombre": "Campanar",
+    "imbornalesCount": 3794,
+    "areaKm2": 5.230542160003097,
+    "densidadImbornalesPorKm2": 725.3550174993244,
+    "vulnerabilidadPercentil": 83.33333333333333
+  },
+  {
+    "distritoCodigo": "18",
+    "distritoNombre": "Poblats de l'Oest",
+    "imbornalesCount": 1587,
+    "areaKm2": 2.008433400449576,
+    "densidadImbornalesPorKm2": 790.1680980035283,
+    "vulnerabilidadPercentil": 77.77777777777777
+  },
+  {
+    "distritoCodigo": "11",
+    "distritoNombre": "Poblats Maritims",
+    "imbornalesCount": 7364,
+    "areaKm2": 8.486863241370884,
+    "densidadImbornalesPorKm2": 867.6939630772808,
+    "vulnerabilidadPercentil": 72.22222222222223
+  },
+  {
+    "distritoCodigo": "14",
+    "distritoNombre": "Benimaclet",
+    "imbornalesCount": 1650,
+    "areaKm2": 1.575981619891536,
+    "densidadImbornalesPorKm2": 1046.9665249735326,
+    "vulnerabilidadPercentil": 66.66666666666667
+  },
+  {
+    "distritoCodigo": "09",
+    "distritoNombre": "Jesus",
+    "imbornalesCount": 3219,
+    "areaKm2": 2.980426733076456,
+    "densidadImbornalesPorKm2": 1080.0466806567945,
+    "vulnerabilidadPercentil": 61.111111111111114
+  },
+  {
+    "distritoCodigo": "15",
+    "distritoNombre": "Rascanya",
+    "imbornalesCount": 2929,
+    "areaKm2": 2.6257574676710647,
+    "densidadImbornalesPorKm2": 1115.4876396858917,
+    "vulnerabilidadPercentil": 55.55555555555556
+  },
+  {
+    "distritoCodigo": "13",
+    "distritoNombre": "Algiros",
+    "imbornalesCount": 3749,
+    "areaKm2": 2.935894186681253,
+    "densidadImbornalesPorKm2": 1276.9533782952462,
+    "vulnerabilidadPercentil": 50
+  },
+  {
+    "distritoCodigo": "16",
+    "distritoNombre": "Benicalap",
+    "imbornalesCount": 3049,
+    "areaKm2": 2.212703724624589,
+    "densidadImbornalesPorKm2": 1377.9522156845912,
+    "vulnerabilidadPercentil": 44.44444444444444
+  },
+  {
+    "distritoCodigo": "08",
+    "distritoNombre": "Patraix",
+    "imbornalesCount": 4192,
+    "areaKm2": 2.8682865731825586,
+    "densidadImbornalesPorKm2": 1461.4997117769483,
+    "vulnerabilidadPercentil": 38.888888888888886
+  },
+  {
+    "distritoCodigo": "06",
+    "distritoNombre": "El Pla del Real",
+    "imbornalesCount": 2646,
+    "areaKm2": 1.6839083269878756,
+    "densidadImbornalesPorKm2": 1571.3444476713794,
+    "vulnerabilidadPercentil": 33.333333333333336
+  },
+  {
+    "distritoCodigo": "12",
+    "distritoNombre": "Camins al Grau",
+    "imbornalesCount": 3819,
+    "areaKm2": 2.3597938736565993,
+    "densidadImbornalesPorKm2": 1618.361689397176,
+    "vulnerabilidadPercentil": 27.77777777777778
+  },
+  {
+    "distritoCodigo": "05",
+    "distritoNombre": "La Saidia",
+    "imbornalesCount": 3305,
+    "areaKm2": 1.9410671110381372,
+    "densidadImbornalesPorKm2": 1702.671680544004,
+    "vulnerabilidadPercentil": 22.22222222222222
+  },
+  {
+    "distritoCodigo": "03",
+    "distritoNombre": "Extramurs",
+    "imbornalesCount": 3429,
+    "areaKm2": 1.9689579450932797,
+    "densidadImbornalesPorKm2": 1741.5303402214365,
+    "vulnerabilidadPercentil": 16.666666666666668
+  },
+  {
+    "distritoCodigo": "07",
+    "distritoNombre": "l'Olivereta",
+    "imbornalesCount": 3474,
+    "areaKm2": 1.986187387155951,
+    "densidadImbornalesPorKm2": 1749.0796802281925,
+    "vulnerabilidadPercentil": 11.11111111111111
+  },
+  {
+    "distritoCodigo": "02",
+    "distritoNombre": "l'Eixample",
+    "imbornalesCount": 3307,
+    "areaKm2": 1.7283307245379547,
+    "densidadImbornalesPorKm2": 1913.4069382953778,
+    "vulnerabilidadPercentil": 5.555555555555555
+  },
+  {
+    "distritoCodigo": "01",
+    "distritoNombre": "Ciutat Vella",
+    "imbornalesCount": 5722,
+    "areaKm2": 1.6874798233475303,
+    "densidadImbornalesPorKm2": 3390.8553576948902,
+    "vulnerabilidadPercentil": 0
+  }
+]

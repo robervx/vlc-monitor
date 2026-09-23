@@ -23,6 +23,7 @@ import type { VentanaTendencia } from './services/tendencia-terminos';
 import type { EventoAgenda, SnapshotAgenda } from './services/agenda-eventos';
 import type { AvisoMovilidad, SnapshotAvisosMovilidad } from './services/movilidad-incidencias-previsiones';
 import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
+import type { RiesgoEscorrentiaDistrito } from './services/riesgo-escorrentia';
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility, PANEL_PREFERENCES_REGISTRY } from './ui/panel-preferences';
 import { registrarFrescura } from './ui/estado-frescura';
@@ -685,6 +686,41 @@ async function fetchDatosFallasActual(): Promise<DatosFallas & { fresh: boolean 
   return (await res.json()) as DatosFallas & { fresh: boolean };
 }
 
+// Azul (agua) — distinto del rojo/naranja/dorado ya usados por otras capas.
+// Gris neutro cuando `activo` es false (sin lluvia registrada): el índice es
+// 0 por diseño de la fórmula (spec 046 §3), no se pinta como si fuera "riesgo
+// bajo" — es "no aplica ahora mismo".
+const COLOR_ESCORRENTIA_INACTIVO: Color = [148, 163, 184, 40];
+function colorChoroplethEscorrentia(d: RiesgoEscorrentiaDistrito | undefined): Color {
+  if (!d || !d.activo) return COLOR_ESCORRENTIA_INACTIVO;
+  const t = d.indiceRelativo / 100;
+  return [Math.round(191 - t * 150), Math.round(219 - t * 130), 255, Math.round(60 + t * 170)];
+}
+
+function renderEscorrentiaLeyenda(root: HTMLDivElement, distritos: RiesgoEscorrentiaDistrito[], fresh: boolean): void {
+  const activos = distritos.filter((d) => d.activo).sort((a, b) => b.indiceRelativo - a.indiceRelativo);
+  const peor = activos[0];
+  root.innerHTML =
+    activos.length === 0
+      ? `
+        <div class="info-panel__desc">Riesgo de acumulación de agua</div>
+        <div class="trafico-leyenda__row">Sin lluvia registrada ahora mismo — indicador inactivo en los 19 distritos</div>
+        <div class="info-panel__meta">${metaFrescura('Geoportal + Open-Meteo', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+      `
+      : `
+        <div class="info-panel__desc">Riesgo de acumulación de agua — ${activos.length} distrito${activos.length === 1 ? '' : 's'} con lluvia activa</div>
+        <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(13,71,161)"></span>Peor comparativamente: ${escapeHtml(peor!.distritoNombre)} (${peor!.indiceRelativo})</div>
+        <div class="info-panel__meta">Estimación relativa, no una probabilidad de inundación — no sustituye avisos oficiales</div>
+        <div class="info-panel__meta">${metaFrescura('Geoportal + Open-Meteo', distritos[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+      `;
+}
+
+async function fetchRiesgoEscorrentiaActual(): Promise<{ distritos: RiesgoEscorrentiaDistrito[]; fresh: boolean }> {
+  const res = await fetch('/api/emergencia/v1/riesgo-escorrentia');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/riesgo-escorrentia -> HTTP ${res.status}`);
+  return (await res.json()) as { distritos: RiesgoEscorrentiaDistrito[]; fresh: boolean };
+}
+
 // Spec 026 — mostaza/morado/verde azulado: distintos de rojo (reservado para
 // spec 021), naranja (spec 022) y dorado (Fallas, spec 008).
 const COLOR_TIPO_VIA_PUBLICA: Record<TipoIncidenciaViaPublica, Color> = {
@@ -1140,6 +1176,7 @@ interface ControlPanel {
   aparcamientoToggle: HTMLInputElement;
   pulsoToggle: HTMLInputElement;
   fallasToggle: HTMLInputElement;
+  riesgoEscorrentiaToggle: HTMLInputElement;
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
   agendaToggle: HTMLInputElement;
@@ -1219,6 +1256,10 @@ function buildControlPanel(): ControlPanel {
         <input type="checkbox" id="toggle-fallas" />
         Fallas
       </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-riesgo-escorrentia" />
+        Riesgo de acumulación de agua
+      </label>
     </details>
   `;
   document.body.appendChild(panel);
@@ -1249,6 +1290,7 @@ function buildControlPanel(): ControlPanel {
     aparcamientoToggle: panel.querySelector('#toggle-aparcamiento')!,
     pulsoToggle: panel.querySelector('#toggle-pulso')!,
     fallasToggle: panel.querySelector('#toggle-fallas')!,
+    riesgoEscorrentiaToggle: panel.querySelector('#toggle-riesgo-escorrentia')!,
     // spec 040 — cámaras/contexto mediático/tendencia/agenda dejan de ser filas
     // del selector (se mudan a la vista /inteligencia, siempre visibles ahí, no
     // capas de mapa que se enciendan/apaguen). Se crean como checkboxes
@@ -1306,6 +1348,8 @@ async function main(): Promise<void> {
   let pulsoDistritos: PulsoDistrito[] = [];
   let fallasVisible = false;
   let datosFallas: DatosFallas = { monumentos: [], carpas: [], zonasMovilidadReducida: [] };
+  let riesgoEscorrentiaVisible = false;
+  let riesgoEscorrentia: RiesgoEscorrentiaDistrito[] = [];
   // v3 (DoD de V1, 2026-09-16) — los puntos calientes del mock de densidad
   // (más abajo) necesitan los monumentos falleros aunque la capa "Fallas" en
   // sí no esté activada; se cargan una vez, la primera vez que hagan falta.
@@ -1461,6 +1505,7 @@ async function main(): Promise<void> {
 
     const intensidadPorDistrito = new Map(densidadMock.map((d) => [d.distritoCodigo, d.intensidad]));
     const pulsoPorDistrito = new Map(pulsoDistritos.map((p) => [p.distritoCodigo, p]));
+    const riesgoEscorrentiaPorDistrito = new Map(riesgoEscorrentia.map((d) => [d.distritoCodigo, d]));
     // v4 (spec 010 §5) — escenarios vivo+confirmado, base de los marcadores y
     // de los puntos de tramo resaltados (primario); el choropleth de abajo es
     // el contexto.
@@ -1573,6 +1618,16 @@ async function main(): Promise<void> {
             pickable: false,
             getFillColor: (f) => colorChoroplethPulso(pulsoPorDistrito.get(f.properties.codigo)),
             updateTriggers: { getFillColor: [pulsoDistritos] },
+          }),
+        riesgoEscorrentiaVisible &&
+          new GeoJsonLayer<DistritoProperties>({
+            id: 'riesgo-escorrentia',
+            data: featureCollection,
+            stroked: false,
+            filled: true,
+            pickable: false,
+            getFillColor: (f) => colorChoroplethEscorrentia(riesgoEscorrentiaPorDistrito.get(f.properties.codigo)),
+            updateTriggers: { getFillColor: [riesgoEscorrentia] },
           }),
         pulsoTramosAfectados.length > 0 &&
           new ScatterplotLayer<(typeof pulsoTramosAfectados)[number]>({
@@ -2082,7 +2137,13 @@ async function main(): Promise<void> {
 
   // spec 033 — grupo "Contexto e informativas": contador de capas activas + se
   // abre solo si hay alguna encendida (p. ej. al llegar por una URL compartida).
-  const togglesContexto = [panel.mockToggle, panel.valenbisiToggle, panel.aparcamientoToggle, panel.fallasToggle];
+  const togglesContexto = [
+    panel.mockToggle,
+    panel.valenbisiToggle,
+    panel.aparcamientoToggle,
+    panel.fallasToggle,
+    panel.riesgoEscorrentiaToggle,
+  ];
   function actualizarContextoSelector(): void {
     const activas = togglesContexto.filter((t) => t.checked).length;
     panel.contextoContador.textContent = `${activas} / ${togglesContexto.length}`;
@@ -2287,6 +2348,32 @@ async function main(): Promise<void> {
     if (fallasVisible && !fallasPollingIniciado) {
       fallasPollingIniciado = true;
       startPolling(refreshFallas, 6 * 60 * 60 * 1000); // igual TTL que la caché del endpoint, spec 008 §4
+    } else {
+      renderLayers();
+    }
+  });
+
+  const riesgoEscorrentiaLeyendaRoot = buildInfoPanel('riesgo-escorrentia-leyenda', { colapsable: true });
+  riesgoEscorrentiaLeyendaRoot.hidden = true;
+  let riesgoEscorrentiaPollingIniciado = false;
+  async function refreshRiesgoEscorrentia(): Promise<void> {
+    try {
+      const { distritos: datos, fresh } = await fetchRiesgoEscorrentiaActual();
+      riesgoEscorrentia = datos;
+      renderLayers();
+      renderEscorrentiaLeyenda(riesgoEscorrentiaLeyendaRoot, datos, fresh);
+    } catch (err) {
+      riesgoEscorrentiaLeyendaRoot.textContent = 'Riesgo de acumulación de agua no disponible';
+      console.error('Fallo al cargar riesgo de escorrentía:', err);
+    }
+  }
+
+  panel.riesgoEscorrentiaToggle.addEventListener('change', () => {
+    riesgoEscorrentiaVisible = panel.riesgoEscorrentiaToggle.checked;
+    riesgoEscorrentiaLeyendaRoot.hidden = !riesgoEscorrentiaVisible;
+    if (riesgoEscorrentiaVisible && !riesgoEscorrentiaPollingIniciado) {
+      riesgoEscorrentiaPollingIniciado = true;
+      startPolling(refreshRiesgoEscorrentia, 15 * 60 * 1000); // igual TTL que la caché del endpoint (hereda el de meteo-zona), spec 046 §4
     } else {
       renderLayers();
     }

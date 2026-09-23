@@ -1802,7 +1802,8 @@
 
       .altimetria-fila,
       .meteo-zona-fila,
-      .pluviometro-fila {
+      .pluviometro-fila,
+      .escorrentia-fila {
         display: flex;
         align-items: center;
         gap: 6px;
@@ -1812,13 +1813,15 @@
       }
 
       .altimetria-fila__nombre,
-      .meteo-zona-fila__nombre {
+      .meteo-zona-fila__nombre,
+      .escorrentia-fila__nombre {
         flex: 0 0 84px;
         font-weight: 600;
         color: #333;
       }
 
-      .altimetria-fila__barra {
+      .altimetria-fila__barra,
+      .escorrentia-fila__barra {
         flex: 1;
         height: 8px;
         background: #eef2f5;
@@ -1832,7 +1835,15 @@
         background: linear-gradient(90deg, #8bc34a, #d4a017, #b45f4d);
       }
 
-      .altimetria-fila__valor {
+      /* Azul (agua), no el verde-ámbar-marrón de altimetría — distinto concepto, mismo layout. */
+      .escorrentia-fila__barra > span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, #90caf9, #1e88e5, #0d47a1);
+      }
+
+      .altimetria-fila__valor,
+      .escorrentia-fila__valor {
         flex: 0 0 48px;
         text-align: right;
         color: #555;

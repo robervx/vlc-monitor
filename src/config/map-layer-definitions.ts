@@ -162,6 +162,14 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
     zoomMinimo: 0,
     agregacion: 'lista',
   },
+  riesgoEscorrentia: {
+    key: 'riesgoEscorrentia',
+    specId: '046',
+    grupo: 'contexto',
+    renderers: ['deck'],
+    zoomMinimo: 0,
+    agregacion: 'choropleth-distrito',
+  },
   //
   // No añadas entradas aquí sin que exista antes la spec correspondiente
   // en specs/, con su contrato de capa ya congelado (sección 5 de la spec).

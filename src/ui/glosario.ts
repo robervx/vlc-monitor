@@ -132,6 +132,12 @@ const META_CAPAS: Record<string, MetaCapa> = {
     frecuencia: 'Caché refrescada cada ~6 h',
     fuente: 'Scraping de valencia.es/cas/movilidad/incidencias-y-previsiones (no es una API/dataset oficial, se avisa en el propio panel)',
   },
+  riesgoEscorrentia: {
+    nombre: 'Riesgo de acumulación de agua',
+    mide: 'Índice relativo (0-100) entre distritos, combinando densidad de imbornales y lluvia registrada ahora mismo — en 0 sin lluvia activa, no es una probabilidad de inundación ni sustituye avisos oficiales de Protección Civil',
+    frecuencia: 'Densidad de imbornales: dato fijo (seed único). Lluvia: caché refrescada cada ~15 min',
+    fuente: 'Geoportal del Ajuntament de València (ArcGIS, capa de imbornales) + Open-Meteo (lluvia por distrito, spec 044)',
+  },
 };
 
 /** Claves de `LAYER_REGISTRY` sin entrada en `META_CAPAS` — debe ser [] siempre. */

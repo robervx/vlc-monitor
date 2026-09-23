@@ -26225,12006 +26225,6 @@ function construirHistoricoDistrito(snapshots, rollups, distritoCodigo, dias, ah
 // data/trafico-historico.json
 var trafico_historico_default = [
   {
-    timestamp: "2026-08-18T20:28:13.585Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-18T20:28:23.923Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-18T22:23:33.646Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-18T23:22:00.135Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T01:13:56.396Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T02:57:28.943Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T03:50:27.704Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T04:36:39.999Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T05:30:02.003Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T06:42:31.319Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T07:38:08.957Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T08:37:15.879Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T09:34:12.512Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T10:28:41.891Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T11:25:21.805Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T12:45:52.396Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T13:43:39.245Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T14:33:41.544Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T15:31:06.170Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T16:31:25.698Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T17:26:52.898Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T18:35:02.281Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T19:24:57.358Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T20:27:24.425Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T21:25:08.211Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T22:24:32.192Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-19T23:22:16.776Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T01:13:22.970Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T02:56:42.288Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T03:50:00.973Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T04:36:48.320Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T05:30:55.998Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T06:44:33.258Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T07:40:28.601Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0.022222222222222223,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0.041666666666666664,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T08:38:19.518Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T09:34:20.864Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T10:30:11.324Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T11:26:03.921Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T12:49:17.150Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T13:46:48.650Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0.010344827586206896,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T14:36:08.306Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T15:33:38.653Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T16:35:05.663Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T17:29:02.749Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T18:38:33.451Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T19:31:27.787Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T20:28:16.125Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T21:28:03.626Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T22:27:45.479Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-20T23:25:11.250Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T01:17:18.962Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T03:02:57.463Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T04:37:55.812Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T05:32:01.058Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T06:46:13.059Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T07:42:08.477Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T08:40:27.225Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T09:36:11.288Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T10:30:18.413Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T11:25:56.366Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T12:46:49.380Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T13:45:11.727Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T14:35:13.669Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T15:33:03.291Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T16:34:12.116Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T17:28:37.760Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T18:36:22.495Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T19:25:53.521Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T20:25:49.134Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T21:24:09.379Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T22:24:32.199Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-21T23:23:46.385Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T01:13:06.534Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T02:54:23.817Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T03:41:18.041Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T04:32:01.207Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T05:26:47.141Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T06:39:23.246Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T07:31:35.163Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T08:30:12.305Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T09:26:24.789Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T10:23:18.355Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T11:20:44.909Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T12:38:17.071Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T13:31:41.289Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T14:20:58.097Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T15:20:31.117Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T16:23:36.459Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0.05714285714285714,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0.04285714285714286,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T17:20:18.644Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0.09428571428571428,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0.04285714285714286,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T18:30:23.690Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T19:22:18.115Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T20:22:34.155Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0.014285714285714285,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0.016666666666666666,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0.16857142857142857,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0.010344827586206896,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0.04,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0.04285714285714286,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T21:21:39.539Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0.02857142857142857,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T22:21:47.145Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-22T23:20:44.301Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T01:19:19.466Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T03:02:46.909Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T04:36:35.213Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T05:29:15.814Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T06:40:14.258Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T07:33:14.716Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T08:29:45.930Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T09:27:17.529Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T10:23:30.105Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T11:20:10.494Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T12:39:36.018Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T13:32:03.832Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T14:23:13.029Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T15:22:00.464Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T16:26:00.257Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T17:19:59.051Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T18:28:59.806Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T19:21:52.768Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T20:22:15.012Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T21:21:39.186Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T22:20:58.288Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-23T23:20:40.133Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-24T01:16:51.245Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.19230769230769232,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-24T03:03:21.687Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
-    timestamp: "2026-08-24T04:43:57.619Z",
-    distritos: [
-      {
-        codigo: "01",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "02",
-        congestion: 0,
-        muestras: 21
-      },
-      {
-        codigo: "03",
-        congestion: 0.15384615384615385,
-        muestras: 26
-      },
-      {
-        codigo: "04",
-        congestion: 0,
-        muestras: 45
-      },
-      {
-        codigo: "05",
-        congestion: 0,
-        muestras: 18
-      },
-      {
-        codigo: "06",
-        congestion: 0,
-        muestras: 35
-      },
-      {
-        codigo: "07",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "08",
-        congestion: 0.07692307692307693,
-        muestras: 13
-      },
-      {
-        codigo: "09",
-        congestion: 0,
-        muestras: 24
-      },
-      {
-        codigo: "10",
-        congestion: 0,
-        muestras: 48
-      },
-      {
-        codigo: "11",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "12",
-        congestion: 0,
-        muestras: 29
-      },
-      {
-        codigo: "13",
-        congestion: 0,
-        muestras: 15
-      },
-      {
-        codigo: "14",
-        congestion: 0,
-        muestras: 7
-      },
-      {
-        codigo: "15",
-        congestion: 0,
-        muestras: 13
-      },
-      {
-        codigo: "16",
-        congestion: 0,
-        muestras: 19
-      },
-      {
-        codigo: "17",
-        congestion: 0,
-        muestras: 10
-      },
-      {
-        codigo: "18",
-        congestion: 0,
-        muestras: 3
-      },
-      {
-        codigo: "19",
-        congestion: 0,
-        muestras: 2
-      }
-    ]
-  },
-  {
     timestamp: "2026-08-24T05:38:06.949Z",
     distritos: [
       {
@@ -55723,11 +43723,8416 @@ var trafico_historico_default = [
         muestras: 2
       }
     ]
+  },
+  {
+    timestamp: "2026-09-17T00:09:22.860Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0.15384615384615385,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 0,
+          congestionado: 0,
+          cortado: 2
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0.10526315789473684,
+        muestras: 19,
+        porEstado: {
+          fluido: 17,
+          denso: 0,
+          congestionado: 0,
+          cortado: 2
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-17T05:48:37.960Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.014285714285714285,
+        muestras: 21,
+        porEstado: {
+          fluido: 20,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.15,
+        muestras: 26,
+        porEstado: {
+          fluido: 20,
+          denso: 3,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.026666666666666665,
+        muestras: 45,
+        porEstado: {
+          fluido: 43,
+          denso: 0,
+          congestionado: 2,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0.016666666666666666,
+        muestras: 18,
+        porEstado: {
+          fluido: 17,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0.008571428571428572,
+        muestras: 35,
+        porEstado: {
+          fluido: 34,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.12631578947368421,
+        muestras: 19,
+        porEstado: {
+          fluido: 13,
+          denso: 4,
+          congestionado: 2,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.12307692307692308,
+        muestras: 13,
+        porEstado: {
+          fluido: 10,
+          denso: 2,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.12857142857142856,
+        muestras: 7,
+        porEstado: {
+          fluido: 4,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0.1,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0.06842105263157895,
+        muestras: 19,
+        porEstado: {
+          fluido: 17,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0.09,
+        muestras: 10,
+        porEstado: {
+          fluido: 8,
+          denso: 1,
+          congestionado: 1,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-17T11:05:42.162Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.1,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0.05263157894736842,
+        muestras: 19,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-17T16:22:30.452Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.014285714285714285,
+        muestras: 21,
+        porEstado: {
+          fluido: 20,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26,
+        porEstado: {
+          fluido: 22,
+          denso: 1,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.015789473684210527,
+        muestras: 19,
+        porEstado: {
+          fluido: 18,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.1,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.012499999999999999,
+        muestras: 24,
+        porEstado: {
+          fluido: 23,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-17T20:02:10.634Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-17T23:24:21.329Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T03:29:40.068Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T08:49:12.635Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.1,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T13:26:14.715Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.1846153846153846,
+        muestras: 26,
+        porEstado: {
+          fluido: 17,
+          denso: 6,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.026666666666666665,
+        muestras: 45,
+        porEstado: {
+          fluido: 41,
+          denso: 4,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0.016666666666666666,
+        muestras: 18,
+        porEstado: {
+          fluido: 17,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0.017142857142857144,
+        muestras: 35,
+        porEstado: {
+          fluido: 33,
+          denso: 2,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.06315789473684211,
+        muestras: 19,
+        porEstado: {
+          fluido: 15,
+          denso: 4,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.14615384615384616,
+        muestras: 13,
+        porEstado: {
+          fluido: 9,
+          denso: 3,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.012499999999999999,
+        muestras: 24,
+        porEstado: {
+          fluido: 23,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0.0062499999999999995,
+        muestras: 48,
+        porEstado: {
+          fluido: 47,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0.015789473684210527,
+        muestras: 19,
+        porEstado: {
+          fluido: 18,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T17:31:34.799Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.006666666666666666,
+        muestras: 45,
+        porEstado: {
+          fluido: 44,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0.01875,
+        muestras: 48,
+        porEstado: {
+          fluido: 45,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T20:30:01.669Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-18T23:03:22.135Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T03:26:27.065Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T08:35:29.386Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T12:54:48.339Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T16:15:38.945Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T19:11:52.739Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0.034482758620689655,
+        muestras: 29,
+        porEstado: {
+          fluido: 28,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-19T22:09:44.829Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T00:43:00.995Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T05:46:42.887Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.041666666666666664,
+        muestras: 24,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T10:45:12.518Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T14:32:32.616Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T18:00:26.737Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.08571428571428572,
+        muestras: 7,
+        porEstado: {
+          fluido: 5,
+          denso: 2,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T21:11:26.957Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0.08571428571428572,
+        muestras: 35,
+        porEstado: {
+          fluido: 32,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-20T23:53:21.497Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-21T03:38:27.351Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-21T09:40:02.386Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26,
+        porEstado: {
+          fluido: 22,
+          denso: 1,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-21T16:15:01.878Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.12692307692307692,
+        muestras: 26,
+        porEstado: {
+          fluido: 22,
+          denso: 1,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.006666666666666666,
+        muestras: 45,
+        porEstado: {
+          fluido: 44,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.031578947368421054,
+        muestras: 19,
+        porEstado: {
+          fluido: 17,
+          denso: 2,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.1,
+        muestras: 13,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-21T20:48:54.048Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-21T23:51:32.526Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.15384615384615385,
+        muestras: 26,
+        porEstado: {
+          fluido: 22,
+          denso: 0,
+          congestionado: 0,
+          cortado: 4
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-22T03:36:55.972Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-22T09:04:45.186Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0,
+        muestras: 21,
+        porEstado: {
+          fluido: 21,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.11538461538461539,
+        muestras: 26,
+        porEstado: {
+          fluido: 23,
+          denso: 0,
+          congestionado: 0,
+          cortado: 3
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.07692307692307693,
+        muestras: 13,
+        porEstado: {
+          fluido: 12,
+          denso: 0,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0,
+        muestras: 24,
+        porEstado: {
+          fluido: 24,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 48,
+        porEstado: {
+          fluido: 48,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0,
+        muestras: 7,
+        porEstado: {
+          fluido: 7,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0,
+        muestras: 2,
+        porEstado: {
+          fluido: 2,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-22T18:32:34.699Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.03913043478260869,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.07142857142857142,
+        muestras: 21,
+        porEstado: {
+          fluido: 17,
+          denso: 3,
+          congestionado: 1,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.08409090909090909,
+        muestras: 44,
+        porEstado: {
+          fluido: 38,
+          denso: 1,
+          congestionado: 4,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.01764705882352941,
+        muestras: 17,
+        porEstado: {
+          fluido: 16,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.024999999999999998,
+        muestras: 12,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.06956521739130435,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 2,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0.010344827586206896,
+        muestras: 29,
+        porEstado: {
+          fluido: 28,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-22T21:48:53.522Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.03913043478260869,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.07142857142857142,
+        muestras: 21,
+        porEstado: {
+          fluido: 17,
+          denso: 3,
+          congestionado: 1,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.08409090909090909,
+        muestras: 44,
+        porEstado: {
+          fluido: 38,
+          denso: 1,
+          congestionado: 4,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.01764705882352941,
+        muestras: 17,
+        porEstado: {
+          fluido: 16,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.024999999999999998,
+        muestras: 12,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.06956521739130435,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 2,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0.010344827586206896,
+        muestras: 29,
+        porEstado: {
+          fluido: 28,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-23T00:03:03.135Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.03913043478260869,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.07142857142857142,
+        muestras: 21,
+        porEstado: {
+          fluido: 17,
+          denso: 3,
+          congestionado: 1,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.08409090909090909,
+        muestras: 44,
+        porEstado: {
+          fluido: 38,
+          denso: 1,
+          congestionado: 4,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.01764705882352941,
+        muestras: 17,
+        porEstado: {
+          fluido: 16,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.024999999999999998,
+        muestras: 12,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.06956521739130435,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 2,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0.010344827586206896,
+        muestras: 29,
+        porEstado: {
+          fluido: 28,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
+  },
+  {
+    timestamp: "2026-09-23T05:32:45.433Z",
+    distritos: [
+      {
+        codigo: "01",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "02",
+        congestion: 0.03913043478260869,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 3,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "03",
+        congestion: 0.07142857142857142,
+        muestras: 21,
+        porEstado: {
+          fluido: 17,
+          denso: 3,
+          congestionado: 1,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "04",
+        congestion: 0.08409090909090909,
+        muestras: 44,
+        porEstado: {
+          fluido: 38,
+          denso: 1,
+          congestionado: 4,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "05",
+        congestion: 0,
+        muestras: 18,
+        porEstado: {
+          fluido: 18,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "06",
+        congestion: 0,
+        muestras: 35,
+        porEstado: {
+          fluido: 35,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "07",
+        congestion: 0.01764705882352941,
+        muestras: 17,
+        porEstado: {
+          fluido: 16,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "08",
+        congestion: 0.024999999999999998,
+        muestras: 12,
+        porEstado: {
+          fluido: 11,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "09",
+        congestion: 0.06956521739130435,
+        muestras: 23,
+        porEstado: {
+          fluido: 20,
+          denso: 2,
+          congestionado: 0,
+          cortado: 1
+        }
+      },
+      {
+        codigo: "10",
+        congestion: 0,
+        muestras: 45,
+        porEstado: {
+          fluido: 45,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "11",
+        congestion: 0.010344827586206896,
+        muestras: 29,
+        porEstado: {
+          fluido: 28,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "12",
+        congestion: 0,
+        muestras: 29,
+        porEstado: {
+          fluido: 29,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "13",
+        congestion: 0,
+        muestras: 15,
+        porEstado: {
+          fluido: 15,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "14",
+        congestion: 0.04285714285714286,
+        muestras: 7,
+        porEstado: {
+          fluido: 6,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "15",
+        congestion: 0,
+        muestras: 13,
+        porEstado: {
+          fluido: 13,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "16",
+        congestion: 0,
+        muestras: 19,
+        porEstado: {
+          fluido: 19,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "17",
+        congestion: 0,
+        muestras: 10,
+        porEstado: {
+          fluido: 10,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "18",
+        congestion: 0,
+        muestras: 3,
+        porEstado: {
+          fluido: 3,
+          denso: 0,
+          congestionado: 0,
+          cortado: 0
+        }
+      },
+      {
+        codigo: "19",
+        congestion: 0.15,
+        muestras: 2,
+        porEstado: {
+          fluido: 1,
+          denso: 1,
+          congestionado: 0,
+          cortado: 0
+        }
+      }
+    ]
   }
 ];
 
 // data/trafico-historico-diario.json
-var trafico_historico_diario_default = [];
+var trafico_historico_diario_default = [
+  {
+    fecha: "2026-08-18",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 4
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0.022222222222222223,
+        muestras: 4
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 4
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0.041666666666666664,
+        muestras: 4
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 4
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-19",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 2
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0.022222222222222223,
+        muestras: 2
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 2
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0.041666666666666664,
+        muestras: 2
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-20",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 2
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0.022222222222222223,
+        muestras: 2
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 2
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0.041666666666666664,
+        muestras: 2
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-21",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 4
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 4
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 4
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 4
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-22",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 2
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 2
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-23",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.15384615384615385,
+        muestras: 2
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 2
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 2
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 2
+      }
+    ]
+  },
+  {
+    fecha: "2026-08-24",
+    distritos: [
+      {
+        codigo: "01",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "02",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "03",
+        congestionMedia: 0.16666666666666666,
+        muestras: 3
+      },
+      {
+        codigo: "04",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "05",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "06",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "07",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "08",
+        congestionMedia: 0.07692307692307693,
+        muestras: 3
+      },
+      {
+        codigo: "09",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "10",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "11",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "12",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "13",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "14",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "15",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "16",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "17",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "18",
+        congestionMedia: 0,
+        muestras: 3
+      },
+      {
+        codigo: "19",
+        congestionMedia: 0,
+        muestras: 3
+      }
+    ]
+  }
+];
 
 // src/server/trafico-historico.ts
 var DIAS_DEFECTO = 7;
@@ -58074,6 +54479,42 @@ async function handler16(req) {
 var agenda_eventos_default = {
   eventos: [
     {
+      id: "mercafestes-en-los-mercados-municipales",
+      titulo: "MERCAFESTES EN LOS MERCADOS MUNICIPALES",
+      categoria: "AGENDA INFANTIL",
+      fechaInicio: "2026-09-25T00:00:00.000Z",
+      fechaFin: "2027-12-17T00:00:00.000Z",
+      resumen: "Si te gusta el ambiente de los mercados, los productos de temporada y compartir plan con los m\xE1s peques de la casa, aqu\xED tienes una selecci\xF3n de fechas donde estas plazas de abastos de Val\xE8ncia se convierten en un aut\xE9ntico parque de experiencias. Cada cita gira alrededor de un producto t\xEDpico y de\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/mercafestes-en-los-mercados-municipales",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cultura-als-barris-2026",
+      titulo: "CULTURA ALS BARRIS 2026",
+      categoria: "CINE",
+      fechaInicio: "2026-09-24T00:00:00.000Z",
+      fechaFin: "2026-11-21T00:00:00.000Z",
+      resumen: "Cultura als Barris\xA0es un proyecto del Ayuntamiento de Val\xE8ncia cuyo objetivo es ampliar los lugares, los p\xFAblicos y la oferta de actividades culturales gratuitas para la ciudadan\xEDa, llegando a los barrios perif\xE9ricos de Val\xE8ncia.\n\nLa cultura no puede quedarse en determinados espacios ni tampoco en z\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cultura-als-barris-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "semana-europea-del-deporte-2026",
+      titulo: "SEMANA EUROPEA DEL DEPORTE 2026",
+      categoria: "DEPORTES",
+      fechaInicio: "2026-09-22T00:00:00.000Z",
+      fechaFin: "2026-09-29T00:00:00.000Z",
+      resumen: "La ciudad de Val\xE8ncia se suma un a\xF1o m\xE1s a la Semana Europea del Deporte, bajo el lema europeo \u2018#BeActive your way\u2019, con una programaci\xF3n de actividades deportivas y de promoci\xF3n de la actividad f\xEDsica dirigida a toda la ciudadan\xEDa. El Ayuntamiento de Val\xE8ncia, a trav\xE9s de la Fundaci\xF3n Deportiva Mun\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/semana-europea-del-deporte-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
       id: "rutas-tematizadas-lengua-signos",
       titulo: "Rutas tematizadas con int\xE9rprete de lengua de signos",
       categoria: "VISITAS GUIADAS",
@@ -58090,7 +54531,34 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-aben-al-abbar-programacion",
+      titulo: "CC Aben Al-Abbar: programaci\xF3n semanal",
+      categoria: "CINE",
+      fechaInicio: "2026-09-20T00:00:00.000Z",
+      fechaFin: "2026-09-26T00:00:00.000Z",
+      resumen: "El Centro Cultural Aben Al-Abbar nace con el prop\xF3sito de convertirse en el punto de encuentro de los vecinos y vecinas de Albors/Algir\xF3s. Es un espacio \xFAnico y completamente reformado, ubicado en un chalet de dos plantas construido en 1916.\n\nOfrecemos una programaci\xF3n multidisciplinar, adaptada a t\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-aben-al-abbar-programacion",
+      distritosMencionados: [
+        {
+          distritoCodigo: "13",
+          distritoNombre: "Algiros",
+          coincidencia: "distrito",
+          textoCoincidente: "Algiros",
+          bajaConfianza: false
+        },
+        {
+          distritoCodigo: "12",
+          distritoNombre: "Camins al Grau",
+          coincidencia: "barrio",
+          textoCoincidente: "Albors",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58102,19 +54570,7 @@ var agenda_eventos_default = {
       resumen: "El 17 de septiembre arranca la edici\xF3n n\xFAmero XIV del Abierto Val\xE8ncia, la convocatoria de promoci\xF3n y difusi\xF3n art\xEDstica que organiza LAVAC (Asociaci\xF3n de Galer\xEDas de Arte Contempor\xE1neo de la Comunitat Valenciana) y que cuenta con el apoyo del Ayuntamiento de Val\xE8ncia. El evento promueve una intens\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/abierto-valencia-2026",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
-      source: "ajuntament-valencia-scraping"
-    },
-    {
-      id: "semana-europea-de-la-movilidad-2026",
-      titulo: "SEMANA EUROPEA DE LA MOVILIDAD 2026",
-      categoria: "AGENDA INFANTIL",
-      fechaInicio: "2026-09-15T00:00:00.000Z",
-      fechaFin: "2026-09-21T00:00:00.000Z",
-      resumen: "Val\xE8ncia celebra, un a\xF1o m\xE1s, la Semana Europea de la Movilidad (SEM), de nuevo con\xA0el lema \u201CMovilidad para todas las personas\u201D.\xA0Esta iniciativa, impulsada por la Comisi\xF3n Europea, busca fomentar h\xE1bitos de movilidad m\xE1s sostenibles, saludables y seguros en las ciudades. El programa de actividades,\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/semana-europea-de-la-movilidad-2026",
-      distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58134,34 +54590,19 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
-      id: "cc-aben-al-abbar-programacion",
-      titulo: "CC Aben Al-Abbar: programaci\xF3n semanal",
-      categoria: "CINE",
-      fechaInicio: "2026-09-13T00:00:00.000Z",
-      fechaFin: "2026-09-19T00:00:00.000Z",
-      resumen: "El Centro Cultural Aben Al-Abbar nace con el prop\xF3sito de convertirse en el punto de encuentro de los vecinos y vecinas de Albors/Algir\xF3s. Es un espacio \xFAnico y completamente reformado, ubicado en un chalet de dos plantas construido en 1916.\n\nOfrecemos una programaci\xF3n multidisciplinar, adaptada a t\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-aben-al-abbar-programacion",
-      distritosMencionados: [
-        {
-          distritoCodigo: "13",
-          distritoNombre: "Algiros",
-          coincidencia: "distrito",
-          textoCoincidente: "Algiros",
-          bajaConfianza: false
-        },
-        {
-          distritoCodigo: "12",
-          distritoNombre: "Camins al Grau",
-          coincidencia: "barrio",
-          textoCoincidente: "Albors",
-          bajaConfianza: false
-        }
-      ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      id: "palau-de-la-musica-programacion-2026",
+      titulo: "Palau de la M\xFAsica - Programaci\xF3n de septiembre",
+      categoria: "M\xDASICA",
+      fechaInicio: "2026-09-15T00:00:00.000Z",
+      fechaFin: "2026-09-29T00:00:00.000Z",
+      resumen: "El Palau de la M\xFAsica es un auditorio de prestigio internacional y un punto de referencia esencial en la vida cultural de la ciudad. Inaugurado en 1987, contiene varias salas para audiciones musicales, congresos, exposiciones, espect\xE1culos y proyecciones de cine, entre otras actividades. Es la sede\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/palau-de-la-musica-programacion-2026",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58173,7 +54614,7 @@ var agenda_eventos_default = {
       resumen: "Durante los meses de septiembre y octubre Val\xE8ncia celebra el festival del dise\xF1o\xA0Val\xE8ncia Design Fest, que re\xFAne a empresas y profesionales nacionales e internacionales con los que descubrir de primera mano el talento local y la efervescencia creativa de nuestra ciudad, designada por UNESCO como\xA0Ci\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/valencia-design-fest-2026",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58193,7 +54634,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58205,7 +54646,7 @@ var agenda_eventos_default = {
       resumen: "La Oficina de l'Energia es un servicio p\xFAblico y gratuito de la fundaci\xF3n Val\xE8ncia Clima i Energia, del Ajuntament de Val\xE8ncia. Se trata de un espacio de informaci\xF3n y formaci\xF3n dirigido a la ciudadan\xEDa, donde se proporciona asesoramiento personalizado, talleres y actividades relacionados con la ene\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/oficina-de-l-energia-actividades-gratuitas",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58217,7 +54658,7 @@ var agenda_eventos_default = {
       resumen: "Val\xE8ncia cuenta con cinco centros culturales a disposici\xF3n de la ciudadan\xEDa, dise\xF1ados para fomentar la participaci\xF3n ciudadana, promover la cultura local y revitalizar los barrios mediante una programaci\xF3n accesible y gratuita. Su programaci\xF3n cuenta con talleres, teatro, m\xFAsica, cuentacuentos, cha\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/centros-culturales-municipales",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58237,27 +54678,31 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
-      id: "cc-reina-121-programacion",
-      titulo: "CC Reina 121 - Programaci\xF3n de septiembre",
-      categoria: "ENCUENTROS",
+      id: "alqueria-dels-moros-visitas-gratuitas",
+      titulo: "Alqueria dels moros - Visitas gratuitas",
+      categoria: "VISITAS GUIADAS",
+      fechaInicio: "2026-08-31T00:00:00.000Z",
+      fechaFin: "2026-12-30T00:00:00.000Z",
+      resumen: "La Alqueria dels moros es un edificio catalogado como Bien de Inter\xE9s Cultural (BIC) desde 2004, que puede visitarse gratuitamente con cita previa. Se trata de un edificio residencial compendio de la arquitectura se\xF1orial y rural de la huerta valenciana de los siglos XIV, XVI y XVIII, que ofrece ele\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/alqueria-dels-moros-visitas-gratuitas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "cc-nave-3-ribes-cas",
+      titulo: "CC Nave 3 Ribes - Programaci\xF3n de septiembre",
+      categoria: "CINE",
       fechaInicio: "2026-08-31T00:00:00.000Z",
       fechaFin: "2026-09-29T00:00:00.000Z",
-      resumen: 'El Centro Cultural Reina 121 es una invitaci\xF3n a plantearnos como queremos dibujar la cultura de nuestro barrio, un proyecto de cultura comunitaria situado en el barrio del Caba\xF1al, que promueve "hacer con los dem\xE1s", construir v\xEDnculos y tejido social.\xA0\n\nLa programaci\xF3n cuenta con talleres, teatro,\u2026',
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-reina-121-programacion",
-      distritosMencionados: [
-        {
-          distritoCodigo: "11",
-          distritoNombre: "Poblats Maritims",
-          coincidencia: "barrio",
-          textoCoincidente: "Caba\xF1al",
-          bajaConfianza: false
-        }
-      ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      resumen: "El Centro Cultural Nave 3 Ribes es un espacio de encuentro y creaci\xF3n colectiva, ubicado en el Parque Central, que funciona como un laboratorio abierto para el desarrollo de f\xF3rmulas innovadoras de participaci\xF3n, aprendizaje y dinamizaci\xF3n cultural. La programaci\xF3n cuenta con\xA0talleres, cine, teatro,\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-nave-3-ribes-cas",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58277,31 +54722,27 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
-      id: "cc-nave-3-ribes-cas",
-      titulo: "CC Nave 3 Ribes - Programaci\xF3n de septiembre",
-      categoria: "CINE",
+      id: "cc-reina-121-programacion",
+      titulo: "CC Reina 121 - Programaci\xF3n de septiembre a diciembre",
+      categoria: "ENCUENTROS",
       fechaInicio: "2026-08-31T00:00:00.000Z",
-      fechaFin: "2026-09-29T00:00:00.000Z",
-      resumen: "El Centro Cultural Nave 3 Ribes es un espacio de encuentro y creaci\xF3n colectiva, ubicado en el Parque Central, que funciona como un laboratorio abierto para el desarrollo de f\xF3rmulas innovadoras de participaci\xF3n, aprendizaje y dinamizaci\xF3n cultural. La programaci\xF3n cuenta con\xA0talleres, cine, teatro,\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-nave-3-ribes-cas",
-      distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
-      source: "ajuntament-valencia-scraping"
-    },
-    {
-      id: "alqueria-dels-moros-visitas-gratuitas",
-      titulo: "Alqueria dels moros - Visitas gratuitas",
-      categoria: "VISITAS GUIADAS",
-      fechaInicio: "2026-08-31T00:00:00.000Z",
-      fechaFin: "2026-12-30T00:00:00.000Z",
-      resumen: "La Alqueria dels moros es un edificio catalogado como Bien de Inter\xE9s Cultural (BIC) desde 2004, que puede visitarse gratuitamente con cita previa. Se trata de un edificio residencial compendio de la arquitectura se\xF1orial y rural de la huerta valenciana de los siglos XIV, XVI y XVIII, que ofrece ele\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/alqueria-dels-moros-visitas-gratuitas",
-      distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fechaFin: "2026-12-18T00:00:00.000Z",
+      resumen: 'El Centro Cultural Reina 121 es una invitaci\xF3n a plantearnos como queremos dibujar la cultura de nuestro barrio, un proyecto de cultura comunitaria situado en el barrio del Caba\xF1al, que promueve "hacer con los dem\xE1s", construir v\xEDnculos y tejido social.\xA0\n\nLa programaci\xF3n cuenta con talleres, teatro,\u2026',
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/cc-reina-121-programacion",
+      distritosMencionados: [
+        {
+          distritoCodigo: "11",
+          distritoNombre: "Poblats Maritims",
+          coincidencia: "barrio",
+          textoCoincidente: "Caba\xF1al",
+          bajaConfianza: false
+        }
+      ],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58313,19 +54754,7 @@ var agenda_eventos_default = {
       resumen: "El Paleontol\xF2gic acoge la exposici\xF3n \u201CMacroArte\u201D, del fot\xF3grafo Tony Tirado,\xA0una invitaci\xF3n a detener el ritmo cotidiano para descubrir la belleza de aquello que normalmente pasa desapercibido. Un recorrido que demuestra que la ciencia comienza con la observaci\xF3n, pero que el conocimiento tambi\xE9n pu\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-macroarte-de-tony-tirado-el-paleontologic",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
-      source: "ajuntament-valencia-scraping"
-    },
-    {
-      id: "pobles-del-sud-rutas-guiadas",
-      titulo: "Pobles del Sud - Rutas guiadas",
-      categoria: "VISITAS GUIADAS",
-      fechaInicio: "2026-06-26T00:00:00.000Z",
-      fechaFin: "2026-09-18T00:00:00.000Z",
-      resumen: "Descubre Val\xE8ncia a trav\xE9s de sus barrios. Un itinerario para conocer su historia, su cultura y, sobre todo, su vida. Para participar se requiere inscripci\xF3n previa a trav\xE9s del correo electr\xF3nico inscripcionturismo@valencia.es, indicando\xA0la fecha y el nombre de la ruta que se desea realizar, as\xED co\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pobles-del-sud-rutas-guiadas",
-      distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58337,7 +54766,7 @@ var agenda_eventos_default = {
       resumen: "La Sala Municipal de Exposiciones del Ajuntament de Val\xE8ncia inaugura ALTRES, una recuperaci\xF3n hist\xF3rica que se aproxima a un episodio singular de la historia reciente del arte valenciano: Els altres 75 anys de pintura valenciana, una contraexposici\xF3n organizada en 1976 por el Col\xB7lectiu de Pintors\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-altres",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58349,7 +54778,7 @@ var agenda_eventos_default = {
       resumen: "La Fundaci\xF3n Deportiva Municipal (FDM) ha programado \u2018Un estiu amb molt d\u2019esport\u2019, con propuestas deportivas para todas las edades que se desarrollar\xE1n durante los meses estivales en piscinas y otras instalaciones municipales. El programa incluye propuestas para todos los p\xFAblicos y edades: desde cu\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/un-estiu-amb-molt-d-esport-2026",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58361,7 +54790,7 @@ var agenda_eventos_default = {
       resumen: "Anualmente, la Federaci\xF3 Cultural Valenciana de Vela Llatina\xA0patrocina las exhibiciones de Vela Latina que organizan las distintas associaciomes de los municipios que bordean el lago de l'Albufera. Estos acontecimientos reunen a asociaciones n\xE1uticas y vecinos con el objetivo de poner en valor el pa\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exhibiciones-de-vela-latina-lago-de-la-albufera-2026",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58373,7 +54802,7 @@ var agenda_eventos_default = {
       resumen: "Con motivo de la celebraci\xF3n del III A\xF1o Jubilar Santo C\xE1liz, se han organizado visitas guiadas gratuitas para descubrir la historia del Santo C\xE1liz. Las rutas recorrer\xE1n distintos puntos hist\xF3ricos de la ciudad relacionados con la reliquia, pasando por enclaves emblem\xE1ticos como las Torres de Serra\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-santo-caliz-visitas-guiadas",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58385,7 +54814,7 @@ var agenda_eventos_default = {
       resumen: "La Casa Museo Blasco Ib\xE1\xF1ez acoge una exposici\xF3n temporal que, con el t\xEDtulo de \u2018La Val\xE8ncia de Blasco Ib\xE1\xF1ez\u2019, rememora escenarios emblem\xE1ticos de la ciudad y de su entorno, as\xED como algunos tipos caracter\xEDsticos de la sociedad valenciana de finales del XIX y principios del XX. La muestra, comisari\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicion-la-valencia-de-blasco-ibanez",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58397,7 +54826,7 @@ var agenda_eventos_default = {
       resumen: "En BIOPARC Val\xE8ncia se recrea la naturaleza salvaje del continente africano: el bosque ecuatorial, Madagascar, los grandes humedales y la sabana. Los animales, la vegetaci\xF3n y el paisaje forman un conjunto que permite al visitante aprender sobre las relaciones entre los organismos y elementos que co\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/bioparc-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58409,7 +54838,7 @@ var agenda_eventos_default = {
       resumen: "Ciencia, g\xE9nero, arte y nuevas tecnolog\xEDas se conjugan en esta iniciativa de la Universitat Polit\xE8cnica de Val\xE8ncia y el centro de innovaci\xF3n Las Naves del Ayuntamiento de Val\xE8ncia, que cuenta con la colaboraci\xF3n de la Fundaci\xF3n Espa\xF1ola para la Ciencia y la Tecnolog\xEDa (FECYT) del Ministerio de Cien\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-dones-de-ciencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58421,7 +54850,7 @@ var agenda_eventos_default = {
       resumen: "El anillo ciclista de la ciudad permite disfrutar a su paso de edificios y lugares emblem\xE1ticos de Val\xE8ncia. Todo un gusto ir en bicicleta y poder empaparse de la cultura y la historia de la ciudad.\n\nLa ruta te llevar\xE1 a lugares tan ic\xF3nicos como la Estaci\xF3n del Norte, dise\xF1ada por el arquitecto Dem\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-cultural-anell-ciclista",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58433,7 +54862,7 @@ var agenda_eventos_default = {
       resumen: "Las cinco rutas de los \xE1rboles monumentales de Val\xE8ncia es una forma muy original y ecol\xF3gica de visitar la ciudad. Se trata de recorrer varias zonas de la ciudad a trav\xE9s de sus \xE1rboles m\xE1s curiosos. \xC1rboles que por su tama\xF1o, forma, edad, rareza, origen biol\xF3gico, belleza o por ser protagonistas d\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ruta-dels-arbres-monumentals-de-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58445,7 +54874,19 @@ var agenda_eventos_default = {
       resumen: "El Museo de Prehistoria se crea en el a\xF1o 1927 como una instituci\xF3n cient\xEDfica dedicada a conservar, investigar y difundir el rico patrimonio arqueol\xF3gico valenciano. En el a\xF1o 1982 se ubic\xF3 definitivamente en la antigua Beneficencia y en 1995 se abrieron al p\xFAblico las actuales Salas de Prehistoria\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-de-prehistoria-de-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
+      source: "ajuntament-valencia-scraping"
+    },
+    {
+      id: "exposicio-permanent-a-l-alqueria-de-felix",
+      titulo: "Exposici\xF3n permanente en La Alquer\xEDa de F\xE9lix",
+      categoria: "EXPOSICIONES",
+      fechaInicio: "2026-01-01T00:00:00.000Z",
+      fechaFin: "2026-12-30T00:00:00.000Z",
+      resumen: "La Alquer\xEDa de F\xE9lix cuenta con una exposici\xF3n permanente que tiene por objetivo dar a conocer su historia y explicar c\xF3mo era antes la vida en la huerta.\xA0\n\nLa exposici\xF3n est\xE1 formada por ocho paneles expositivos que tienen por objetivo divulgar la historia y la arquitectura del edificio, su evoluci\u2026",
+      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicio-permanent-a-l-alqueria-de-felix",
+      distritosMencionados: [],
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58457,7 +54898,7 @@ var agenda_eventos_default = {
       resumen: "En el espectacular edificio dise\xF1ado por Santiago Calatrava los visitantes cuentan con m\xE1s de 26.000 metros cuadrados de exposiciones relacionadas con la actualidad cient\xEDfica y tecnol\xF3gica. La interactividad llena es una de sus se\xF1ales de identidad, debajo el lema \u201CProhibido no tocar, no sentir, no\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-museu-de-les-ciencies",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58469,7 +54910,7 @@ var agenda_eventos_default = {
       resumen: "LocoClub est\xE1 ubicado en pleno centro de la ciudad de Val\xE8ncia. Es un espacio amplio y abierto donde se realizan diferentes actividades, principalmente conciertos y m\xFAsica en directo, pero tambi\xE9n ofrece la posibilidad de celebrar otro tipo de eventos. Con una programaci\xF3n variada que abarca desde r\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/loco-club-programaci%C3%B3",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58481,7 +54922,7 @@ var agenda_eventos_default = {
       resumen: "El Ajuntament de Val\xE8ncia, a trav\xE9s de la Concejal\xEDa de Acci\xF3 Cultural, gestiona este espacio esc\xE9nico ubicado en la calle Joan Verdeguer. Artistas valencianos y propuestas internacionales, con el denominador com\xFAn de los nuevos lenguajes esc\xE9nicos, se han convertido en el motor de una nueva etapa c\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/la-mutant-espai-d-arts-vives",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58501,7 +54942,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58513,7 +54954,7 @@ var agenda_eventos_default = {
       resumen: "En el siglo VIII se construy\xF3 sobre su solar la mezquita mayor de Balansiya, que sirvi\xF3 de catedral tras la fundaci\xF3n del Reino cristiano de Val\xE8ncia por Jaime I el Conquistador en 1238, y el 22 de junio de 1262 el Obispo Fray Andr\xE9s de Albalat O. P. puso la primera piedra de la actual Catedral. En\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/catedral-de-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58525,7 +54966,7 @@ var agenda_eventos_default = {
       resumen: null,
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/ivac-filmoteca-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58537,7 +54978,7 @@ var agenda_eventos_default = {
       resumen: "Caixaforum Val\xE8ncia se ubica en el complejo arquitect\xF3nico de la\xA0Ciutat de les Arts i les Ci\xE8ncies, un conjunto \xFAnico dedicado a la divulgaci\xF3n cient\xEDfica y cultural. Caixaforum, el estandarte cultural de la Fundaci\xF3n \u201Dla Caixa\u201D, apuesta por la divulgaci\xF3n del conocimiento, la cultura y la ciencia c\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-caixaforum-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58549,7 +54990,7 @@ var agenda_eventos_default = {
       resumen: "La Fundaci\xF3n Ca\xF1ada Blanch es un espacio dedicado a la cultura contempor\xE1nea, donde personas referentes en diferentes \xE1reas comparten sus conocimientos y vivencias, permiti\xE9ndonos reflexionar sobre la realidad que nos rodea.\nLiteratura, arte, m\xFAsica, filosof\xEDa, g\xE9nero, ciencia, sociedad, humanidades\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/fundacion-canada-blanch-programacion-cultural",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58569,7 +55010,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58581,7 +55022,7 @@ var agenda_eventos_default = {
       resumen: null,
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/el-centre-museistic-la-beneficencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58593,7 +55034,7 @@ var agenda_eventos_default = {
       resumen: "El Escalante es el proyecto esc\xE9nico para la Infancia y la Juventud de la Diputaci\xF3n de Val\xE8ncia. Nacido en 1985, fue el primer teatro en Espa\xF1a que apost\xF3 por ofrecer producciones y exhibiciones de calidad para los ni\xF1os y a los j\xF3venes que, hasta entonces, solo se encontraban en el teatro para adu\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-escalante-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58605,7 +55046,7 @@ var agenda_eventos_default = {
       resumen: "El Teatro Principal de Val\xE8ncia, inaugurado en 1832 y ubicado en pleno coraz\xF3n de la ciudad, es uno de los espacios culturales m\xE1s ic\xF3nicos y emblem\xE1ticos de la Comunidad Valenciana.\xA0Su historia y tradici\xF3n lo han consolidado como el escenario perfecto para acoger los espect\xE1culos m\xE1s destacados de\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-principal-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58617,7 +55058,7 @@ var agenda_eventos_default = {
       resumen: "El Colegio Mayor Rector Peset se ha consolidado en la ciudad de Valencia como un punto de encuentro de la universidad, la sociedad civil y las entidades sociales y culturales de la ciudad de Valencia, en la programaci\xF3n de sus actividades culturales, formativas y en la transmisi\xF3n de sus experiencia\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/collegi-major-rector-peset-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58629,7 +55070,7 @@ var agenda_eventos_default = {
       resumen: "El actual Museo Fallero de Val\xE8ncia est\xE1 instalado desde 1971 en el antiguo Convento de la Casa Misi\xF3n de San Vicente de Pa\xFAl est\xE1 integrado por la colecci\xF3n de ninots indultados grandes, e infantiles, as\xED como por los carteles anunciadores ganadores y finalistas de las Fallas, los cuadros que retra\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-faller-de-valencia",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58641,7 +55082,7 @@ var agenda_eventos_default = {
       resumen: "El TEM\xA0es algo m\xE1s que un teatro, se ha convertido en un centro cultural al servicio del ciudadano y de sus asociaciones, un laboratorio de escena que tambi\xE9n ofrece talleres y actividades participativas. Ubicado en el barrio Cabanyal, es un edificio emblem\xE1tico.\xA0\nCon una programaci\xF3n de primer\xEDsimo\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-el-musical-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58653,7 +55094,7 @@ var agenda_eventos_default = {
       resumen: "En concreto Flumen teatro Val\xE8ncia es un destino de diversi\xF3n que aporta muchos valores a\xF1adidos. Gracias a nuestra reciente reforma, toda la sala est\xE1 equipada de butacas c\xF3modas que har\xE1n de tu estancia un momento inolvidable que junto con los actores de la funci\xF3n pasar\xE1 en un abrir y cerrar de o\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-fins-a-final-d-any-teatre-flumen",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58665,7 +55106,7 @@ var agenda_eventos_default = {
       resumen: "L\u2019ETNO,\xA0Museu Valenci\xE0 d'Etnolog\xEDa se cre\xF3 en 1982 para recoger, estudiar y difundir todo aquello relacionado con la cultura popular y tradicional valenciana. En el a\xF1o 2023 fue elegido Museo Europeo del A\xF1o por los premios EMYA del Consejo de Europa.\nComo museo de la cultura popular valenciana, inv\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museo-valencia-d-etnologia-actividades",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58677,7 +55118,7 @@ var agenda_eventos_default = {
       resumen: "Teatro C\xEDrculo es un centro de creaci\xF3n, producci\xF3n teatral y exhibici\xF3n de las artes vivas contempor\xE1neas con compa\xF1\xEDa estable, un laboratorio, un taller de entrenamiento y un espacio de acogida de residencias. Cuenta con un equipo art\xEDstico, con colaboradores en distintos \xE1mbitos, con un espacio q\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacion-cultural-teatro-circulo",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58689,7 +55130,7 @@ var agenda_eventos_default = {
       resumen: "El Museo de la Semana Santa Marinera \u201CSalvador Caur\xEDn\u201D de Val\xE8ncia est\xE1 ubicado en un barrio t\xEDpicamente marinero.\xA0La vistosidad de sus trajes, la riqueza simb\xF3lica y la singularidad de sus celebraciones son perceptibles en las im\xE1genes y colecci\xF3n de trajes y elementos expuestos en el Museo y que,\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museu-de-la-setmana-santa-marinera",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58709,7 +55150,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58721,7 +55162,7 @@ var agenda_eventos_default = {
       resumen: "La compa\xF1\xEDa de Teatro de Marionetas la Estrella cuenta con una larga trayectoria produciendo montajes infantiles, con m\xE1s de veinte espect\xE1culos producidos tanto para la programaci\xF3n estable de nuestras salas en Valencia, como para gira y festivales nacionales e internacionales. A lo largo de estos\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-teatro-la-estrella",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58733,7 +55174,7 @@ var agenda_eventos_default = {
       resumen: "El MuVIM es un museo de ideas, consagrado a preservar y dar a conocer las ideas y valores que han hecho posible el mundo moderno.\nLas actividades y exposiciones siempre ofrecen un valor a\xF1adido: son algo m\xE1s que una muestra de objetos, se sirven de objetos para expresar ideas. \nIdeas que pretenden h\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-muvim",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58745,7 +55186,7 @@ var agenda_eventos_default = {
       resumen: "Impulsado por Acci\xF3n Cultural del Pa\xEDs Valenciano (ACPV) y la Instituci\xF3n C\xEDvica y de Pensamiento Joan Fuster (IJF), en 2006 abri\xF3 en el coro de Val\xE8ncia el Octubre Centro de Cultura Contempor\xE1nea (OCCC), una apuesta firme por el revifament de la cultura y la sociedad de todo nuestro pa\xEDs desde una\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-cultural-octubre-centre-de-cultura-contemporania",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58757,7 +55198,7 @@ var agenda_eventos_default = {
       resumen: "Edificio situado en el puerto de Valencia, de planta rectangular y torre con reloj de cuatro esferas y remate cupuliforme. La decoraci\xF3n de sus cuatro fachadas es de tradici\xF3n neoplateresca, aunque en su reconstrucci\xF3n de 1939 se simplific\xF3 hacia formas m\xE1s planas y sobrias. Actualmente se utiliza c\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/sala-exposicions-edifici-del-rellotge",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58769,7 +55210,7 @@ var agenda_eventos_default = {
       resumen: "Feria Val\xE8ncia ofrece el mejor marco para conjugar la celebraci\xF3n de acontecimientos nacionales e internacionales\xA0en un entorno que anima a disfrutar del clima y la gastronom\xEDa. Con un siglo de existencia, es el recinto organizador de acontecimientos m\xE1s antiguo de Espa\xF1a (1917). Dispone de la super\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/fira-de-valencia-agenda",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58781,7 +55222,7 @@ var agenda_eventos_default = {
       resumen: "Bombas Gens Centre d\u2019Arts Digitals\xA0es un lugar de encuentro para todas las propuestas vinculadas al arte y tecnolog\xEDa de nueva generaci\xF3n con una agenda viva, que complementa la oferta expositiva, con eventos, actividades, visitas guiadas patrimoniales y programas formativos especializados.\n\nAgenda\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/bombas-gens-centre-d-arts-digitals-cas",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58793,7 +55234,7 @@ var agenda_eventos_default = {
       resumen: "El museo Iluziona ofrece un ambiente \xFAnico y divertido que combina cultura, arte y entretenimiento para atraer a diversos p\xFAblicos. Proporciona numerosas oportunidades para capturar fotos memorables con efectos visuales asombrosos y fomenta la interacci\xF3n entre visitantes.\n\nM\xE1s informaci\xF3n",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/museo-iluziona-cas",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58805,7 +55246,7 @@ var agenda_eventos_default = {
       resumen: "El\xA0Consejo Superior de Investigaciones Cient\xEDficas\xA0(CSIC) cuenta en el centro de la ciudad de Val\xE8ncia con la Casa de la Ci\xE8ncia, a su vez sede de su Delegaci\xF3n en la Comunidad Valenciana. Entre sus objetivos se encuentra acercar la actividad cient\xEDfico-t\xE9cnica de los centros del CSIC a la sociedad.\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/casa-de-la-ciencia-del-csic-programacion",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58817,7 +55258,7 @@ var agenda_eventos_default = {
       resumen: 'El Instituto Interuniversitario L\xF3pez Pi\xF1ero es un centro dedicado a la investigaci\xF3n y la divulgaci\xF3n en torno a los estudios hist\xF3ricos y sociales sobre la medicina, la tecnolog\xEDa, la ciencia y el medioambiente. Cuenta con programas propios de M\xE1ster y Doctorado en "Historia de la ciencia y comuni\u2026',
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/institut-interuniversitari-lopez-pinero-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58837,7 +55278,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58849,19 +55290,7 @@ var agenda_eventos_default = {
       resumen: "L'Hemisf\xE8ric, fou el primer edifici de la Ciutat de les Arts i les Ci\xE8ncies que va obrir les seues portes al p\xFAblic. \xC9s un edifici\xA0dissenyat per a projeccions digitals i de cine IMAX, que te faran viure aventures a trav\xE9s d'imatges espectaculars. \xC9s la sala m\xE9s gran d'Espanya que alberga tres sistem\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/hemisferic-ciutat-arts-i-ciencies-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
-      source: "ajuntament-valencia-scraping"
-    },
-    {
-      id: "exposicio-permanent-a-l-alqueria-de-felix",
-      titulo: "Exposici\xF3n permanente en La Alquer\xEDa de F\xE9lix",
-      categoria: "EXPOSICIONES",
-      fechaInicio: "2026-01-01T00:00:00.000Z",
-      fechaFin: "2026-12-30T00:00:00.000Z",
-      resumen: "La Alquer\xEDa de F\xE9lix cuenta con una exposici\xF3n permanente que tiene por objetivo dar a conocer su historia y explicar c\xF3mo era antes la vida en la huerta.\xA0\n\nLa exposici\xF3n est\xE1 formada por ocho paneles expositivos que tienen por objetivo divulgar la historia y la arquitectura del edificio, su evoluci\u2026",
-      url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/exposicio-permanent-a-l-alqueria-de-felix",
-      distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58873,7 +55302,7 @@ var agenda_eventos_default = {
       resumen: "Una escena que abre nuevos \xE1mbitos de conexi\xF3n con el p\xFAblico. Teatro de proximidad, independiente, alternativo, pr\xF3ximo, a tu lado y en Val\xE8ncia. Desde la comedia al drama, pasando por la tragedia y la tragicomedia: todas las experiencias son posibles en Sala Carme Teatre Val\xE8ncia. Amor y pasi\xF3n po\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/programacio-fins-a-final-d-any-carme-teatre",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58885,7 +55314,7 @@ var agenda_eventos_default = {
       resumen: null,
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-olympia-programaci%C3%B3",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58897,7 +55326,7 @@ var agenda_eventos_default = {
       resumen: "Teatro Talia est\xE1 ubicado en el casco antiguo de Val\xE8ncia. Se inaugur\xF3 en 1928. En sus inicios, se representaban obras locales, tanto en valenciano como en castellano. Es de los teatros m\xE1s peque\xF1os de la Generalitat, con un aforo de unos 350 espectadores. Durante todo el a\xF1o nos ofrece una amplia p\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-talia-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58917,7 +55346,7 @@ var agenda_eventos_default = {
           bajaConfianza: false
         }
       ],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58929,7 +55358,7 @@ var agenda_eventos_default = {
       resumen: "Entidad privada sin \xE1nimo de lucro que trabaja en favor del progreso de las personas y la sociedad valenciana, \xA0que fomenta la participaci\xF3n y el acceso a la cultura. Sus actividades culturales se centran en exposiciones, talleres did\xE1cticos, ciclos de conferencias, premios y el apoyo de la lengua y\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/centre-cultural-bancaixa",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58941,7 +55370,7 @@ var agenda_eventos_default = {
       resumen: "El Jard\xEDn Bot\xE1nico de la Universitat de Val\xE8ncia es un museo vivo situado al casco hist\xF3rico de la ciudad, un espacio universitario abierto al p\xFAblico que tiene como misi\xF3n popularizar el mundo vegetal fomentando su estudio, ense\xF1anza, divulgaci\xF3n y conservaci\xF3n, as\xED como tambi\xE9n su uso sostenible.\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pogramacio-cultural-jardi-botanic",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58953,7 +55382,7 @@ var agenda_eventos_default = {
       resumen: "Desde hace m\xE1s de tres d\xE9cadas, Black Note Club ha sido el epicentro de la m\xFAsica en directo en Val\xE8ncia y un referente a nivel nacional, ofreciendo una plataforma para artistas emergentes y consagrados. Black Note Club se ha convertido en el lugar de encuentro para los amantes de la m\xFAsica en vivo.\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/black-note-club-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58965,7 +55394,7 @@ var agenda_eventos_default = {
       resumen: "La instituci\xF3n\xA0nace el 23 de marzo de 1879\xA0para \u201Catender las necesidades culturales y de formaci\xF3n, en su profesi\xF3n, de los empleados del comercio\u201D. En sus 139 a\xF1os de vida, se ha consolidado como una de las instituciones de referencia de la sociedad civil valenciana, en materia cultural, mercantil\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/pogramacio-cultural-ateneo",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58977,7 +55406,7 @@ var agenda_eventos_default = {
       resumen: "El edificio del Palacio de Congresos de Val\xE8ncia\xA0fue dise\xF1ado por el c\xE9lebre arquitecto brit\xE1nico Norman Foster e \xA0inaugurado en 1998.\xA0Dispone de tres auditorios, una gran sala de exposiciones y diversas salas de reuniones. En su programaci\xF3n, que ofrece eventos nacionales e internacionales, destaca\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/palau-de-congressos-de-valencia-activitats",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -58989,7 +55418,7 @@ var agenda_eventos_default = {
       resumen: "El Teatro Rialto fue construido en el a\xF1o 1939 por iniciativa de la familia Gonz\xE1lez Galindo. La estructura del edificio es compleja; cine, sal\xF3n de t\xE9 y restaurante en su origen, despu\xE9s de la rehabilitaci\xF3n se habilit\xF3 una sala para las proyecciones cinematogr\xE1ficas de la filmoteca de la Generalit\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/teatre-rialto-programacio",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     },
     {
@@ -59001,11 +55430,11 @@ var agenda_eventos_default = {
       resumen: "El Centro de Recepci\xF3n del Visitante del Santo C\xE1liz, ubicado en el\xA0Almud\xEDn, acoge una exposici\xF3n por el\xA0III A\xF1o Jubilar del Santo C\xE1liz. El Santo C\xE1liz es la copa que, seg\xFAn la tradici\xF3n, pudo usar Jes\xFAs en la \xDAltima Cena.\xA0 Desde entonces, viaj\xF3 desde Jerusal\xE9n hasta los Pirineos, fue protegida por\u2026",
       url: "https://www.valencia.es/cas/agenda-de-la-ciudad/-/content/almudin-exposicion-iii-ano-jubilar-santo-caliz",
       distritosMencionados: [],
-      fetchedAt: "2026-09-16T23:25:29.183Z",
+      fetchedAt: "2026-09-23T16:11:43.200Z",
       source: "ajuntament-valencia-scraping"
     }
   ],
-  fetchedAt: "2026-09-16T23:25:29.183Z",
+  fetchedAt: "2026-09-23T16:11:43.200Z",
   estructuraSospechosa: false
 };
 
@@ -59019,6 +55448,174 @@ async function handler17() {
       "cache-control": "public, max-age=600, stale-while-revalidate=3600"
     }
   });
+}
+
+// data/lugares-movilidad-valencia.json
+var lugares_movilidad_valencia_default = [
+  { alias: ["roig arena"], lugar: "Roig Arena", lat: 39.4491041, lon: -0.3643501 },
+  { alias: ["mestalla"], lugar: "Estadi de Mestalla (Valencia CF)", lat: 39.4753863, lon: -0.3565192 },
+  { alias: ["estadi ciutat de valencia", "ciutat de valencia"], lugar: "Estadi Ciutat de Val\xE8ncia (Levante UD)", lat: 39.4946425, lon: -0.3638622 },
+  { alias: ["enginyer manuel soto", "ingeniero manuel soto"], lugar: "Avinguda de l'Enginyer Manuel Soto", lat: 39.4549994, lon: -0.3299295 },
+  { alias: ["marina de valencia", "tinglado"], lugar: "Marina de Val\xE8ncia (Tinglados)", lat: 39.459577, lon: -0.3145551 },
+  { alias: ["ciutat de les arts", "ciudad de las artes"], lugar: "Ciutat de les Arts i les Ci\xE8ncies", lat: 39.4557563, lon: -0.352552 },
+  { alias: ["doctor moliner"], lugar: "Carrer del Doctor Moliner", lat: 39.4767117, lon: -0.3625788 },
+  { alias: ["blasco ibanez"], lugar: "Avinguda de Blasco Ib\xE1\xF1ez", lat: 39.4776459, lon: -0.3618003 },
+  { alias: ["colon"], lugar: "Carrer de Col\xF3n", lat: 39.468764, lon: -0.3725047 },
+  { alias: ["peset aleixandre"], lugar: "Avinguda Doctor Peset Aleixandre", lat: 39.4907239, lon: -0.3802498 },
+  { alias: ["montcada", "moncada"], lugar: "Cam\xED de Montcada", lat: 39.4902937, lon: -0.3781584 },
+  { alias: ["perez galdos"], lugar: "Avinguda de P\xE9rez Gald\xF3s", lat: 39.4745533, lon: -0.3955315 },
+  { alias: ["giorgeta"], lugar: "Carrer de Sant Vicent M\xE0rtir - Giorgeta", lat: 39.459589, lon: -0.3829641 },
+  { alias: ["russafa", "ruzafa"], lugar: "Carrer de Russafa", lat: 39.4661661, lon: -0.3744498 },
+  { alias: ["porta de la mar", "puerta del mar"], lugar: "Porta de la Mar", lat: 39.472078, lon: -0.3684537 },
+  { alias: ["placa de l ajuntament", "plaza del ayuntamiento"], lugar: "Pla\xE7a de l'Ajuntament", lat: 39.4706473, lon: -0.3768264 }
+];
+
+// src/services/movilidad-incidencias-previsiones.ts
+var HEADERS4 = { "User-Agent": "vlc-monitor/1.0 (+https://github.com/)" };
+var URL_FUENTE_AVISOS_MOVILIDAD = "https://www.valencia.es/cas/movilidad/incidencias-y-previsiones";
+var LUGARES = lugares_movilidad_valencia_default;
+var ENTIDADES_HTML3 = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  oacute: "\xF3",
+  Oacute: "\xD3",
+  eacute: "\xE9",
+  Eacute: "\xC9",
+  aacute: "\xE1",
+  Aacute: "\xC1",
+  iacute: "\xED",
+  Iacute: "\xCD",
+  uacute: "\xFA",
+  Uacute: "\xDA",
+  ntilde: "\xF1",
+  Ntilde: "\xD1",
+  uuml: "\xFC"
+};
+function decodeEntities3(texto) {
+  return texto.replace(/&#(\d+);/g, (_, dec2) => String.fromCharCode(Number(dec2))).replace(/&#x([0-9a-fA-F]+);/g, (_, hex4) => String.fromCharCode(parseInt(hex4, 16))).replace(/&([a-zA-Z]+);/g, (match, nombre) => ENTIDADES_HTML3[nombre] ?? match);
+}
+function limpiarHtml3(texto) {
+  return decodeEntities3(texto.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ")).trim();
+}
+var TIPO_POR_TITULO = {
+  Incidencias: "incidencia",
+  Previsiones: "prevision"
+};
+function trocearItems(seccionHtml) {
+  return seccionHtml.split('<span class="bloque_enlace">').slice(1);
+}
+var RE_FECHA = /(?:(\d{4})-(\d{2})-(\d{2})(?:\s+\d{2}:\d{2}:\d{2}(?:\.\d+)?)?|(\d{2})-(\d{2})-(\d{4}))/;
+function extraerFecha2(textoBruto) {
+  const m2 = RE_FECHA.exec(textoBruto);
+  if (!m2) return null;
+  const fechaTexto = m2[1] ? `${m2[1]}-${m2[2]}-${m2[3]}` : `${m2[6]}-${m2[5]}-${m2[4]}`;
+  return { fechaTexto, fin: m2.index + m2[0].length };
+}
+function parsearItem(bloque) {
+  const enlace = /<a href="([^"]+)"[^>]*target="_blank">([\s\S]*?)<\/a>/i.exec(bloque);
+  const textoBruto = enlace ? enlace[2] : bloque.split("</span>")[0];
+  const planoUrl = enlace ? decodeEntities3(enlace[1].trim()) : null;
+  const fecha = extraerFecha2(textoBruto);
+  if (!fecha) return null;
+  const descripcion = limpiarHtml3(textoBruto.slice(fecha.fin));
+  if (!descripcion) return null;
+  return { fechaTexto: fecha.fechaTexto, descripcion, planoUrl };
+}
+function parsearAvisosMovilidad(html) {
+  const resultado = [];
+  const partes = html.split(/<h3 class="bloque_subtitulo">([^<]+)<\/h3>/);
+  for (let i = 1; i < partes.length; i += 2) {
+    const tipo = TIPO_POR_TITULO[partes[i].trim()];
+    if (!tipo) continue;
+    for (const bloque of trocearItems(partes[i + 1] ?? "")) {
+      const item = parsearItem(bloque);
+      if (item) resultado.push({ tipo, item });
+    }
+  }
+  return resultado;
+}
+function parsearFechaPublicacion2(fechaTexto) {
+  const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fechaTexto);
+  if (!m2) return null;
+  const fecha = /* @__PURE__ */ new Date(`${m2[1]}-${m2[2]}-${m2[3]}T00:00:00.000Z`);
+  return Number.isNaN(fecha.getTime()) ? null : fecha.toISOString();
+}
+function normalizar2(texto) {
+  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+function resolverLugar(descripcion) {
+  const texto = normalizar2(descripcion);
+  for (const candidato of LUGARES) {
+    for (const alias of candidato.alias) {
+      const aliasNormalizado = normalizar2(alias).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const patron = new RegExp(`\\b${aliasNormalizado}\\b`);
+      if (patron.test(texto)) {
+        return { lugar: candidato.lugar, lat: candidato.lat, lon: candidato.lon };
+      }
+    }
+  }
+  return null;
+}
+async function construirId(tipo, fechaPublicacion, descripcion) {
+  const datos = new TextEncoder().encode(`${tipo}|${fechaPublicacion}|${descripcion}`);
+  const hash2 = await crypto.subtle.digest("SHA-1", datos);
+  return [...new Uint8Array(hash2)].map((b2) => b2.toString(16).padStart(2, "0")).join("").slice(0, 16);
+}
+async function construirAviso2(tipo, item, fetchedAt) {
+  const fechaPublicacion = parsearFechaPublicacion2(item.fechaTexto);
+  if (!fechaPublicacion) return null;
+  const lugarResuelto = resolverLugar(item.descripcion);
+  return {
+    id: await construirId(tipo, fechaPublicacion, item.descripcion),
+    tipo,
+    fechaPublicacion,
+    descripcion: item.descripcion,
+    planoUrl: item.planoUrl,
+    lugar: lugarResuelto?.lugar ?? null,
+    lat: lugarResuelto?.lat ?? null,
+    lon: lugarResuelto?.lon ?? null,
+    fetchedAt,
+    source: "ajuntament-valencia-movilidad-incidencias-previsiones"
+  };
+}
+async function fetchAvisosMovilidad() {
+  const res = await fetch(URL_FUENTE_AVISOS_MOVILIDAD, { headers: HEADERS4 });
+  if (!res.ok) {
+    throw new Error(`valencia.es (incidencias y previsiones) respondi\xF3 HTTP ${res.status}`);
+  }
+  const html = await res.text();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const crudos = parsearAvisosMovilidad(html);
+  if (crudos.length === 0) {
+    throw new Error("Sin \xEDtems reconocidos en incidencias-y-previsiones \u2014 posible cambio de estructura de la fuente");
+  }
+  const avisos = (await Promise.all(crudos.map(({ tipo, item }) => construirAviso2(tipo, item, fetchedAt)))).filter((a2) => a2 !== null).sort((a2, b2) => b2.fechaPublicacion.localeCompare(a2.fechaPublicacion));
+  return { avisos, fetchedAt };
+}
+
+// src/server/movilidad-avisos.ts
+var CACHE_KEY10 = "movilidad:avisos-incidencias-previsiones:v1";
+var TTL_MS12 = 6 * 60 * 60 * 1e3;
+async function handler18() {
+  try {
+    const { value: snapshot, fresh } = await getOrFetch(CACHE_KEY10, TTL_MS12, fetchAvisosMovilidad);
+    return new Response(JSON.stringify({ ...snapshot, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=600, stale-while-revalidate=21600"
+      }
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: err instanceof Error ? err.message : String(err) }),
+      { status: 502, headers: { "content-type": "application/json; charset=utf-8" } }
+    );
+  }
 }
 
 // src/services/meteo-zona.ts
@@ -59045,8 +55642,8 @@ function normalizarLluviaVientoPorDistrito(distritos2, respuesta) {
 
 // src/server/meteo-zona.ts
 setLoadedDistricts(distritosFromGeoJSON(distritos_valencia_default));
-var CACHE_KEY10 = "emergencia:meteo-zona:v1";
-var TTL_MS12 = 15 * 60 * 1e3;
+var CACHE_KEY11 = "emergencia:meteo-zona:v1";
+var TTL_MS13 = 15 * 60 * 1e3;
 async function fetchMeteoZona() {
   const distritos2 = getLoadedDistricts().map((d2) => ({
     codigo: d2.codigo,
@@ -59060,9 +55657,9 @@ async function fetchMeteoZona() {
   const respuesta = await res.json();
   return normalizarLluviaVientoPorDistrito(distritos2, respuesta);
 }
-async function handler18() {
+async function handler19() {
   try {
-    const { value: distritos2, fresh } = await getOrFetch(CACHE_KEY10, TTL_MS12, fetchMeteoZona);
+    const { value: distritos2, fresh } = await getOrFetch(CACHE_KEY11, TTL_MS13, fetchMeteoZona);
     return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
       status: 200,
       headers: {
@@ -59147,8 +55744,8 @@ function normalizarPluviometrosSaih(crudas) {
 }
 
 // src/server/pluviometros-saih.ts
-var CACHE_KEY11 = "emergencia:pluviometros-saih:v1";
-var TTL_MS13 = 15 * 60 * 1e3;
+var CACHE_KEY12 = "emergencia:pluviometros-saih:v1";
+var TTL_MS14 = 15 * 60 * 1e3;
 var SAIH_URL = "https://saih.chj.es/mapa-lluvias";
 var USER_AGENT = "vlc-monitor-emergencia-bot/1.0 (+https://github.com/robervx/vlc-monitor)";
 async function fetchPluviometros() {
@@ -59160,9 +55757,9 @@ async function fetchPluviometros() {
   const crudas = JSON.parse(m2[1]);
   return normalizarPluviometrosSaih(crudas);
 }
-async function handler19() {
+async function handler20() {
   try {
-    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY11, TTL_MS13, fetchPluviometros);
+    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY12, TTL_MS14, fetchPluviometros);
     return new Response(JSON.stringify({ estaciones, fresh }), {
       status: 200,
       headers: {
@@ -59335,7 +55932,7 @@ var altimetria_valencia_default = [
 ];
 
 // src/server/altimetria-valencia.ts
-async function handler20() {
+async function handler21() {
   return new Response(JSON.stringify({ distritos: altimetria_valencia_default }), {
     status: 200,
     headers: {
@@ -59343,6 +55940,231 @@ async function handler20() {
       "cache-control": "public, max-age=86400, stale-while-revalidate=604800"
     }
   });
+}
+
+// src/services/riesgo-escorrentia.ts
+var ADVERTENCIA_RIESGO_ESCORRENTIA = "Estimaci\xF3n relativa a partir de densidad de sumideros y lluvia registrada \u2014 no sustituye avisos oficiales de Protecci\xF3n Civil.";
+var UMBRAL_LLUVIA_ACTIVACION_MM = 0.2;
+function factorLluvia(lluviaUltimaHoraMm) {
+  if (lluviaUltimaHoraMm < UMBRAL_LLUVIA_ACTIVACION_MM) return 0;
+  const rango = UMBRAL_LLUVIA_MM - UMBRAL_LLUVIA_ACTIVACION_MM;
+  return Math.min(1, (lluviaUltimaHoraMm - UMBRAL_LLUVIA_ACTIVACION_MM) / rango);
+}
+function calcularRiesgoEscorrentia(imbornales, lluviaPorDistrito, fetchedAt, observedAt) {
+  return imbornales.map((d2) => {
+    const lluviaUltimaHoraMm = lluviaPorDistrito.get(d2.distritoCodigo) ?? 0;
+    const activo = lluviaUltimaHoraMm >= UMBRAL_LLUVIA_ACTIVACION_MM;
+    const indiceRelativo = Math.round(d2.vulnerabilidadPercentil * factorLluvia(lluviaUltimaHoraMm));
+    return {
+      distritoCodigo: d2.distritoCodigo,
+      distritoNombre: d2.distritoNombre,
+      imbornalesCount: d2.imbornalesCount,
+      areaKm2: d2.areaKm2,
+      densidadImbornalesPorKm2: d2.densidadImbornalesPorKm2,
+      lluviaUltimaHoraMm,
+      activo,
+      indiceRelativo,
+      advertencia: ADVERTENCIA_RIESGO_ESCORRENTIA,
+      observedAt,
+      fetchedAt,
+      source: ["geoportal-valencia-imbornales", "044"]
+    };
+  });
+}
+
+// data/imbornales-distrito.json
+var imbornales_distrito_default = [
+  {
+    distritoCodigo: "19",
+    distritoNombre: "Poblats del Sud",
+    imbornalesCount: 2834,
+    areaKm2: 66.02727646109997,
+    densidadImbornalesPorKm2: 42.921655289986916,
+    vulnerabilidadPercentil: 100
+  },
+  {
+    distritoCodigo: "17",
+    distritoNombre: "Poblats del Nord",
+    imbornalesCount: 1282,
+    areaKm2: 15.156451979659323,
+    densidadImbornalesPorKm2: 84.58443979636559,
+    vulnerabilidadPercentil: 94.44444444444444
+  },
+  {
+    distritoCodigo: "10",
+    distritoNombre: "Quatre Carreres",
+    imbornalesCount: 6534,
+    areaKm2: 11.311509694620327,
+    densidadImbornalesPorKm2: 577.6417274439966,
+    vulnerabilidadPercentil: 88.88888888888889
+  },
+  {
+    distritoCodigo: "04",
+    distritoNombre: "Campanar",
+    imbornalesCount: 3794,
+    areaKm2: 5.230542160003097,
+    densidadImbornalesPorKm2: 725.3550174993244,
+    vulnerabilidadPercentil: 83.33333333333333
+  },
+  {
+    distritoCodigo: "18",
+    distritoNombre: "Poblats de l'Oest",
+    imbornalesCount: 1587,
+    areaKm2: 2.008433400449576,
+    densidadImbornalesPorKm2: 790.1680980035283,
+    vulnerabilidadPercentil: 77.77777777777777
+  },
+  {
+    distritoCodigo: "11",
+    distritoNombre: "Poblats Maritims",
+    imbornalesCount: 7364,
+    areaKm2: 8.486863241370884,
+    densidadImbornalesPorKm2: 867.6939630772808,
+    vulnerabilidadPercentil: 72.22222222222223
+  },
+  {
+    distritoCodigo: "14",
+    distritoNombre: "Benimaclet",
+    imbornalesCount: 1650,
+    areaKm2: 1.575981619891536,
+    densidadImbornalesPorKm2: 1046.9665249735326,
+    vulnerabilidadPercentil: 66.66666666666667
+  },
+  {
+    distritoCodigo: "09",
+    distritoNombre: "Jesus",
+    imbornalesCount: 3219,
+    areaKm2: 2.980426733076456,
+    densidadImbornalesPorKm2: 1080.0466806567945,
+    vulnerabilidadPercentil: 61.111111111111114
+  },
+  {
+    distritoCodigo: "15",
+    distritoNombre: "Rascanya",
+    imbornalesCount: 2929,
+    areaKm2: 2.6257574676710647,
+    densidadImbornalesPorKm2: 1115.4876396858917,
+    vulnerabilidadPercentil: 55.55555555555556
+  },
+  {
+    distritoCodigo: "13",
+    distritoNombre: "Algiros",
+    imbornalesCount: 3749,
+    areaKm2: 2.935894186681253,
+    densidadImbornalesPorKm2: 1276.9533782952462,
+    vulnerabilidadPercentil: 50
+  },
+  {
+    distritoCodigo: "16",
+    distritoNombre: "Benicalap",
+    imbornalesCount: 3049,
+    areaKm2: 2.212703724624589,
+    densidadImbornalesPorKm2: 1377.9522156845912,
+    vulnerabilidadPercentil: 44.44444444444444
+  },
+  {
+    distritoCodigo: "08",
+    distritoNombre: "Patraix",
+    imbornalesCount: 4192,
+    areaKm2: 2.8682865731825586,
+    densidadImbornalesPorKm2: 1461.4997117769483,
+    vulnerabilidadPercentil: 38.888888888888886
+  },
+  {
+    distritoCodigo: "06",
+    distritoNombre: "El Pla del Real",
+    imbornalesCount: 2646,
+    areaKm2: 1.6839083269878756,
+    densidadImbornalesPorKm2: 1571.3444476713794,
+    vulnerabilidadPercentil: 33.333333333333336
+  },
+  {
+    distritoCodigo: "12",
+    distritoNombre: "Camins al Grau",
+    imbornalesCount: 3819,
+    areaKm2: 2.3597938736565993,
+    densidadImbornalesPorKm2: 1618.361689397176,
+    vulnerabilidadPercentil: 27.77777777777778
+  },
+  {
+    distritoCodigo: "05",
+    distritoNombre: "La Saidia",
+    imbornalesCount: 3305,
+    areaKm2: 1.9410671110381372,
+    densidadImbornalesPorKm2: 1702.671680544004,
+    vulnerabilidadPercentil: 22.22222222222222
+  },
+  {
+    distritoCodigo: "03",
+    distritoNombre: "Extramurs",
+    imbornalesCount: 3429,
+    areaKm2: 1.9689579450932797,
+    densidadImbornalesPorKm2: 1741.5303402214365,
+    vulnerabilidadPercentil: 16.666666666666668
+  },
+  {
+    distritoCodigo: "07",
+    distritoNombre: "l'Olivereta",
+    imbornalesCount: 3474,
+    areaKm2: 1.986187387155951,
+    densidadImbornalesPorKm2: 1749.0796802281925,
+    vulnerabilidadPercentil: 11.11111111111111
+  },
+  {
+    distritoCodigo: "02",
+    distritoNombre: "l'Eixample",
+    imbornalesCount: 3307,
+    areaKm2: 1.7283307245379547,
+    densidadImbornalesPorKm2: 1913.4069382953778,
+    vulnerabilidadPercentil: 5.555555555555555
+  },
+  {
+    distritoCodigo: "01",
+    distritoNombre: "Ciutat Vella",
+    imbornalesCount: 5722,
+    areaKm2: 1.6874798233475303,
+    densidadImbornalesPorKm2: 3390.8553576948902,
+    vulnerabilidadPercentil: 0
+  }
+];
+
+// src/server/riesgo-escorrentia.ts
+var CACHE_KEY13 = "emergencia:riesgo-escorrentia:v1";
+var TTL_MS15 = 15 * 60 * 1e3;
+async function leerLluviaPorDistrito() {
+  try {
+    const res = await handler19();
+    if (!res.ok) return { lluvia: /* @__PURE__ */ new Map(), observedAt: (/* @__PURE__ */ new Date()).toISOString() };
+    const body = await res.json();
+    const lluvia = new Map(body.distritos.map((d2) => [d2.distritoCodigo, d2.precipitacionMm]));
+    const observedAt = body.distritos[0]?.fecha ?? (/* @__PURE__ */ new Date()).toISOString();
+    return { lluvia, observedAt };
+  } catch (err) {
+    console.error("emergencia/v1/meteo-zona no disponible para riesgo-escorrentia:", err);
+    return { lluvia: /* @__PURE__ */ new Map(), observedAt: (/* @__PURE__ */ new Date()).toISOString() };
+  }
+}
+async function fetchRiesgoEscorrentia() {
+  const { lluvia, observedAt } = await leerLluviaPorDistrito();
+  const fetchedAt = (/* @__PURE__ */ new Date()).toISOString();
+  return calcularRiesgoEscorrentia(imbornales_distrito_default, lluvia, fetchedAt, observedAt);
+}
+async function handler22() {
+  try {
+    const { value: distritos2, fresh } = await getOrFetch(CACHE_KEY13, TTL_MS15, fetchRiesgoEscorrentia);
+    return new Response(JSON.stringify({ distritos: distritos2, fresh }), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "public, max-age=60, stale-while-revalidate=900"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 502,
+      headers: { "content-type": "application/json; charset=utf-8" }
+    });
+  }
 }
 
 // node_modules/@ai-sdk/provider/dist/index.js
@@ -102121,7 +98943,7 @@ var distritosBasicos3 = distritosFromGeoJSON(distritos_valencia_default).map((d2
 }));
 var CLAVE_HISTERESIS_PULSO3 = "pulso:escenarios-previos:v1";
 var CLAVE_TRAFICO_PREVIO3 = "insights:trafico:estado-previo";
-async function handler21() {
+async function handler23() {
   try {
     const resolverDistrito2 = (lat, lon) => getDistrictAtCoordinates(lat, lon)?.codigo ?? null;
     const [meteoResult, aireResult, traficoResult] = await Promise.all([
@@ -102176,12 +98998,12 @@ async function handler21() {
 }
 
 // src/server/sintesis-ia.ts
-var CACHE_KEY12 = "sintesis-ia:actual:v1";
-var TTL_MS14 = 90 * 60 * 1e3;
+var CACHE_KEY14 = "sintesis-ia:actual:v1";
+var TTL_MS16 = 90 * 60 * 1e3;
 var MODELO = "gemini-3-flash-preview";
-async function leerJson(handler28) {
+async function leerJson(handler30) {
   try {
-    const res = await handler28();
+    const res = await handler30();
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -102192,7 +99014,7 @@ async function leerJson(handler28) {
 async function recolectarSenales() {
   const [insights, sugerencias, pulso, mediatico, avisos] = await Promise.all([
     leerJson(handler10),
-    leerJson(handler21),
+    leerJson(handler23),
     leerJson(handler9),
     leerJson(handler12),
     leerJson(handler2)
@@ -102232,9 +99054,9 @@ async function fetchSintesisIA() {
   }
   return construirSintesisIA(object3, MODELO, (/* @__PURE__ */ new Date()).toISOString());
 }
-async function handler22() {
+async function handler24() {
   try {
-    const { value: sintesis, fresh } = await getOrFetch(CACHE_KEY12, TTL_MS14, fetchSintesisIA);
+    const { value: sintesis, fresh } = await getOrFetch(CACHE_KEY14, TTL_MS16, fetchSintesisIA);
     return new Response(JSON.stringify({ sintesis, fresh }), {
       status: 200,
       headers: {
@@ -108618,12 +105440,12 @@ var camaras_dgt_valencia_default = [
 ];
 
 // src/server/sintesis-ia-v2.ts
-var CACHE_KEY13 = "sintesis-ia:v2:actual";
-var TTL_MS15 = 90 * 60 * 1e3;
+var CACHE_KEY15 = "sintesis-ia:v2:actual";
+var TTL_MS17 = 90 * 60 * 1e3;
 var MODELO2 = "gemini-3-flash-preview";
-async function leerJson2(handler28) {
+async function leerJson2(handler30) {
   try {
-    const res = await handler28();
+    const res = await handler30();
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -108635,7 +105457,7 @@ async function construirSenales() {
   const [trafico, incidencias, meteoZona, agenda] = await Promise.all([
     leerJson2(handler5),
     leerJson2(handler14),
-    leerJson2(handler18),
+    leerJson2(handler19),
     leerJson2(handler17)
   ]);
   return correlacionarSenales({
@@ -108689,9 +105511,9 @@ async function fetchSintesisV2() {
   await escribirHistoricoRecomendaciones(db(), recomendaciones, MODELO2, idsPersistidos);
   return { senales, recomendaciones, generadaEn: (/* @__PURE__ */ new Date()).toISOString(), modelo: MODELO2 };
 }
-async function handler23() {
+async function handler25() {
   try {
-    const { value, fresh } = await getOrFetch(CACHE_KEY13, TTL_MS15, fetchSintesisV2);
+    const { value, fresh } = await getOrFetch(CACHE_KEY15, TTL_MS17, fetchSintesisV2);
     return new Response(JSON.stringify({ ...value, fresh }), {
       status: 200,
       headers: {
@@ -108762,8 +105584,8 @@ function normalizarEstacionesAvamet(crudas) {
 }
 
 // src/server/avamet-estaciones.ts
-var CACHE_KEY14 = "emergencia:avamet-estaciones:v1";
-var TTL_MS16 = 15 * 60 * 1e3;
+var CACHE_KEY16 = "emergencia:avamet-estaciones:v1";
+var TTL_MS18 = 15 * 60 * 1e3;
 var AVAMET_URL = "https://www.avamet.org/mxo-mxo.php?territori=c15";
 var USER_AGENT2 = "vlc-monitor-emergencia-bot/1.0 (+https://github.com/robervx/vlc-monitor)";
 async function fetchEstacionesAvamet() {
@@ -108775,9 +105597,9 @@ async function fetchEstacionesAvamet() {
   const crudas = JSON.parse(m2[1]);
   return normalizarEstacionesAvamet(crudas);
 }
-async function handler24() {
+async function handler26() {
   try {
-    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY14, TTL_MS16, fetchEstacionesAvamet);
+    const { value: estaciones, fresh } = await getOrFetch(CACHE_KEY16, TTL_MS18, fetchEstacionesAvamet);
     return new Response(JSON.stringify({ estaciones, fresh }), {
       status: 200,
       headers: {
@@ -108938,7 +105760,7 @@ function json3(obj, status, extraHeaders) {
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...extraHeaders }
   });
 }
-async function handler25(req) {
+async function handler27(req) {
   if (req.method !== "POST") return json3({ ok: false }, 405);
   const secret = process.env.AUTH_SECRET;
   let users;
@@ -108980,7 +105802,7 @@ async function handler25(req) {
 }
 
 // src/server/auth-logout.ts
-async function handler26(req) {
+async function handler28(req) {
   const status = req.method === "POST" ? 200 : 405;
   return new Response(JSON.stringify({ ok: status === 200 }), {
     status,
@@ -108993,7 +105815,7 @@ async function handler26(req) {
 }
 
 // src/server/auth-estado.ts
-async function handler27(req) {
+async function handler29(req) {
   const secret = process.env.AUTH_SECRET;
   const sesion = secret ? await verificarSesion(leerCookie(req.headers.get("cookie"), COOKIE_NOMBRE), secret) : null;
   return new Response(
@@ -109021,16 +105843,18 @@ var RUTAS = {
   "geo/v1/distritos": handler15,
   "mock/v1/densidad-personas": handler16,
   "agenda/v1/eventos": handler17,
-  "emergencia/v1/meteo-zona": handler18,
-  "emergencia/v1/pluviometros": handler19,
-  "emergencia/v1/altimetria": handler20,
-  "sintesis/v1/actual": handler22,
-  "sintesis/v2/actual": handler23,
-  "emergencia/v1/avamet": handler24,
-  "decision/v1/sugerencias": handler21,
-  "auth/v1/login": handler25,
-  "auth/v1/logout": handler26,
-  "auth/v1/estado": handler27
+  "movilidad/v1/avisos-incidencias-previsiones": handler18,
+  "emergencia/v1/meteo-zona": handler19,
+  "emergencia/v1/pluviometros": handler20,
+  "emergencia/v1/altimetria": handler21,
+  "emergencia/v1/riesgo-escorrentia": handler22,
+  "sintesis/v1/actual": handler24,
+  "sintesis/v2/actual": handler25,
+  "emergencia/v1/avamet": handler26,
+  "decision/v1/sugerencias": handler23,
+  "auth/v1/login": handler27,
+  "auth/v1/logout": handler28,
+  "auth/v1/estado": handler29
 };
 var BASE = "http://d.invalid";
 async function dispatch(req) {
