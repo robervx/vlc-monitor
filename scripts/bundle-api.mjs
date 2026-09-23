@@ -24,6 +24,19 @@ await build({
   logLevel: 'info',
   // Node built-ins quedan externos (correcto). Todo lo demás —incluidas las
   // dependencias npm (@turf/circle, rbush)— se inlinea.
+  //
+  // Bug real de producción (2026-09-23): una dependencia transitiva de
+  // @ai-sdk/gateway (@vercel/oidc, usada por sintesis-ia.ts/sintesis-ia-v2.ts)
+  // hace un `require(...)` dinámico (no estático) que esbuild no puede
+  // inlinear. En `format: 'esm'` no existe un `require` global, así que el
+  // shim que genera esbuild lo detecta como `undefined` y lanza "Dynamic
+  // require of ... is not supported" — en tiempo de CARGA del módulo, lo que
+  // tira TODA la función (todas las rutas, no solo las de IA). Se soluciona
+  // definiendo un `require` real vía `createRequire`, igual que recomienda la
+  // documentación de esbuild para este caso exacto.
+  banner: {
+    js: "import { createRequire as __vlcCreateRequire } from 'node:module';\nconst require = __vlcCreateRequire(import.meta.url);",
+  },
 });
 
 console.log('api/router.js generado.');

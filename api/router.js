@@ -1,3 +1,5 @@
+import { createRequire as __vlcCreateRequire } from 'node:module';
+const require = __vlcCreateRequire(import.meta.url);
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
