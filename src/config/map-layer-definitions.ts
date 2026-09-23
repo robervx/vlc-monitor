@@ -154,6 +154,14 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
     zoomMinimo: 0,
     agregacion: 'lista',
   },
+  avisosMovilidad: {
+    key: 'avisosMovilidad',
+    specId: '048',
+    grupo: 'contexto',
+    renderers: ['panel'],
+    zoomMinimo: 0,
+    agregacion: 'lista',
+  },
   //
   // No añadas entradas aquí sin que exista antes la spec correspondiente
   // en specs/, con su contrato de capa ya congelado (sección 5 de la spec).

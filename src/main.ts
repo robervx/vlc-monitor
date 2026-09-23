@@ -21,6 +21,7 @@ import type { DatosFallas, MonumentoFalla } from './services/fallas';
 import type { ItemMediatico } from './services/mediatico';
 import type { VentanaTendencia } from './services/tendencia-terminos';
 import type { EventoAgenda, SnapshotAgenda } from './services/agenda-eventos';
+import type { AvisoMovilidad, SnapshotAvisosMovilidad } from './services/movilidad-incidencias-previsiones';
 import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility, PANEL_PREFERENCES_REGISTRY } from './ui/panel-preferences';
@@ -1056,6 +1057,72 @@ async function fetchAgendaEventosActual(): Promise<SnapshotAgenda> {
   return (await res.json()) as SnapshotAgenda;
 }
 
+// spec 048 — avisos oficiales de movilidad (incidencias y previsiones) de
+// valencia.es. Mismo patrón visual que la agenda (spec 027): panel de lista
+// con aviso persistente de scraping, sin puntos en el mapa (spec 048 §0/§5).
+interface MovilidadPanel {
+  root: HTMLDivElement;
+  list: HTMLDivElement;
+}
+
+function buildMovilidadPanel(): MovilidadPanel {
+  const root = document.createElement('div');
+  root.id = 'movilidad-avisos-panel';
+  root.hidden = true;
+  root.innerHTML = `
+    <div class="media-panel__header">Incidencias y previsiones de movilidad</div>
+    <div class="agenda-panel__aviso">Contenido extraído por scraping de valencia.es (Ayuntamiento de València) — no es una API ni un dataset oficial.</div>
+    <div class="media-panel__list" id="movilidad-avisos-panel-list"></div>
+    <div class="info-panel__meta" id="movilidad-avisos-panel-meta"></div>
+  `;
+  document.body.appendChild(root);
+  return { root, list: root.querySelector('#movilidad-avisos-panel-list')! };
+}
+
+function formatoFechaAviso(fechaPublicacion: string): string {
+  return new Date(fechaPublicacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function renderItemMovilidad(aviso: AvisoMovilidad): string {
+  const chipTipo = aviso.tipo === 'prevision'
+    ? '<span class="media-panel__chip media-panel__chip--impacto">Previsión</span>'
+    : '<span class="media-panel__chip">Incidencia</span>';
+  const chipLugar = aviso.lugar ? `<span class="media-panel__chip">${escapeHtml(aviso.lugar)}</span>` : '';
+  const enlacePlano = aviso.planoUrl
+    ? ` · <a href="${escapeHtml(aviso.planoUrl)}" target="_blank" rel="noopener noreferrer">Ver plano</a>`
+    : '';
+  return `
+    <div class="media-panel__item">
+      <div class="media-panel__item-meta">${formatoFechaAviso(aviso.fechaPublicacion)}${enlacePlano}</div>
+      <div class="media-panel__item-titulo">${escapeHtml(aviso.descripcion)}</div>
+      <div class="media-panel__chips">${chipTipo}${chipLugar}</div>
+    </div>
+  `;
+}
+
+function renderMovilidadPanel(panel: MovilidadPanel, snapshot: SnapshotAvisosMovilidad, fresh: boolean): void {
+  const incidencias = snapshot.avisos.filter((a) => a.tipo === 'incidencia');
+  const previsiones = snapshot.avisos.filter((a) => a.tipo === 'prevision');
+
+  const bloque = (titulo: string, avisos: AvisoMovilidad[]): string =>
+    avisos.length === 0
+      ? ''
+      : `<div class="media-panel__grupo-titulo">${escapeHtml(titulo)}</div>${avisos.map(renderItemMovilidad).join('')}`;
+
+  const html = bloque('Previsiones', previsiones) + bloque('Incidencias', incidencias);
+  panel.list.innerHTML = html || '<div class="tendencia-panel__insuficiente">Sin avisos de movilidad ahora mismo.</div>';
+
+  const meta = panel.root.querySelector('#movilidad-avisos-panel-meta')!;
+  meta.innerHTML = metaFrescura('valencia.es (scraping)', snapshot.fetchedAt, fresh) + ` · ${snapshot.avisos.length} avisos`;
+}
+
+async function fetchAvisosMovilidadActual(): Promise<{ snapshot: SnapshotAvisosMovilidad; fresh: boolean }> {
+  const res = await fetch('/api/movilidad/v1/avisos-incidencias-previsiones');
+  if (!res.ok) throw new Error(`GET /api/movilidad/v1/avisos-incidencias-previsiones -> HTTP ${res.status}`);
+  const { fresh, ...snapshot } = (await res.json()) as SnapshotAvisosMovilidad & { fresh: boolean };
+  return { snapshot, fresh };
+}
+
 async function fetchTendenciaActual(ventana: 'hora' | 'dia'): Promise<{ panel: VentanaTendencia; fresh: boolean }> {
   const res = await fetch(`/api/mediatico/v1/tendencia?ventana=${ventana}`);
   if (!res.ok) throw new Error(`GET /api/mediatico/v1/tendencia -> HTTP ${res.status}`);
@@ -1076,6 +1143,7 @@ interface ControlPanel {
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
   agendaToggle: HTMLInputElement;
+  movilidadToggle: HTMLInputElement;
   viaPublicaToggle: HTMLInputElement;
   camarasToggle: HTMLInputElement;
   /** spec 033: grupo plegable "Contexto e informativas" y sus adornos. */
@@ -1192,6 +1260,7 @@ function buildControlPanel(): ControlPanel {
     mediaToggle: toggleSiempreActivo(),
     tendenciaToggle: toggleSiempreActivo(),
     agendaToggle: toggleSiempreActivo(),
+    movilidadToggle: toggleSiempreActivo(),
     camarasToggle: toggleSiempreActivo(),
     viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
     contextoDetails,
@@ -2343,6 +2412,26 @@ async function main(): Promise<void> {
     }
   });
 
+  const movilidadPanel = buildMovilidadPanel();
+  let movilidadPollingIniciado = false;
+  async function refreshMovilidad(): Promise<void> {
+    try {
+      const { snapshot, fresh } = await fetchAvisosMovilidadActual();
+      renderMovilidadPanel(movilidadPanel, snapshot, fresh);
+    } catch (err) {
+      movilidadPanel.list.textContent = 'Avisos de movilidad no disponibles';
+      console.error('Fallo al cargar los avisos de movilidad:', err);
+    }
+  }
+
+  panel.movilidadToggle.addEventListener('change', () => {
+    movilidadPanel.root.hidden = !panel.movilidadToggle.checked;
+    if (panel.movilidadToggle.checked && !movilidadPollingIniciado) {
+      movilidadPollingIniciado = true;
+      startPolling(refreshMovilidad, 6 * 60 * 60 * 1000); // igual TTL que la caché del endpoint, spec 048 §4
+    }
+  });
+
   montarCamarasPanel(panel.camarasToggle);
 
   // spec 040 — "Actualidad institucional" (039) se muda del sidebar a un panel
@@ -2375,7 +2464,7 @@ async function main(): Promise<void> {
   // `toggleSiempreActivo`) para que cada panel cargue sus datos/polling desde
   // el arranque — su visibilidad real la decide solo la vista actual (ver
   // `initRouter` al final de esta función), no este checkbox.
-  for (const t of [panel.mediaToggle, panel.tendenciaToggle, panel.agendaToggle, panel.camarasToggle]) {
+  for (const t of [panel.mediaToggle, panel.tendenciaToggle, panel.agendaToggle, panel.movilidadToggle, panel.camarasToggle]) {
     t.dispatchEvent(new Event('change'));
   }
 
@@ -2488,6 +2577,7 @@ async function main(): Promise<void> {
     'camaras-panel',
     'camaras-dgt-panel',
     'agenda-panel',
+    'movilidad-avisos-panel',
     'actualidad-redes-panel',
     'apoyo-decision-panel',
     'altimetria-panel',

@@ -1,0 +1,18 @@
+[
+  { "alias": ["roig arena"], "lugar": "Roig Arena", "lat": 39.4491041, "lon": -0.3643501 },
+  { "alias": ["mestalla"], "lugar": "Estadi de Mestalla (Valencia CF)", "lat": 39.4753863, "lon": -0.3565192 },
+  { "alias": ["estadi ciutat de valencia", "ciutat de valencia"], "lugar": "Estadi Ciutat de València (Levante UD)", "lat": 39.4946425, "lon": -0.3638622 },
+  { "alias": ["enginyer manuel soto", "ingeniero manuel soto"], "lugar": "Avinguda de l'Enginyer Manuel Soto", "lat": 39.4549994, "lon": -0.3299295 },
+  { "alias": ["marina de valencia", "tinglado"], "lugar": "Marina de València (Tinglados)", "lat": 39.4595770, "lon": -0.3145551 },
+  { "alias": ["ciutat de les arts", "ciudad de las artes"], "lugar": "Ciutat de les Arts i les Ciències", "lat": 39.4557563, "lon": -0.3525520 },
+  { "alias": ["doctor moliner"], "lugar": "Carrer del Doctor Moliner", "lat": 39.4767117, "lon": -0.3625788 },
+  { "alias": ["blasco ibanez"], "lugar": "Avinguda de Blasco Ibáñez", "lat": 39.4776459, "lon": -0.3618003 },
+  { "alias": ["colon"], "lugar": "Carrer de Colón", "lat": 39.4687640, "lon": -0.3725047 },
+  { "alias": ["peset aleixandre"], "lugar": "Avinguda Doctor Peset Aleixandre", "lat": 39.4907239, "lon": -0.3802498 },
+  { "alias": ["montcada", "moncada"], "lugar": "Camí de Montcada", "lat": 39.4902937, "lon": -0.3781584 },
+  { "alias": ["perez galdos"], "lugar": "Avinguda de Pérez Galdós", "lat": 39.4745533, "lon": -0.3955315 },
+  { "alias": ["giorgeta"], "lugar": "Carrer de Sant Vicent Màrtir - Giorgeta", "lat": 39.4595890, "lon": -0.3829641 },
+  { "alias": ["russafa", "ruzafa"], "lugar": "Carrer de Russafa", "lat": 39.4661661, "lon": -0.3744498 },
+  { "alias": ["porta de la mar", "puerta del mar"], "lugar": "Porta de la Mar", "lat": 39.4720780, "lon": -0.3684537 },
+  { "alias": ["placa de l ajuntament", "plaza del ayuntamiento"], "lugar": "Plaça de l'Ajuntament", "lat": 39.4706473, "lon": -0.3768264 }
+]

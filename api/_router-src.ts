@@ -31,6 +31,7 @@ import viaPublicaIncidencias from '../src/server/via-publica-incidencias';
 import geoDistritos from '../src/server/geo-distritos';
 import mockDensidad from '../src/server/mock-densidad';
 import agendaEventos from '../src/server/agenda-eventos';
+import movilidadAvisos from '../src/server/movilidad-avisos';
 import meteoZona from '../src/server/meteo-zona';
 import pluviometrosSaih from '../src/server/pluviometros-saih';
 import altimetriaValencia from '../src/server/altimetria-valencia';
@@ -62,6 +63,7 @@ const RUTAS: Record<string, Handler> = {
   'geo/v1/distritos': geoDistritos,
   'mock/v1/densidad-personas': mockDensidad,
   'agenda/v1/eventos': agendaEventos,
+  'movilidad/v1/avisos-incidencias-previsiones': movilidadAvisos,
   'emergencia/v1/meteo-zona': meteoZona,
   'emergencia/v1/pluviometros': pluviometrosSaih,
   'emergencia/v1/altimetria': altimetriaValencia,

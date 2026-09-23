@@ -126,6 +126,12 @@ const META_CAPAS: Record<string, MetaCapa> = {
     frecuencia: 'Caché refrescada cada ~6 h',
     fuente: 'Scraping de valencia.es, valenciacf.com, levanteud.com, roigarena.com y fdmvalencia.es (ninguna es una API/dataset oficial, se avisa en el propio panel)',
   },
+  avisosMovilidad: {
+    nombre: 'Incidencias y previsiones de movilidad',
+    mide: 'Obras destacadas y eventos con corte de tráfico anunciados por el propio área de Movilidad, con la calle/franja horaria oficial y enlace al plano cuando lo hay',
+    frecuencia: 'Caché refrescada cada ~6 h',
+    fuente: 'Scraping de valencia.es/cas/movilidad/incidencias-y-previsiones (no es una API/dataset oficial, se avisa en el propio panel)',
+  },
 };
 
 /** Claves de `LAYER_REGISTRY` sin entrada en `META_CAPAS` — debe ser [] siempre. */
