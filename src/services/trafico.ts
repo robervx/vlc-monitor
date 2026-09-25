@@ -70,6 +70,16 @@ export async function fetchEstadoTrafico(
     throw new Error(`Geoportal (tráfico) respondió HTTP ${res.status}`);
   }
   const body = (await res.json()) as ArcGisTrafficResponse;
+
+  // Incidente real (2026-09-23): el Geoportal a veces responde HTTP 200 con
+  // un cuerpo de error del propio ArcGIS Server (`{"error":{"code":400,...}}`)
+  // en vez de una FeatureCollection — sin este chequeo, `body.features.filter`
+  // petaba con un TypeError confuso y tiraba el endpoint entero en vez de
+  // dejar que `getOrFetch` sirviera el último snapshot bueno (stale-on-error).
+  if (!Array.isArray(body.features)) {
+    throw new Error('Geoportal (tráfico) respondió sin "features" — posible incidencia del servicio');
+  }
+
   const fetchedAt = new Date().toISOString();
 
   // ~8% de las filas de origen llegan con geometry/idtramo/denominacion a
