@@ -1527,6 +1527,21 @@ async function main(): Promise<void> {
     zoom: initialState.zoom,
   });
   map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+  // Condición de carrera real (investigada 2026-09-25, ver memoria de
+  // proyecto): `renderLayers()` se dispara desde ~30 sitios independientes
+  // (toggles, polling, fetches, clics) sin ninguna coordinación entre ellos
+  // ni con MapLibre, que carga su estilo/transform interno de forma
+  // asíncrona. Cualquiera de esos ~30 disparadores puede ganarle la carrera
+  // al propio `load` de MapLibre y empujar capas al overlay de deck.gl antes
+  // de que el mapa esté listo para aceptarlas — de ahí el
+  // `TypeError: reading 'height'` intermitente dentro del propio bundle de
+  // maplibre-gl. No se soluciona añadiendo una comprobación en cada uno de
+  // esos ~30 sitios (se olvidaría en el 31): se soluciona en el único punto
+  // por el que TODOS pasan antes de tocar el motor de render, `overlay.
+  // setProps()` dentro de `renderLayers()` — ver la comprobación de
+  // `mapaListo` ahí abajo.
+  let mapaListo = false;
   window.addEventListener('resize', () => map.resize());
 
   // Sin listener propio, MapLibre relanza sus 'error' internos como excepción
@@ -2312,7 +2327,11 @@ async function main(): Promise<void> {
         }),
     ].filter((layer): layer is Exclude<typeof layer, false> => layer !== false);
 
-    overlay.setProps({ layers });
+    // Único choque con el motor de render — ver el porqué de `mapaListo`
+    // junto a `new maplibregl.Map(...)` más arriba. El resto de la función
+    // (construir `layers` a partir del estado actual) es puro y barato de
+    // repetir; lo único que hay que proteger es este `setProps`.
+    if (mapaListo) overlay.setProps({ layers });
   }
 
   // Spec 021 — modo cordón de incidente: oculta los paneles habituales
@@ -2997,6 +3016,7 @@ async function main(): Promise<void> {
   }
 
   map.on('load', () => {
+    mapaListo = true;
     renderLayers();
     if (initialState.distrito) {
       const centroide = getDistrictCentroid(initialState.distrito);
