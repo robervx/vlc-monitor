@@ -13,10 +13,20 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 // tesela vectorial: nunca dispara 'load', así que el mapa se queda vacío para
 // siempre (sin ningún error, porque nada llega a fallar de forma ruidosa).
 // La solución documentada de la propia librería para bundlers es no dejar
-// que lo adivine: importar el fichero real como asset con Vite (`?url`, lo
-// copia a dist/assets con hash y nos da la URL servible real) y pasárselo
-// explícitamente con `setWorkerUrl` antes de crear el primer `Map`.
-import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+// que lo adivine: pasarle explícitamente la URL real con `setWorkerUrl`
+// antes de crear el primer `Map`.
+//
+// OJO — `?url` (probado y descartado) NO basta: solo copia el fichero tal
+// cual, sin bundlear. `maplibre-gl-worker.mjs` importa a su vez
+// `./maplibre-gl-shared.mjs` (fichero propio de la librería, no tocado por
+// Vite con `?url`), así que ese import relativo también 404 — el worker
+// falla al instanciarse como módulo ES, con un error silencioso y genérico
+// (`ErrorEvent` sin mensaje) que no llega a la consola principal por
+// defecto. `?worker&url` sí trata este fichero como un entrypoint de verdad:
+// Vite lo bundlea (resuelve e inlinea sus propios imports) y emite un único
+// fichero de worker autocontenido — sin dependencias sueltas que puedan
+// faltar en dist/assets.
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer, ScatterplotLayer, IconLayer, TextLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
