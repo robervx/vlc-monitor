@@ -59,6 +59,16 @@ export async function fetchAparcamientos(
     throw new Error(`Geoportal (aparcamiento) respondió HTTP ${res.status}`);
   }
   const body = (await res.json()) as ArcGisParkingResponse;
+
+  // El Geoportal a veces responde HTTP 200 con un cuerpo de error del propio
+  // ArcGIS Server (`{"error":{"code":400,...}}`) en vez de una FeatureCollection —
+  // sin este chequeo, `body.features.filter` petaba con un TypeError confuso y
+  // tiraba el endpoint entero en vez de dejar que `getOrFetch` sirviera el
+  // último snapshot bueno (stale-on-error). Ver incidente real en trafico.ts.
+  if (!Array.isArray(body.features)) {
+    throw new Error('Geoportal (aparcamiento) respondió sin "features" — posible incidencia del servicio');
+  }
+
   const fetchedAt = new Date().toISOString();
 
   const featuresValidas = body.features.filter(

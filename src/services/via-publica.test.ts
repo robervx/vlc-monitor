@@ -89,4 +89,12 @@ describe('fetchIncidenciasViaPublica', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }));
     await expect(fetchIncidenciasViaPublica(() => null)).rejects.toThrow('503');
   });
+
+  it('lanza (en vez de petar con un TypeError) si el Geoportal responde HTTP 200 con un cuerpo de error de ArcGIS Server', async () => {
+    // Caso real observado en producción el 2026-09-23 (ver trafico.ts): `res.ok`
+    // es true pero el cuerpo no es una FeatureCollection.
+    const cuerpoErrorArcGis = { error: { code: 400, message: 'Failed to execute query.', details: [] } };
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(cuerpoErrorArcGis) }));
+    await expect(fetchIncidenciasViaPublica(() => null)).rejects.toThrow('features');
+  });
 });
