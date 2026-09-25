@@ -1534,6 +1534,20 @@ async function main(): Promise<void> {
 
   const initialState = readStateFromUrl();
 
+  // DEBUG TEMPORAL (2026-09-25) — quitar en cuanto se confirme el diagnóstico.
+  // Ningún Worker interno de MapLibre expone sus errores al hilo principal
+  // por defecto; esto los intercepta y los saca a consola para saber si el
+  // worker arranca y se comunica de verdad, o si falla en silencio.
+  const OrigWorker = window.Worker;
+  window.Worker = class extends OrigWorker {
+    constructor(...args: ConstructorParameters<typeof OrigWorker>) {
+      super(...args);
+      console.log('[DEBUG] Worker creado:', args[0]);
+      this.addEventListener('error', (e) => console.error('[DEBUG] Worker error:', e.message, e));
+      this.addEventListener('messageerror', (e) => console.error('[DEBUG] Worker messageerror:', e));
+    }
+  } as typeof OrigWorker;
+
   maplibregl.setWorkerUrl(maplibreWorkerUrl);
   const map = new maplibregl.Map({
     container: 'map',
@@ -1542,6 +1556,13 @@ async function main(): Promise<void> {
     zoom: initialState.zoom,
   });
   map.addControl(new maplibregl.NavigationControl(), 'top-right');
+  for (const ev of ['styledata', 'sourcedata', 'data', 'idle', 'render'] as const) {
+    let contador = 0;
+    map.on(ev, () => {
+      contador++;
+      if (contador <= 3 || ev === 'idle') console.log(`[DEBUG] map event '${ev}' #${contador}`);
+    });
+  }
 
   // Condición de carrera real (investigada 2026-09-25, ver memoria de
   // proyecto): `renderLayers()` se dispara desde ~30 sitios independientes
