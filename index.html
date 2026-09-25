@@ -70,6 +70,16 @@
         bottom: 0;
       }
 
+      /* maplibre-gl.css de la v6.x ya no incluye position/inset en
+         .maplibregl-canvas-container (sí lo llevaba en v4) — el div
+         colapsa a height:0 porque su único hijo (.maplibregl-canvas)
+         es position:absolute y queda fuera del flujo normal. Sin esto
+         el mapa no pinta nada, aunque el canvas interno mida bien. */
+      .maplibregl-canvas-container {
+        position: absolute;
+        inset: 0;
+      }
+
       /* Cabecera institucional — spec 019 */
       #app-header {
         position: fixed;
@@ -1041,6 +1051,12 @@
         line-height: 1.4;
       }
 
+      .alert-modal__momento {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 8px;
+      }
+
       .alert-modal__footer {
         display: flex;
         justify-content: flex-end;
@@ -1469,6 +1485,12 @@
         margin-top: 2px;
       }
 
+      .insight-card__momento {
+        font-size: 10px;
+        color: #94a3b8;
+        margin-top: 4px;
+      }
+
       .insight-card__copiar {
         margin-top: 6px;
         font-size: 11px;
@@ -1696,6 +1718,20 @@
       }
       :root[data-vista='inteligencia']:not([data-layout='movil']) #tendencia-panel {
         order: 12;
+      }
+      /* #movilidad-avisos-panel (spec 048) se añadió sin entrada aquí — bug
+         real: sin `order` explícito caía en el 0 por defecto de flex y se
+         colaba EL PRIMERO, por delante incluso de las cámaras. Pedido del
+         usuario (2026-09-24): que quede en un segundo plano, no como
+         principal — se manda al final. */
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #movilidad-avisos-panel {
+        order: 13;
+      }
+      /* Spec 049 — lista de sonómetros de Russafa (sin geometría verificada,
+         no es una capa de mapa, ver spec 049 §7). Contenido secundario, igual
+         criterio que movilidad-avisos-panel. */
+      :root[data-vista='inteligencia']:not([data-layout='movil']) #zas-ruido-panel {
+        order: 14;
       }
 
       /* Spec 045/047 — advertencia de IA, compartida por síntesis v1 y por

@@ -25,11 +25,30 @@ export function formatoFrescura(fetchedAt: string): string {
   return `hace ${minutos} min`;
 }
 
+// Fecha/hora absoluta — pedido explícito del usuario (2026-09-24): el "hace
+// N min" relativo no basta para saber DESDE CUÁNDO es un dato, hace falta el
+// momento exacto en todo sitio que muestre información. "hoy"/"ayer" cuando
+// aplica, si no día/mes cortos — siempre HH:MM en 24h.
+export function formatoFechaHora(iso: string): string {
+  const fecha = new Date(iso);
+  if (Number.isNaN(fecha.getTime())) return '';
+  const ahora = new Date();
+  const horaMin = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const esMismoDia = (a: Date, b: Date): boolean =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  if (esMismoDia(fecha, ahora)) return `hoy ${horaMin}`;
+  const ayer = new Date(ahora);
+  ayer.setDate(ayer.getDate() - 1);
+  if (esMismoDia(fecha, ayer)) return `ayer ${horaMin}`;
+  const diaMes = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+  return `${diaMes} ${horaMin}`;
+}
+
 export function metaFrescura(fuente: string, fetchedAt: string, fresh: boolean): string {
   const aviso = fresh
     ? ''
     : '<span class="info-panel__stale" title="No se pudo refrescar, mostrando el último dato bueno">⚠ no actualizado</span>';
-  return `${fuente} · actualizado ${formatoFrescura(fetchedAt)} ${aviso}`;
+  return `${fuente} · actualizado ${formatoFrescura(fetchedAt)} (${formatoFechaHora(fetchedAt)}) ${aviso}`;
 }
 
 export function buildInfoPanel(id: string, opciones?: { colapsable?: boolean }): HTMLDivElement {

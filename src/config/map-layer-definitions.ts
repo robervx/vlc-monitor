@@ -165,7 +165,43 @@ export const LAYER_REGISTRY: Record<string, LayerDefinition> = {
   riesgoEscorrentia: {
     key: 'riesgoEscorrentia',
     specId: '046',
-    grupo: 'contexto',
+    // v4 (2026-09-24, pedido explícito del usuario): pasa de 'contexto' a
+    // 'primaria' — la quiere arriba del todo del selector, antes que tráfico.
+    grupo: 'primaria',
+    renderers: ['deck'],
+    zoomMinimo: 0,
+    agregacion: 'choropleth-distrito',
+  },
+  temperaturaZona: {
+    key: 'temperaturaZona',
+    specId: '050',
+    grupo: 'primaria',
+    renderers: ['deck'],
+    zoomMinimo: 0,
+    agregacion: 'punto',
+  },
+  zonasZas: {
+    key: 'zonasZas',
+    specId: '049',
+    grupo: 'primaria',
+    // 'mixta': polígonos ya declarados (deck, mapa) + lista de sonómetros de
+    // Russafa sin geometría verificada (panel, /inteligencia) — spec 049 §5.
+    renderers: ['deck', 'panel'],
+    zoomMinimo: 0,
+    agregacion: 'mixta',
+  },
+  precipitacionZona: {
+    key: 'precipitacionZona',
+    specId: '051',
+    grupo: 'primaria',
+    renderers: ['deck'],
+    zoomMinimo: 0,
+    agregacion: 'punto',
+  },
+  altimetria: {
+    key: 'altimetria',
+    specId: '052',
+    grupo: 'primaria',
     renderers: ['deck'],
     zoomMinimo: 0,
     agregacion: 'choropleth-distrito',

@@ -24,6 +24,9 @@ import type { EventoAgenda, SnapshotAgenda } from './services/agenda-eventos';
 import type { AvisoMovilidad, SnapshotAvisosMovilidad } from './services/movilidad-incidencias-previsiones';
 import type { IncidenciaViaPublica, TipoIncidenciaViaPublica } from './services/via-publica';
 import type { RiesgoEscorrentiaDistrito } from './services/riesgo-escorrentia';
+import type { EstacionAvamet } from './services/avamet-estaciones';
+import type { ZonaZas, SonometroRuzafa, PanelZas } from './services/zas';
+import type { ResumenAltimetriaDistrito } from './services/altimetria';
 import { mountChasis } from './ui/chasis';
 import { applyPanelVisibility, PANEL_PREFERENCES_REGISTRY } from './ui/panel-preferences';
 import { registrarFrescura } from './ui/estado-frescura';
@@ -61,7 +64,7 @@ import { montarSenalesPanel } from './ui/senales-ia-panel';
 import { montarRecomendacionesPanel } from './ui/recomendaciones-actuacion-panel';
 import { buildProtocolosContent } from './ui/protocolos-panel';
 import { onPeticionCentrarMapa } from './ui/centrar-mapa';
-import { escapeHtml, metaFrescura, buildInfoPanel, startPolling } from './ui/panel-utils';
+import { escapeHtml, metaFrescura, formatoFechaHora, buildInfoPanel, startPolling } from './ui/panel-utils';
 import { marcadoresSentido, type MarcadorSentido } from './services/flechas-sentido';
 import { puntosFlujoParaTramo } from './services/flujo-animado';
 import type { Coordenada } from './services/proximidad';
@@ -256,6 +259,7 @@ function renderAlertaModalActual(): void {
     <div class="alert-modal__cuerpo">
       <div class="alert-modal__titulo" id="alert-modal-titulo">${escapeHtml(insight.titulo)}</div>
       <div class="alert-modal__desc">${escapeHtml(insight.descripcion)}</div>
+      <div class="alert-modal__momento">Detectado ${formatoFechaHora(insight.detectedAt)}</div>
     </div>
     <div class="alert-modal__footer">
       <button type="button" class="alert-modal__ver">Ver en el panel</button>
@@ -346,6 +350,7 @@ function renderInsightsPanel(root: HTMLDivElement, panel: PanelInsights, fresh: 
         <div class="insight-card insight-card--${insight.severidad}">
           <div class="insight-card__titulo">${insight.titulo}</div>
           <div class="insight-card__desc">${insight.descripcion}</div>
+          <div class="insight-card__momento">Detectado ${formatoFechaHora(insight.detectedAt)}</div>
           <div class="insight-card__fuentes">${chips}</div>
           <button class="insight-card__copiar" type="button" data-insight-index="${i}">Copiar borrador</button>
         </div>`;
@@ -719,6 +724,170 @@ async function fetchRiesgoEscorrentiaActual(): Promise<{ distritos: RiesgoEscorr
   const res = await fetch('/api/emergencia/v1/riesgo-escorrentia');
   if (!res.ok) throw new Error(`GET /api/emergencia/v1/riesgo-escorrentia -> HTTP ${res.status}`);
   return (await res.json()) as { distritos: RiesgoEscorrentiaDistrito[]; fresh: boolean };
+}
+
+// specs 050/051 — reutiliza tal cual el endpoint ya `Implemented` de spec 044,
+// sin tocar su contrato de datos (ver specs/050-temperatura-por-zona-capa.md §2).
+async function fetchEstacionesAvametActual(): Promise<{ estaciones: EstacionAvamet[]; fresh: boolean }> {
+  const res = await fetch('/api/emergencia/v1/avamet');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/avamet -> HTTP ${res.status}`);
+  return (await res.json()) as { estaciones: EstacionAvamet[]; fresh: boolean };
+}
+
+// v2 (2026-09-25, petición del usuario) — estilo "insignia con valor", como
+// el mapa embebido de AVAMET (mxo-mxo.php, verificado en vivo: círculo de
+// color fijo en pantalla con el número en blanco dentro, mismo tamaño a
+// cualquier zoom). Antes era un `ScatterplotLayer` sin texto — ver histórico
+// en specs/050 y 051. Radio en píxeles (no metros): un valor legible tiene
+// que medir lo mismo en pantalla se acerque o aleje el mapa.
+const RADIO_INSIGNIA_ZONA_PX = 14;
+
+// Spec 050 — gradiente azul (frío) a rojo (cálido), acotado a un rango de
+// temperatura urbana realista para Valencia (10-35°C); fuera de rango se
+// satura al extremo más cercano, no se extrapola el color.
+const TEMPERATURA_ZONA_MIN_C = 10;
+const TEMPERATURA_ZONA_MAX_C = 35;
+function colorTemperaturaZona(estacion: EstacionAvamet): Color {
+  const t = Math.min(
+    1,
+    Math.max(0, (estacion.temperaturaC - TEMPERATURA_ZONA_MIN_C) / (TEMPERATURA_ZONA_MAX_C - TEMPERATURA_ZONA_MIN_C)),
+  );
+  return [Math.round(40 + t * 215), Math.round(120 - t * 100), Math.round(215 - t * 195), 220];
+}
+
+function renderTemperaturaZonaLeyenda(root: HTMLDivElement, estaciones: EstacionAvamet[], fresh: boolean): void {
+  if (estaciones.length === 0) {
+    root.innerHTML = `<div class="info-panel__desc">Temperatura por zona — sin estaciones disponibles ahora mismo</div>`;
+    return;
+  }
+  const masCalida = estaciones.reduce((a, b) => (b.temperaturaC > a.temperaturaC ? b : a));
+  const masFria = estaciones.reduce((a, b) => (b.temperaturaC < a.temperaturaC ? b : a));
+  root.innerHTML = `
+    <div class="info-panel__desc">Temperatura por zona — ${estaciones.length} estaciones reales</div>
+    <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(255,20,20)"></span>Más cálida: ${escapeHtml(masCalida.nombre)} (${masCalida.temperaturaC}°C)</div>
+    <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(40,120,215)"></span>Más fría: ${escapeHtml(masFria.nombre)} (${masFria.temperaturaC}°C)</div>
+    <div class="info-panel__meta">Solo estas ${estaciones.length} ubicaciones — no es una interpolación de toda la ciudad</div>
+    <div class="info-panel__meta">${metaFrescura('AVAMET', estaciones[0]?.observadoEn ?? new Date().toISOString(), fresh)}</div>
+  `;
+}
+
+// Spec 051 v2 — un único color (azul); el mm exacto ahora se lee en la
+// insignia (ver RADIO_INSIGNIA_ZONA_PX), así que el radio deja de codificar
+// la cantidad (antes era la única señal — v1, sin texto). 0mm no se oculta:
+// es información, igual que antes.
+const COLOR_PRECIPITACION_ZONA: Color = [30, 100, 220, 210];
+
+function renderPrecipitacionZonaLeyenda(root: HTMLDivElement, estaciones: EstacionAvamet[], fresh: boolean): void {
+  if (estaciones.length === 0) {
+    root.innerHTML = `<div class="info-panel__desc">Precipitación — sin estaciones disponibles ahora mismo</div>`;
+    return;
+  }
+  const conLluvia = estaciones.filter((e) => e.precipitacionDiaMm > 0).sort((a, b) => b.precipitacionDiaMm - a.precipitacionDiaMm);
+  root.innerHTML =
+    conLluvia.length === 0
+      ? `
+        <div class="info-panel__desc">Precipitación — ${estaciones.length} estaciones reales</div>
+        <div class="trafico-leyenda__row">Sin lluvia registrada hoy en ninguna estación</div>
+        <div class="info-panel__meta">${metaFrescura('AVAMET', estaciones[0]?.observadoEn ?? new Date().toISOString(), fresh)}</div>
+      `
+      : `
+        <div class="info-panel__desc">Precipitación — ${conLluvia.length} de ${estaciones.length} estaciones con lluvia hoy</div>
+        <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(30,100,220)"></span>Máxima hoy: ${escapeHtml(conLluvia[0]!.nombre)} (${conLluvia[0]!.precipitacionDiaMm} mm)</div>
+        <div class="info-panel__meta">${metaFrescura('AVAMET', estaciones[0]?.observadoEn ?? new Date().toISOString(), fresh)}</div>
+      `;
+}
+
+// Spec 049 — morado/violeta: no usado todavía por ninguna otra capa.
+const COLOR_ZONA_ZAS: Color = [147, 51, 234, 90];
+
+// Mismas 6 bandas y colores que el Mapa Estratégico de Ruido oficial del
+// geoportal (renderer de .../Salud/MapServer/144, verificado en vivo en la
+// investigación de spec 049 §2) — no se inventa una escala de color nueva.
+function colorBandaRuido(db: number): Color {
+  if (db < 55) return [0, 153, 51, 220];
+  if (db < 60) return [0, 204, 51, 220];
+  if (db < 65) return [204, 204, 2, 220];
+  if (db < 70) return [255, 205, 105, 220];
+  if (db < 75) return [255, 128, 2, 220];
+  return [255, 2, 2, 220];
+}
+
+function renderZonasZasLeyenda(root: HTMLDivElement, zonas: ZonaZas[], fresh: boolean): void {
+  const nombres = [...new Set(zonas.map((z) => z.nombre))];
+  root.innerHTML = `
+    <div class="info-panel__desc">Zonas Acústicamente Saturadas — ${nombres.length} declaradas</div>
+    <div class="trafico-leyenda__row">${nombres.map(escapeHtml).join(', ') || 'Sin zonas disponibles'}</div>
+    <div class="info-panel__meta">Russafa (ZAS más reciente) todavía no está en esta capa del geoportal — ver ruido en directo en /inteligencia</div>
+    <div class="info-panel__meta">${metaFrescura('Geoportal de Valencia', zonas[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+  `;
+}
+
+async function fetchPanelZasActual(): Promise<PanelZas & { fresh: boolean }> {
+  const res = await fetch('/api/emergencia/v1/zas');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/zas -> HTTP ${res.status}`);
+  return (await res.json()) as PanelZas & { fresh: boolean };
+}
+
+function renderSonometrosRuzafaPanel(root: HTMLDivElement, sonometros: SonometroRuzafa[], fresh: boolean): void {
+  if (sonometros.length === 0) {
+    root.innerHTML = `
+      <div class="media-panel__header">Ruido en Russafa (ZAS)</div>
+      <div class="tendencia-panel__insuficiente">Sonómetros no disponibles ahora mismo.</div>
+    `;
+    return;
+  }
+  const filas = [...sonometros]
+    .sort((a, b) => b.laeqDb - a.laeqDb)
+    .map(
+      (s) => `
+        <div class="trafico-leyenda__row">
+          <span class="trafico-leyenda__dot" style="background:rgb(${colorBandaRuido(s.laeqDb).slice(0, 3).join(',')})"></span>
+          ${escapeHtml(s.direccion)} — ${s.laeqDb.toFixed(1)} dBA
+        </div>`,
+    )
+    .join('');
+  root.innerHTML = `
+    <div class="media-panel__header">Ruido en Russafa (ZAS) — ${sonometros.length} sonómetros</div>
+    <div class="agenda-panel__aviso">Nivel medio diario (LAeq) del día anterior completo, no instantáneo. Sin coordenadas verificadas para pintarlos en el mapa — ver spec 049 §7.</div>
+    <div class="media-panel__list">${filas}</div>
+    <div class="info-panel__meta">${metaFrescura('Ajuntament de València (VLCi)', sonometros[0]?.fetchedAt ?? new Date().toISOString(), fresh)}</div>
+  `;
+}
+
+// Spec 052 — choropleth por distrito sobre elevacionMediaM (2.5-40.9 m reales
+// en los 19 distritos, ver spec §5). Verde (cota baja, litoral) -> marrón
+// (cota alta, interior), convención habitual de mapa topográfico — acotado
+// 0-45 m con margen sobre el máximo real, mismo patrón de saturar en los
+// extremos que `colorTemperaturaZona` (spec 050).
+const ALTIMETRIA_MIN_M = 0;
+const ALTIMETRIA_MAX_M = 45;
+function colorChoroplethAltimetria(d: ResumenAltimetriaDistrito | undefined): Color {
+  if (!d) return [158, 158, 158, 60];
+  const t = Math.min(1, Math.max(0, (d.elevacionMediaM - ALTIMETRIA_MIN_M) / (ALTIMETRIA_MAX_M - ALTIMETRIA_MIN_M)));
+  // verde [67,160,71] -> marrón [121,85,72]
+  return [Math.round(67 + t * 54), Math.round(160 - t * 75), Math.round(71 + t * 1), 170];
+}
+
+function renderAltimetriaLeyenda(root: HTMLDivElement, distritos: ResumenAltimetriaDistrito[]): void {
+  if (distritos.length === 0) {
+    root.innerHTML = `<div class="info-panel__desc">Altimetría — sin datos disponibles ahora mismo</div>`;
+    return;
+  }
+  const masAlto = distritos.reduce((a, b) => (b.elevacionMediaM > a.elevacionMediaM ? b : a));
+  const masBajo = distritos.reduce((a, b) => (b.elevacionMediaM < a.elevacionMediaM ? b : a));
+  root.innerHTML = `
+    <div class="info-panel__desc">Altimetría — elevación media por distrito</div>
+    <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(121,86,72)"></span>Más alto: ${escapeHtml(masAlto.distritoNombre)} (${masAlto.elevacionMediaM.toFixed(1)} m)</div>
+    <div class="trafico-leyenda__row"><span class="trafico-leyenda__dot" style="background:rgb(67,160,71)"></span>Más bajo: ${escapeHtml(masBajo.distritoNombre)} (${masBajo.elevacionMediaM.toFixed(1)} m)</div>
+    <div class="info-panel__meta">Media por distrito, no una rejilla continua — ver ranking completo en /inteligencia</div>
+    <div class="info-panel__meta">Fuente: IGN (Instituto Geográfico Nacional) · dato fijo, no cambia con el tiempo</div>
+  `;
+}
+
+async function fetchAltimetriaActual(): Promise<{ distritos: ResumenAltimetriaDistrito[] }> {
+  const res = await fetch('/api/emergencia/v1/altimetria');
+  if (!res.ok) throw new Error(`GET /api/emergencia/v1/altimetria -> HTTP ${res.status}`);
+  return (await res.json()) as { distritos: ResumenAltimetriaDistrito[] };
 }
 
 // Spec 026 — mostaza/morado/verde azulado: distintos de rojo (reservado para
@@ -1177,10 +1346,15 @@ interface ControlPanel {
   pulsoToggle: HTMLInputElement;
   fallasToggle: HTMLInputElement;
   riesgoEscorrentiaToggle: HTMLInputElement;
+  temperaturaZonaToggle: HTMLInputElement;
+  zonasZasToggle: HTMLInputElement;
+  precipitacionZonaToggle: HTMLInputElement;
+  altimetriaToggle: HTMLInputElement;
   mediaToggle: HTMLInputElement;
   tendenciaToggle: HTMLInputElement;
   agendaToggle: HTMLInputElement;
   movilidadToggle: HTMLInputElement;
+  zasRuidoToggle: HTMLInputElement;
   viaPublicaToggle: HTMLInputElement;
   camarasToggle: HTMLInputElement;
   /** spec 033: grupo plegable "Contexto e informativas" y sus adornos. */
@@ -1217,6 +1391,26 @@ function buildControlPanel(): ControlPanel {
     </div>
     <div class="controls__group controls__group--primaria">
       <div class="controls__group-head">Prioritarias</div>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-riesgo-escorrentia" />
+        Riesgo de acumulación de agua
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-temperatura-zona" />
+        Temperatura por zona
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-zonas-zas" />
+        Zonas Acústicamente Saturadas
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-precipitacion-zona" />
+        Precipitación
+      </label>
+      <label class="controls__row">
+        <input type="checkbox" id="toggle-altimetria" />
+        Altimetría
+      </label>
       <label class="controls__row">
         <input type="checkbox" id="toggle-trafico" />
         Tráfico en tiempo real
@@ -1256,10 +1450,6 @@ function buildControlPanel(): ControlPanel {
         <input type="checkbox" id="toggle-fallas" />
         Fallas
       </label>
-      <label class="controls__row">
-        <input type="checkbox" id="toggle-riesgo-escorrentia" />
-        Riesgo de acumulación de agua
-      </label>
     </details>
   `;
   document.body.appendChild(panel);
@@ -1291,6 +1481,10 @@ function buildControlPanel(): ControlPanel {
     pulsoToggle: panel.querySelector('#toggle-pulso')!,
     fallasToggle: panel.querySelector('#toggle-fallas')!,
     riesgoEscorrentiaToggle: panel.querySelector('#toggle-riesgo-escorrentia')!,
+    temperaturaZonaToggle: panel.querySelector('#toggle-temperatura-zona')!,
+    zonasZasToggle: panel.querySelector('#toggle-zonas-zas')!,
+    precipitacionZonaToggle: panel.querySelector('#toggle-precipitacion-zona')!,
+    altimetriaToggle: panel.querySelector('#toggle-altimetria')!,
     // spec 040 — cámaras/contexto mediático/tendencia/agenda dejan de ser filas
     // del selector (se mudan a la vista /inteligencia, siempre visibles ahí, no
     // capas de mapa que se enciendan/apaguen). Se crean como checkboxes
@@ -1303,6 +1497,7 @@ function buildControlPanel(): ControlPanel {
     tendenciaToggle: toggleSiempreActivo(),
     agendaToggle: toggleSiempreActivo(),
     movilidadToggle: toggleSiempreActivo(),
+    zasRuidoToggle: toggleSiempreActivo(),
     camarasToggle: toggleSiempreActivo(),
     viaPublicaToggle: panel.querySelector('#toggle-via-publica')!,
     contextoDetails,
@@ -1334,6 +1529,15 @@ async function main(): Promise<void> {
   map.addControl(new maplibregl.NavigationControl(), 'top-right');
   window.addEventListener('resize', () => map.resize());
 
+  // Sin listener propio, MapLibre relanza sus 'error' internos como excepción
+  // no controlada (ver investigación de la condición de carrera intermitente
+  // en su render/cámara interna, solo en `npm run dev` — nunca en producción).
+  // Esto no arregla esa causa raíz (aguas arriba, no en este código), pero
+  // evita el "Uncaught" suelto en consola y deja rastro explícito si reaparece.
+  map.on('error', (e) => {
+    console.error('MapLibre: evento de error interno del mapa:', e.error);
+  });
+
   let selectedDistrito: string | null = initialState.distrito;
   let mockVisible = false;
   let horaSimulada = `${String(new Date().getHours()).padStart(2, '0')}:00`;
@@ -1350,6 +1554,21 @@ async function main(): Promise<void> {
   let datosFallas: DatosFallas = { monumentos: [], carpas: [], zonasMovilidadReducida: [] };
   let riesgoEscorrentiaVisible = false;
   let riesgoEscorrentia: RiesgoEscorrentiaDistrito[] = [];
+  // specs 050/051 — temperatura y precipitación por zona son dos capas/toggles
+  // independientes que comparten la misma fuente (AVAMET, ya usada por spec
+  // 044): un solo fetch/poll sirve a las dos, ver iniciarPollingAvametSiHaceFalta.
+  let temperaturaZonaVisible = false;
+  let precipitacionZonaVisible = false;
+  let estacionesAvamet: EstacionAvamet[] = [];
+  let zonasZasVisible = false;
+  let zonasZas: ZonaZas[] = [];
+  let sonometrosRuzafa: SonometroRuzafa[] = [];
+  // Spec 052 — dato estático (la altimetría no cambia), un único fetch la
+  // primera vez que se activa el checkbox, sin polling (a diferencia de las
+  // capas de arriba, que sí refrescan periódicamente).
+  let altimetriaVisible = false;
+  let altimetriaDistritos: ResumenAltimetriaDistrito[] = [];
+  let altimetriaCargada = false;
   // v3 (DoD de V1, 2026-09-16) — los puntos calientes del mock de densidad
   // (más abajo) necesitan los monumentos falleros aunque la capa "Fallas" en
   // sí no esté activada; se cargan una vez, la primera vez que hagan falta.
@@ -1506,6 +1725,7 @@ async function main(): Promise<void> {
     const intensidadPorDistrito = new Map(densidadMock.map((d) => [d.distritoCodigo, d.intensidad]));
     const pulsoPorDistrito = new Map(pulsoDistritos.map((p) => [p.distritoCodigo, p]));
     const riesgoEscorrentiaPorDistrito = new Map(riesgoEscorrentia.map((d) => [d.distritoCodigo, d]));
+    const altimetriaPorDistrito = new Map(altimetriaDistritos.map((d) => [d.distritoCodigo, d]));
     // v4 (spec 010 §5) — escenarios vivo+confirmado, base de los marcadores y
     // de los puntos de tramo resaltados (primario); el choropleth de abajo es
     // el contexto.
@@ -1619,6 +1839,20 @@ async function main(): Promise<void> {
             getFillColor: (f) => colorChoroplethPulso(pulsoPorDistrito.get(f.properties.codigo)),
             updateTriggers: { getFillColor: [pulsoDistritos] },
           }),
+        // Spec 052 — choropleth de altimetría, antes que riesgo-escorrentia en
+        // el array (se pinta primero) para que, si ambas capas están activas
+        // a la vez, la de riesgo de agua (más urgente/accionable) quede
+        // encima, nunca tapada.
+        altimetriaVisible &&
+          new GeoJsonLayer<DistritoProperties>({
+            id: 'altimetria',
+            data: featureCollection,
+            stroked: false,
+            filled: true,
+            pickable: false,
+            getFillColor: (f) => colorChoroplethAltimetria(altimetriaPorDistrito.get(f.properties.codigo)),
+            updateTriggers: { getFillColor: [altimetriaDistritos] },
+          }),
         riesgoEscorrentiaVisible &&
           new GeoJsonLayer<DistritoProperties>({
             id: 'riesgo-escorrentia',
@@ -1628,6 +1862,87 @@ async function main(): Promise<void> {
             pickable: false,
             getFillColor: (f) => colorChoroplethEscorrentia(riesgoEscorrentiaPorDistrito.get(f.properties.codigo)),
             updateTriggers: { getFillColor: [riesgoEscorrentia] },
+          }),
+        // v2 — insignia (círculo de color fijo en pantalla) + valor numérico
+        // encima, como el mapa embebido de AVAMET (petición del usuario,
+        // verificado en vivo contra avamet.org/mxo-mxo.php). Dos capas: el
+        // círculo de fondo (ScatterplotLayer, radiusUnits:'pixels' para que
+        // mida lo mismo a cualquier zoom) + el texto (TextLayer) centrado
+        // encima — deck.gl no tiene un tipo de capa "insignia con texto"
+        // único, es el patrón habitual para componerlo.
+        temperaturaZonaVisible &&
+          new ScatterplotLayer<EstacionAvamet>({
+            id: 'temperatura-zona',
+            data: estacionesAvamet,
+            pickable: false,
+            getPosition: (e) => [e.lon, e.lat],
+            getFillColor: colorTemperaturaZona,
+            stroked: true,
+            getLineColor: [255, 255, 255, 230],
+            lineWidthMinPixels: 1.5,
+            getRadius: RADIO_INSIGNIA_ZONA_PX,
+            radiusUnits: 'pixels',
+            updateTriggers: { getFillColor: [estacionesAvamet] },
+          }),
+        temperaturaZonaVisible &&
+          new TextLayer<EstacionAvamet>({
+            id: 'temperatura-zona-valor',
+            data: estacionesAvamet,
+            pickable: false,
+            getPosition: (e) => [e.lon, e.lat],
+            getText: (e) => `${Math.round(e.temperaturaC)}°`,
+            getSize: 12,
+            getColor: [255, 255, 255, 255],
+            fontWeight: 700,
+            getTextAnchor: 'middle',
+            getAlignmentBaseline: 'center',
+            outlineWidth: 2,
+            outlineColor: [0, 0, 0, 160],
+            updateTriggers: { getText: [estacionesAvamet] },
+          }),
+        precipitacionZonaVisible &&
+          new ScatterplotLayer<EstacionAvamet>({
+            id: 'precipitacion-zona',
+            data: estacionesAvamet,
+            pickable: false,
+            getPosition: (e) => [e.lon, e.lat],
+            getFillColor: COLOR_PRECIPITACION_ZONA,
+            stroked: true,
+            getLineColor: [255, 255, 255, 230],
+            lineWidthMinPixels: 1.5,
+            getRadius: RADIO_INSIGNIA_ZONA_PX,
+            radiusUnits: 'pixels',
+          }),
+        precipitacionZonaVisible &&
+          new TextLayer<EstacionAvamet>({
+            id: 'precipitacion-zona-valor',
+            data: estacionesAvamet,
+            pickable: false,
+            getPosition: (e) => [e.lon, e.lat],
+            getText: (e) => (e.precipitacionDiaMm >= 10 ? Math.round(e.precipitacionDiaMm).toString() : e.precipitacionDiaMm.toFixed(1)),
+            getSize: 11,
+            getColor: [255, 255, 255, 255],
+            fontWeight: 700,
+            getTextAnchor: 'middle',
+            getAlignmentBaseline: 'center',
+            outlineWidth: 2,
+            outlineColor: [0, 0, 0, 160],
+            updateTriggers: { getText: [estacionesAvamet] },
+          }),
+        zonasZasVisible &&
+          new GeoJsonLayer<{ nombre: string }>({
+            id: 'zonas-zas',
+            data: {
+              type: 'FeatureCollection',
+              features: zonasZas.map((z) => ({ type: 'Feature', geometry: z.geometry, properties: { nombre: z.nombre } })),
+            },
+            stroked: true,
+            filled: true,
+            getFillColor: COLOR_ZONA_ZAS,
+            getLineColor: [147, 51, 234, 200],
+            lineWidthMinPixels: 2,
+            pickable: false,
+            updateTriggers: { getFillColor: [zonasZas] },
           }),
         pulsoTramosAfectados.length > 0 &&
           new ScatterplotLayer<(typeof pulsoTramosAfectados)[number]>({
@@ -2142,7 +2457,6 @@ async function main(): Promise<void> {
     panel.valenbisiToggle,
     panel.aparcamientoToggle,
     panel.fallasToggle,
-    panel.riesgoEscorrentiaToggle,
   ];
   function actualizarContextoSelector(): void {
     const activas = togglesContexto.filter((t) => t.checked).length;
@@ -2379,6 +2693,86 @@ async function main(): Promise<void> {
     }
   });
 
+  // specs 050/051 — un solo fetch/poll de AVAMET sirve a las dos capas
+  // (temperatura y precipitación), activado por cualquiera de los dos toggles.
+  const temperaturaZonaLeyendaRoot = buildInfoPanel('temperatura-zona-leyenda', { colapsable: true });
+  temperaturaZonaLeyendaRoot.hidden = true;
+  const precipitacionZonaLeyendaRoot = buildInfoPanel('precipitacion-zona-leyenda', { colapsable: true });
+  precipitacionZonaLeyendaRoot.hidden = true;
+  let avametPollingIniciado = false;
+  async function refreshAvamet(): Promise<void> {
+    try {
+      const { estaciones, fresh } = await fetchEstacionesAvametActual();
+      estacionesAvamet = estaciones;
+      renderLayers();
+      renderTemperaturaZonaLeyenda(temperaturaZonaLeyendaRoot, estaciones, fresh);
+      renderPrecipitacionZonaLeyenda(precipitacionZonaLeyendaRoot, estaciones, fresh);
+    } catch (err) {
+      temperaturaZonaLeyendaRoot.textContent = 'Temperatura por zona no disponible';
+      precipitacionZonaLeyendaRoot.textContent = 'Precipitación no disponible';
+      console.error('Fallo al cargar estaciones AVAMET:', err);
+    }
+  }
+  function iniciarPollingAvametSiHaceFalta(): void {
+    if (!avametPollingIniciado) {
+      avametPollingIniciado = true;
+      startPolling(refreshAvamet, 15 * 60 * 1000); // igual TTL que la caché del endpoint, spec 044 §4
+    } else {
+      renderLayers();
+    }
+  }
+
+  panel.temperaturaZonaToggle.addEventListener('change', () => {
+    temperaturaZonaVisible = panel.temperaturaZonaToggle.checked;
+    temperaturaZonaLeyendaRoot.hidden = !temperaturaZonaVisible;
+    if (temperaturaZonaVisible) {
+      iniciarPollingAvametSiHaceFalta();
+    } else {
+      renderLayers();
+    }
+  });
+
+  panel.precipitacionZonaToggle.addEventListener('change', () => {
+    precipitacionZonaVisible = panel.precipitacionZonaToggle.checked;
+    precipitacionZonaLeyendaRoot.hidden = !precipitacionZonaVisible;
+    if (precipitacionZonaVisible) {
+      iniciarPollingAvametSiHaceFalta();
+    } else {
+      renderLayers();
+    }
+  });
+
+  // Spec 052 — dato estático (spec 044): un único fetch la primera vez que
+  // se activa el checkbox, sin polling — la altimetría no cambia, a
+  // diferencia de las capas de arriba.
+  const altimetriaLeyendaRoot = buildInfoPanel('altimetria-leyenda', { colapsable: true });
+  altimetriaLeyendaRoot.hidden = true;
+  async function cargarAltimetriaSiHaceFalta(): Promise<void> {
+    if (altimetriaCargada) {
+      renderLayers();
+      return;
+    }
+    altimetriaCargada = true;
+    try {
+      const { distritos } = await fetchAltimetriaActual();
+      altimetriaDistritos = distritos;
+      renderLayers();
+      renderAltimetriaLeyenda(altimetriaLeyendaRoot, distritos);
+    } catch (err) {
+      altimetriaLeyendaRoot.textContent = 'Altimetría no disponible';
+      console.error('Fallo al cargar altimetría:', err);
+    }
+  }
+  panel.altimetriaToggle.addEventListener('change', () => {
+    altimetriaVisible = panel.altimetriaToggle.checked;
+    altimetriaLeyendaRoot.hidden = !altimetriaVisible;
+    if (altimetriaVisible) {
+      void cargarAltimetriaSiHaceFalta();
+    } else {
+      renderLayers();
+    }
+  });
+
   const viaPublicaLeyendaRoot = buildInfoPanel('via-publica-leyenda', { colapsable: true });
   viaPublicaLeyendaRoot.hidden = true;
   let viaPublicaPollingIniciado = false;
@@ -2519,6 +2913,46 @@ async function main(): Promise<void> {
     }
   });
 
+  // Spec 049 — el panel de ruido de Russafa es contenido fijo de lectura
+  // (como agenda/movilidad), no una capa de mapa: sin coordenadas verificadas
+  // para sus 16 sonómetros (ver spec §7), se muestran siempre como lista en
+  // /inteligencia. El mismo fetch alimenta también `zonasZas` (los polígonos
+  // ya declarados), que sí es una capa de mapa — su checkbox propio
+  // (`zonasZasToggle`) solo decide si se pintan, sin volver a pedir el dato.
+  const zasRuidoPanelRoot = document.createElement('div');
+  zasRuidoPanelRoot.id = 'zas-ruido-panel';
+  zasRuidoPanelRoot.hidden = true;
+  document.body.appendChild(zasRuidoPanelRoot);
+  const zonasZasLeyendaRoot = buildInfoPanel('zonas-zas-leyenda', { colapsable: true });
+  zonasZasLeyendaRoot.hidden = true;
+  async function refreshPanelZas(): Promise<void> {
+    try {
+      const { zonas, sonometrosRuzafa: sonometros, fresh } = await fetchPanelZasActual();
+      zonasZas = zonas;
+      sonometrosRuzafa = sonometros;
+      renderLayers();
+      renderSonometrosRuzafaPanel(zasRuidoPanelRoot, sonometros, fresh);
+      renderZonasZasLeyenda(zonasZasLeyendaRoot, zonas, fresh);
+    } catch (err) {
+      zasRuidoPanelRoot.textContent = 'Ruido en Russafa no disponible';
+      console.error('Fallo al cargar zonas ZAS:', err);
+    }
+  }
+  let zasPollingIniciado = false;
+  panel.zasRuidoToggle.addEventListener('change', () => {
+    zasRuidoPanelRoot.hidden = !panel.zasRuidoToggle.checked;
+    if (panel.zasRuidoToggle.checked && !zasPollingIniciado) {
+      zasPollingIniciado = true;
+      startPolling(refreshPanelZas, 60 * 60 * 1000); // igual TTL que la caché del endpoint, spec 049 §4
+    }
+  });
+
+  panel.zonasZasToggle.addEventListener('change', () => {
+    zonasZasVisible = panel.zonasZasToggle.checked;
+    zonasZasLeyendaRoot.hidden = !zonasZasVisible;
+    renderLayers();
+  });
+
   montarCamarasPanel(panel.camarasToggle);
 
   // spec 040 — "Actualidad institucional" (039) se muda del sidebar a un panel
@@ -2551,7 +2985,14 @@ async function main(): Promise<void> {
   // `toggleSiempreActivo`) para que cada panel cargue sus datos/polling desde
   // el arranque — su visibilidad real la decide solo la vista actual (ver
   // `initRouter` al final de esta función), no este checkbox.
-  for (const t of [panel.mediaToggle, panel.tendenciaToggle, panel.agendaToggle, panel.movilidadToggle, panel.camarasToggle]) {
+  for (const t of [
+    panel.mediaToggle,
+    panel.tendenciaToggle,
+    panel.agendaToggle,
+    panel.movilidadToggle,
+    panel.zasRuidoToggle,
+    panel.camarasToggle,
+  ]) {
     t.dispatchEvent(new Event('change'));
   }
 
@@ -2656,6 +3097,15 @@ async function main(): Promise<void> {
     ['pulso-leyenda', panel.pulsoToggle],
     ['fallas-leyenda', panel.fallasToggle],
     ['via-publica-leyenda', panel.viaPublicaToggle],
+    // `riesgo-escorrentia-leyenda` (spec 046) se había quedado fuera de esta
+    // lista — bug real: en móvil, al salir de /mapa, la leyenda no se ocultaba
+    // (en escritorio no se notaba porque #info-panels se oculta entero). Se
+    // corrige de paso al añadir las dos capas nuevas de specs 050/051.
+    ['riesgo-escorrentia-leyenda', panel.riesgoEscorrentiaToggle],
+    ['temperatura-zona-leyenda', panel.temperaturaZonaToggle],
+    ['precipitacion-zona-leyenda', panel.precipitacionZonaToggle],
+    ['zonas-zas-leyenda', panel.zonasZasToggle],
+    ['altimetria-leyenda', panel.altimetriaToggle],
   ];
   const idsPaneleFijos = PANEL_PREFERENCES_REGISTRY.map((d) => d.key);
   const idsInteligencia = [
@@ -2665,6 +3115,7 @@ async function main(): Promise<void> {
     'camaras-dgt-panel',
     'agenda-panel',
     'movilidad-avisos-panel',
+    'zas-ruido-panel',
     'actualidad-redes-panel',
     'apoyo-decision-panel',
     'altimetria-panel',

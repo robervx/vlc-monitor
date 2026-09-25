@@ -7,7 +7,8 @@
 //     `#actualidad-redes-panel` (spec 040), `#apoyo-decision-panel` (spec 041),
 //     `#altimetria-panel`/`#meteo-zona-panel` (spec 044), `#senales-ia-panel`/
 //     `#recomendaciones-ia-panel` (spec 047, sustituye a `#sintesis-ia-panel`
-//     de spec 045) y `#protocolos-panel` (spec 042) se reparentan dentro del
+//     de spec 045), `#protocolos-panel` (spec 042), `#movilidad-avisos-panel`
+//     (spec 048) y `#zas-ruido-panel` (spec 049) se reparentan dentro del
 //     sheet para que todo quede en un único sitio con scroll —
 //     la vista activa (`:root[data-vista]`, ver `router.ts`) decide cuáles de
 //     ellos son visibles, independientemente de dónde vivan en el DOM;
@@ -40,6 +41,8 @@ const IDS_REPARENTABLES = [
   'senales-ia-panel',
   'recomendaciones-ia-panel',
   'protocolos-panel',
+  'movilidad-avisos-panel',
+  'zas-ruido-panel',
 ] as const;
 
 let sheet: HTMLElement | null = null;

@@ -138,6 +138,30 @@ const META_CAPAS: Record<string, MetaCapa> = {
     frecuencia: 'Densidad de imbornales: dato fijo (seed único). Lluvia: caché refrescada cada ~15 min',
     fuente: 'Geoportal del Ajuntament de València (ArcGIS, capa de imbornales) + Open-Meteo (lluvia por distrito, spec 044)',
   },
+  temperaturaZona: {
+    nombre: 'Temperatura por zona',
+    mide: 'Temperatura real en 15 estaciones meteorológicas dentro de Valencia ciudad — no es una interpolación de toda la superficie de la ciudad, solo esas ubicaciones',
+    frecuencia: 'Caché refrescada cada ~15 min',
+    fuente: 'AVAMET (Associació Valenciana de Meteorologia), spec 044',
+  },
+  precipitacionZona: {
+    nombre: 'Precipitación',
+    mide: 'Lluvia acumulada hoy (mm) en las mismas 15 estaciones de AVAMET — dato crudo por estación, distinto del índice de riesgo de acumulación de agua (que usa lluvia por distrito de Open-Meteo)',
+    frecuencia: 'Caché refrescada cada ~15 min',
+    fuente: 'AVAMET (Associació Valenciana de Meteorologia), spec 044',
+  },
+  zonasZas: {
+    nombre: 'Zonas Acústicamente Saturadas (ZAS)',
+    mide: 'Polígonos de las ZAS ya declaradas (Carmen, Xúquer, Woody, Juan Llorens) — Russafa, la ZAS más reciente, todavía no está publicada en esta capa del geoportal; su ruido en directo (16 sonómetros) se muestra como lista en /inteligencia, sin coordenadas verificadas para pintarlos en el mapa',
+    frecuencia: 'Polígonos: dato fijo (seed único). Sonómetros de Russafa: caché refrescada cada ~60 min (dato diario, no instantáneo)',
+    fuente: 'Geoportal del Ajuntament de València (ArcGIS) + datos abiertos VLCi (sonómetros de Russafa)',
+  },
+  altimetria: {
+    nombre: 'Altimetría',
+    mide: 'Elevación media por distrito (choropleth de los 19 distritos) — no es una rejilla continua: el dato de detalle de la rejilla original del IGN se agrega y se descarta tras calcular el resumen por distrito, ver spec 052',
+    frecuencia: 'Dato fijo (seed único) — la altimetría no cambia',
+    fuente: 'IGN (Instituto Geográfico Nacional), Modelo Digital del Terreno',
+  },
 };
 
 /** Claves de `LAYER_REGISTRY` sin entrada en `META_CAPAS` — debe ser [] siempre. */
