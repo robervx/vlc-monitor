@@ -214,5 +214,14 @@ export default defineConfig(({ mode }) => {
     server: {
       port: Number(process.env.DEV_PORT) || 3000,
     },
+    // maplibre-gl v6 localiza su worker con `new URL(..., import.meta.url)` +
+    // `new Worker(url, {type:'module'})`, relativo a su propio módulo. El dep
+    // optimizer de Vite prebundlea maplibre-gl en un único fichero bajo
+    // .vite/deps/ (esa URL relativa deja de apuntar a nada real) — el mapa
+    // nunca pinta nada. Excluirlo del optimizador hace que Vite sirva el
+    // paquete tal cual está en node_modules/, con el worker al lado donde
+    // MapLibre lo espera.
+    optimizeDeps: { exclude: ['maplibre-gl'] },
+    worker: { format: 'es' },
   };
 });
