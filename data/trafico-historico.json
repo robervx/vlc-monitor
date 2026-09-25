@@ -1,4505 +1,5 @@
 [
   {
-    "timestamp": "2026-08-24T05:38:06.949Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T06:58:02.203Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T08:01:22.601Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T09:48:00.454Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T10:37:02.357Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T11:28:32.943Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0.010344827586206896,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T12:49:59.794Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0.013333333333333332,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0.015789473684210527,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T13:51:56.564Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T14:41:55.691Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T15:38:54.304Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T16:37:16.372Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T17:31:00.446Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T18:39:23.012Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T19:29:32.833Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T20:30:05.354Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0.034482758620689655,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T21:28:54.410Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T22:26:23.668Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-24T23:21:53.128Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T01:14:42.795Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T02:58:24.682Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T03:54:16.239Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T04:38:50.803Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T05:31:18.582Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T06:47:07.443Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T07:43:11.238Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T08:41:38.036Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T09:34:56.152Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T10:32:43.928Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T11:27:32.175Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T12:46:41.682Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T13:50:31.447Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T14:44:43.925Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T15:42:03.352Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T16:37:03.945Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0.0062499999999999995,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T17:31:58.285Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.008571428571428572,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0.0062499999999999995,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0.010344827586206896,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0.04285714285714286,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T18:39:05.375Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.07428571428571427,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0.0062499999999999995,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0.010344827586206896,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0.04285714285714286,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T19:31:51.125Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.05714285714285714,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0.0062499999999999995,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T20:28:58.961Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.05714285714285714,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T21:28:00.250Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0.016666666666666666,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.1257142857142857,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T22:27:23.685Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.05714285714285714,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0.024999999999999998,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0.3,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-25T23:25:07.294Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0.05714285714285714,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-26T01:17:31.413Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-26T04:39:14.740Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-26T05:34:01.434Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-08-26T06:49:30.009Z",
-    "distritos": [
-      {
-        "codigo": "01",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "02",
-        "congestion": 0,
-        "muestras": 21
-      },
-      {
-        "codigo": "03",
-        "congestion": 0.15384615384615385,
-        "muestras": 26
-      },
-      {
-        "codigo": "04",
-        "congestion": 0,
-        "muestras": 45
-      },
-      {
-        "codigo": "05",
-        "congestion": 0,
-        "muestras": 18
-      },
-      {
-        "codigo": "06",
-        "congestion": 0,
-        "muestras": 35
-      },
-      {
-        "codigo": "07",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "08",
-        "congestion": 0.07692307692307693,
-        "muestras": 13
-      },
-      {
-        "codigo": "09",
-        "congestion": 0,
-        "muestras": 24
-      },
-      {
-        "codigo": "10",
-        "congestion": 0,
-        "muestras": 48
-      },
-      {
-        "codigo": "11",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "12",
-        "congestion": 0,
-        "muestras": 29
-      },
-      {
-        "codigo": "13",
-        "congestion": 0,
-        "muestras": 15
-      },
-      {
-        "codigo": "14",
-        "congestion": 0,
-        "muestras": 7
-      },
-      {
-        "codigo": "15",
-        "congestion": 0,
-        "muestras": 13
-      },
-      {
-        "codigo": "16",
-        "congestion": 0,
-        "muestras": 19
-      },
-      {
-        "codigo": "17",
-        "congestion": 0,
-        "muestras": 10
-      },
-      {
-        "codigo": "18",
-        "congestion": 0,
-        "muestras": 3
-      },
-      {
-        "codigo": "19",
-        "congestion": 0,
-        "muestras": 2
-      }
-    ]
-  },
-  {
     "timestamp": "2026-08-26T07:45:49.606Z",
     "distritos": [
       {
@@ -25197,6 +20697,1718 @@
         "porEstado": {
           "fluido": 1,
           "denso": 1,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-23T22:43:44.651Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.11538461538461539,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-24T01:08:37.356Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.11538461538461539,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-24T07:17:18.837Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.12692307692307692,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 22,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0.012499999999999999,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-24T13:17:12.219Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.11538461538461539,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0.006666666666666666,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 44,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-24T18:15:04.996Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.12692307692307692,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 22,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-24T22:01:12.162Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.11538461538461539,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-25T01:10:01.496Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.11538461538461539,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 45,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 7,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-25T07:11:22.475Z",
+    "distritos": [
+      {
+        "codigo": "01",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "02",
+        "congestion": 0,
+        "muestras": 23,
+        "porEstado": {
+          "fluido": 23,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "03",
+        "congestion": 0.12692307692307692,
+        "muestras": 26,
+        "porEstado": {
+          "fluido": 22,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 3
+        }
+      },
+      {
+        "codigo": "04",
+        "congestion": 0.019999999999999997,
+        "muestras": 45,
+        "porEstado": {
+          "fluido": 42,
+          "denso": 3,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "05",
+        "congestion": 0,
+        "muestras": 18,
+        "porEstado": {
+          "fluido": 18,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "06",
+        "congestion": 0,
+        "muestras": 35,
+        "porEstado": {
+          "fluido": 35,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "07",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "08",
+        "congestion": 0.07692307692307693,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 12,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 1
+        }
+      },
+      {
+        "codigo": "09",
+        "congestion": 0,
+        "muestras": 24,
+        "porEstado": {
+          "fluido": 24,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "10",
+        "congestion": 0,
+        "muestras": 48,
+        "porEstado": {
+          "fluido": 48,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "11",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "12",
+        "congestion": 0,
+        "muestras": 29,
+        "porEstado": {
+          "fluido": 29,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "13",
+        "congestion": 0,
+        "muestras": 15,
+        "porEstado": {
+          "fluido": 15,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "14",
+        "congestion": 0.04285714285714286,
+        "muestras": 7,
+        "porEstado": {
+          "fluido": 6,
+          "denso": 1,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "15",
+        "congestion": 0,
+        "muestras": 13,
+        "porEstado": {
+          "fluido": 13,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "16",
+        "congestion": 0,
+        "muestras": 19,
+        "porEstado": {
+          "fluido": 19,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "17",
+        "congestion": 0,
+        "muestras": 10,
+        "porEstado": {
+          "fluido": 10,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "18",
+        "congestion": 0,
+        "muestras": 3,
+        "porEstado": {
+          "fluido": 3,
+          "denso": 0,
+          "congestionado": 0,
+          "cortado": 0
+        }
+      },
+      {
+        "codigo": "19",
+        "congestion": 0,
+        "muestras": 2,
+        "porEstado": {
+          "fluido": 2,
+          "denso": 0,
           "congestionado": 0,
           "cortado": 0
         }
