@@ -3,6 +3,20 @@
 // interleaved) — sin globo 3D, ver CLAUDE.md §5.
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+// Causa raíz real del mapa en blanco (investigada 2026-09-25, ver memoria de
+// proyecto): maplibre-gl localiza su worker con una URL relativa calculada en
+// tiempo de ejecución a partir de `import.meta.url` de su propio módulo. Vite/
+// Rollup incrusta ese módulo dentro del bundle principal en producción (deja
+// de ser un fichero propio), así que esa URL calculada apunta a
+// `/assets/maplibre-gl-worker.mjs`, que nunca se genera — 404 real,
+// confirmado en producción. Sin worker, MapLibre no puede parsear ninguna
+// tesela vectorial: nunca dispara 'load', así que el mapa se queda vacío para
+// siempre (sin ningún error, porque nada llega a fallar de forma ruidosa).
+// La solución documentada de la propia librería para bundlers es no dejar
+// que lo adivine: importar el fichero real como asset con Vite (`?url`, lo
+// copia a dist/assets con hash y nos da la URL servible real) y pasárselo
+// explícitamente con `setWorkerUrl` antes de crear el primer `Map`.
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { GeoJsonLayer, ScatterplotLayer, IconLayer, TextLayer } from '@deck.gl/layers';
 import type { PickingInfo, Color } from '@deck.gl/core';
@@ -1520,6 +1534,7 @@ async function main(): Promise<void> {
 
   const initialState = readStateFromUrl();
 
+  maplibregl.setWorkerUrl(maplibreWorkerUrl);
   const map = new maplibregl.Map({
     container: 'map',
     style: OPENFREEMAP_STYLE,
