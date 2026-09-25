@@ -18,6 +18,7 @@
     "seed:camaras-dgt": "tsx scripts/seed-camaras-dgt.ts",
     "seed:altimetria": "tsx scripts/seed-altimetria.ts",
     "seed:imbornales": "tsx scripts/seed-imbornales-distrito.ts",
+    "seed:zonas-zas": "tsx scripts/seed-zonas-zas.ts",
     "snapshot:trafico-historico": "tsx scripts/snapshot-trafico-historico.ts",
     "snapshot:pulso-sombra": "tsx scripts/snapshot-pulso-sombra.ts",
     "verificar:reconciliacion-trafico-grafo": "tsx scripts/verificar-reconciliacion-trafico-grafo.ts",

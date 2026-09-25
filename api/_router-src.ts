@@ -39,6 +39,7 @@ import riesgoEscorrentia from '../src/server/riesgo-escorrentia';
 import sintesisIa from '../src/server/sintesis-ia';
 import sintesisIaV2 from '../src/server/sintesis-ia-v2';
 import avametEstaciones from '../src/server/avamet-estaciones';
+import zas from '../src/server/zas';
 import decisionSugerencias from '../src/server/decision-sugerencias';
 import authLogin from '../src/server/auth-login';
 import authLogout from '../src/server/auth-logout';
@@ -72,6 +73,7 @@ const RUTAS: Record<string, Handler> = {
   'sintesis/v1/actual': sintesisIa,
   'sintesis/v2/actual': sintesisIaV2,
   'emergencia/v1/avamet': avametEstaciones,
+  'emergencia/v1/zas': zas,
   'decision/v1/sugerencias': decisionSugerencias,
   'auth/v1/login': authLogin,
   'auth/v1/logout': authLogout,
